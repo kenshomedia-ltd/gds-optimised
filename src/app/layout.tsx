@@ -2,6 +2,18 @@
 import type { Metadata, Viewport } from "next";
 import { Lato, Roboto } from "next/font/google";
 import { getLayoutData } from "@/lib/strapi/data-loader";
+import { LegalServer } from "@/components/layout/Legal";
+import DynamicTheme from "@/components/layout/DynamicTheme/DynamicTheme";
+import { Header } from "@/components/layout/Header";
+
+// Font Awesome
+// import { config } from '@fortawesome/fontawesome-svg-core'
+// import '@fortawesome/fontawesome-svg-core/styles.css'
+
+// // Font Awesome Kit package
+// import '@awesome.me/kit-0e07a43543'
+// config.autoAddCss = false;
+
 import "./globals.css";
 
 // Configure Lato for headings
@@ -64,44 +76,63 @@ export default async function RootLayout({
   // Fetch layout data with caching
   const layoutData = await getLayoutData();
 
-  // Log the data received from API
-  console.log("=== LAYOUT DATA FROM API ===");
-  console.log("Layout:", JSON.stringify(layoutData.layout, null, 2));
-  console.log("Navigation:", JSON.stringify(layoutData.navigation, null, 2));
-  console.log(
-    "Translations:",
-    JSON.stringify(layoutData.translations, null, 2)
-  );
-  console.log("=== END LAYOUT DATA ===");
+  const siteId = process.env.NEXT_PUBLIC_SITE_ID || "default";
 
   return (
     <html lang="en" className={`${lato.variable} ${roboto.variable}`}>
       <head>
+        {/* 3. RENDER THE THEME COMPONENT */}
+        {/* This component imports the CSS but renders no HTML */}
+        <DynamicTheme siteId={siteId} />
+
         {/* Preconnect to critical third-party origins */}
         <link rel="preconnect" href={process.env.NEXT_PUBLIC_API_URL || ""} />
         <link rel="dns-prefetch" href={process.env.NEXT_PUBLIC_API_URL || ""} />
+
+        {/* Preload critical assets */}
+        <link
+          rel="preload"
+          href="/icons/logo-timone.svg"
+          as="image"
+          type="image/svg+xml"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          href="/icons/logo-adm.svg"
+          as="image"
+          type="image/svg+xml"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          href="/icons/plus-18.svg"
+          as="image"
+          type="image/svg+xml"
+          crossOrigin="anonymous"
+        />
       </head>
 
-      <body className="min-h-screen bg-white text-gray-900 antialiased font-body">
-        {/* Basic layout structure */}
-        <div className="flex flex-col min-h-screen">
-          {/* Temporary header placeholder */}
-          <header className="bg-gray-100 p-4 border-b">
-            <div className="container mx-auto">
-              <h1 className="text-2xl font-heading font-bold">Site Header</h1>
-              <p className="text-sm mt-1">
-                Navigation items: {layoutData.navigation.mainNavigation.length}
-              </p>
-              <p className="text-sm">Logo URL: {layoutData.layout.Logo.url}</p>
-            </div>
-          </header>
+      <body className="min-h-screen bg-body-bg text-body-text antialiased font-body">
+        {/* Legal bar at the very top */}
+        <LegalServer legalText={layoutData.layout.legalText} />
+
+        {/* Main layout structure */}
+        <div className="flex flex-col min-h-[calc(100vh-35px)]">
+          {/* Header Component */}
+          <Header
+            logo={layoutData.layout.Logo}
+            mainNavigation={layoutData.navigation.mainNavigation}
+            subNavigation={layoutData.navigation.subNavigation}
+            translations={layoutData.translations}
+          />
 
           {/* Main content */}
-          <main className="flex-1 container mx-auto py-8 px-4">{children}</main>
+          <main className="flex-1">{children}</main>
 
           {/* Temporary footer placeholder */}
-          <footer className="bg-gray-100 p-4 border-t mt-auto">
-            <div className="container mx-auto">
+          <footer className="bg-footer-bkg text-footer-text mt-auto">
+            <div className="container mx-auto p-4">
               <p className="text-sm">
                 Footer Images: {layoutData.layout.footerImages.length}
               </p>
@@ -109,7 +140,6 @@ export default async function RootLayout({
                 Translations loaded:{" "}
                 {Object.keys(layoutData.translations).length}
               </p>
-              <p className="text-xs mt-1">{layoutData.layout.legalText}</p>
             </div>
           </footer>
         </div>

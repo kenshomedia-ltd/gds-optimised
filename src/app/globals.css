@@ -190,6 +190,47 @@
   html {
     scroll-behavior: smooth;
   }
+  
+  /* Background utilities */
+  .bg-body-bg { background-color: var(--site-body-bg); }
+  .bg-navbar-bkg { background-color: var(--site-navbar-bkg); }
+  .bg-footer-bkg { background-color: var(--site-footer-bkg); }
+  .bg-legal-bkg { background-color: var(--site-legal-bkg); }
+  .bg-subnavbar-bkg { background-color: var(--site-subnavbar-bkg); }
+  .bg-nav-hover-bkg { background-color: var(--site-nav-hover-bkg); }
+  
+  /* Text color utilities */
+  .text-body-text { color: var(--site-body-text); }
+  .text-navbar-text { color: var(--site-navbar-text); }
+  .text-footer-text { color: var(--site-footer-text); }
+  .text-footer-quicklink-text { color: var(--site-footer-quicklink-text); }
+  .text-legal-text { color: var(--site-legal-text); }
+  .text-heading-text { color: var(--site-heading-text); }
+  
+  /* Single color utilities */
+  .bg-primary { background-color: var(--site-primary); }
+  .bg-secondary { background-color: var(--site-secondary); }
+  .bg-misc { background-color: var(--site-misc); }
+  .bg-success { background-color: var(--site-success); }
+  .bg-warning { background-color: var(--site-warning); }
+  .bg-danger { background-color: var(--site-danger); }
+  
+  .text-primary { color: var(--site-primary); }
+  .text-secondary { color: var(--site-secondary); }
+  .text-misc { color: var(--site-misc); }
+  .text-success { color: var(--site-success); }
+  .text-warning { color: var(--site-warning); }
+  .text-danger { color: var(--site-danger); }
+  
+  /* Border utilities */
+  .border-primary { border-color: var(--site-primary); }
+  .border-secondary { border-color: var(--site-secondary); }
+  .border-footer-bkg { border-color: var(--site-footer-bkg); }
+  
+  /* Social media colors */
+  .bg-facebook { background-color: var(--site-facebook); }
+  .bg-twitter { background-color: var(--site-twitter); }
+  .bg-linkedin { background-color: var(--site-linkedin); }
 
   /* Reduced motion preferences */
   @media (prefers-reduced-motion: reduce) {
@@ -201,6 +242,39 @@
       transition-duration: 0.01ms !important;
       scroll-behavior: auto !important;
     }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideDown {
+    from { transform: translateY(-100%); }
+    to { transform: translateY(0); }
+  }
+
+  @keyframes searchExpand {
+    from { 
+      width: 2.5rem; 
+      opacity: 0; 
+    }
+    to { 
+      width: 20rem; 
+      opacity: 1; 
+    }
+  }
+
+  .animate-fadeIn {
+    animation: fadeIn 0.2s ease-out;
+  }
+
+  .animate-slideDown {
+    animation: slideDown 0.3s ease-out;
+  }
+
+  .animate-searchExpand {
+    animation: searchExpand 0.3s ease-out forwards;
   }
 }
 
