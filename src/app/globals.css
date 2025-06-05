@@ -1,26 +1,301 @@
+/* src/app/global.css */
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Import your site-specific theme */
+@import "./themes/base-theme.css";
+
+/* Define custom utilities that Tailwind doesn't recognize */
+@theme {
+
+  /* Font families */
+  --font-family-heading: var(--font-lato), system-ui, sans-serif;
+  --font-family-body: var(--font-roboto), system-ui, sans-serif;
+  
+  /* Extend default Tailwind theme */
+  --font-family-sans: var(--font-roboto), system-ui, sans-serif;
+  
+  /* Add white and other basic colors if not in theme */
+  --color-white: var(--site-white);
+  --color-black: var(--site-black);
+  --color-transparent: var(--site-transparent);
+  --color-current: var(--site-current);
+  
+  /* Gray scale */
+  --color-gray-50: var(--site-gray-50);
+  --color-gray-100: var(--site-gray-100);
+  --color-gray-200: var(--site-gray-200);
+  --color-gray-300: var(--site-gray-300);
+  --color-gray-400: var(--site-gray-400);
+  --color-gray-500: var(--site-gray-500);
+  --color-gray-600: var(--site-gray-600);
+  --color-gray-700: var(--site-gray-700);
+  --color-gray-800: var(--site-gray-800);
+  --color-gray-900: var(--site-gray-900);
+  
+  /* GDS Site Specific Colors */
+  --color-body-bg: var(--site-body-bg);
+  --color-body-text: var(--site-body-text);
+  --color-primary: var(--site-primary);
+  --color-secondary: var(--site-secondary);
+  --color-misc: var(--site-misc);
+  --color-success: var(--site-success);
+  --color-warning: var(--site-warning);
+  --color-danger: var(--site-danger);
+  --color-facebook: var(--site-facebook);
+  --color-twitter: var(--site-twitter);
+  --color-linkedin: var(--site-linkedin);
+  
+  /* Custom gray scale */
+  --color-grey-100: var(--site-grey-100);
+  --color-grey-300: var(--site-grey-300);
+  --color-grey-500: var(--site-grey-500);
+  --color-grey-600: var(--site-grey-600);
+  --color-grey-700: var(--site-grey-700);
+  
+  /* Blue scale */
+  --color-blue-100: var(--site-blue-100);
+  --color-blue-300: var(--site-blue-300);
+  --color-blue-400: var(--site-blue-400);
+  --color-blue-450: var(--site-blue-450);
+  --color-blue-500: var(--site-blue-500);
+  --color-blue-700: var(--site-blue-700);
+  --color-blue-900: var(--site-blue-900);
+  
+  /* Purple scale */
+  --color-purple-100: var(--site-purple-100);
+  --color-purple-300: var(--site-purple-300);
+  --color-purple-500: var(--site-purple-500);
+  --color-purple-700: var(--site-purple-700);
+  --color-purple-800: var(--site-purple-800);
+  --color-purple-900: var(--site-purple-900);
+  
+  /* Background colors */
+  --color-background-1: var(--site-background-1);
+  --color-background-100: var(--site-background-100);
+  --color-background-500: var(--site-background-500);
+  --color-background-700: var(--site-background-700);
+  --color-background-900: var(--site-background-900);
+  
+  /* Accent colors */
+  --color-accent-1: var(--site-accent-1);
+  --color-accent-50: var(--site-accent-50);
+  --color-accent-100: var(--site-accent-100);
+  --color-accent-300: var(--site-accent-300);
+  --color-accent-500: var(--site-accent-500);
+  --color-accent-700: var(--site-accent-700);
+  --color-accent-800: var(--site-accent-800);
+  --color-accent-900: var(--site-accent-900);
+  
+  /* Component-specific colors */
+  --color-navbar-bkg: var(--site-navbar-bkg);
+  --color-navbar-text: var(--site-navbar-text);
+  --color-footer-bkg: var(--site-footer-bkg);
+  --color-footer-text: var(--site-footer-text);
+  --color-footer-quicklink-text: var(--site-footer-quicklink-text);
+  --color-legal-bkg: var(--site-legal-bkg);
+  --color-legal-text: var(--site-legal-text);
+  --color-heading-text: var(--site-heading-text);
+  --color-subnavbar-bkg: var(--site-subnavbar-bkg);
+  --color-nav-hover-bkg: var(--site-nav-hover-bkg);
+  
+  /* Semantic colors */
+  --color-secondary-tint: var(--site-secondary-tint);
+  --color-secondary-text: var(--site-secondary-text);
+  --color-misc-tint: var(--site-misc-tint);
+  --color-misc-text: var(--site-misc-text);
+
+  --animate-fadeIn: fadeIn 1s ease-in-out infinite;
+
+  /* Spacing and sizing */
+  --radius-base: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+/* Base styles */
+@layer base {
+  /* Font family utilities */
+  .font-heading {
+    font-family: var(--font-family-heading);
+  }
+  
+  .font-body {
+    font-family: var(--font-family-body);
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  /* Apply fonts globally */
+  html {
+    font-family: var(--font-family-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Apply Lato to all headings */
+  h1, h2, h3, h4, h5, h6,
+  .h1, .h2, .h3, .h4, .h5, .h6 {
+    font-family: var(--font-family-heading);
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  /* Heading size scale with responsive sizing */
+  h1, .h1 {
+    font-size: clamp(2rem, 5vw, 3.75rem);
+  }
+
+  h2, .h2 {
+    font-size: clamp(1.75rem, 4vw, 3rem);
+  }
+
+  h3, .h3 {
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+  }
+
+  h4, .h4 {
+    font-size: clamp(1.25rem, 2.5vw, 1.875rem);
+  }
+
+  h5, .h5 {
+    font-size: clamp(1.125rem, 2vw, 1.5rem);
+  }
+
+  h6, .h6 {
+    font-size: clamp(1rem, 1.5vw, 1.25rem);
+  }
+
+  /* Body text defaults */
+  body {
+    font-family: var(--font-family-body);
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--color-foreground);
+    background-color: var(--color-background);
+  }
+
+  p {
+    margin-bottom: 1rem;
+  }
+
+  p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Focus styles for accessibility */
+  *:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+  }
+
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Reduced motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Component styles */
+@layer components {
+  /* Container with responsive padding */
+  .container {
+    width: 100%;
+    margin-inline: auto;
+    padding-inline: 1rem;
+    max-width: 1280px;
+  }
+
+  @media (min-width: 640px) {
+    .container {
+      padding-inline: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .container {
+      padding-inline: 2rem;
+    }
+  }
+}
+
+/* Utility classes for font weights */
+@layer utilities {
+  /* Lato weights */
+  .font-heading-light {
+    font-family: var(--font-family-heading);
+    font-weight: 300;
+  }
+
+  .font-heading-normal {
+    font-family: var(--font-family-heading);
+    font-weight: 400;
+  }
+
+  .font-heading-bold {
+    font-family: var(--font-family-heading);
+    font-weight: 700;
+  }
+
+  .font-heading-black {
+    font-family: var(--font-family-heading);
+    font-weight: 900;
+  }
+
+  /* Roboto weights */
+  .font-body-light {
+    font-family: var(--font-family-body);
+    font-weight: 300;
+  }
+
+  .font-body-normal {
+    font-family: var(--font-family-body);
+    font-weight: 400;
+  }
+
+  .font-body-medium {
+    font-family: var(--font-family-body);
+    font-weight: 500;
+  }
+
+  .font-body-bold {
+    font-family: var(--font-family-body);
+    font-weight: 700;
+  }
+
+  /* Text utilities */
+  .text-muted {
+    color: var(--color-muted-foreground);
+  }
+
+  /* Border utilities */
+  .border-default {
+    border-color: var(--color-border);
+  }
+
+  /* Background utilities */
+  .bg-muted {
+    background-color: var(--color-muted);
+  }
+
+  /* Radius utilities */
+  .rounded-base {
+    border-radius: var(--radius-base);
+  }
+
+  .rounded-lg {
+    border-radius: var(--radius-lg);
+  }
+
+  .rounded-xl {
+    border-radius: var(--radius-xl);
+  }
 }

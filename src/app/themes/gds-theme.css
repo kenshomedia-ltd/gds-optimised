@@ -1,0 +1,94 @@
+/* src/styles/themes/gds-theme.css */
+@import "./base-theme.css";
+
+:root {
+  /* Essential colors that Tailwind expects */
+  --site-white: #ffffff;
+  --site-black: #000000;
+  --site-transparent: transparent;
+  --site-current: currentColor;
+  
+  /* Gray scale */
+  --site-gray-50: #f9fafb;
+  --site-gray-100: #f3f4f6;
+  --site-gray-200: #e5e7eb;
+  --site-gray-300: #d1d5db;
+  --site-gray-400: #9ca3af;
+  --site-gray-500: #6b7280;
+  --site-gray-600: #4b5563;
+  --site-gray-700: #374151;
+  --site-gray-800: #1f2937;
+  --site-gray-900: #111827;
+  
+  /* GDS Site Specific Colors */
+  --site-body-bg: #DCE9F3;
+  --site-body-text: #475059;
+  --site-primary: #01579B;
+  --site-secondary: #FF5B14;
+  --site-misc: #00BCD4;
+  --site-success: #22C55E;
+  --site-warning: #F59E0B;
+  --site-danger: #EF4444;
+  --site-facebook: #4267b2;
+  --site-twitter: #1da1f2;
+  --site-linkedin: #0a66c2;
+  
+  /* Custom gray scale */
+  --site-grey-100: #EEF4F9;
+  --site-grey-300: #CED4DA;
+  --site-grey-500: #7C838D;
+  --site-grey-600: #ADB5BD;
+  --site-grey-700: #485057;
+  
+  /* Blue scale */
+  --site-blue-100: #9FCBEE;
+  --site-blue-300: #4994CF;
+  --site-blue-400: #01467C;
+  --site-blue-450: #013D6D;
+  --site-blue-500: #2C5779;
+  --site-blue-700: #1D394F;
+  --site-blue-900: #1C2028;
+  
+  /* Purple scale */
+  --site-purple-100: #C3BDFF;
+  --site-purple-300: #7669F2;
+  --site-purple-500: #3E0497;
+  --site-purple-700: #1D166A;
+  --site-purple-800: #120028;
+  --site-purple-900: #120028;
+  
+  /* Background colors */
+  --site-background-1: #DCE9F3;
+  --site-background-100: #203E56;
+  --site-background-500: #070c3f;
+  --site-background-700: #163183;
+  --site-background-900: #101C34;
+  
+  /* Accent colors */
+  --site-accent-1: #ffd976;
+  --site-accent-50: #ffbb38;
+  --site-accent-100: #FF9035;
+  --site-accent-300: #FF5B14;
+  --site-accent-500: #3FE6FC;
+  --site-accent-700: #00BCD4;
+  --site-accent-800: #de7d45;
+  --site-accent-900: #9b4e22;
+  
+  /* Component-specific colors */
+  --site-navbar-bkg: #01579B;
+  --site-navbar-text: #ffffff;
+  --site-footer-bkg: #485057;
+  --site-footer-text: #ffffff;
+  --site-footer-quicklink-text: #ffffff;
+  --site-legal-bkg: #01467C;
+  --site-legal-text: #ffffff;
+  --site-heading-text: #01579B;
+  --site-subnavbar-bkg: #013D6D;
+  --site-nav-hover-bkg: #013D6D;
+  
+  /* Semantic colors */
+  --site-secondary-tint: #FF9035;
+  --site-secondary-text: #ffffff;
+  --site-misc-tint: #3FE6FC;
+  --site-misc-text: #ffffff;
+}
