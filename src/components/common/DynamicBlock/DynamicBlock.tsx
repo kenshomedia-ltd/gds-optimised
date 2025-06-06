@@ -8,20 +8,20 @@ import { Skeleton } from "@/components/ui/Skeleton";
 
 // Lazy load components for better performance
 const componentMap = {
-//   "homepage.home-game-list": dynamic(
-//     () => import("@/components/games/GameGrid").then((mod) => mod.GameGrid),
-//     { loading: () => <Skeleton className="h-96 w-full" /> }
-//   ),
-//   "homepage.home-casino-list": dynamic(
-//     () =>
-//       import("@/components/casino/CasinoTable").then((mod) => mod.CasinoTable),
-//     { loading: () => <Skeleton className="h-96 w-full" /> }
-//   ),
-//   "homepage.home-blog-list": dynamic(
-//     () =>
-//       import("@/components/widgets/LatestBlogs").then((mod) => mod.LatestBlogs),
-//     { loading: () => <Skeleton className="h-64 w-full" /> }
-//   ),
+  //   "homepage.home-game-list": dynamic(
+  //     () => import("@/components/games/GameGrid").then((mod) => mod.GameGrid),
+  //     { loading: () => <Skeleton className="h-96 w-full" /> }
+  //   ),
+  //   "homepage.home-casino-list": dynamic(
+  //     () =>
+  //       import("@/components/casino/CasinoTable").then((mod) => mod.CasinoTable),
+  //     { loading: () => <Skeleton className="h-96 w-full" /> }
+  //   ),
+  //   "homepage.home-blog-list": dynamic(
+  //     () =>
+  //       import("@/components/widgets/LatestBlogs").then((mod) => mod.LatestBlogs),
+  //     { loading: () => <Skeleton className="h-64 w-full" /> }
+  //   ),
   "shared.introduction-with-image": dynamic(
     () =>
       import("@/components/common/IntroWithImage").then(
@@ -29,39 +29,36 @@ const componentMap = {
       ),
     { loading: () => <Skeleton className="h-48 w-full" /> }
   ),
-//   "casinos.casino-list": dynamic(
-//     () =>
-//       import("@/components/casino/CasinoTable").then((mod) => mod.CasinoTable),
-//     { loading: () => <Skeleton className="h-96 w-full" /> }
-//   ),
-//   "homepage.home-featured-providers": dynamic(
-//     () =>
-//       import("@/components/widgets/FeaturedProviders").then(
-//         (mod) => mod.FeaturedProviders
-//       ),
-//     { loading: () => <Skeleton className="h-64 w-full" /> }
-//   ),
-//   "shared.overview-block": dynamic(
-//     () =>
-//       import("@/components/widgets/OverviewBlock").then(
-//         (mod) => mod.OverviewBlock
-//       ),
-//     { loading: () => <Skeleton className="h-48 w-full" /> }
-//   ),
-//   "shared.single-content": dynamic(
-//     () =>
-//       import("@/components/common/SingleContent").then(
-//         (mod) => mod.SingleContent
-//       ),
-//     { loading: () => <Skeleton className="h-32 w-full" /> }
-//   ),
-//   "homepage.home-testimonies": dynamic(
-//     () =>
-//       import("@/components/widgets/Testimonials").then(
-//         (mod) => mod.Testimonials
-//       ),
-//     { loading: () => <Skeleton className="h-64 w-full" /> }
-//   ),
+  //   "casinos.casino-list": dynamic(
+  //     () =>
+  //       import("@/components/casino/CasinoTable").then((mod) => mod.CasinoTable),
+  //     { loading: () => <Skeleton className="h-96 w-full" /> }
+  //   ),
+  //   "homepage.home-featured-providers": dynamic(
+  //     () =>
+  //       import("@/components/widgets/FeaturedProviders").then(
+  //         (mod) => mod.FeaturedProviders
+  //       ),
+  //     { loading: () => <Skeleton className="h-64 w-full" /> }
+  //   ),
+  "shared.overview-block": dynamic(
+    () => import("@/components/widgets/Overview").then((mod) => mod.Overview),
+    { loading: () => <Skeleton className="h-48 w-full" /> }
+  ),
+  //   "shared.single-content": dynamic(
+  //     () =>
+  //       import("@/components/common/SingleContent").then(
+  //         (mod) => mod.SingleContent
+  //       ),
+  //     { loading: () => <Skeleton className="h-32 w-full" /> }
+  //   ),
+  //   "homepage.home-testimonies": dynamic(
+  //     () =>
+  //       import("@/components/widgets/Testimonials").then(
+  //         (mod) => mod.Testimonials
+  //       ),
+  //     { loading: () => <Skeleton className="h-64 w-full" /> }
+  //   ),
 };
 
 /**
@@ -139,10 +136,10 @@ export function DynamicBlock({
     //       translations: additionalData?.translations,
     //     };
 
-    //   case "shared.overview-block":
-    //     return {
-    //       data: blockData,
-    //     };
+      case "shared.overview-block":
+        return {
+          data: blockData,
+        };
 
     //   case "shared.single-content":
     //     return {
