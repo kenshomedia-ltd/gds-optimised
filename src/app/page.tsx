@@ -71,11 +71,6 @@ export default async function HomePage() {
   // Log performance in development
   if (process.env.NODE_ENV === "development") {
     console.log(`Homepage data fetching took: ${Date.now() - startTime}ms`);
-    console.log(
-      "Homepage blocks:",
-      blocks.map((b) => b.__component)
-    );
-    console.log("additionalData", additionalData);
   }
 
   // Schema.org structured data

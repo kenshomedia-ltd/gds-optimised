@@ -2,6 +2,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Enable standalone output for Docker deployment
+  output: "standalone",
   // Image optimization configuration
   images: {
     // Allow images from AWS CloudFront
@@ -13,6 +15,12 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "giochigatsby.s3.amazonaws.com",
+      },
+      {
+        protocol: 'https',
+        hostname: 'giochigatsby.s3.eu-west-1.amazonaws.com',
+        port: '',
+        pathname: '/**',
       },
       // Add your Strapi domain if needed
       {
@@ -44,9 +52,6 @@ const nextConfig: NextConfig = {
 
   // Strict mode for better development
   reactStrictMode: true,
-
-  // SWC minification
-  swcMinify: true,
 
   // PoweredBy header removal for security
   poweredByHeader: false,

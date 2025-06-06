@@ -26,8 +26,6 @@ export function CasinoTable({
   translations = {},
   className,
 }: CasinoTableProps) {
-
-  console.log('casinos', casinos)
   return (
     <div
       className={cn(

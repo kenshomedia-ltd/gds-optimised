@@ -95,6 +95,7 @@ export function GameCard({
             loading={loading}
             priority={priority}
             quality={75}
+            progressive={true}
             className="object-cover transition-transform duration-300 group-hover:scale-105"
             onError={() => setImageError(true)}
           />

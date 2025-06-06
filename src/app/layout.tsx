@@ -19,22 +19,24 @@ import { Toaster } from "sonner";
 
 import "./globals.css";
 
-// Configure Lato for headings
+// Configure Lato for headings with font metrics for reduced CLS
 const lato = Lato({
   weight: ["300", "400", "700", "900"],
   subsets: ["latin"],
   display: "swap",
   variable: "--font-lato",
   preload: true,
+  adjustFontFallback: true, // This line reduces CLS
 });
 
-// Configure Roboto for body text
+// Configure Roboto for body text with font metrics for reduced CLS
 const roboto = Roboto({
   weight: ["300", "400", "500", "700"],
   subsets: ["latin"],
   display: "swap",
   variable: "--font-roboto",
   preload: true,
+  adjustFontFallback: true, // This line reduces CLS
 });
 
 // Viewport configuration for mobile optimization

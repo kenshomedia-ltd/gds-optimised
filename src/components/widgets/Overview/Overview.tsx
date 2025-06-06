@@ -138,7 +138,6 @@ function OverviewCard({
  * - Proper semantic HTML structure
  */
 export function Overview({ data, className }: OverviewBlockProps) {
-  console.log("data", data);
   // Memoize the overview items to prevent unnecessary re-renders
   const overviewItems = useMemo(() => data?.overviews || [], [data?.overviews]);
 

@@ -104,6 +104,7 @@ export function BlogCard({
               loading={priority ? "eager" : "lazy"}
               priority={priority}
               quality={80}
+              progressive={true}
               className={cn(
                 "object-cover opacity-90",
                 "transition-all duration-300",

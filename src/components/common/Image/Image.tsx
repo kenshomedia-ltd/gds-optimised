@@ -1,7 +1,7 @@
 // src/components/common/Image/Image.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import NextImage from "next/image";
 import { SvgImage } from "./SvgImage";
 import type { ImageProps } from "@/types/image.types";
@@ -12,9 +12,10 @@ import {
   generateBlurDataURL,
   imageLoader,
 } from "@/lib/utils/image";
+import { cn } from "@/lib/utils/cn";
 
 /**
- * Optimized Image component with AWS Image Handler support
+ * Enhanced Image component with optional progressive loading
  *
  * Features:
  * - Automatic WebP conversion
@@ -22,7 +23,8 @@ import {
  * - Blur placeholder support
  * - AWS Image Handler integration
  * - SVG pass-through
- * - Lazy loading by default
+ * - Progressive loading with LQIP (opt-in)
+ * - Intersection Observer for truly lazy loading
  * - CWV optimizations
  */
 export function Image({
@@ -44,13 +46,34 @@ export function Image({
   unoptimized,
   embedSvg = false,
   svgProps,
+  // New progressive loading props
+  progressive = false,
+  lowQualityUrl,
+  threshold = 0.1,
+  rootMargin = "50px",
 }: ImageProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState(false);
   const [blurUrl, setBlurUrl] = useState<string | undefined>(blurDataURL);
+  const [isInView, setIsInView] = useState(priority || !progressive);
+  const [currentSrc, setCurrentSrc] = useState(src);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const isSvg = isSvgUrl(src);
   const isExternal = isExternalUrl(src);
+
+  // Generate low quality URL if progressive and not provided
+  useEffect(() => {
+    if (progressive && !lowQualityUrl && !isSvg) {
+      const lqUrl = buildImageUrl(src, {
+        width: 40,
+        height: height && width ? Math.round((40 / width) * height) : undefined,
+        quality: 10,
+        format: "webp",
+      });
+      setCurrentSrc(lqUrl);
+    }
+  }, [progressive, lowQualityUrl, src, width, height, isSvg]);
 
   // Generate blur data URL if needed
   useEffect(() => {
@@ -60,9 +83,54 @@ export function Image({
     }
   }, [src, width, height, placeholder, blurUrl, isSvg]);
 
+  // Intersection Observer for progressive loading
+  useEffect(() => {
+    if (!progressive || priority || !containerRef.current) {
+      setIsInView(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsInView(true);
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        threshold,
+        rootMargin,
+      }
+    );
+
+    observer.observe(containerRef.current);
+
+    return () => {
+      if (containerRef.current) {
+        observer.unobserve(containerRef.current);
+      }
+    };
+  }, [progressive, priority, threshold, rootMargin]);
+
+  // Load high quality image when in view (for progressive loading)
+  useEffect(() => {
+    if (progressive && isInView && currentSrc !== src) {
+      const img = new window.Image();
+      img.src = src;
+      img.onload = () => {
+        setCurrentSrc(src);
+        setIsLoaded(true);
+      };
+    }
+  }, [progressive, isInView, currentSrc, src]);
+
   // Handle image load
   const handleLoad = () => {
-    setIsLoaded(true);
+    if (!progressive || currentSrc === src) {
+      setIsLoaded(true);
+    }
     onLoad?.();
   };
 
@@ -96,54 +164,93 @@ export function Image({
   // Build optimized URL for non-Next.js optimized images
   const optimizedSrc =
     isExternal && !unoptimized
-      ? buildImageUrl(src, { width, height, quality, format: "webp" })
-      : src;
+      ? buildImageUrl(currentSrc, { width, height, quality, format: "webp" })
+      : currentSrc;
+
+  const containerClasses = cn(
+    "relative inline-block",
+    fill ? "w-full h-full" : "",
+    className
+  );
+
+  const imageClasses = cn(
+    "transition-all duration-300",
+    progressive && !isLoaded ? "blur-lg scale-110" : "blur-0 scale-100",
+    error ? "opacity-50" : "",
+    !isLoaded && placeholder === "blur" && !progressive ? "blur-sm" : ""
+  );
 
   return (
     <div
-      className={`relative inline-block ${fill ? "w-full h-full" : ""}`}
+      ref={containerRef}
+      className={containerClasses}
       style={
         !fill && width && height
           ? { width, height, maxWidth: "100%" }
           : undefined
       }
     >
-      <NextImage
-        src={optimizedSrc}
-        alt={alt}
-        width={fill ? undefined : width}
-        height={fill ? undefined : height}
-        fill={fill}
-        sizes={imageSizes}
-        quality={quality}
-        priority={priority}
-        loading={priority ? undefined : loading}
-        placeholder={
-          placeholder === "blur" && blurUrl
-            ? "blur"
-            : placeholder === "empty"
-            ? "empty"
-            : undefined
-        }
-        blurDataURL={blurUrl}
-        loader={isExternal ? imageLoader : undefined}
-        unoptimized={unoptimized || isSvg}
-        className={`
-          ${className || ""}
-          ${!isLoaded && placeholder === "blur" ? "blur-sm" : ""}
-          ${error ? "opacity-50" : ""}
-          transition-all duration-300
-        `.trim()}
-        style={{
-          ...style,
-          objectFit: style?.objectFit || "cover",
-        }}
-        onLoad={handleLoad}
-        onError={handleError}
-      />
+      {!progressive || isInView ? (
+        <>
+          <NextImage
+            src={optimizedSrc}
+            alt={alt}
+            width={fill ? undefined : width}
+            height={fill ? undefined : height}
+            fill={fill}
+            sizes={imageSizes}
+            quality={quality}
+            priority={priority}
+            loading={priority ? undefined : loading}
+            placeholder={
+              placeholder === "blur" && blurUrl && !progressive
+                ? "blur"
+                : placeholder === "empty"
+                ? "empty"
+                : undefined
+            }
+            blurDataURL={blurUrl}
+            loader={isExternal ? imageLoader : undefined}
+            unoptimized={unoptimized || isSvg}
+            className={imageClasses}
+            style={{
+              ...style,
+              objectFit: style?.objectFit || "cover",
+            }}
+            onLoad={handleLoad}
+            onError={handleError}
+          />
 
-      {/* Loading skeleton */}
-      {!isLoaded && placeholder !== "blur" && (
+          {/* High quality image overlay for progressive loading */}
+          {progressive && isLoaded && currentSrc !== src && (
+            <NextImage
+              src={src}
+              alt={alt}
+              width={fill ? undefined : width}
+              height={fill ? undefined : height}
+              fill={fill}
+              sizes={imageSizes}
+              quality={quality}
+              priority
+              className="absolute inset-0 z-10"
+              style={{
+                ...style,
+                objectFit: style?.objectFit || "cover",
+              }}
+              onLoad={() => setCurrentSrc(src)}
+            />
+          )}
+        </>
+      ) : (
+        // Placeholder while not in view
+        <div
+          className="absolute inset-0 bg-gray-200 animate-pulse rounded"
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Loading skeleton for non-progressive images */}
+      {!progressive && !isLoaded && placeholder !== "blur" && (
         <div
           className="absolute inset-0 bg-gray-200 animate-pulse rounded"
           aria-hidden="true"

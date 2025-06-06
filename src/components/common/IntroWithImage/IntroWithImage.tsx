@@ -150,6 +150,7 @@ export function IntroWithImage({
                 height={200}
                 className="w-full h-auto rounded-lg shadow-xl"
                 priority={isHomePage}
+                progressive={true}
                 quality={90}
                 sizes="(max-width: 1024px) 100vw, 515px"
                 placeholder="blur"

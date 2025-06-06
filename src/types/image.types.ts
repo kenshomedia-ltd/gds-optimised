@@ -1,5 +1,6 @@
 // src/types/image.types.ts
 
+
 /**
  * Base image properties
  */
@@ -23,6 +24,11 @@ export interface ImageProps {
   // SVG specific options
   embedSvg?: boolean;
   svgProps?: React.SVGProps<SVGSVGElement>;
+  // Progressive loading options
+  progressive?: boolean;
+  lowQualityUrl?: string;
+  threshold?: number;
+  rootMargin?: string;
 }
 
 /**
