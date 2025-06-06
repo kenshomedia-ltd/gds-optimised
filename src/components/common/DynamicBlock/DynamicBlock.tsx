@@ -53,13 +53,13 @@ const componentMap = {
     () => import("@/components/widgets/Overview").then((mod) => mod.Overview),
     { loading: () => <Skeleton className="h-48 w-full" /> }
   ),
-  //   "shared.single-content": dynamic(
-  //     () =>
-  //       import("@/components/common/SingleContent").then(
-  //         (mod) => mod.SingleContent
-  //       ),
-  //     { loading: () => <Skeleton className="h-32 w-full" /> }
-  //   ),
+    "shared.single-content": dynamic(
+      () =>
+        import("@/components/common/SingleContent").then(
+          (mod) => mod.SingleContent
+        ),
+      { loading: () => <Skeleton className="h-32 w-full" /> }
+    ),
   //   "homepage.home-testimonies": dynamic(
   //     () =>
   //       import("@/components/widgets/Testimonials").then(
@@ -149,10 +149,10 @@ export function DynamicBlock({
           data: blockData,
         };
 
-      //   case "shared.single-content":
-      //     return {
-      //       block: blockData,
-      //     };
+        case "shared.single-content":
+          return {
+            block: blockData,
+          };
 
       //   case "homepage.home-testimonies":
       //     return {

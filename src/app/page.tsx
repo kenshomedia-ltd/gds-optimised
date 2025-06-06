@@ -132,7 +132,7 @@ export default async function HomePage() {
           {mainBlocks.map((block, index) => (
             <section
               key={`main-${block.__component}-${index}`}
-              className="animate-fadeIn opacity-0"
+              className="opacity-0 animate-[fadeIn_0.6s_ease-out_100ms_forwards]"
               style={{
                 animationDelay: `${index * 100}ms`,
                 animationFillMode: "forwards",

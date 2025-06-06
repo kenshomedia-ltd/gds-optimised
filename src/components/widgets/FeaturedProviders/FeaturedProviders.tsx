@@ -26,10 +26,7 @@ export function FeaturedProviders({
 }: FeaturedProvidersProps) {
   // Extract and deduplicate providers
   const providers = useMemo(() => {
-    // Handle the nested structure from the API
     const homeFeaturedProviders = data?.homeFeaturedProviders;
-
-    // The API shows it's not an array but a single object with providers array
     const providersData = homeFeaturedProviders?.providers || [];
 
     const seen = new Set<string>();
@@ -42,7 +39,6 @@ export function FeaturedProviders({
     });
   }, [data?.homeFeaturedProviders]);
 
-  // Get provider base URL
   const providerBaseUrl =
     process.env.NEXT_PUBLIC_PROVIDER_PAGE_PATH || "/providers";
 
@@ -64,8 +60,7 @@ export function FeaturedProviders({
         <h2
           className={cn(
             "text-white text-2xl font-bold mt-10",
-            "animate-fadeIn opacity-0",
-            "[animation-delay:100ms] [animation-fill-mode:forwards]"
+            "opacity-0 animate-[fadeIn_0.6s_ease-out_100ms_forwards]"
           )}
         >
           {data.title}
@@ -99,8 +94,7 @@ export function FeaturedProviders({
           "border border-white/20",
           "text-white rounded-full",
           "hover:bg-white/20 transition-all duration-300",
-          "animate-fadeIn opacity-0",
-          "[animation-delay:400ms] [animation-fill-mode:forwards]",
+          "opacity-0 animate-[fadeIn_0.6s_ease-out_400ms_forwards]",
           "focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
         )}
       >
@@ -142,17 +136,18 @@ function ProviderCard({ provider, providerBaseUrl, index }: ProviderCardProps) {
   const providerSlug = provider.slug;
   const providerTitle = provider.title || "Provider";
 
+  // Calculate animation delay based on index
+  const animationDelay = index < 10 ? 100 : 200;
+
   return (
     <Link
       href={`${providerBaseUrl}/${providerSlug}/`}
-      className={cn(
-        "group relative block",
-        "animate-fadeIn opacity-0",
-        index < 10 ? "[animation-delay:100ms]" : "[animation-delay:200ms]",
-        "[animation-fill-mode:forwards]"
-      )}
+      className={cn("group relative block", "opacity-0")}
       data-provider={providerSlug}
       aria-label={`View ${providerTitle} games`}
+      style={{
+        animation: `fadeIn 0.6s ease-out ${animationDelay}ms forwards`,
+      }}
     >
       <div
         className={cn(
@@ -188,9 +183,15 @@ function ProviderCard({ provider, providerBaseUrl, index }: ProviderCardProps) {
               priority={index < 10}
               loading={index < 10 ? "eager" : "lazy"}
               className="max-w-full max-h-[32px] w-auto h-auto object-contain"
-              unoptimized={false}
               quality={85}
               sizes="(max-width: 640px) 40px, 80px"
+              style={{
+                width: "auto",
+                height: "auto",
+                maxWidth: "100%",
+                maxHeight: "32px",
+              }}
+              unoptimized={imageUrl.endsWith(".svg")}
             />
           ) : (
             <span className="text-gray-400 text-xs text-center px-1 truncate">

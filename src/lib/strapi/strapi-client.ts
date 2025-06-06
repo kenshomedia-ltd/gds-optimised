@@ -135,8 +135,10 @@ class StrapiClient {
       queryString ? `?${queryString}` : ""
     }`;
 
-    console.log("Fetching URL:", url);
-    
+    if (process.env.NODE_ENV === "development") {
+      console.log("Fetching URL:", url);
+    }
+
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 10000); // 10s timeout
 
@@ -157,16 +159,54 @@ class StrapiClient {
 
       clearTimeout(timeout);
 
+      // Check content type before parsing
+      const contentType = response.headers.get("content-type");
+
       if (!response.ok) {
-        const errorText = await response.text();
+        let errorMessage = `API call failed: ${response.status} ${response.statusText}`;
+
+        // Try to get error details
+        if (contentType?.includes("application/json")) {
+          try {
+            const errorData = await response.json();
+            errorMessage += ` - ${
+              errorData.error?.message || JSON.stringify(errorData)
+            }`;
+          } catch {
+            const errorText = await response.text();
+            errorMessage += ` - ${errorText}`;
+          }
+        } else {
+          const errorText = await response.text();
+          errorMessage += ` - ${errorText.substring(0, 200)}...`; // Limit error text
+        }
+
+        throw new Error(errorMessage);
+      }
+
+      // Ensure we're getting JSON
+      if (!contentType?.includes("application/json")) {
+        const text = await response.text();
         throw new Error(
-          `API call failed: ${response.status} ${response.statusText} - ${errorText}`
+          `Expected JSON response but got ${contentType}. Response: ${text.substring(
+            0,
+            200
+          )}...`
         );
       }
 
       return response.json();
     } catch (error: any) {
       clearTimeout(timeout);
+
+      // Don't retry JSON parse errors
+      if (
+        error.message.includes("JSON") ||
+        error.message.includes("Expected JSON")
+      ) {
+        console.error(`Invalid response format from ${endpoint}:`, error);
+        throw error;
+      }
 
       // Retry logic for network errors
       if (
