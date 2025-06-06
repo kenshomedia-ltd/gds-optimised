@@ -135,6 +135,8 @@ class StrapiClient {
       queryString ? `?${queryString}` : ""
     }`;
 
+    console.log("Fetching URL:", url);
+    
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 10000); // 10s timeout
 

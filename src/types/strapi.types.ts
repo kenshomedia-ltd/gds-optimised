@@ -299,17 +299,50 @@ export interface CasinoData {
 /**
  * Blog/Article data structure
  */
+
+/**
+ * Blog category
+ */
+export interface BlogCategory {
+  id: number;
+  documentId?: string;
+  blogCategory: string;
+  slug: string;
+}
+
+/**
+ * Blog author
+ */
+export interface BlogAuthor {
+  id: number;
+  documentId?: string;
+  firstName: string;
+  lastName: string;
+  slug?: string;
+  photo?: StrapiImage;
+}
+
+/**
+ * Blog/Article data structure
+ */
 export interface BlogData {
   id: number;
   documentId?: string;
   title: string;
   slug: string;
+  blogBrief?: string;
   excerpt?: string;
-  content: string;
+  content?: string;
+  content1?: string;
   publishedAt: string;
+  createdAt: string;
+  updatedAt: string;
+  minutesRead?: number;
   readingTime?: number;
-  featuredImage: StrapiImage;
-  author: GameAuthor;
+  images?: StrapiImage[];
+  featuredImage?: StrapiImage;
+  author?: BlogAuthor;
+  blogCategory?: BlogCategory;
   categories?: GameCategory[];
   tags?: string[];
   seo?: SEOData;

@@ -5,6 +5,7 @@ import { getLayoutData } from "@/lib/strapi/data-loader";
 import { LegalServer } from "@/components/layout/Legal";
 import DynamicTheme from "@/components/layout/DynamicTheme/DynamicTheme";
 import { Header } from "@/components/layout/Header";
+import { Footer, FooterServer } from "@/components/layout/Footer";
 
 // Font Awesome
 // import { config } from '@fortawesome/fontawesome-svg-core'
@@ -130,18 +131,13 @@ export default async function RootLayout({
           {/* Main content */}
           <main className="flex-1">{children}</main>
 
-          {/* Temporary footer placeholder */}
-          <footer className="bg-footer-bkg text-footer-text mt-auto">
-            <div className="container mx-auto p-4">
-              <p className="text-sm">
-                Footer Images: {layoutData.layout.footerImages.length}
-              </p>
-              <p className="text-xs mt-1">
-                Translations loaded:{" "}
-                {Object.keys(layoutData.translations).length}
-              </p>
-            </div>
-          </footer>
+          <FooterServer
+            footerContent={layoutData.layout.footerContent}
+            footerImages={layoutData.layout.footerImages}
+            footerNavigation={layoutData.navigation.footerNavigation}
+            footerNavigations={layoutData.navigation.footerNavigations}
+            translations={layoutData.translations}
+          />
         </div>
       </body>
     </html>

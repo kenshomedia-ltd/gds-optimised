@@ -75,7 +75,7 @@ export function Header({
       {/* Main Header */}
       <header
         className={`
-          sticky top-0 z-50 w-full bg-navbar-bkg
+          top-0 z-50 w-full bg-navbar-bkg
           transition-shadow duration-300
           ${isScrolled ? "shadow-lg" : ""}
         `}

@@ -372,4 +372,47 @@
   .rounded-xl {
     border-radius: var(--radius-xl);
   }
+
+    /* Border utilities */
+  .border-default {
+    border-color: var(--color-border);
+  }
+
+  /* Background utilities */
+  .bg-muted {
+    background-color: var(--color-muted);
+  }
+
+  /* Radius utilities */
+  .rounded-base {
+    border-radius: var(--radius-base);
+  }
+
+  .rounded-lg {
+    border-radius: var(--radius-lg);
+  }
+
+  .rounded-xl {
+    border-radius: var(--radius-xl);
+  }
+
+  /* Footer content specific styles */
+  .about-site {
+    h4 {
+      color: white;
+      margin-bottom: 0.5rem;
+    }
+    
+    p {
+      margin-bottom: 1rem;
+    }
+    
+    p:last-child {
+      margin-bottom: 0;
+    }
+    
+    a {
+      text-decoration: underline;
+    }
+  }
 }
