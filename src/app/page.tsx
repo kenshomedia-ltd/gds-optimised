@@ -1,62 +1,152 @@
 // src/app/page.tsx
 import { getHomepageData } from "@/lib/strapi/homepage-data-loader";
 import { getLayoutData } from "@/lib/strapi/data-loader";
+import { DynamicBlock } from "@/components/common/DynamicBlock";
+import { generateMetadata as generateSEOMetadata } from "@/lib/utils/seo";
+import type { Metadata } from "next";
 
 // Force dynamic rendering for ISR with on-demand revalidation
 export const dynamic = "force-static";
 export const revalidate = 300; // 5 minutes
 
-/**
- * Homepage component with data logging
- */
+// Generate metadata for the page
+export async function generateMetadata(): Promise<Metadata> {
+  const [layoutData, homepageData] = await Promise.all([
+    getLayoutData({ cached: true }),
+    getHomepageData({ cached: true }),
+  ]);
+
+  const { translations } = layoutData;
+  const { homepage } = homepageData;
+
+  return generateSEOMetadata({
+    title: homepage.seo?.metaTitle || translations?.homePageTitle || "Home",
+    description:
+      homepage.seo?.metaDescription || translations?.homePageDescription || "",
+    keywords: homepage.seo?.keywords,
+    canonicalUrl: process.env.NEXT_PUBLIC_SITE_URL,
+    image: homepage.seo?.metaImage?.url,
+  });
+}
+
+// Hero block types configuration
+const HERO_BLOCK_TYPES = [
+  "shared.introduction-with-image",
+  "homepage.home-game-list",
+  "homepage.home-featured-providers",
+  "shared.overview-block",
+];
+
 export default async function HomePage() {
+  // Performance timing
+  const startTime = Date.now();
+
   // Parallel data fetching
   const [layoutData, homepageData] = await Promise.all([
     getLayoutData({ cached: true }),
     getHomepageData({ cached: true }),
   ]);
 
-  // Console log all the data
-  console.log("=== LAYOUT DATA ===");
-  console.log(JSON.stringify(layoutData, null, 2));
+  const { homepage, games, blogs, casinos } = homepageData;
+  const { translations } = layoutData;
 
-  console.log("\n=== HOMEPAGE DATA ===");
-  console.log("Homepage Title:", homepageData.homepage.title);
-  console.log("Homepage Blocks Count:", homepageData.homepage.blocks.length);
-  console.log(
-    "Homepage Blocks Types:",
-    homepageData.homepage.blocks.map((b) => b.__component)
+  // Additional data for blocks
+  const additionalData = {
+    games,
+    blogs,
+    casinos,
+    translations,
+  };
+
+  // Separate blocks by section
+  const blocks = homepage?.blocks || [];
+  const heroBlocks = blocks.filter(
+    (block, index) => index < 4 && HERO_BLOCK_TYPES.includes(block.__component)
+  );
+  const mainBlocks = blocks.filter(
+    (block, index) =>
+      !(index < 4 && HERO_BLOCK_TYPES.includes(block.__component))
   );
 
-  console.log("\n=== GAMES DATA ===");
-  console.log("Total Games:", homepageData.games.length);
-  console.log(
-    "Game Titles:",
-    homepageData.games.map((g) => g.title)
-  );
+  // Log performance in development
+  if (process.env.NODE_ENV === "development") {
+    console.log(`Homepage data fetching took: ${Date.now() - startTime}ms`);
+    console.log(
+      "Homepage blocks:",
+      blocks.map((b) => b.__component)
+    );
+  }
 
-  console.log("\n=== BLOGS DATA ===");
-  console.log("Total Blogs:", homepageData.blogs.length);
-  console.log(
-    "Blog Titles:",
-    homepageData.blogs.map((b) => b.title)
-  );
-
-  console.log("\n=== CASINOS DATA ===");
-  console.log("Total Casinos:", homepageData.casinos?.length || 0);
-  console.log(
-    "Casino Titles:",
-    homepageData.casinos?.map((c) => c.title) || []
-  );
+  // Schema.org structured data
+  const homepageSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: process.env.NEXT_PUBLIC_SITE_NAME,
+    url: process.env.NEXT_PUBLIC_SITE_URL,
+    description:
+      homepage.seo?.metaDescription || translations?.homePageDescription || "",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: `${process.env.NEXT_PUBLIC_SITE_URL}/search?q={search_term_string}`,
+      },
+      "query-input": "required name=search_term_string",
+    },
+  };
 
   return (
-    <main className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold text-heading-text mb-4">
-        Homepage Data Loaded Successfully
-      </h1>
-      <p className="text-lg text-body-text">
-        Check the console for all the loaded data.
-      </p>
-    </main>
+    <>
+      {/* Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(homepageSchema) }}
+      />
+
+      {/* Hero Section with Featured Blocks */}
+      {heroBlocks.length > 0 && (
+        <section className="relative overflow-hidden bg-gradient-to-b from-background-900 from-30% via-background-700 via-80% to-background-500 pb-12 rounded-b-3xl">
+          <div className="container relative mx-auto px-4 pb-16 z-10">
+            {heroBlocks.map((block, index) => (
+              <div key={`hero-${block.__component}-${index}`} className="mb-8">
+                <DynamicBlock
+                  blockType={block.__component}
+                  blockData={block}
+                  additionalData={additionalData}
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* Starry Sky Background Effect */}
+          <div className="absolute top-0 left-0 w-full pointer-events-none">
+            <div className="h-[80vh] bg-[#0e1a2f]" />
+            <div className="h-[300px] bg-[#0e1a2f] rounded-b-[50%_300px]" />
+          </div>
+        </section>
+      )}
+
+      {/* Main Content Section */}
+      <main className="container mx-auto px-4 py-8">
+        <div className="space-y-12">
+          {mainBlocks.map((block, index) => (
+            <section
+              key={`main-${block.__component}-${index}`}
+              className="animate-fadeIn opacity-0"
+              style={{
+                animationDelay: `${index * 100}ms`,
+                animationFillMode: "forwards",
+              }}
+            >
+              <DynamicBlock
+                blockType={block.__component}
+                blockData={block}
+                additionalData={additionalData}
+              />
+            </section>
+          ))}
+        </div>
+      </main>
+    </>
   );
 }
