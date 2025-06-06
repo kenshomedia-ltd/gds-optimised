@@ -32,11 +32,11 @@ const componentMap = {
       ),
     { loading: () => <Skeleton className="h-48 w-full" /> }
   ),
-  //   "casinos.casino-list": dynamic(
-  //     () =>
-  //       import("@/components/casino/CasinoTable").then((mod) => mod.CasinoTable),
-  //     { loading: () => <Skeleton className="h-96 w-full" /> }
-  //   ),
+  "homepage.home-casino-list": dynamic(
+    () =>
+      import("@/components/widgets/CasinoList").then((mod) => mod.CasinoList),
+    { loading: () => <Skeleton className="h-96 w-full" /> }
+  ),
   "homepage.home-featured-providers": dynamic(
     () =>
       import("@/components/widgets/FeaturedProviders").then(
@@ -53,20 +53,25 @@ const componentMap = {
     () => import("@/components/widgets/Overview").then((mod) => mod.Overview),
     { loading: () => <Skeleton className="h-48 w-full" /> }
   ),
-    "shared.single-content": dynamic(
-      () =>
-        import("@/components/common/SingleContent").then(
-          (mod) => mod.SingleContent
-        ),
-      { loading: () => <Skeleton className="h-32 w-full" /> }
-    ),
-  //   "homepage.home-testimonies": dynamic(
-  //     () =>
-  //       import("@/components/widgets/Testimonials").then(
-  //         (mod) => mod.Testimonials
-  //       ),
-  //     { loading: () => <Skeleton className="h-64 w-full" /> }
-  //   ),
+  "shared.single-content": dynamic(
+    () =>
+      import("@/components/common/SingleContent").then(
+        (mod) => mod.SingleContent
+      ),
+    { loading: () => <Skeleton className="h-32 w-full" /> }
+  ),
+  "homepage.home-testimonies": dynamic(
+    () =>
+      import("@/components/widgets/Testimonials").then(
+        (mod) => mod.Testimonials
+      ),
+    {
+      loading: () =>
+        import("@/components/widgets/Testimonials").then((mod) => (
+          <mod.TestimonialsSkeleton />
+        )),
+    }
+  ),
 };
 
 /**
@@ -113,12 +118,12 @@ export function DynamicBlock({
       //       translations: additionalData?.translations,
       //     };
 
-      //   case "homepage.home-casino-list":
-      //     return {
-      //       ...blockData,
-      //       casinos: additionalData?.casinos || [],
-      //       translations: additionalData?.translations,
-      //     };
+        case "homepage.home-casino-list":
+          return {
+            block: blockData,
+            casinos: additionalData?.casinos || [],
+            translations: additionalData?.translations,
+          };
 
       //   case "casinos.casino-list":
       //     return {
@@ -154,10 +159,10 @@ export function DynamicBlock({
             block: blockData,
           };
 
-      //   case "homepage.home-testimonies":
-      //     return {
-      //       data: blockData,
-      //     };
+        case "homepage.home-testimonies":
+          return {
+            data: blockData,
+          };
 
       default:
         return baseProps;

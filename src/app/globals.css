@@ -301,6 +301,56 @@
   }
 }
 
+/* Casino Table Styles */
+@layer components {
+  /* Table wrapper */
+  .table-wrapper {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+
+  /* Position badges */
+  .casino-logo__first a {
+    background: linear-gradient(to bottom, #ffd976, #ffbb38);
+  }
+  
+  .casino-logo__first .casino-logo__tag {
+    background: linear-gradient(to bottom, #ffd976, #ffbb38);
+    box-shadow: 0px 0px 4px #ffbd3b, 0px 1px 6px rgba(16, 24, 40, 0.1);
+  }
+
+  .casino-logo__second a {
+    background: linear-gradient(to bottom, #dbe5ef, #b1bbc6);
+  }
+  
+  .casino-logo__second .casino-logo__tag {
+    background: linear-gradient(to bottom, #dbe5ef, #b1bbc6);
+    box-shadow: 0px 0px 4px #d7e1eb, 0px 1px 6px rgba(16, 24, 40, 0.1);
+  }
+
+  .casino-logo__third a {
+    background: linear-gradient(to bottom, #de7d45, #9b4e22);
+  }
+  
+  .casino-logo__third .casino-logo__tag {
+    background: linear-gradient(to bottom, #de7d45, #9b4e22);
+    box-shadow: 0px 0px 4px #d77842, 0px 1px 6px rgba(16, 24, 40, 0.1);
+  }
+
+  /* Badge styles */
+  .exclusive-badge {
+    background: linear-gradient(to bottom, #FF5B14, #de7d45);
+  }
+
+  .new-casino-badge {
+    background: linear-gradient(to bottom, #00BCD4, #01579B);
+  }
+
+  /* Casino list title */
+  .casino-list-title {
+    text-shadow: 0px 0px 12px rgba(63, 230, 252, 0.6);
+  }
+}
+
 /* Utility classes for font weights */
 @layer utilities {
   /* Lato weights */
@@ -415,4 +465,11 @@
       text-decoration: underline;
     }
   }
+
+  /* Add color utilities for casino table */
+  .bg-casino-table-bkg { background-color: #f5f5f5; }
+  .bg-casino-table-header-bkg { background-color: var(--site-primary); }
+  .text-casino-table-text { color: var(--site-body-text); }
+  .border-casino-table-tr-border { border-color: #e5e7eb; }
+  .bg-no-deposit-gradient { background-color: #10b981; }
 }

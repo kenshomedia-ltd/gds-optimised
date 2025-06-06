@@ -75,6 +75,7 @@ export default async function HomePage() {
       "Homepage blocks:",
       blocks.map((b) => b.__component)
     );
+    console.log("additionalData", additionalData);
   }
 
   // Schema.org structured data
