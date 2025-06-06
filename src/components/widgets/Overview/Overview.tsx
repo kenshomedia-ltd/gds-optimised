@@ -30,8 +30,8 @@ function OverviewCard({
   // Handle the direct image structure from Strapi
   const imageUrl = overview.card_img?.url;
   const imageAlt = overview.card_img?.alternativeText || overview.title;
-  const imageWidth = overview.card_img?.width;
-  const imageHeight = overview.card_img?.height;
+  // const imageWidth = overview.card_img?.width;
+  // const imageHeight = overview.card_img?.height;
 
   if (overviewType === "Version 2") {
     return (

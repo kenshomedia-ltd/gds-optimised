@@ -2,8 +2,8 @@
 
 import type {
   ImageTransformParams,
-  ImageHandlerPayload,
-  ImageEdits,
+  // ImageHandlerPayload,
+  // ImageEdits,
 } from "@/types/image.types";
 
 /**

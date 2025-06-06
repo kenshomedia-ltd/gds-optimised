@@ -7,11 +7,15 @@ import type {
   HomepageBlock,
   HomeGameListBlock,
   HomeBlogListBlock,
-  HomeCasinoListBlock,
+  // HomeCasinoListBlock,
   HomepageDataResponse,
   ExtractedGameSettings,
 } from "@/types/homepage.types";
-import type { GameData, BlogData, CasinoData } from "@/types/strapi.types";
+import type {
+  GameData,
+  BlogData,
+  CasinoData
+} from "@/types/strapi.types";
 
 // Revalidation times for different content types
 const REVALIDATE_TIMES = {
@@ -137,7 +141,10 @@ async function fetchGamesForProviders(
       },
     };
 
-    const response = await strapiClient.fetchWithCache<any>(
+    const response = await strapiClient.fetchWithCache<{
+      data: GameData[];
+      meta: { pagination: { total: number } };
+    }>(
       "games",
       query,
       REVALIDATE_TIMES.games
@@ -330,11 +337,13 @@ function buildHomepageQuery() {
  * React cache for deduplicating requests within a single render
  */
 const getHomepageDataCached = cache(
-  async (locale?: string): Promise<HomepageDataResponse> => {
+  async (): Promise<HomepageDataResponse> => {
     try {
       // Fetch homepage structure first
       const homepageQuery = buildHomepageQuery();
-      const homepageResponse = await strapiClient.fetchWithCache<any>(
+      const homepageResponse = await strapiClient.fetchWithCache<{
+        data: Homepage;
+      }>(
         "homepage",
         homepageQuery,
         REVALIDATE_TIMES.homepage
@@ -355,15 +364,18 @@ const getHomepageDataCached = cache(
         // Fetch games if providers are specified
         gameSettings.providers.length > 0
           ? fetchGamesForProviders(
-              gameSettings.providers,
-              gameSettings.totalGamesToDisplay,
-              gameSettings.sortBy,
-              gameSettings.gamesQuotaPerProvider
-            )
+            gameSettings.providers,
+            gameSettings.totalGamesToDisplay,
+            gameSettings.sortBy,
+            gameSettings.gamesQuotaPerProvider
+          )
           : Promise.resolve([]),
 
         // Fetch blogs
-        strapiClient.fetchWithCache<any>(
+        strapiClient.fetchWithCache<{
+          data: BlogData[];
+          meta: { pagination: { total: number } };
+        }>(
           "blogs",
           {
             fields: [
@@ -398,7 +410,10 @@ const getHomepageDataCached = cache(
 
         // Fetch casinos if needed
         hasCasinoBlock
-          ? strapiClient.fetchWithCache<any>(
+          ? strapiClient.fetchWithCache<{
+              data: CasinoData[];
+              meta: { pagination: { total: number } };
+            }>(
               "casinos",
               {
                 fields: [

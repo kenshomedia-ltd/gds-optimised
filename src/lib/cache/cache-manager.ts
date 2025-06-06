@@ -146,7 +146,7 @@ export class CacheManager {
           try {
             const { data } = JSON.parse(value);
             result.set(keys[index], data);
-          } catch (e) {
+          } catch {
             // Skip invalid entries
           }
         }
@@ -165,7 +165,7 @@ export class CacheManager {
   async warmCache(
     entries: Array<{
       key: string;
-      data: any;
+      data: unknown;
       options: Pick<CacheOptions, "ttl" | "swr">;
     }>
   ): Promise<void> {
@@ -197,7 +197,7 @@ export const cacheManager = new CacheManager();
  * Create a cached function with stale-while-revalidate
  */
 export function createCachedFunction<
-  T extends (...args: any[]) => Promise<any>
+  T extends (...args: unknown[]) => Promise<unknown>
 >(fn: T, options: CacheOptions): T {
   const wrappedFn = async (...args: Parameters<T>): Promise<ReturnType<T>> => {
     const cacheKey = `${options.key}:${JSON.stringify(args)}`;

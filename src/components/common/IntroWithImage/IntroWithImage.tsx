@@ -39,7 +39,7 @@ export function IntroWithImage({
     imageData?.alternativeText ||
     heading ||
     "";
-  const imageMime = imageData?.attributes?.mime || imageData?.mime;
+  // const imageMime = imageData?.attributes?.mime || imageData?.mime;
   const hasImage = Boolean(imageUrl);
 
   // Determine if content should be truncated on mobile

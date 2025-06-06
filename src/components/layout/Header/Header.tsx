@@ -8,7 +8,7 @@ import { faHeart, faUser, faBars } from "@awesome.me/kit-0e07a43543/icons/duoton
 import { Image } from "@/components/common/Image";
 import { SearchBar } from "@/components/features/Search/SearchBar";
 import { MainNav } from "./MainNav";
-import { SubNav } from "./SubNav";
+// import { SubNav } from "./SubNav";
 import { MobileMenu } from "./MobileMenu";
 import type { HeaderProps } from "@/types/header.types";
 

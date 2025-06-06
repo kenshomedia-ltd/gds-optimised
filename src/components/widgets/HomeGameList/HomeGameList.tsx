@@ -5,7 +5,7 @@ import { Suspense } from "react";
 import { GameList } from "@/components/games/GameList/GameList";
 import { GameCardSkeleton } from "@/components/games/GameCard/GameCardSkeleton";
 import type { HomeGameListBlock, GameData } from "@/types/game.types";
-import { cn } from "@/lib/utils/cn";
+// import { cn } from "@/lib/utils/cn";
 
 interface HomeGameListProps {
   block: HomeGameListBlock;

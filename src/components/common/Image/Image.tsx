@@ -90,6 +90,7 @@ export function Image({
       return;
     }
 
+    const element = containerRef.current;
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -105,11 +106,11 @@ export function Image({
       }
     );
 
-    observer.observe(containerRef.current);
+    observer.observe(element);
 
     return () => {
-      if (containerRef.current) {
-        observer.unobserve(containerRef.current);
+      if (element) {
+        observer.unobserve(element);
       }
     };
   }, [progressive, priority, threshold, rootMargin]);

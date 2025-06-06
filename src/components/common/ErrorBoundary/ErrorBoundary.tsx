@@ -64,7 +64,8 @@ export function ErrorBoundary({ error, reset, className }: ErrorBoundaryProps) {
           </h2>
 
           <p className="text-gray-600 mb-6">
-            We're sorry, but something unexpected happened. Please try again.
+            We&apos;re sorry, but something unexpected happened. Please try
+            again.
           </p>
 
           {/* Development Error Details */}

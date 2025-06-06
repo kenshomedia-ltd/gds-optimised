@@ -125,7 +125,17 @@ export function FeaturedProviders({
  * Individual provider card with hover effects and lazy loading
  */
 interface ProviderCardProps {
-  provider: any;
+  provider: {
+    id: number;
+    documentId?: string;
+    title: string;
+    slug: string;
+    images?: {
+      url: string;
+      width?: number;
+      height?: number;
+    };
+  };
   providerBaseUrl: string;
   index: number;
 }

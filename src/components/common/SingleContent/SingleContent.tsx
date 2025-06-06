@@ -27,7 +27,7 @@ export function SingleContent({
   priority = false,
 }: SingleContentProps) {
   // Sanitize and process content
-  const { sanitizedContent, processedContent, textPreview } = useMemo(() => {
+  const { processedContent, textPreview } = useMemo(() => {
     if (!block?.content) {
       return { sanitizedContent: "", processedContent: "", textPreview: "" };
     }

@@ -21,7 +21,7 @@ interface MainNavProps {
  * - Smooth animations
  * - Accessibility compliant
  */
-export function MainNav({ navigation, translations }: MainNavProps) {
+export function MainNav({ navigation }: MainNavProps) {
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const navRef = useRef<HTMLDivElement>(null);

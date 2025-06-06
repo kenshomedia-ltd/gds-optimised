@@ -43,7 +43,7 @@ export function FavoritesProvider({
   const [favorites, setFavorites] = useState<FavoriteGame[]>([]);
   const [userFavorites, setUserFavorites] =
     useState<UserFavoriteGame[]>(initialUserFavorites);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading] = useState(false);
   const router = useRouter();
 
   // Load favorites from localStorage on mount
@@ -140,7 +140,7 @@ export function FavoritesProvider({
   const removeFavorite = useCallback(
     async (gameId: number) => {
       // Store current state for rollback
-      const prevFavorites = favorites;
+      // const prevFavorites = favorites;
       const prevUserFavorites = userFavorites;
 
       // Optimistic update

@@ -5,7 +5,7 @@ import {
   revalidateLayout,
   revalidateGames,
   revalidateGame,
-  clearAllCaches,
+  // clearAllCaches,
 } from "@/app/actions/cache";
 
 // Webhook secret from Strapi
@@ -133,27 +133,6 @@ export async function GET() {
  */
 export async function OPTIONS() {
   return new NextResponse(null, { status: 200 });
-}
-
-// Type for Strapi webhook payload
-interface StrapiWebhookPayload {
-  event:
-    | "entry.create"
-    | "entry.update"
-    | "entry.delete"
-    | "entry.publish"
-    | "entry.unpublish";
-  createdAt: string;
-  model: string;
-  entry: {
-    id: number;
-    slug?: string;
-    [key: string]: any;
-  };
-  user?: {
-    id: number;
-    email: string;
-  };
 }
 
 // Helper function to revalidate by path (import from cache actions)

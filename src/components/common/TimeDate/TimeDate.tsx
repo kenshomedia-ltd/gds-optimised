@@ -21,7 +21,7 @@ interface TimeDateProps {
  */
 export function TimeDate({
   timeDate,
-  translations = {},
+  // translations = {},
   className,
 }: TimeDateProps) {
   const date = new Date(timeDate);

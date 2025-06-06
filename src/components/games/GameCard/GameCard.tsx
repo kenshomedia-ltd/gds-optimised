@@ -25,7 +25,7 @@ export function GameCard({
   priority = false,
   loading = "lazy",
   className,
-  index = 0,
+  // index = 0,
 }: GameCardProps) {
   const [imageError, setImageError] = useState(false);
 

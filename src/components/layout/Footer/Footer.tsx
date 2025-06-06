@@ -1,5 +1,5 @@
 // src/components/layout/Footer/Footer.tsx
-import Link from "next/link";
+// import Link from "next/link";
 import { FooterLinks } from "./FooterLinks";
 import { FooterImages } from "./FooterImages";
 import { FooterBottom } from "./FooterBottom";

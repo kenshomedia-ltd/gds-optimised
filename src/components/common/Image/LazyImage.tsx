@@ -126,6 +126,7 @@ export function LazyImage({
       {/* The actual image */}
       <Image
         {...imageProps}
+        alt={imageProps.alt || ""}
         onLoad={handleLoad}
         onError={handleError}
         loading="lazy"

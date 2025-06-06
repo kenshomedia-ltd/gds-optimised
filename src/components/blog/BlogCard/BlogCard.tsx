@@ -28,7 +28,6 @@ export function BlogCard({
   isFeatured = false,
   priority = false,
   className,
-  index = 0,
 }: BlogCardProps) {
   const [imageError, setImageError] = useState(false);
 

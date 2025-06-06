@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import Link from "next/link";
+// import Link from "next/link";
 import { GameCard } from "../GameCard/GameCard";
 import { GameCardSkeleton } from "../GameCard/GameCardSkeleton";
 import type { GameListProps, GameData } from "@/types/game.types";

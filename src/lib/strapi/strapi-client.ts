@@ -35,6 +35,17 @@ export const REVALIDATE_TIMES = {
   static: 3600, // 1 hour for relatively static content
 };
 
+interface TranslationItem {
+  key: string;
+  value: string;
+}
+
+interface TranslationResponse {
+  data: {
+    translation: TranslationItem[] | Record<string, string>;
+  };
+}
+
 class StrapiClient {
   private baseURL: string;
   private token: string;
@@ -335,7 +346,7 @@ class StrapiClient {
       populate: "*",
     };
 
-    const response = await this.fetchWithCache<any>(
+    const response = await this.fetchWithCache<TranslationResponse>(
       "translation",
       query,
       CACHE_TTL.translations

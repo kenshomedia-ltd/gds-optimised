@@ -53,7 +53,7 @@ export function FavoriteButton({
           await addFavorite(game);
           toast.success(translations.addToFavorites || "Added to favorites");
         }
-      } catch (error) {
+      } catch {
         toast.error(translations.favoriteError || "Failed to update favorites");
       } finally {
         setTimeout(() => setIsAnimating(false), 300);
