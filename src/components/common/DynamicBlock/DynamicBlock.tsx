@@ -15,16 +15,18 @@ const componentMap = {
       ),
     { loading: () => <Skeleton className="h-96 w-full" /> }
   ),
-  //   "homepage.home-casino-list": dynamic(
-  //     () =>
-  //       import("@/components/casino/CasinoTable").then((mod) => mod.CasinoTable),
-  //     { loading: () => <Skeleton className="h-96 w-full" /> }
-  //   ),
-  //   "homepage.home-blog-list": dynamic(
-  //     () =>
-  //       import("@/components/widgets/LatestBlogs").then((mod) => mod.LatestBlogs),
-  //     { loading: () => <Skeleton className="h-64 w-full" /> }
-  //   ),
+  "homepage.home-blog-list": dynamic(
+    () =>
+      import("@/components/widgets/HomeLatestBlogs").then(
+        (mod) => mod.HomeLatestBlogs
+      ),
+    {
+      loading: () =>
+        import("@/components/widgets/HomeLatestBlogs").then((mod) => (
+          <mod.HomeLatestBlogsSkeleton />
+        )),
+    }
+  ),
   "shared.introduction-with-image": dynamic(
     () =>
       import("@/components/common/IntroWithImage").then(
@@ -111,12 +113,12 @@ export function DynamicBlock({
           translations: additionalData?.translations,
         };
 
-      //   case "homepage.home-blog-list":
-      //     return {
-      //       ...blockData,
-      //       blogs: additionalData?.blogs || [],
-      //       translations: additionalData?.translations,
-      //     };
+      case "homepage.home-blog-list":
+        return {
+          block: blockData,
+          blogs: additionalData?.blogs || [],
+          translations: additionalData?.translations,
+        };
 
         case "homepage.home-casino-list":
           return {
@@ -124,15 +126,6 @@ export function DynamicBlock({
             casinos: additionalData?.casinos || [],
             translations: additionalData?.translations,
           };
-
-      //   case "casinos.casino-list":
-      //     return {
-      //       casinos:
-      //         blockData.casinosList?.map((item: any) => item.casino?.data) || [],
-      //       showCasinoTableHeader: blockData.showCasinoFilters !== true,
-      //       country: additionalData?.country,
-      //       translations: additionalData?.translations,
-      //     };
 
       case "shared.introduction-with-image":
         return {
