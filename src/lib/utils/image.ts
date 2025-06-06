@@ -56,7 +56,41 @@ export function buildImageUrl(
 
   const basePath = extractBasePath(src);
   const imageHandlerUrl = getImageHandlerUrl();
+  const imageKey = basePath.startsWith("/") ? basePath.slice(1) : basePath;
 
+  // New AWS URL format using path segments
+  const pathSegments = [];
+
+  // Add size segment e.g., "235x244"
+  if (params.width && params.height) {
+    pathSegments.push(`${params.width}x${params.height}`);
+  }
+
+  // Build and add filters segment e.g., "filters:quality(100)"
+  const filterOptions = [];
+  if (params.quality) {
+    filterOptions.push(`quality(${params.quality})`);
+  }
+  // You can extend this to add other filters here in the future
+  // e.g., if (params.format) filterOptions.push(`format(${params.format})`);
+
+  if (filterOptions.length > 0) {
+    pathSegments.push(`filters:${filterOptions.join(":")}`);
+  }
+
+  // Add the image key
+  pathSegments.push(imageKey);
+
+  // Join the base URL and all path segments, filtering out any empty ones
+  const finalUrl = [imageHandlerUrl.replace(/\/$/, ""), ...pathSegments]
+    .filter(Boolean)
+    .join("/");
+
+  return finalUrl;
+
+  /*
+  // === Base64 Encoded Implementation (commented out for reference) ===
+  
   // Build edits object
   const edits: ImageEdits = {
     resize: {
@@ -92,6 +126,7 @@ export function buildImageUrl(
   const encodedPayload = btoa(JSON.stringify(payload));
 
   return `${imageHandlerUrl}/${encodedPayload}`;
+  */
 }
 
 /**

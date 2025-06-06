@@ -54,7 +54,11 @@ export function MainNav({ navigation, translations }: MainNavProps) {
   };
 
   return (
-    <div className="flex items-center space-x-1" ref={navRef}>
+    <div
+      // Added `whitespace-nowrap` to prevent menu items from wrapping to the next line.
+      className="flex items-center space-x-1 whitespace-nowrap"
+      ref={navRef}
+    >
       {navigation.map((item, index) => {
         const hasSubmenu = item.subMenu && item.subMenu.length > 0;
         const isActive = activeDropdown === index;
@@ -115,7 +119,7 @@ export function MainNav({ navigation, translations }: MainNavProps) {
               </button>
             )}
 
-            {/* Dropdown Menu */}
+            {/* Dropdown Menu (logic is unchanged) */}
             {hasSubmenu && (
               <div
                 className={`

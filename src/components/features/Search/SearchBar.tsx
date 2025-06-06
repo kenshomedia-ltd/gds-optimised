@@ -1,385 +1,232 @@
-// src/components/features/Search/SearchBar.tsx
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { instantMeiliSearch } from "@meilisearch/instant-meilisearch";
+import { Image } from "@/components/common/Image";
 import { icons } from "@/lib/icons/icons";
-import type { SearchBarProps } from "./search.types";
+import { cn } from "@/lib/utils/cn";
+import type { SearchBarProps, SearchResult } from "./search.types";
 
-/**
- * SearchBar Component with smooth animations
- *
- * Features:
- * - Smooth expand/collapse animations
- * - Keyboard shortcuts (Cmd/Ctrl + K)
- * - Mobile-optimized overlay
- * - Auto-focus and click-outside handling
- * - Accessible with proper ARIA labels
- * - Optimized for CWV with minimal re-renders
- */
+// Initialize Meilisearch client
+const { searchClient } = instantMeiliSearch(
+  process.env.NEXT_PUBLIC_MEILISEARCH_HOST || "http://127.0.0.1:7700",
+  process.env.NEXT_PUBLIC_MEILISEARCH_SEARCH_KEY || "",
+  {
+    placeholderSearch: false,
+    // You can customize the highlight tags here, but we will replace them manually
+    // highlightPreTag: '<mark>',
+    // highlightPostTag: '</mark>',
+  }
+);
+
 export function SearchBar({
-  position = "header",
   placeholder = "Search games...",
-  onSearch,
   className = "",
-  autoFocus = false,
+  maxResults = 8,
 }: SearchBarProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [query, setQuery] = useState("");
-  const [isMounted, setIsMounted] = useState(false);
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
 
-  // Prevent hydration issues
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+  const siteURL = process.env.NEXT_PUBLIC_SITE_URL || "";
+  const gamePagePath = process.env.NEXT_PUBLIC_GAME_PAGE_PATH || "/games";
 
-  // Handle keyboard shortcut (Cmd/Ctrl + K)
+  // Debounced search logic
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-        e.preventDefault();
-        setIsExpanded(true);
+    if (!query.trim()) {
+      setResults([]);
+      setIsSearching(false);
+      return;
+    }
+    const debounceTimeout = setTimeout(() => {
+      setIsSearching(true);
+      searchClient
+        .search<SearchResult>([
+          {
+            indexName:
+              process.env.NEXT_PUBLIC_MEILISEARCH_INDEX_NAME || "games",
+            query,
+            params: {
+              hitsPerPage: maxResults,
+              attributesToHighlight: ["title"],
+              highlightPreTag: "__ais-highlight__",
+              highlightPostTag: "__/ais-highlight__",
+            },
+          },
+        ])
+        .then(({ results: searchResults }) => {
+          setResults(searchResults[0]?.hits || []);
+        })
+        .catch((err) => {
+          console.error("MeiliSearch error:", err);
+          setResults([]);
+        })
+        .finally(() => {
+          setIsSearching(false);
+        });
+    }, 300);
+    return () => clearTimeout(debounceTimeout);
+  }, [query, maxResults]);
+
+  // Combined keyboard and outside click handler
+  useEffect(() => {
+    const handleInteraction = (e: MouseEvent | KeyboardEvent) => {
+      if (!isExpanded) {
+        if (
+          (e as KeyboardEvent).key === "k" &&
+          ((e as KeyboardEvent).metaKey || (e as KeyboardEvent).ctrlKey)
+        ) {
+          e.preventDefault();
+          setIsExpanded(true);
+        }
+        return;
       }
-
-      // Handle escape key
-      if (e.key === "Escape" && isExpanded) {
+      if ((e as KeyboardEvent).key === "Escape") {
         setIsExpanded(false);
-        setQuery("");
+      }
+      if (
+        e.type === "mousedown" &&
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
+        setIsExpanded(false);
       }
     };
 
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
+    document.addEventListener("keydown", handleInteraction);
+    document.addEventListener("mousedown", handleInteraction);
+    return () => {
+      document.removeEventListener("keydown", handleInteraction);
+      document.removeEventListener("mousedown", handleInteraction);
+    };
   }, [isExpanded]);
 
   // Focus input when expanded
   useEffect(() => {
-    if (isExpanded && inputRef.current) {
-      // Small delay to ensure animation starts before focus
-      const timer = setTimeout(() => {
-        inputRef.current?.focus();
-      }, 100);
-      return () => clearTimeout(timer);
+    if (isExpanded) {
+      inputRef.current?.focus();
     }
   }, [isExpanded]);
 
-  // Handle click outside to collapse
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node) &&
-        isExpanded &&
-        position !== "page"
-      ) {
-        setIsExpanded(false);
-        setQuery("");
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isExpanded, position]);
-
-  // Auto-focus on mount if specified
-  useEffect(() => {
-    if (autoFocus && position === "page" && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [autoFocus, position]);
-
-  const handleSubmit = useCallback(
-    (e: React.FormEvent) => {
-      e.preventDefault();
-      if (query.trim()) {
-        if (onSearch) {
-          onSearch(query);
-        } else {
-          router.push(`/search?q=${encodeURIComponent(query)}`);
-        }
-        setQuery("");
-        if (position === "header") {
-          setIsExpanded(false);
-        }
-      }
-    },
-    [query, onSearch, router, position]
-  );
-
-  const handleClear = useCallback(() => {
+  const resetSearch = useCallback(() => {
     setQuery("");
-    inputRef.current?.focus();
-  }, []);
-
-  const toggleSearch = useCallback(() => {
-    setIsExpanded(!isExpanded);
-    if (!isExpanded) {
-      setQuery("");
-    }
-  }, [isExpanded]);
-
-  const handleClose = useCallback(() => {
-    setQuery("");
+    setResults([]);
     setIsExpanded(false);
   }, []);
 
-  // Don't render until mounted to prevent hydration issues
-  if (!isMounted) {
-    return null;
-  }
-
-  // Mobile: Expandable search with overlay
-  if (position === "header") {
-    return (
-      <>
-        {/* Search Container */}
-        <div
-          ref={containerRef}
-          className={`relative flex items-center ${className}`}
-        >
-          {/* Desktop Animated Search Bar */}
-          <div
-            className={`
-              hidden lg:flex items-center overflow-hidden
-              transition-all duration-300 ease-in-out
-              bg-white/10 backdrop-blur-sm rounded-full
-              ${
-                isExpanded
-                  ? "w-80 border border-white/20 shadow-lg"
-                  : "w-10 h-10 border border-transparent hover:border-white/10"
-              }
-            `}
-          >
-            <button
-              type="button"
-              onClick={toggleSearch}
-              className={`
-                h-10 w-10 rounded-full flex-shrink-0
-                flex items-center justify-center
-                text-navbar-text hover:bg-white/10
-                transition-colors duration-200
-              `}
-              aria-label={isExpanded ? "Close search" : "Open search"}
-              aria-expanded={isExpanded}
-            >
-              <div
-                className="w-5 h-5"
-                dangerouslySetInnerHTML={{
-                  __html: isExpanded ? icons.close : icons.search,
-                }}
-              />
-            </button>
-
-            <form onSubmit={handleSubmit} className="flex-1 flex items-center">
-              <input
-                ref={inputRef}
-                type="search"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder={placeholder}
-                className={`
-                  bg-transparent border-0 outline-none w-full
-                  text-navbar-text placeholder-navbar-text/60
-                  transition-all duration-300
-                  ${
-                    isExpanded
-                      ? "opacity-100 px-3 py-2"
-                      : "opacity-0 w-0 p-0 pointer-events-none"
-                  }
-                `}
-                aria-hidden={!isExpanded}
-                aria-label="Search games"
-                autoComplete="off"
-                spellCheck={false}
-              />
-
-              {/* Clear button */}
-              {query && isExpanded && (
-                <button
-                  type="button"
-                  onClick={handleClear}
-                  className="
-                    mr-3 text-navbar-text/60 hover:text-navbar-text
-                    transition-colors duration-200
-                  "
-                  aria-label="Clear search"
-                >
-                  <div
-                    className="w-4 h-4"
-                    dangerouslySetInnerHTML={{ __html: icons.close }}
-                  />
-                </button>
-              )}
-            </form>
-          </div>
-
-          {/* Keyboard shortcut hint */}
-          {!isExpanded && (
-            <kbd
-              className="
-              hidden xl:inline-flex ml-2 px-2 py-1
-              text-xs text-navbar-text/60 
-              bg-white/5 rounded border border-white/10
-            "
-            >
-              ⌘K
-            </kbd>
-          )}
-
-          {/* Mobile Search Toggle */}
-          <button
-            type="button"
-            onClick={() => setIsExpanded(true)}
-            className={`
-              p-2 rounded-md text-navbar-text hover:bg-white/10 
-              transition-colors lg:hidden
-            `}
-            aria-label="Search"
-          >
-            <div
-              className="w-5 h-5"
-              dangerouslySetInnerHTML={{ __html: icons.search }}
-            />
-          </button>
-        </div>
-
-        {/* Mobile Search Overlay */}
-        {isExpanded && (
-          <div
-            className="
-              fixed inset-0 z-50 bg-black/50 backdrop-blur-sm
-              lg:hidden animate-fadeIn
-            "
-            onClick={handleClose}
-          >
-            <div
-              className="
-                absolute top-0 left-0 right-0 bg-navbar-bkg
-                border-b border-white/10 shadow-xl
-                animate-slideDown
-              "
-              onClick={(e) => e.stopPropagation()}
-            >
-              <form onSubmit={handleSubmit} className="p-4">
-                <div className="relative">
-                  <input
-                    ref={inputRef}
-                    type="search"
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    placeholder={placeholder}
-                    className="
-                      w-full pl-12 pr-24 py-4
-                      bg-white/10 backdrop-blur-sm
-                      border border-white/20 rounded-xl
-                      text-navbar-text placeholder-navbar-text/60
-                      focus:outline-none focus:ring-2 focus:ring-white/30
-                      focus:bg-white/15 transition-all duration-200
-                    "
-                    aria-label="Search games"
-                    autoComplete="off"
-                    spellCheck={false}
-                  />
-
-                  <div
-                    className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-navbar-text/60"
-                    dangerouslySetInnerHTML={{ __html: icons.search }}
-                  />
-
-                  {query && (
-                    <button
-                      type="button"
-                      onClick={handleClear}
-                      className="
-                        absolute right-16 top-1/2 -translate-y-1/2
-                        text-navbar-text/60 hover:text-navbar-text
-                        transition-colors
-                      "
-                      aria-label="Clear search"
-                    >
-                      <div
-                        className="w-5 h-5"
-                        dangerouslySetInnerHTML={{ __html: icons.close }}
-                      />
-                    </button>
-                  )}
-
-                  <button
-                    type="button"
-                    onClick={handleClose}
-                    className="
-                      absolute right-2 top-1/2 -translate-y-1/2
-                      px-3 py-2 text-sm text-navbar-text
-                      hover:bg-white/10 rounded-lg
-                      transition-colors
-                    "
-                    aria-label="Close search"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-      </>
-    );
-  }
-
-  // Page-level search bar (always expanded)
   return (
-    <form onSubmit={handleSubmit} className={`w-full ${className}`}>
-      <div className="relative group">
+    <div
+      ref={containerRef}
+      className={cn(
+        "relative flex items-center justify-end h-10 w-10",
+        className
+      )}
+    >
+      <div
+        className={cn(
+          "absolute top-0 right-0 h-10",
+          "flex items-center backdrop-blur-sm rounded-full",
+          "transition-all duration-300 ease-in-out",
+          isExpanded
+            ? "w-80 border-white/20 bg-white/10 shadow-lg"
+            : "w-10 border-transparent bg-transparent"
+        )}
+      >
+        <button
+          type="button"
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="h-10 w-10 flex-shrink-0 flex items-center justify-center rounded-full text-navbar-text bg-transparent hover:bg-white/10 transition-colors"
+          aria-label={isExpanded ? "Close search" : "Open search"}
+        >
+          <div
+            className="w-5 h-5"
+            dangerouslySetInnerHTML={{
+              __html: isExpanded ? icons.close : icons.search,
+            }}
+          />
+        </button>
         <input
           ref={inputRef}
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={placeholder}
-          className="
-            w-full pl-12 pr-12 py-3
-            bg-gray-50 border-2 border-gray-200
-            rounded-xl text-gray-900 placeholder-gray-500
-            focus:outline-none focus:ring-0 focus:border-primary
-            focus:bg-white transition-all duration-200
-            group-hover:border-gray-300
-          "
-          aria-label="Search games"
-          autoComplete="off"
-          spellCheck={false}
+          className={cn(
+            "w-full h-full bg-transparent border-0 outline-none pr-4 text-navbar-text placeholder-navbar-text/60",
+            "transition-opacity duration-200",
+            isExpanded ? "opacity-100" : "opacity-0 pointer-events-none"
+          )}
+          aria-hidden={!isExpanded}
         />
-
-        <div
-          className="
-            absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 
-            text-gray-400 group-focus-within:text-primary
-            transition-colors duration-200
-          "
-          dangerouslySetInnerHTML={{ __html: icons.search }}
-        />
-
-        {query && (
-          <button
-            type="button"
-            onClick={handleClear}
-            className="
-              absolute right-4 top-1/2 -translate-y-1/2
-              text-gray-400 hover:text-gray-600
-              transition-colors duration-200
-            "
-            aria-label="Clear search"
-          >
-            <div
-              className="w-5 h-5"
-              dangerouslySetInnerHTML={{ __html: icons.close }}
-            />
-          </button>
-        )}
       </div>
-    </form>
+
+      {/* Results Dropdown */}
+      {isExpanded && query && (
+        <div className="absolute top-full right-0 mt-2 w-80 bg-white rounded-lg shadow-2xl overflow-hidden z-50">
+          <div className="max-h-[60vh] overflow-y-auto p-2">
+            {isSearching && (
+              <div className="p-4 text-center text-sm text-gray-500">
+                Searching...
+              </div>
+            )}
+            {!isSearching && results.length > 0 && (
+              <ul>
+                {results.map((hit) => {
+                  // START OF FIX
+                  const highlightedTitle =
+                    hit._highlightResult?.title?.value || hit.title;
+                  const formattedTitle = highlightedTitle
+                    .replace(
+                      /__ais-highlight__/g,
+                      '<mark class="font-semibold text-primary bg-transparent">'
+                    )
+                    .replace(/__\/ais-highlight__/g, "</mark>");
+                  // END OF FIX
+
+                  return (
+                    <li key={hit.id}>
+                      <Link
+                        href={`${siteURL}${gamePagePath}/${hit.slug}/`}
+                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition-colors group"
+                        onClick={resetSearch}
+                      >
+                        <Image
+                          src={
+                            hit.logo || "/images/placeholder-game.webp"
+                          }
+                          alt={hit.title}
+                          width={48}
+                          height={48}
+                          className="w-12 h-12 object-cover rounded border border-gray-200"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <div
+                            className="font-medium text-sm text-gray-900 truncate group-hover:text-primary"
+                            dangerouslySetInnerHTML={{ __html: formattedTitle }}
+                          />
+                          <div className="text-xs text-gray-500">
+                            {hit.provider}
+                          </div>
+                        </div>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+            {!isSearching && results.length === 0 && query.length > 1 && (
+              <div className="p-4 text-center text-sm text-gray-500">
+                No results for &quot;{query}&quot;
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

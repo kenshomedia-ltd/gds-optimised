@@ -29,7 +29,7 @@ export function SubNav({ navigation }: SubNavProps) {
           <Link
             key={item.id}
             href={item.url || "#"}
-            className="group inline-flex items-center gap-2 rounded-md bg-nav-hover-bkg px-3 py-1.5 text-xs font-medium uppercase text-navbar-text transition-all duration-200 hover:bg-opacity-80 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75"
+            className="group inline-flex items-center gap-2 rounded-md bg-transparent px-3 py-1.5 text-xs font-medium uppercase text-navbar-text transition-colors duration-200 hover:bg-nav-hover-bkg focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75"
           >
             {item.images && (
               <div className="relative h-4 w-4 transition-transform duration-200 group-hover:scale-110">
