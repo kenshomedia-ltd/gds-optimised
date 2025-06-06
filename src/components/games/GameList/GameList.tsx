@@ -127,7 +127,7 @@ export function GameList({
         )}
 
         {/* View all link */}
-        {block.link && (
+        {/* {block.link && (
           <div className="text-center mt-8">
             <Link
               href={block.link.url}
@@ -141,7 +141,7 @@ export function GameList({
               {block.link.label}
             </Link>
           </div>
-        )}
+        )} */}
       </div>
     </section>
   );

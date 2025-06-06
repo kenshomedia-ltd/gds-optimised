@@ -8,10 +8,13 @@ import { Skeleton } from "@/components/ui/Skeleton";
 
 // Lazy load components for better performance
 const componentMap = {
-    "homepage.home-game-list": dynamic(
-      () => import("@/components/widgets/HomeGameList").then((mod) => mod.HomeGameList),
-      { loading: () => <Skeleton className="h-96 w-full" /> }
-    ),
+  "homepage.home-game-list": dynamic(
+    () =>
+      import("@/components/widgets/HomeGameList").then(
+        (mod) => mod.HomeGameList
+      ),
+    { loading: () => <Skeleton className="h-96 w-full" /> }
+  ),
   //   "homepage.home-casino-list": dynamic(
   //     () =>
   //       import("@/components/casino/CasinoTable").then((mod) => mod.CasinoTable),
@@ -34,13 +37,18 @@ const componentMap = {
   //       import("@/components/casino/CasinoTable").then((mod) => mod.CasinoTable),
   //     { loading: () => <Skeleton className="h-96 w-full" /> }
   //   ),
-  //   "homepage.home-featured-providers": dynamic(
-  //     () =>
-  //       import("@/components/widgets/FeaturedProviders").then(
-  //         (mod) => mod.FeaturedProviders
-  //       ),
-  //     { loading: () => <Skeleton className="h-64 w-full" /> }
-  //   ),
+  "homepage.home-featured-providers": dynamic(
+    () =>
+      import("@/components/widgets/FeaturedProviders").then(
+        (mod) => mod.FeaturedProviders
+      ),
+    {
+      loading: () =>
+        import("@/components/widgets/FeaturedProviders").then((mod) => (
+          <mod.FeaturedProvidersSkeleton />
+        )),
+    }
+  ),
   "shared.overview-block": dynamic(
     () => import("@/components/widgets/Overview").then((mod) => mod.Overview),
     { loading: () => <Skeleton className="h-48 w-full" /> }
@@ -98,28 +106,28 @@ export function DynamicBlock({
           translations: additionalData?.translations,
         };
 
-    //   case "homepage.home-blog-list":
-    //     return {
-    //       ...blockData,
-    //       blogs: additionalData?.blogs || [],
-    //       translations: additionalData?.translations,
-    //     };
+      //   case "homepage.home-blog-list":
+      //     return {
+      //       ...blockData,
+      //       blogs: additionalData?.blogs || [],
+      //       translations: additionalData?.translations,
+      //     };
 
-    //   case "homepage.home-casino-list":
-    //     return {
-    //       ...blockData,
-    //       casinos: additionalData?.casinos || [],
-    //       translations: additionalData?.translations,
-    //     };
+      //   case "homepage.home-casino-list":
+      //     return {
+      //       ...blockData,
+      //       casinos: additionalData?.casinos || [],
+      //       translations: additionalData?.translations,
+      //     };
 
-    //   case "casinos.casino-list":
-    //     return {
-    //       casinos:
-    //         blockData.casinosList?.map((item: any) => item.casino?.data) || [],
-    //       showCasinoTableHeader: blockData.showCasinoFilters !== true,
-    //       country: additionalData?.country,
-    //       translations: additionalData?.translations,
-    //     };
+      //   case "casinos.casino-list":
+      //     return {
+      //       casinos:
+      //         blockData.casinosList?.map((item: any) => item.casino?.data) || [],
+      //       showCasinoTableHeader: blockData.showCasinoFilters !== true,
+      //       country: additionalData?.country,
+      //       translations: additionalData?.translations,
+      //     };
 
       case "shared.introduction-with-image":
         return {
@@ -130,26 +138,26 @@ export function DynamicBlock({
           isHomePage: true,
         };
 
-    //   case "homepage.home-featured-providers":
-    //     return {
-    //       ...blockData,
-    //       translations: additionalData?.translations,
-    //     };
+      case "homepage.home-featured-providers":
+        return {
+          data: blockData,
+          translations: additionalData?.translations,
+        };
 
       case "shared.overview-block":
         return {
           data: blockData,
         };
 
-    //   case "shared.single-content":
-    //     return {
-    //       block: blockData,
-    //     };
+      //   case "shared.single-content":
+      //     return {
+      //       block: blockData,
+      //     };
 
-    //   case "homepage.home-testimonies":
-    //     return {
-    //       data: blockData,
-    //     };
+      //   case "homepage.home-testimonies":
+      //     return {
+      //       data: blockData,
+      //     };
 
       default:
         return baseProps;

@@ -3,6 +3,11 @@
 // Overview components
 export { Overview } from "./Overview";
 export { HomeGameList } from "./HomeGameList";
+export {
+  FeaturedProviders,
+  FeaturedProvidersSkeleton,
+} from "./FeaturedProviders";
+
 
 // Add other widget exports as they are created:
 // export { PopularGames } from "./PopularGames";
