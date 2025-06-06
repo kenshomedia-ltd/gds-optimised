@@ -8,10 +8,10 @@ import { Skeleton } from "@/components/ui/Skeleton";
 
 // Lazy load components for better performance
 const componentMap = {
-  //   "homepage.home-game-list": dynamic(
-  //     () => import("@/components/games/GameGrid").then((mod) => mod.GameGrid),
-  //     { loading: () => <Skeleton className="h-96 w-full" /> }
-  //   ),
+    "homepage.home-game-list": dynamic(
+      () => import("@/components/widgets/HomeGameList").then((mod) => mod.HomeGameList),
+      { loading: () => <Skeleton className="h-96 w-full" /> }
+    ),
   //   "homepage.home-casino-list": dynamic(
   //     () =>
   //       import("@/components/casino/CasinoTable").then((mod) => mod.CasinoTable),
@@ -91,12 +91,12 @@ export function DynamicBlock({
     };
 
     switch (blockType) {
-    //   case "homepage.home-game-list":
-    //     return {
-    //       block: blockData,
-    //       games: additionalData?.games || [],
-    //       translations: additionalData?.translations,
-    //     };
+      case "homepage.home-game-list":
+        return {
+          block: blockData,
+          games: additionalData?.games || [],
+          translations: additionalData?.translations,
+        };
 
     //   case "homepage.home-blog-list":
     //     return {

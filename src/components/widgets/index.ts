@@ -2,6 +2,7 @@
 
 // Overview components
 export { Overview } from "./Overview";
+export { HomeGameList } from "./HomeGameList";
 
 // Add other widget exports as they are created:
 // export { PopularGames } from "./PopularGames";

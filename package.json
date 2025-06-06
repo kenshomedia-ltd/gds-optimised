@@ -13,6 +13,7 @@
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@meilisearch/instant-meilisearch": "^0.26.0",
+    "critters": "^0.0.25",
     "instantsearch.js": "^4.78.3",
     "ioredis": "^5.6.1",
     "isomorphic-dompurify": "^2.25.0",
@@ -22,7 +23,8 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "rehype-raw": "^7.0.0",
-    "remark-gfm": "^4.0.1"
+    "remark-gfm": "^4.0.1",
+    "sonner": "^2.0.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

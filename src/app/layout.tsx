@@ -5,7 +5,9 @@ import { getLayoutData } from "@/lib/strapi/data-loader";
 import { LegalServer } from "@/components/layout/Legal";
 import DynamicTheme from "@/components/layout/DynamicTheme/DynamicTheme";
 import { Header } from "@/components/layout/Header";
-import { Footer, FooterServer } from "@/components/layout/Footer";
+import { FooterServer } from "@/components/layout/Footer";
+import { ClientProviders } from "@/components/providers/ClientProviders";
+import { Toaster } from "sonner";
 
 // Font Awesome
 // import { config } from '@fortawesome/fontawesome-svg-core'
@@ -129,7 +131,9 @@ export default async function RootLayout({
           />
 
           {/* Main content */}
-          <main className="flex-1">{children}</main>
+          <ClientProviders>
+            <main className="flex-1">{children}</main>
+          </ClientProviders>
 
           <FooterServer
             footerContent={layoutData.layout.footerContent}
@@ -139,6 +143,16 @@ export default async function RootLayout({
             translations={layoutData.translations}
           />
         </div>
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            style: {
+              background: "var(--color-background-900)",
+              color: "var(--color-white)",
+              border: "1px solid var(--color-border)",
+            },
+          }}
+        />
       </body>
     </html>
   );
