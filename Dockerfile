@@ -1,15 +1,18 @@
 # Dockerfile
 # Optimized multi-stage build for a Next.js standalone application
 
-# Stage 1: Dependencies (No changes needed here)
+# Stage 1: Dependencies
 FROM node:20-alpine AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
+
+# Copy package files
 COPY package.json package-lock.json* ./
 COPY .npmrc* ./
-RUN --mount=type=cache,target=/root/.npm \
-    npm ci --only=production && \
-    npm cache clean --force
+
+# Install dependencies with cache mount
+# --- MODIFIED LINE ---
+RUN --mount=type=cache,target=/root/.npm sh -c "npm cache verify && npm ci --only=production"
 
 # Stage 2: Builder
 FROM node:20-alpine AS builder
@@ -18,9 +21,8 @@ WORKDIR /app
 # Copy package files and install all dependencies (including dev)
 COPY package.json package-lock.json* ./
 COPY .npmrc* ./
-RUN --mount=type=cache,target=/root/.npm \
-    npm ci && \
-    npm cache clean --force
+# --- MODIFIED LINE ---
+RUN --mount=type=cache,target=/root/.npm sh -c "npm cache verify && npm ci"
 
 # Copy source code
 COPY . .
