@@ -1,16 +1,12 @@
 # Dockerfile
-# Multi-stage build for Next.js application with caching optimization
+# Optimized multi-stage build for a Next.js standalone application
 
-# Stage 1: Dependencies
+# Stage 1: Dependencies (No changes needed here)
 FROM node:20-alpine AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
-
-# Copy package files
 COPY package.json package-lock.json* ./
 COPY .npmrc* ./
-
-# Install dependencies with cache mount
 RUN --mount=type=cache,target=/root/.npm \
     npm ci --only=production && \
     npm cache clean --force
@@ -29,7 +25,7 @@ RUN --mount=type=cache,target=/root/.npm \
 # Copy source code
 COPY . .
 
-# Build arguments for environment variables
+# Build arguments for PUBLIC environment variables needed by 'npm run build'
 ARG NEXT_PUBLIC_API_URL
 ARG NEXT_PUBLIC_API_TOKEN
 ARG NEXT_PUBLIC_SITE_ID
@@ -41,9 +37,6 @@ ARG NEXT_PUBLIC_MEILISEARCH_SEARCH_KEY
 ARG NEXT_PUBLIC_MEILISEARCH_INDEX_NAME
 ARG NEXT_PUBLIC_IMAGE_URL
 ARG NEXT_PUBLIC_IMAGE_BUCKET
-ARG REDIS_HOST
-ARG REDIS_PORT
-ARG REDIS_PASSWORD
 
 # Set build-time environment variables
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
@@ -57,9 +50,10 @@ ENV NEXT_PUBLIC_MEILISEARCH_SEARCH_KEY=$NEXT_PUBLIC_MEILISEARCH_SEARCH_KEY
 ENV NEXT_PUBLIC_MEILISEARCH_INDEX_NAME=$NEXT_PUBLIC_MEILISEARCH_INDEX_NAME
 ENV NEXT_PUBLIC_IMAGE_URL=$NEXT_PUBLIC_IMAGE_URL
 ENV NEXT_PUBLIC_IMAGE_BUCKET=$NEXT_PUBLIC_IMAGE_BUCKET
-ENV REDIS_HOST=$REDIS_HOST
-ENV REDIS_PORT=$REDIS_PORT
-ENV REDIS_PASSWORD=$REDIS_PASSWORD
+
+# --- REMOVED RUNTIME SECRETS ---
+# ARG REDIS_HOST, REDIS_PORT, REDIS_PASSWORD and their ENV counterparts have been removed.
+# They are not needed for the build and should not be baked into the image.
 
 # Disable telemetry during build
 ENV NEXT_TELEMETRY_DISABLED=1
@@ -71,39 +65,35 @@ RUN npm run build
 FROM node:20-alpine AS runner
 WORKDIR /app
 
-# Install dumb-init for proper signal handling
 RUN apk add --no-cache dumb-init
 
-# Create non-root user
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nextjs -u 1001
 
-# Copy necessary files
+# Copy necessary files from previous stages
+COPY --from=deps /app/node_modules ./node_modules
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/package.json ./package.json
-
-# Copy build artifacts
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Switch to non-root user
 USER nextjs
 
-# Expose port
 EXPOSE 3000
 
-# Set runtime environment variables
+# Set runtime environment variables for defaults and telemetry
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
-ENV HOSTNAME="0.0.0.0"
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD node -e "require('http').get('http://localhost:3000/api/health', (r) => {if (r.statusCode !== 200) throw new Error()})"
+# The critical runtime variables (REDIS_HOST, API tokens, etc.) will be
+# injected by Cloud Run via the cloudbuild.yaml 'set-env-vars' flag.
+# There is no need to declare them here.
 
-# Use dumb-init to handle signals properly
+# A more robust healthcheck
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3000', (res) => res.statusCode === 200 ? process.exit(0) : process.exit(1))"
+
 ENTRYPOINT ["dumb-init", "--"]
 
-# Start the application
 CMD ["node", "server.js"]
