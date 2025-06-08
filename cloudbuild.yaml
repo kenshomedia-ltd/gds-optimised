@@ -1,11 +1,18 @@
 # cloudbuild.yaml
-# GCP Cloud Build configuration for Next.js deployment to Cloud Run
+# Optimized and simplified GCP Cloud Build configuration for Next.js deployment to Cloud Run
 
 steps:
-  # Step 1: Build Docker image
+  # Step 1: Build the Docker image
   - name: 'gcr.io/cloud-builders/docker'
+    id: 'Build Docker Image'
     args:
       - 'build'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${_SERVICE_NAME}:$COMMIT_SHA'
+      - '.' # Docker context
+      - '-f'
+      - 'Dockerfile'
+      # Pass substitutions as build arguments to the Dockerfile
       - '--build-arg'
       - 'NEXT_PUBLIC_API_URL=${_NEXT_PUBLIC_API_URL}'
       - '--build-arg'
@@ -34,99 +41,89 @@ steps:
       - 'REDIS_PORT=${_REDIS_PORT}'
       - '--build-arg'
       - 'REDIS_PASSWORD=${_REDIS_PASSWORD}'
-      - '-t'
-      - '${_ARTIFACT_REGISTRY_URL}/${PROJECT_ID}/${_REPOSITORY}/${_IMAGE_NAME}:${SHORT_SHA}'
-      - '-t'
-      - '${_ARTIFACT_REGISTRY_URL}/${PROJECT_ID}/${_REPOSITORY}/${_IMAGE_NAME}:latest'
-      - '-f'
-      - 'Dockerfile'
-      - '.'
 
-  # Step 2: Push Docker image to Artifact Registry
+  # Step 2: Push the Docker image to Google Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
+    id: 'Push Docker Image'
     args:
       - 'push'
-      - '--all-tags'
-      - '${_ARTIFACT_REGISTRY_URL}/${PROJECT_ID}/${_REPOSITORY}/${_IMAGE_NAME}'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${_SERVICE_NAME}:$COMMIT_SHA'
 
-  # Step 3: Deploy to Cloud Run
+  # Step 3: Deploy the image to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'Deploy to Cloud Run'
     entrypoint: gcloud
     args:
       - 'run'
       - 'deploy'
       - '${_SERVICE_NAME}'
       - '--image'
-      - '${_ARTIFACT_REGISTRY_URL}/${PROJECT_ID}/${_REPOSITORY}/${_IMAGE_NAME}:${SHORT_SHA}'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${_SERVICE_NAME}:$COMMIT_SHA'
       - '--region'
       - '${_REGION}'
       - '--platform'
       - 'managed'
       - '--port'
       - '3000'
-      - '--memory'
-      - '${_MEMORY}'
-      - '--cpu'
-      - '${_CPU}'
-      - '--min-instances'
-      - '${_MIN_INSTANCES}'
-      - '--max-instances'
-      - '${_MAX_INSTANCES}'
-      - '--concurrency'
-      - '${_CONCURRENCY}'
-      - '--cpu-throttling'
-      - '--set-env-vars'
-      - 'NODE_ENV=production'
-      - '--set-env-vars'
-      - 'NEXT_PUBLIC_API_URL=${_NEXT_PUBLIC_API_URL}'
-      - '--set-env-vars'
-      - 'NEXT_PUBLIC_API_TOKEN=${_NEXT_PUBLIC_API_TOKEN}'
-      - '--set-env-vars'
-      - 'NEXT_PUBLIC_SITE_ID=${_NEXT_PUBLIC_SITE_ID}'
-      - '--set-env-vars'
-      - 'NEXT_PUBLIC_SITE_NAME=${_NEXT_PUBLIC_SITE_NAME}'
-      - '--set-env-vars'
-      - 'NEXT_PUBLIC_HOSTNAME=${_NEXT_PUBLIC_HOSTNAME}'
-      - '--set-env-vars'
-      - 'NEXT_LANG=${_NEXT_LANG}'
-      - '--set-env-vars'
-      - 'NEXT_PUBLIC_MEILISEARCH_HOST=${_NEXT_PUBLIC_MEILISEARCH_HOST}'
-      - '--set-env-vars'
-      - 'NEXT_PUBLIC_MEILISEARCH_SEARCH_KEY=${_NEXT_PUBLIC_MEILISEARCH_SEARCH_KEY}'
-      - '--set-env-vars'
-      - 'NEXT_PUBLIC_MEILISEARCH_INDEX_NAME=${_NEXT_PUBLIC_MEILISEARCH_INDEX_NAME}'
-      - '--set-env-vars'
-      - 'NEXT_PUBLIC_IMAGE_URL=${_NEXT_PUBLIC_IMAGE_URL}'
-      - '--set-env-vars'
-      - 'NEXT_PUBLIC_IMAGE_BUCKET=${_NEXT_PUBLIC_IMAGE_BUCKET}'
-      - '--set-env-vars'
-      - 'REDIS_HOST=${_REDIS_HOST}'
-      - '--set-env-vars'
-      - 'REDIS_PORT=${_REDIS_PORT}'
-      - '--set-env-vars'
-      - 'REDIS_PASSWORD=${_REDIS_PASSWORD}'
+      - '--allow-unauthenticated'
+      # --- VPC Connector Configuration ---
       - '--vpc-connector'
       - '${_VPC_CONNECTOR}'
       - '--vpc-egress'
-      - 'private-ranges-only'
-      - '--allow-unauthenticated'
+      - 'private-ranges-only' # Or 'all-traffic' depending on your needs
+      # --- Environment Variables ---
+      - '--set-env-vars'
+      - |- # Use |- for multi-line string
+        NODE_ENV=production,
+        NEXT_PUBLIC_API_URL=${_NEXT_PUBLIC_API_URL},
+        NEXT_PUBLIC_API_TOKEN=${_NEXT_PUBLIC_API_TOKEN},
+        NEXT_PUBLIC_SITE_ID=${_NEXT_PUBLIC_SITE_ID},
+        NEXT_PUBLIC_SITE_NAME=${_NEXT_PUBLIC_SITE_NAME},
+        NEXT_PUBLIC_HOSTNAME=${_NEXT_PUBLIC_HOSTNAME},
+        NEXT_LANG=${_NEXT_LANG},
+        NEXT_PUBLIC_MEILISEARCH_HOST=${_NEXT_PUBLIC_MEILISEARCH_HOST},
+        NEXT_PUBLIC_MEILISEARCH_SEARCH_KEY=${_NEXT_PUBLIC_MEILISEARCH_SEARCH_KEY},
+        NEXT_PUBLIC_MEILISEARCH_INDEX_NAME=${_NEXT_PUBLIC_MEILISEARCH_INDEX_NAME},
+        NEXT_PUBLIC_IMAGE_URL=${_NEXT_PUBLIC_IMAGE_URL},
+        NEXT_PUBLIC_IMAGE_BUCKET=${_NEXT_PUBLIC_IMAGE_BUCKET},
+        REDIS_HOST=${_REDIS_HOST},
+        REDIS_PORT=${_REDIS_PORT},
+        REDIS_PASSWORD=${_REDIS_PASSWORD}
 
-# Default substitution variables (can be overridden)
+# List of images built by this pipeline
+images:
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${_SERVICE_NAME}:$COMMIT_SHA'
+
+# Default substitution values.
+# Override these in your Cloud Build trigger configuration.
 substitutions:
-  _ARTIFACT_REGISTRY_URL: 'europe-west1-docker.pkg.dev'
-  _REPOSITORY: 'nextjs-apps'
-  _IMAGE_NAME: 'casino-site'
-  _SERVICE_NAME: 'casino-site'
-  _REGION: 'europe-west1'
-  _MEMORY: '1Gi'
-  _CPU: '1'
-  _MIN_INSTANCES: '1'
-  _MAX_INSTANCES: '100'
-  _CONCURRENCY: '1000'
-  _VPC_CONNECTOR: 'projects/${PROJECT_ID}/locations/${_REGION}/connectors/redis-connector'
+  _SERVICE_NAME: 'gds-optimised'
+  _REGION: 'europe-west8'
+  _ARTIFACT_REGISTRY_REPO: 'nextjs-apps' # Your Artifact Registry repository name
+  _VPC_CONNECTOR: 'projects/${PROJECT_ID}/locations/${_REGION}/connectors/redis-connector' # Fully qualified name
+
+  # --- Application Environment Variables ---
+  _NEXT_PUBLIC_API_URL: 'http://your-api.example.com'
+  _NEXT_PUBLIC_API_TOKEN: 'your_api_token'
+  _NEXT_PUBLIC_SITE_ID: 'gds'
+  _NEXT_PUBLIC_SITE_NAME: 'Production Site'
+  _NEXT_PUBLIC_HOSTNAME: 'www.example.com'
+  _NEXT_LANG: 'en'
+  _NEXT_PUBLIC_MEILISEARCH_HOST: 'http://your-meili.example.com'
+  _NEXT_PUBLIC_MEILISEARCH_SEARCH_KEY: 'your_meili_search_key'
+  _NEXT_PUBLIC_MEILISEARCH_INDEX_NAME: 'your_meili_index'
+  _NEXT_PUBLIC_IMAGE_URL: 'http://images.example.com'
+  _NEXT_PUBLIC_IMAGE_BUCKET: 'your-image-bucket-name'
+  
+  # --- Secret/VPC substitutions (Best to configure in trigger) ---
+  _REDIS_HOST: '10.0.0.3'
+  _REDIS_PORT: '6379'
+  _REDIS_PASSWORD: 'your-redis-auth-string'
+
 
 options:
   logging: CLOUD_LOGGING_ONLY
   machineType: 'E2_HIGHCPU_8'
+  dynamicSubstitutions: true
 
 timeout: '1200s'
