@@ -25,7 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
       homepage.seo?.metaDescription || translations?.homePageDescription || "",
     keywords: homepage.seo?.keywords,
     canonicalUrl: process.env.NEXT_PUBLIC_SITE_URL,
-    image: homepage.seo?.metaImage?.url,
+    // image: homepage.seo?.metaImage?.url,
   });
 }
 

@@ -2,6 +2,7 @@
 
 // Skeleton components for loading states
 export { Skeleton, SkeletonText } from "./Skeleton";
+export { Collapsible } from "./Collapsible";
 
 // Add other UI components as they are created:
 // export { Button } from "./Button";

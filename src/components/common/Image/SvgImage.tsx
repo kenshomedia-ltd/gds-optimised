@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import NextImage from "next/image";
 import DOMPurify from "isomorphic-dompurify";
 
 interface SvgImageProps {
@@ -145,18 +146,19 @@ export function SvgImage({
     }
   }, [svgContent, width, height, className, svgProps]);
 
-  // Regular img tag for non-embedded SVGs
+  // Use Next.js Image for non-embedded SVGs
   if (!embedSvg) {
     return (
-      <img
+      <NextImage
         src={src}
         alt={alt}
-        width={width}
-        height={height}
+        width={width || 24}
+        height={height || 24}
         className={className}
         onLoad={onLoad}
         onError={onError}
         loading="lazy"
+        unoptimized // SVGs don't need Next.js optimization
       />
     );
   }

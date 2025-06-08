@@ -3,7 +3,17 @@
 
 import dynamic from "next/dynamic";
 import { Suspense } from "react";
-import type { DynamicBlockProps } from "@/types/dynamic-block.types";
+import type {
+  DynamicBlockProps,
+  HomeBlogListBlock,
+  HomeCasinoListBlock,
+  HomeFeaturedProvidersBlock,
+  HomeGameListBlock,
+  HomeTestimoniesBlock,
+  IntroductionWithImageBlock,
+  OverviewBlock,
+  SingleContentBlock,
+} from "@/types/dynamic-block.types";
 import { Skeleton } from "@/components/ui/Skeleton";
 
 // Lazy load components for better performance
@@ -100,71 +110,76 @@ export function DynamicBlock({
 
   // Prepare props based on block type
   const getComponentProps = () => {
-    const baseProps = {
-      ...blockData,
-      translations: additionalData?.translations,
-    };
+    // Removed baseProps to ensure type safety within each case.
 
     switch (blockType) {
       case "homepage.home-game-list":
         return {
-          block: blockData,
+          block: blockData as HomeGameListBlock,
           games: additionalData?.games || [],
           translations: additionalData?.translations,
         };
 
       case "homepage.home-blog-list":
         return {
-          block: blockData,
+          block: blockData as HomeBlogListBlock,
           blogs: additionalData?.blogs || [],
           translations: additionalData?.translations,
         };
 
-        case "homepage.home-casino-list":
-          return {
-            block: blockData,
-            casinos: additionalData?.casinos || [],
-            translations: additionalData?.translations,
-          };
+      case "homepage.home-casino-list":
+        return {
+          block: blockData as HomeCasinoListBlock,
+          casinos: additionalData?.casinos || [],
+          translations: additionalData?.translations,
+        };
 
       case "shared.introduction-with-image":
+        const introData = blockData as IntroductionWithImageBlock;
         return {
-          heading: blockData.heading,
-          introduction: blockData.introduction,
-          image: blockData.image,
+          heading: introData.heading,
+          introduction: introData.introduction,
+          image: introData.image,
           translations: additionalData?.translations,
           isHomePage: true,
         };
 
       case "homepage.home-featured-providers":
         return {
-          data: blockData,
+          data: blockData as HomeFeaturedProvidersBlock,
           translations: additionalData?.translations,
         };
 
       case "shared.overview-block":
         return {
-          data: blockData,
+          data: blockData as OverviewBlock,
         };
 
-        case "shared.single-content":
-          return {
-            block: blockData,
-          };
+      case "shared.single-content":
+        return {
+          block: blockData as SingleContentBlock,
+        };
 
-        case "homepage.home-testimonies":
-          return {
-            data: blockData,
-          };
+      case "homepage.home-testimonies":
+        return {
+          data: blockData as HomeTestimoniesBlock,
+        };
 
+      // Ensure all components in the map have a case here
       default:
-        return baseProps;
+        return { data: blockData };
     }
   };
 
+  // The type-safe alternative to using 'any'
+  const TypedComponent = Component as unknown as React.FC<
+    Record<string, unknown>
+  >;
+
+
   return (
     <Suspense fallback={<Skeleton className="h-48 w-full animate-pulse" />}>
-      <Component {...getComponentProps()} />
+      <TypedComponent {...getComponentProps()} />
     </Suspense>
   );
 }

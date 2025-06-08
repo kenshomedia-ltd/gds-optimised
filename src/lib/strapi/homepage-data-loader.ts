@@ -487,8 +487,8 @@ const getHomepageDataCached = cache(
  * Next.js unstable_cache for persistent caching with ISR
  */
 const getHomepageDataPersistent = unstable_cache(
-  async (locale?: string) => {
-    return getHomepageDataCached(locale);
+  async () => {
+    return getHomepageDataCached();
   },
   ["homepage-data"],
   {
@@ -503,19 +503,18 @@ const getHomepageDataPersistent = unstable_cache(
  */
 export async function getHomepageData(
   options: {
-    locale?: string;
     cached?: boolean;
   } = {}
 ): Promise<HomepageDataResponse> {
-  const { locale = "en", cached = true } = options;
+  const { cached = true } = options;
 
   // Use persistent cache by default
   if (cached) {
-    return getHomepageDataPersistent(locale);
+    return getHomepageDataPersistent();
   }
 
   // Direct fetch without persistent cache (still uses React cache)
-  return getHomepageDataCached(locale);
+  return getHomepageDataCached();
 }
 
 /**

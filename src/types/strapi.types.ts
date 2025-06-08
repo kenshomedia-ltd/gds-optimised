@@ -1,5 +1,7 @@
 // src/types/strapi.types.ts
 
+import { BaseHomepageBlock } from "./homepage.types";
+
 /**
  * Base Strapi response wrapper
  */
@@ -33,6 +35,14 @@ export interface StrapiImageFormat {
 /**
  * Strapi image data
  */
+
+// Define a more specific type for the nested image structure
+export interface NestedStrapiImage {
+  data?: {
+    attributes?: StrapiImage;
+  };
+}
+
 export interface StrapiImage {
   id: number;
   documentId: string;
@@ -54,7 +64,6 @@ export interface StrapiImage {
   url: string;
   previewUrl?: string | null;
   provider?: string;
-  provider_metadata?: any;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -175,6 +184,15 @@ export interface GameEmbedCode {
 }
 
 /**
+ * FAQ item
+ */
+export interface Faqs {
+  id: number;
+  question: string;
+  answer: string;
+};
+
+/**
  * Game info table
  */
 export interface GameInfoTable {
@@ -198,7 +216,6 @@ export interface SEOData {
   keywords?: string;
   canonicalURL?: string;
   metaRobots?: string;
-  structuredData?: any;
   metaSocial?: {
     socialNetwork: string;
     title: string;
@@ -215,6 +232,32 @@ export interface FAQItem {
   question: string;
   answer: string;
 }
+
+export interface HowTo {
+  id: number;
+  heading: string;
+  copy: string;
+  image: StrapiImage;
+};
+
+export interface HowToGroup {
+  id: number;
+  title: string;
+  description: string;
+  howToGroup: HowTo[];
+};
+
+export interface ProsCons {
+  heading: string;
+  pros: {
+    list: string;
+  }[];
+  proImage: StrapiImage;
+  cons: {
+    list: string;
+  }[];
+  conImage: StrapiImage;
+};
 
 /**
  * Game data structure
@@ -244,9 +287,12 @@ export interface GameData {
   gameInfoTable?: GameInfoTable;
   seo?: SEOData;
   faqs?: FAQItem[];
-  howTo?: any;
-  proscons?: any;
-  blocks?: any[];
+  howTo?: {
+    title: string;
+    howToGroup: HowToGroup;
+  };
+  proscons?: ProsCons;
+  blocks?: BaseHomepageBlock[];
 }
 
 /**

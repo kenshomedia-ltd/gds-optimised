@@ -1,4 +1,5 @@
 // src/components/layout/Legal/LegalServer.tsx
+import Image from "next/image";
 import type { LegalProps } from "./legal.types";
 
 /**
@@ -9,7 +10,7 @@ import type { LegalProps } from "./legal.types";
  *
  * Features:
  * - No client-side JavaScript required
- * - Inline SVGs for immediate rendering
+ * - Next.js Image optimization
  * - Preload hints for better performance
  *
  * @param {LegalProps} props - Component props
@@ -47,39 +48,39 @@ export function LegalServer({ legalText, className }: LegalProps) {
           {/* Legal text with proper spacing */}
           <span className="mr-2 leading-tight">{legalText}</span>
 
-          {/* Compliance icons */}
+          {/* Compliance icons using Next.js Image */}
           <div
             className="flex items-center gap-[2px]"
             aria-label="Compliance certifications"
           >
-            <img
+            <Image
               src="/icons/logo-timone.svg"
               alt="Logo Timone - Regulatory compliance"
               width={40}
               height={25}
               className="inline-block"
-              loading="eager"
-              decoding="async"
+              priority
+              unoptimized // SVGs don't need optimization
             />
 
-            <img
+            <Image
               src="/icons/logo-adm.svg"
               alt="ADM - Agenzia delle Dogane e dei Monopoli certification"
               width={60}
               height={25}
               className="inline-block"
-              loading="eager"
-              decoding="async"
+              priority
+              unoptimized // SVGs don't need optimization
             />
 
-            <img
+            <Image
               src="/icons/plus-18.svg"
               alt="18+ Age restriction - Gambling is prohibited for minors"
               width={40}
               height={22}
               className="inline-block"
-              loading="eager"
-              decoding="async"
+              priority
+              unoptimized // SVGs don't need optimization
             />
           </div>
         </div>

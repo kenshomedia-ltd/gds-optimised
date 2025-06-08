@@ -38,7 +38,7 @@ export interface GameData {
   createdAt: string;
   updatedAt?: string;
   publishedAt?: string;
-  images?: StrapiImage;
+  images?: StrapiImage | StrapiImage[];
   provider?: GameProvider;
   categories?: GameCategory[];
   isGameDisabled?: boolean;

@@ -5,8 +5,39 @@ import { useState } from "react";
 import { Image } from "@/components/common/Image";
 import { TimeDate } from "@/components/common/TimeDate";
 import { HeaderAuthor } from "@/components/common/HeaderAuthor";
-import type { IntroWithImageProps } from "@/types/intro-with-image.types";
+import type {
+  IntroWithImageProps,
+  ImageProp,
+} from "@/types/intro-with-image.types";
+import type { StrapiImage, NestedStrapiImage } from "@/types/strapi.types";
 import { cn } from "@/lib/utils/cn";
+
+/**
+ * Type guard to check if image has nested structure
+ */
+function isNestedImage(image: ImageProp): image is NestedStrapiImage {
+  return (
+    image !== null &&
+    typeof image === "object" &&
+    "data" in image &&
+    !("url" in image)
+  ); // This ensures it's not a StrapiImage
+}
+
+/**
+ * Extract image data from either nested or direct structure
+ */
+function extractImageData(
+  image: ImageProp | undefined
+): StrapiImage | undefined {
+  if (!image) return undefined;
+
+  if (isNestedImage(image)) {
+    return image.data?.attributes;
+  }
+
+  return image as StrapiImage;
+}
 
 /**
  * IntroWithImage Component
@@ -32,15 +63,10 @@ export function IntroWithImage({
   const [isExpanded, setIsExpanded] = useState(false);
 
   // Process image data - handle both nested and direct structures
-  const imageData = image?.data || image;
-  const imageUrl = imageData?.attributes?.url || imageData?.url;
-  const imageAlt =
-    imageData?.attributes?.alternativeText ||
-    imageData?.alternativeText ||
-    heading ||
-    "";
-  // const imageMime = imageData?.attributes?.mime || imageData?.mime;
-  const hasImage = Boolean(imageUrl);
+  const imageData = extractImageData(image);
+  const imageUrl = imageData?.url;
+  const imageAlt = imageData?.alternativeText || heading || "";
+  const hasValidImage = Boolean(imageUrl); // Renamed for clarity
 
   // Determine if content should be truncated on mobile
   const shouldTruncate =
@@ -51,7 +77,7 @@ export function IntroWithImage({
       <div
         className={cn(
           "relative grid grid-cols-12 gap-4 pb-5 px-4 lg:px-0 lg:gap-8",
-          hasImage ? "pt-0 lg:pt-10" : "pt-5",
+          hasValidImage ? "pt-0 lg:pt-10" : "pt-5",
           "xl:container xl:mx-auto"
         )}
       >
@@ -59,7 +85,9 @@ export function IntroWithImage({
         <div
           className={cn(
             "col-span-12 lg:z-20",
-            hasImage ? "order-2 lg:order-1 lg:col-span-7" : "lg:col-span-12"
+            hasValidImage
+              ? "order-2 lg:order-1 lg:col-span-7"
+              : "lg:col-span-12"
           )}
         >
           <div className="mx-auto lg:mx-0">
@@ -133,7 +161,7 @@ export function IntroWithImage({
         </div>
 
         {/* Image Column */}
-        {hasImage && (
+        {hasValidImage && imageUrl && imageData && (
           <div
             className={cn(
               "col-span-12 lg:col-span-5",
@@ -146,8 +174,8 @@ export function IntroWithImage({
               <Image
                 src={imageUrl}
                 alt={imageAlt}
-                width={515}
-                height={200}
+                width={imageData.width || 515}
+                height={imageData.height || 200}
                 className="w-full h-auto rounded-lg shadow-xl"
                 priority={isHomePage}
                 progressive={true}

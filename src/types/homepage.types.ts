@@ -31,6 +31,18 @@ export interface BaseHomepageBlock {
   __component: HomepageBlockComponent;
 }
 
+export interface DynamicBlockProps {
+  // blockType prop is no longer needed as it can be derived from blockData
+  blockData: HomepageBlock; // Changed from 'any' to the union type 'HomepageBlock'
+  additionalData?: {
+    translations?: Record<string, string>;
+    games?: GameData[];
+    casinos?: CasinoData[];
+    blogs?: BlogData[];
+    country?: string;
+  };
+}
+
 /**
  * Single content block
  */

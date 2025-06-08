@@ -25,9 +25,13 @@ export function GameCard({
   priority = false,
   loading = "lazy",
   className,
-  // index = 0,
-}: GameCardProps) {
+}: // index = 0,
+GameCardProps) {
   const [imageError, setImageError] = useState(false);
+
+  // Get the first image from the array
+  const gameImage = Array.isArray(game.images) ? game.images[0] : game.images;
+  const hasImage = gameImage && gameImage.url;
 
   // Calculate if game is new (within 14 days)
   const isNewGame = () => {
@@ -86,10 +90,10 @@ export function GameCard({
 
       {/* Game image container */}
       <div className="absolute inset-0 overflow-hidden rounded-lg bg-gray-200">
-        {!imageError && game.images?.url ? (
+        {!imageError && hasImage ? (
           <Image
-            src={game.images.url}
-            alt={game.images.alternativeText || `${game.title} slot game`}
+            src={gameImage.url}
+            alt={gameImage.alternativeText || `${game.title} slot game`}
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
             loading={loading}
@@ -187,8 +191,10 @@ export function GameCard({
             <FavoriteButton
               gameId={game.id}
               gameTitle={game.title}
+              game={game}
               translations={translations}
               className="ml-2"
+              size="sm"
             />
           </div>
 

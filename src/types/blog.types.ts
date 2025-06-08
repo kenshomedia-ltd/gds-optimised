@@ -1,6 +1,6 @@
 // src/types/blog.types.ts
 
-import type { StrapiImage } from "./strapi.types";
+import type { StrapiImage, SEOData } from "./strapi.types";
 
 /**
  * Blog author structure
@@ -47,7 +47,7 @@ export interface BlogData {
   blogCategory?: BlogCategory;
   categories?: BlogCategory[];
   tags?: string[];
-  seo?: any;
+  seo: SEOData;
 }
 
 /**

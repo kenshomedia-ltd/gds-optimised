@@ -1,22 +1,32 @@
-// src/components/layout/DynamicTheme.tsx
+// src/components/layout/DynamicTheme/DynamicTheme.tsx
 
-// This is a server component, so this logic runs only on the server.
+/**
+ * DynamicTheme Component
+ *
+ * Server component that dynamically loads CSS themes based on site ID.
+ * Falls back to 'gds' theme if the requested theme is not found.
+ */
 const DynamicTheme = async ({ siteId }: { siteId: string }) => {
   try {
-    // Attempt to import the site-specific theme.
-    // The '@' path alias should be configured in your tsconfig.json
+    // This works because webpack can statically analyze the pattern
+    // It will create chunks for all CSS files matching the pattern in the themes directory
     await import(`@/app/themes/${siteId}-theme.css`);
     console.log(`Successfully loaded theme for: ${siteId}`);
   } catch (error) {
-    // If it fails (e.g., file not found), import the default theme.
-    await import("@/app/themes/gds-theme.css");
+    // If the specific theme doesn't exist, fall back to default
     console.log(
-      `'${siteId}-theme.css' not found. Fell back to 'gds-theme.css'. | Error: ${error}`
+      `'${siteId}-theme.css' not found. Falling back to 'gds-theme.css'. | Error: ${error}`
     );
+
+    try {
+      await import("@/app/themes/gds-theme.css");
+    } catch (fallbackError) {
+      console.error(`Failed to load default theme: ${fallbackError}`);
+    }
   }
 
-  // This component doesn't render any JSX. Its only purpose is to
-  // add a CSS import to the page's dependency graph.
+  // This component doesn't render any JSX.
+  // Its only purpose is to add a CSS import to the page's dependency graph.
   return null;
 };
 

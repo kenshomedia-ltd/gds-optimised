@@ -69,6 +69,9 @@ export function FavoritesProvider({
 
   // Convert GameData to FavoriteGame format
   const gameToFavorite = useCallback((game: GameData): FavoriteGame => {
+    // Handle images - get the first image if it's an array
+    const gameImage = Array.isArray(game.images) ? game.images[0] : game.images;
+
     return {
       id: game.id,
       title: game.title,
@@ -81,9 +84,9 @@ export function FavoritesProvider({
             title: game.provider.title,
           }
         : undefined,
-      images: game.images
+      images: gameImage
         ? {
-            url: game.images.url,
+            url: gameImage.url,
           }
         : undefined,
       categories: game.categories?.map((cat) => ({ title: cat.title })),

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Image } from "@/components/common/Image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@awesome.me/kit-0e07a43543/icons/duotone/light";
+import type { StrapiImage } from "@/types/strapi.types";
 
 interface HeaderAuthorProps {
   author: {
@@ -12,12 +13,7 @@ interface HeaderAuthorProps {
     firstName: string;
     lastName: string;
     slug?: string;
-    photo?: {
-      url: string;
-      width?: number;
-      height?: number;
-      alternativeText?: string;
-    };
+    photo?: StrapiImage;
   };
   translations?: Record<string, string>;
   className?: string;
@@ -43,12 +39,12 @@ export function HeaderAuthor({
 
   const content = (
     <>
-      {author.photo ? (
+      {author.photo?.url ? (
         <Image
           src={author.photo.url}
-          alt={authorName}
-          width={24}
-          height={24}
+          alt={author.photo.alternativeText || authorName}
+          width={author.photo.width || 24}
+          height={author.photo.height || 24}
           className="w-6 h-6 rounded-full object-cover"
           quality={85}
         />

@@ -6,7 +6,15 @@ export { HomeGameList } from "./HomeGameList";
 export {
   FeaturedProviders,
   FeaturedProvidersSkeleton,
+  FeaturedProvidersServer,
 } from "./FeaturedProviders";
+
+export { CasinoList } from "./CasinoList";
+
+export {
+  HomeLatestBlogs,
+  HomeLatestBlogsSkeleton,
+} from "./HomeLatestBlogs";
 
 export { Testimonials, TestimonialsSkeleton } from "./Testimonials";
 

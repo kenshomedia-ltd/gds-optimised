@@ -2,11 +2,48 @@
 import qs from "qs";
 import { Redis } from "ioredis";
 import type {
-  StrapiResponse,
   LayoutData,
   NavigationData,
   TranslationData,
+  GameData,
+  // BlogData,
+  GamesListResponse,
 } from "@/types/strapi.types";
+
+// Define types for Strapi queries
+interface StrapiQuery {
+  fields?: string[];
+  populate?: Record<string, unknown> | string;
+  filters?: Record<string, unknown>;
+  sort?: string | string[];
+  pagination?: {
+    page?: number;
+    pageSize?: number;
+    withCount?: boolean;
+  };
+}
+
+interface StrapiMetaResponse {
+  pagination?: {
+    page: number;
+    pageSize: number;
+    pageCount: number;
+    total: number;
+  };
+}
+
+interface StrapiDataResponse<T> {
+  data: T;
+  meta?: StrapiMetaResponse;
+}
+
+interface TranslationResponse {
+  data: {
+    translation?:
+      | Array<{ key: string; value: string }>
+      | Record<string, string>;
+  };
+}
 
 // Initialize Redis client
 const redis = new Redis({
@@ -35,17 +72,6 @@ export const REVALIDATE_TIMES = {
   static: 3600, // 1 hour for relatively static content
 };
 
-interface TranslationItem {
-  key: string;
-  value: string;
-}
-
-interface TranslationResponse {
-  data: {
-    translation: TranslationItem[] | Record<string, string>;
-  };
-}
-
 class StrapiClient {
   private baseURL: string;
   private token: string;
@@ -72,10 +98,7 @@ class StrapiClient {
   /**
    * Generate cache key with proper namespace
    */
-  private getCacheKey(
-    endpoint: string,
-    params: Record<string, any> = {}
-  ): string {
+  private getCacheKey(endpoint: string, params: StrapiQuery = {}): string {
     const paramsHash = qs.stringify(params, {
       encodeValuesOnly: true,
       skipNulls: true,
@@ -87,9 +110,9 @@ class StrapiClient {
   /**
    * Fetch with automatic caching and error handling
    */
-  private async fetchWithCache<T>(
+  async fetchWithCache<T>(
     endpoint: string,
-    query: Record<string, any> = {},
+    query: StrapiQuery = {},
     ttl?: number
   ): Promise<T> {
     const cacheKey = this.getCacheKey(endpoint, query);
@@ -127,7 +150,7 @@ class StrapiClient {
    */
   private async fetch<T>(
     endpoint: string,
-    query: Record<string, any> = {},
+    query: StrapiQuery = {},
     retries = 3
   ): Promise<T> {
     if (!this.baseURL || !this.token) {
@@ -207,13 +230,16 @@ class StrapiClient {
       }
 
       return response.json();
-    } catch (error: any) {
+    } catch (error: unknown) {
       clearTimeout(timeout);
+
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
 
       // Don't retry JSON parse errors
       if (
-        error.message.includes("JSON") ||
-        error.message.includes("Expected JSON")
+        errorMessage.includes("JSON") ||
+        errorMessage.includes("Expected JSON")
       ) {
         console.error(`Invalid response format from ${endpoint}:`, error);
         throw error;
@@ -222,7 +248,8 @@ class StrapiClient {
       // Retry logic for network errors
       if (
         retries > 0 &&
-        (error.name === "AbortError" || error.message.includes("fetch"))
+        error instanceof Error &&
+        (error.name === "AbortError" || errorMessage.includes("fetch"))
       ) {
         console.warn(`Retrying ${endpoint}, attempts left: ${retries}`);
         await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait 1s before retry
@@ -252,7 +279,7 @@ class StrapiClient {
    * Get layout critical data with optimized query
    */
   async getLayoutCritical(): Promise<LayoutData> {
-    const query = {
+    const query: StrapiQuery = {
       populate: {
         Logo: {
           fields: ["url", "width", "height"],
@@ -269,7 +296,7 @@ class StrapiClient {
       },
     };
 
-    const response = await this.fetchWithCache<{ data: LayoutData }>(
+    const response = await this.fetchWithCache<StrapiDataResponse<LayoutData>>(
       "layout",
       query,
       CACHE_TTL.layout
@@ -281,7 +308,7 @@ class StrapiClient {
    * Get navigation data with proper caching
    */
   async getNavigation(): Promise<NavigationData> {
-    const query = {
+    const query: StrapiQuery = {
       populate: {
         mainNavigation: {
           fields: ["title", "url"],
@@ -330,11 +357,9 @@ class StrapiClient {
       },
     };
 
-    const response = await this.fetchWithCache<{ data: NavigationData }>(
-      "main-navigation",
-      query,
-      CACHE_TTL.navigation
-    );
+    const response = await this.fetchWithCache<
+      StrapiDataResponse<NavigationData>
+    >("main-navigation", query, CACHE_TTL.navigation);
     return response.data;
   }
 
@@ -342,7 +367,7 @@ class StrapiClient {
    * Get translations with extended caching
    */
   async getTranslations(): Promise<TranslationData> {
-    const query = {
+    const query: StrapiQuery = {
       populate: "*",
     };
 
@@ -360,19 +385,16 @@ class StrapiClient {
 
     // If translations come as an array, convert to object
     if (Array.isArray(response.data.translation)) {
-      return response.data.translation.reduce(
-        (acc: TranslationData, item: any) => {
-          if (item.key && item.value) {
-            acc[item.key] = item.value;
-          }
-          return acc;
-        },
-        {}
-      );
+      return response.data.translation.reduce((acc: TranslationData, item) => {
+        if (item.key && item.value) {
+          acc[item.key] = item.value;
+        }
+        return acc;
+      }, {});
     }
 
     // If already an object, return directly
-    return response.data;
+    return response.data as unknown as TranslationData;
   }
 
   /**
@@ -387,7 +409,7 @@ class StrapiClient {
       categories?: string[];
       author?: string;
     } = {}
-  ): Promise<any> {
+  ): Promise<GamesListResponse> {
     const {
       page = 1,
       pageSize = 18,
@@ -397,7 +419,7 @@ class StrapiClient {
       author = "",
     } = options;
 
-    const query = {
+    const query: StrapiQuery = {
       fields: [
         "title",
         "slug",
@@ -454,14 +476,18 @@ class StrapiClient {
       },
     };
 
-    return this.fetchWithCache<any>("games", query, CACHE_TTL.games);
+    return this.fetchWithCache<GamesListResponse>(
+      "games",
+      query,
+      CACHE_TTL.games
+    );
   }
 
   /**
    * Get single game with full details
    */
-  async getGameBySlug(slug: string): Promise<any> {
-    const query = {
+  async getGameBySlug(slug: string): Promise<GameData | null> {
+    const query: StrapiQuery = {
       fields: [
         "title",
         "heading",
@@ -532,7 +558,7 @@ class StrapiClient {
       },
     };
 
-    const response = await this.fetchWithCache<any>(
+    const response = await this.fetchWithCache<GamesListResponse>(
       "games",
       query,
       CACHE_TTL.gameDetail
@@ -543,7 +569,7 @@ class StrapiClient {
   /**
    * Get popular games with view-based sorting
    */
-  async getPopularGames(limit: number = 10): Promise<any> {
+  async getPopularGames(limit: number = 10): Promise<GamesListResponse> {
     return this.getGames({
       pageSize: limit,
       sort: "views:desc,ratingAvg:desc",
@@ -553,11 +579,11 @@ class StrapiClient {
   /**
    * Get new games from last 14 days
    */
-  async getNewGames(limit: number = 10): Promise<any> {
+  async getNewGames(limit: number = 10): Promise<GamesListResponse> {
     const twoWeeksAgo = new Date();
     twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
 
-    const query = {
+    const query: StrapiQuery = {
       fields: ["title", "slug", "ratingAvg", "createdAt"],
       populate: {
         images: {
@@ -581,7 +607,11 @@ class StrapiClient {
       },
     };
 
-    return this.fetchWithCache<any>("games", query, CACHE_TTL.games);
+    return this.fetchWithCache<GamesListResponse>(
+      "games",
+      query,
+      CACHE_TTL.games
+    );
   }
 
   /**

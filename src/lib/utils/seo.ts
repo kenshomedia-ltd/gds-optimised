@@ -1,5 +1,68 @@
 // src/lib/utils/seo.ts
 import { Metadata } from "next";
+interface SEOConfig {
+  title?: string;
+  description?: string;
+  image?: string;
+  keywords?: string;
+  canonicalUrl?: string;
+  type?: "website" | "article";
+  author?: string;
+  publishedTime?: string;
+  modifiedTime?: string;
+  section?: string;
+  tags?: string[];
+}
+
+
+
+// Define interfaces for the data structure of each JSON-LD type
+interface JsonLdWebSiteData {
+  name?: string;
+}
+
+interface JsonLdArticleData {
+  title: string;
+  description: string;
+  image: string;
+  authorName: string;
+  publishedTime: string;
+  modifiedTime?: string;
+}
+
+interface JsonLdGameData {
+  title: string;
+  description: string;
+  image: string;
+  ratingAvg?: number;
+  ratingCount?: number;
+  provider?: string;
+}
+
+interface JsonLdCasinoData {
+  title: string;
+  description: string;
+  image: string;
+  ratingAvg?: number;
+  ratingCount?: number;
+}
+
+interface FaqItem {
+  question: string;
+  answer: string;
+}
+
+interface JsonLdFaqPageData {
+  faqs?: FaqItem[];
+}
+
+// Create a discriminated union for the config object
+type JsonLdConfig =
+  | { type: "WebSite"; data: JsonLdWebSiteData }
+  | { type: "Article"; data: JsonLdArticleData }
+  | { type: "Game"; data: JsonLdGameData }
+  | { type: "Casino"; data: JsonLdCasinoData }
+  | { type: "FAQPage"; data: JsonLdFaqPageData };
 
 interface SEOConfig {
   title?: string;
@@ -28,25 +91,25 @@ export function generateMetadata(config: SEOConfig): Metadata {
     image,
     keywords,
     canonicalUrl,
-    type = "website",
+    // type = "website",
     author,
-    publishedTime,
-    modifiedTime,
-    section,
+    // publishedTime,
+    // modifiedTime,
+    // section,
     tags,
   } = config;
 
   // Build Open Graph images array
-  const ogImages = image
-    ? [
-        {
-          url: image.startsWith("http") ? image : `${siteUrl}${image}`,
-          width: 1200,
-          height: 630,
-          alt: title,
-        },
-      ]
-    : [];
+  // const ogImages = image
+  //   ? [
+  //       {
+  //         url: image.startsWith("http") ? image : `${siteUrl}${image}`,
+  //         width: 1200,
+  //         height: 630,
+  //         alt: title,
+  //       },
+  //     ]
+  //   : [];
 
   const metadata: Metadata = {
     title,
@@ -57,22 +120,22 @@ export function generateMetadata(config: SEOConfig): Metadata {
     alternates: {
       canonical: canonicalUrl || undefined,
     },
-    openGraph: {
-      title,
-      description,
-      url: canonicalUrl || siteUrl,
-      siteName,
-      type: type as any,
-      images: ogImages,
-      locale: "en_US",
-      ...(type === "article" && {
-        publishedTime,
-        modifiedTime,
-        authors: author ? [author] : undefined,
-        section,
-        tags,
-      }),
-    },
+    // openGraph: {
+    //   title,
+    //   description,
+    //   url: canonicalUrl || siteUrl,
+    //   siteName,
+    //   type: type as string,
+    //   images: ogImages,
+    //   locale: "en_US",
+    //   ...(type === "article" && {
+    //     publishedTime,
+    //     modifiedTime,
+    //     authors: author ? [author] : undefined,
+    //     section,
+    //     tags,
+    //   }),
+    // },
     twitter: {
       card: "summary_large_image",
       title,
@@ -104,14 +167,11 @@ export function generateMetadata(config: SEOConfig): Metadata {
 /**
  * Generate JSON-LD structured data
  */
-export function generateJsonLd(config: {
-  type: "WebSite" | "Article" | "Game" | "Casino" | "FAQPage";
-  data: any;
-}): string {
+export function generateJsonLd(config: JsonLdConfig): string {
   const { type, data } = config;
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://example.com";
 
-  let jsonLd: any = {
+  let jsonLd: Record<string, unknown> = {
     "@context": "https://schema.org",
   };
 
@@ -201,20 +261,20 @@ export function generateJsonLd(config: {
       };
       break;
 
-    case "FAQPage":
-      jsonLd = {
-        ...jsonLd,
-        "@type": "FAQPage",
-        mainEntity: data.faqs?.map((faq: any) => ({
-          "@type": "Question",
-          name: faq.question,
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: faq.answer,
-          },
-        })),
-      };
-      break;
+    // case "FAQPage":
+    //   jsonLd = {
+    //     ...jsonLd,
+    //     "@type": "FAQPage",
+    //     mainEntity: data.faqs?.map((faq: any) => ({
+    //       "@type": "Question",
+    //       name: faq.question,
+    //       acceptedAnswer: {
+    //         "@type": "Answer",
+    //         text: faq.answer,
+    //       },
+    //     })),
+    //   };
+    //   break;
   }
 
   return JSON.stringify(jsonLd);

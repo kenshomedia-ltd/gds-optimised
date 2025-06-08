@@ -77,14 +77,14 @@ export function LazyImage({
     setHasLoaded(true);
     setHasError(false);
     imageProps.onLoad?.();
-  }, [imageProps.onLoad]);
+  }, [imageProps]);
 
   // Handle image error
   const handleError = useCallback(() => {
     setHasError(true);
     setHasLoaded(false);
     imageProps.onError?.();
-  }, [imageProps.onError]);
+  }, [imageProps]);
 
   // Calculate dimensions for placeholder
   const placeholderStyle = {

@@ -1,23 +1,23 @@
+// src/components/features/Search/SearchBar.tsx
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { instantMeiliSearch } from "@meilisearch/instant-meilisearch";
+import { MeiliSearch } from "meilisearch";
 import { Image } from "@/components/common/Image";
 import { icons } from "@/lib/icons/icons";
 import { cn } from "@/lib/utils/cn";
-import type { SearchBarProps, SearchResult } from "./search.types";
+import type { SearchBarProps, SearchResult } from "@/types/search.types";
 
 // Initialize Meilisearch client
-const { searchClient } = instantMeiliSearch(
-  process.env.NEXT_PUBLIC_MEILISEARCH_HOST || "http://127.0.0.1:7700",
-  process.env.NEXT_PUBLIC_MEILISEARCH_SEARCH_KEY || "",
-  {
-    placeholderSearch: false,
-    // You can customize the highlight tags here, but we will replace them manually
-    // highlightPreTag: '<mark>',
-    // highlightPostTag: '</mark>',
-  }
+const client = new MeiliSearch({
+  host: process.env.NEXT_PUBLIC_MEILISEARCH_HOST || "http://127.0.0.1:7700",
+  apiKey: process.env.NEXT_PUBLIC_MEILISEARCH_SEARCH_KEY || "",
+});
+
+// Get the search index
+const searchIndex = client.index(
+  process.env.NEXT_PUBLIC_MEILISEARCH_INDEX_NAME || "games"
 );
 
 export function SearchBar({
@@ -43,33 +43,26 @@ export function SearchBar({
       setIsSearching(false);
       return;
     }
-    const debounceTimeout = setTimeout(() => {
+
+    const debounceTimeout = setTimeout(async () => {
       setIsSearching(true);
-      searchClient
-        .search<SearchResult>([
-          {
-            indexName:
-              process.env.NEXT_PUBLIC_MEILISEARCH_INDEX_NAME || "games",
-            query,
-            params: {
-              hitsPerPage: maxResults,
-              attributesToHighlight: ["title"],
-              highlightPreTag: "__ais-highlight__",
-              highlightPostTag: "__/ais-highlight__",
-            },
-          },
-        ])
-        .then(({ results: searchResults }) => {
-          setResults(searchResults[0]?.hits || []);
-        })
-        .catch((err) => {
-          console.error("MeiliSearch error:", err);
-          setResults([]);
-        })
-        .finally(() => {
-          setIsSearching(false);
+      try {
+        const searchResults = await searchIndex.search<SearchResult>(query, {
+          limit: maxResults,
+          attributesToHighlight: ["title"],
+          highlightPreTag: "__ais-highlight__",
+          highlightPostTag: "__/ais-highlight__",
         });
+
+        setResults(searchResults.hits);
+      } catch (err) {
+        console.error("MeiliSearch error:", err);
+        setResults([]);
+      } finally {
+        setIsSearching(false);
+      }
     }, 300);
+
     return () => clearTimeout(debounceTimeout);
   }, [query, maxResults]);
 
@@ -177,7 +170,7 @@ export function SearchBar({
             {!isSearching && results.length > 0 && (
               <ul>
                 {results.map((hit) => {
-                  // START OF FIX
+                  // Handle highlighting
                   const highlightedTitle =
                     hit._highlightResult?.title?.value || hit.title;
                   const formattedTitle = highlightedTitle
@@ -186,7 +179,6 @@ export function SearchBar({
                       '<mark class="font-semibold text-primary bg-transparent">'
                     )
                     .replace(/__\/ais-highlight__/g, "</mark>");
-                  // END OF FIX
 
                   return (
                     <li key={hit.id}>
@@ -196,9 +188,7 @@ export function SearchBar({
                         onClick={resetSearch}
                       >
                         <Image
-                          src={
-                            hit.logo || "/images/placeholder-game.webp"
-                          }
+                          src={hit.logo || "/images/placeholder-game.webp"}
                           alt={hit.title}
                           width={48}
                           height={48}

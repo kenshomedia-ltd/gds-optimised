@@ -9,7 +9,7 @@ export { Header, MainNav, SubNav, MobileMenu } from "./Header";
 export type { HeaderProps } from "./Header";
 
 // Footer components
-export { Footer, FooterLinks, FooterImages, FooterBottom, FooterContent } from "./Footer";
+export { Footer, FooterServer, FooterLinks, FooterImages, FooterBottom, FooterContent } from "./Footer";
 export type { FooterProps } from "./Footer";
 
 // Footer components (to be implemented)

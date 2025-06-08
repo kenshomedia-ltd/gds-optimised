@@ -63,6 +63,13 @@ export interface CacheOptions {
   revalidate?: number;
 }
 
+// Type for cache entries
+interface CacheEntry {
+  key: string;
+  data: unknown;
+  options: Pick<CacheOptions, "ttl" | "swr">;
+}
+
 /**
  * Enhanced cache manager with stale-while-revalidate pattern
  */
@@ -162,13 +169,7 @@ export class CacheManager {
   /**
    * Warm cache with multiple entries
    */
-  async warmCache(
-    entries: Array<{
-      key: string;
-      data: unknown;
-      options: Pick<CacheOptions, "ttl" | "swr">;
-    }>
-  ): Promise<void> {
+  async warmCache(entries: CacheEntry[]): Promise<void> {
     const pipeline = redis.pipeline();
 
     for (const { key, data, options } of entries) {
@@ -195,15 +196,17 @@ export const cacheManager = new CacheManager();
 
 /**
  * Create a cached function with stale-while-revalidate
+ * Fixed type constraints for proper TypeScript inference
  */
-export function createCachedFunction<
-  T extends (...args: unknown[]) => Promise<unknown>
->(fn: T, options: CacheOptions): T {
-  const wrappedFn = async (...args: Parameters<T>): Promise<ReturnType<T>> => {
+export function createCachedFunction<TArgs extends unknown[], TReturn>(
+  fn: (...args: TArgs) => Promise<TReturn>,
+  options: CacheOptions
+): (...args: TArgs) => Promise<TReturn> {
+  const wrappedFn = async (...args: TArgs): Promise<TReturn> => {
     const cacheKey = `${options.key}:${JSON.stringify(args)}`;
 
     // Try to get from cache
-    const { data, isStale } = await cacheManager.get<ReturnType<T>>(cacheKey);
+    const { data, isStale } = await cacheManager.get<TReturn>(cacheKey);
 
     if (data && !isStale) {
       // Fresh data, return immediately
@@ -237,7 +240,7 @@ export function createCachedFunction<
     return fresh;
   };
 
-  return wrappedFn as T;
+  return wrappedFn;
 }
 
 /**
@@ -279,13 +282,19 @@ export function cachedFetch<T>(
  * Prefetch and warm cache for critical data
  */
 export async function prefetchCriticalData(paths: string[]): Promise<void> {
-  const entries = [];
+  // Explicitly type the entries array
+  const entries: CacheEntry[] = [];
 
   for (const path of paths) {
     // You can customize this based on your path structure
     if (path === "/") {
-      // Prefetch homepage data
-      // This would call your actual data fetching functions
+      // Example: Prefetch homepage data
+      // const homepageData = await fetchHomepageData();
+      // entries.push({
+      //   key: "homepage:data",
+      //   data: homepageData,
+      //   options: CACHE_CONFIG.homepage
+      // });
     }
     // Add more path-specific prefetching
   }
