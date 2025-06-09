@@ -95,6 +95,7 @@
   --color-legal-bkg: var(--site-legal-bkg);
   --color-legal-text: var(--site-legal-text);
   --color-heading-text: var(--site-heading-text);
+  --color-featured-heading-text: var(--site-featured-heading-text);
   --color-subnavbar-bkg: var(--site-subnavbar-bkg);
   --color-nav-hover-bkg: var(--site-nav-hover-bkg);
   
@@ -103,8 +104,6 @@
   --color-secondary-text: var(--site-secondary-text);
   --color-misc-tint: var(--site-misc-tint);
   --color-misc-text: var(--site-misc-text);
-
-  --animate-fadeIn: fadeIn 1s ease-in-out infinite;
 
   /* Spacing and sizing */
   --radius-base: 0.5rem;
@@ -141,6 +140,9 @@
   /* Heading size scale with responsive sizing */
   h1, .h1 {
     font-size: clamp(2rem, 5vw, 3.75rem);
+    color: var(--color-white);
+    text-shadow: 0px 0px 12px rgba(63, 230, 252, 0.6);
+    backdrop-filter: blur(6px);
   }
 
   h2, .h2 {
@@ -161,6 +163,10 @@
 
   h6, .h6 {
     font-size: clamp(1rem, 1.5vw, 1.25rem);
+  }
+
+  .featured-header .text-heading-text{
+    color: var(--color-featured-heading-text) !important;
   }
 
   /* Body text defaults */

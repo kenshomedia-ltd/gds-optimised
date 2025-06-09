@@ -76,7 +76,7 @@ export function IntroWithImage({
     <section className="relative z-20" aria-label={heading}>
       <div
         className={cn(
-          "relative grid grid-cols-12 gap-4 pb-5 px-4 lg:px-0 lg:gap-8",
+          "relative grid grid-cols-12 gap-4 px-4 lg:px-0 lg:gap-8",
           hasValidImage ? "pt-0 lg:pt-10" : "pt-5",
           "xl:container xl:mx-auto"
         )}

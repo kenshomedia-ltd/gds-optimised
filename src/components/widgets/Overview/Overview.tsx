@@ -106,7 +106,7 @@ function OverviewCard({
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[rgba(31,18,58,0.6)] to-[rgba(31,18,58,0.8)] z-10" />
 
       {/* Content */}
-      <div className="relative z-20 flex justify-center items-center h-full py-5 md:py-10 px-5">
+      <div className="relative z-20 flex justify-center items-center h-full py-16 md:py-16 px-5">
         <h3
           className={cn(
             "font-bold text-[15px] md:text-[20px] text-white text-center",

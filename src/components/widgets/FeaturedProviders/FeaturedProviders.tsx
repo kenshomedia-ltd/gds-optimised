@@ -59,7 +59,7 @@ export function FeaturedProviders({
       {data.title && (
         <h2
           className={cn(
-            "text-white text-2xl font-bold mt-10",
+            "text-white text-2xl font-bold",
             "opacity-0 animate-[fadeIn_0.6s_ease-out_100ms_forwards]"
           )}
         >
