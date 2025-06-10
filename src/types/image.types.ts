@@ -1,6 +1,5 @@
 // src/types/image.types.ts
 
-
 /**
  * Base image properties
  */
@@ -29,6 +28,8 @@ export interface ImageProps {
   lowQualityUrl?: string;
   threshold?: number;
   rootMargin?: string;
+  // Responsive height option
+  responsive?: boolean;
 }
 
 /**

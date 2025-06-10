@@ -26,6 +26,7 @@ import { cn } from "@/lib/utils/cn";
  * - Progressive loading with LQIP (opt-in)
  * - Intersection Observer for truly lazy loading
  * - CWV optimizations
+ * - Optional responsive height handling
  */
 export function Image({
   src,
@@ -51,7 +52,9 @@ export function Image({
   lowQualityUrl,
   threshold = 0.1,
   rootMargin = "50px",
-}: ImageProps) {
+  // New responsive prop
+  responsive = false,
+}: ImageProps & { responsive?: boolean }) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState(false);
   const [blurUrl, setBlurUrl] = useState<string | undefined>(blurDataURL);
@@ -181,15 +184,52 @@ export function Image({
     !isLoaded && placeholder === "blur" && !progressive ? "blur-sm" : ""
   );
 
+  // Determine container styles based on responsive prop
+  const containerStyles =
+    !fill && width && height
+      ? responsive
+        ? {
+            width: "100%",
+            maxWidth: width,
+            aspectRatio: `${width} / ${height}`,
+          }
+        : {
+            width,
+            height,
+            maxWidth: "100%",
+          }
+      : undefined;
+
+  // Build image styles - FIXED: Don't set height when fill is true
+  const imageStyles = (() => {
+    const baseStyles = {
+      ...style,
+      objectFit: style?.objectFit || "cover",
+    };
+
+    // If fill is true, don't set width or height
+    if (fill) {
+      return baseStyles;
+    }
+
+    // If responsive is true, use responsive width/height
+    if (responsive) {
+      return {
+        ...baseStyles,
+        width: "100%",
+        height: "auto",
+      };
+    }
+
+    // Otherwise, use default Next.js Image behavior
+    return baseStyles;
+  })();
+
   return (
     <div
       ref={containerRef}
       className={containerClasses}
-      style={
-        !fill && width && height
-          ? { width, height, maxWidth: "100%" }
-          : undefined
-      }
+      style={containerStyles}
     >
       {!progressive || isInView ? (
         <>
@@ -214,10 +254,7 @@ export function Image({
             loader={isExternal ? imageLoader : undefined}
             unoptimized={unoptimized || isSvg}
             className={imageClasses}
-            style={{
-              ...style,
-              objectFit: style?.objectFit || "cover",
-            }}
+            style={imageStyles}
             onLoad={handleLoad}
             onError={handleError}
           />
@@ -234,10 +271,7 @@ export function Image({
               quality={quality}
               priority
               className="absolute inset-0 z-10"
-              style={{
-                ...style,
-                objectFit: style?.objectFit || "cover",
-              }}
+              style={imageStyles}
               onLoad={() => setCurrentSrc(src)}
             />
           )}

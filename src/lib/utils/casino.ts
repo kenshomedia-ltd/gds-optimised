@@ -18,7 +18,7 @@ export function formatWelcomeBonus(
 
   // Handle bonus amount
   if (bonusSection?.bonusAmount) {
-    bonusText = `${bonusSection.bonusAmount}€`;
+    bonusText = `${bonusSection.bonusAmount}€ ${reloadBonusText}`;
   }
 
   // Handle cashback

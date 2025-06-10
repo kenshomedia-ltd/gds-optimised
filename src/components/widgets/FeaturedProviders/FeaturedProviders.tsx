@@ -71,7 +71,7 @@ export function FeaturedProviders({
       <div
         className={cn(
           "grid gap-3 w-full max-w-7xl",
-          "grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-8 xl:grid-cols-10"
+          "grid-cols-3 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-8 xl:grid-cols-10"
         )}
       >
         {providers.map((provider, index) => (

@@ -4,10 +4,11 @@
 import Link from "next/link";
 import { Image } from "@/components/common/Image";
 import { CasinoBadge } from "../CasinoBadge/CasinoBadge";
-import { CasinoRating } from "../CasinoRating/CasinoRating";
+// import { CasinoRating } from "../CasinoRating/CasinoRating";
+import { StarRatingDisplay } from "@/components/ui/StarRating/StarRatingDisplay";
 import { Collapsible } from "@/components/ui/Collapsible/Collapsible";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircleInfo } from "@awesome.me/kit-0e07a43543/icons/duotone/light";
+import { faCircleInfo, faChevronRight } from "@awesome.me/kit-0e07a43543/icons/duotone/light";
 import type { CasinoRowProps } from "@/types/casino.types";
 import {
   formatWelcomeBonus,
@@ -34,6 +35,9 @@ export function CasinoRow({
   const noDepositBonus = formatNoDepositBonus(casino, translations);
   const welcomeBonus = formatWelcomeBonus(casino, translations.reloadBonus);
 
+  const siteId = process.env.NEXT_PUBLIC_SITE_ID || "default";
+  const casinoPagePath = process.env.NEXT_PUBLIC_CASINO_PAGE_PATH || "/casinos";
+
   // Position badge styles
   const positionStyles = {
     0: "casino-logo__first",
@@ -44,12 +48,12 @@ export function CasinoRow({
   return (
     <tr className="flex flex-wrap md:table-row border-[12px] border-casino-table-tr-border bg-white">
       {/* Casino Logo Cell */}
-      <td className="casino-logo w-1/2 md:w-[210px] md:max-w-[210px] relative overflow-hidden">
+      <td className="casino-logo px-3 py-2 w-1/2 md:w-[230px] md:max-w-[230px] relative overflow-hidden">
         {badge && <CasinoBadge text={badge.text} type={badge.type} />}
 
         <div
           className={cn(
-            "h-full flex items-center px-3 py-2 bg-white rounded-tl-lg md:rounded-bl-lg relative max-w-[368px]",
+            "h-full flex items-center bg-white rounded-tl-lg md:rounded-bl-lg relative max-w-[368px]",
             positionStyles[index as keyof typeof positionStyles]
           )}
         >
@@ -58,7 +62,7 @@ export function CasinoRow({
             <span
               className={cn(
                 "casino-logo__tag w-[28px] h-6 absolute flex justify-center items-center",
-                "p-[2px] top-0 left-[18px] rounded-bl rounded-br",
+                "p-[2px] top-0 left-[18px] rounded-bl rounded-br z-10",
                 "text-white text-sm font-bold bg-gradient-to-b"
               )}
             >
@@ -87,14 +91,45 @@ export function CasinoRow({
       {/* Rating Cell */}
       <td className="text-center w-1/2 md:w-auto">
         <div className="px-3 py-3 flex h-full flex-col items-center justify-center bg-white rounded-tr-lg md:rounded-tr-none">
-          <CasinoRating
-            ratingAvg={casino.ratingAvg}
-            ratingCount={casino.ratingCount}
-            casinoSlug={casino.slug}
-            casinoTitle={casino.title}
-            translations={translations}
-            showVotes={true}
+          {/* Star Rating Display */}
+          <StarRatingDisplay
+            rating={casino.ratingAvg}
+            size="md"
+            showValue={false}
+            className="mb-2"
           />
+
+          {/* Rating value and vote count */}
+          <div className="flex items-center gap-2 text-xs text-gray-500">
+            <span className="font-medium tabular-nums">
+              {casino.ratingAvg.toFixed(1)}/5
+            </span>
+            <span className="text-gray-400">•</span>
+            <span>
+              ({casino.ratingCount} {translations.votes || "votes"})
+            </span>
+          </div>
+
+          {/* Review link */}
+          <div className="flex items-center justify-center">
+            <Link
+              href={`${siteId === "gds" ? "/it" : ""}${casinoPagePath}/${
+                casino.slug
+              }/`}
+              className="casino-name text-[14px] text-grey-500 mr-[11px] hover:text-primary transition-colors group"
+            >
+              <span className="hidden sm:inline-flex sm:pr-1">
+                {casino.title}
+              </span>
+              <span className="underline">
+                {translations.review || "Review"}
+              </span>
+            </Link>
+            <FontAwesomeIcon
+              icon={faChevronRight}
+              className="w-[14px] h-[14px] text-grey-500 transition-transform group-hover:translate-x-0.5"
+            />
+          </div>
         </div>
       </td>
 
@@ -207,7 +242,7 @@ export function CasinoRow({
             {casino.casinoBonus.bonusUrl && (
               <Link
                 href={casino.casinoBonus.bonusUrl}
-                className="btn btn-misc uppercase text-white w-full mb-[7px] font-extrabold"
+                className="w-full text-center mb-2 px-8 py-2 rounded font-bold text-sm whitespace-nowrap bg-misc text-misc-text uppercase hover:bg-misc-tint transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
                 rel="sponsored"
                 target="_blank"
               >

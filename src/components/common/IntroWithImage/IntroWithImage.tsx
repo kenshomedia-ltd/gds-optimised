@@ -175,13 +175,14 @@ export function IntroWithImage({
                 src={imageUrl}
                 alt={imageAlt}
                 width={imageData.width || 515}
-                height={imageData.height || 200}
+                height={imageData.height || 290}
                 className="w-full h-auto rounded-lg shadow-xl"
                 priority={isHomePage}
                 progressive={true}
                 quality={90}
-                sizes="(max-width: 1024px) 100vw, 515px"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 515px"
                 placeholder="blur"
+                responsive={true}
               />
             </div>
           </div>

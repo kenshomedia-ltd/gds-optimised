@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils/cn";
  * - Mobile-first responsive design
  * - Badge system for new/hot games
  * - Lazy loading by default
+ * - Fixed favorite button positioning
  */
 export function GameCard({
   game,
@@ -25,8 +26,7 @@ export function GameCard({
   priority = false,
   loading = "lazy",
   className,
-}: // index = 0,
-GameCardProps) {
+}: GameCardProps) {
   const [imageError, setImageError] = useState(false);
 
   // Get the first image from the array
@@ -170,70 +170,77 @@ GameCardProps) {
           </Link>
         </div>
 
-        {/* Game info footer */}
-        <div className="game-info mt-auto p-2 rounded-b-lg bg-gradient-to-t from-background-900/60 to-transparent">
-          <div
-            className={cn(
-              "flex justify-between items-center mb-0.5",
-              "transition-transform duration-300",
-              "translate-y-5 group-hover:translate-y-0"
-            )}
-          >
-            <h3 className="text-white text-sm font-bold m-0 line-clamp-1 flex-1">
-              <Link
-                href={gameUrl}
-                className="hover:text-secondary-tint transition-colors"
-                prefetch={false}
-              >
-                {game.title}
-              </Link>
-            </h3>
-            <FavoriteButton
-              gameId={game.id}
-              gameTitle={game.title}
-              game={game}
-              translations={translations}
-              className="ml-2"
-              size="sm"
-            />
-          </div>
-
-          {/* Provider and rating info */}
-          <div
-            className={cn(
-              "flex items-center gap-1",
-              "opacity-0 transition-opacity duration-300",
-              "group-hover:opacity-100"
-            )}
-          >
-            {game.provider && (
-              <>
+        {/* Game info footer - Fixed positioning */}
+        <div className="game-info mt-auto rounded-b-lg bg-gradient-to-t from-background-900/60 to-transparent">
+          {/* Main info section with proper padding and height constraints */}
+          <div className="p-2 pb-1">
+            <div
+              className={cn(
+                "flex items-start justify-between gap-1",
+                "transition-transform duration-300",
+                "translate-y-5 group-hover:translate-y-0"
+              )}
+            >
+              {/* Title with constrained width */}
+              <h3 className="text-white text-sm font-bold m-0 min-w-0 flex-1">
                 <Link
-                  href={providerUrl}
-                  className="text-grey-300 text-xs hover:text-white transition-colors"
+                  href={gameUrl}
+                  className="hover:text-secondary-tint transition-colors block truncate"
                   prefetch={false}
                 >
-                  {game.provider.title}
+                  {game.title}
                 </Link>
-                <span className="text-grey-300 text-xs">•</span>
-              </>
-            )}
+              </h3>
+
+              {/* Favorite button with fixed dimensions */}
+              <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center">
+                <FavoriteButton
+                  gameId={game.id}
+                  gameTitle={game.title}
+                  game={game}
+                  translations={translations}
+                  size="sm"
+                />
+              </div>
+            </div>
+
+            {/* Provider and rating info - Fixed height */}
             <div
-              className="flex items-center gap-0.5"
-              role="img"
-              aria-label={`Rating: ${game.ratingAvg.toFixed(1)} out of 5`}
+              className={cn(
+                "flex items-center gap-1 mt-0.5 h-4",
+                "opacity-0 transition-opacity duration-300",
+                "group-hover:opacity-100"
+              )}
             >
-              <svg
-                className="w-2.5 h-2.5 text-warning"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                aria-hidden="true"
+              {game.provider && (
+                <>
+                  <Link
+                    href={providerUrl}
+                    className="text-grey-300 text-xs hover:text-white transition-colors truncate max-w-[100px]"
+                    prefetch={false}
+                  >
+                    {game.provider.title}
+                  </Link>
+                  <span className="text-grey-300 text-xs">•</span>
+                </>
+              )}
+              <div
+                className="flex items-center gap-0.5"
+                role="img"
+                aria-label={`Rating: ${game.ratingAvg.toFixed(1)} out of 5`}
               >
-                <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
-              </svg>
-              <span className="text-[10px] text-grey-300">
-                {game.ratingAvg.toFixed(1)}/5
-              </span>
+                <svg
+                  className="w-2.5 h-2.5 text-warning flex-shrink-0"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                </svg>
+                <span className="text-[10px] text-grey-300">
+                  {game.ratingAvg.toFixed(1)}/5
+                </span>
+              </div>
             </div>
           </div>
         </div>

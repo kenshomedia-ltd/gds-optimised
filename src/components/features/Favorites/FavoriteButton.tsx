@@ -19,6 +19,7 @@ import { toast } from "sonner";
  * - Accessible button with ARIA labels
  * - Toast notifications
  * - Responsive sizes
+ * - Fixed dimensions to prevent overflow
  */
 export function FavoriteButton({
   gameId,
@@ -61,16 +62,17 @@ export function FavoriteButton({
     });
   };
 
+  // Fixed size classes for better containment
   const sizeClasses = {
-    sm: "w-4 h-4 p-1",
-    md: "w-5 h-5 p-1.5",
-    lg: "w-6 h-6 p-2",
+    sm: "w-6 h-6",
+    md: "w-8 h-8",
+    lg: "w-10 h-10",
   };
 
   const iconSizeClasses = {
-    sm: "text-xs",
-    md: "text-sm",
-    lg: "text-base",
+    sm: "w-4 h-4",
+    md: "w-5 h-5",
+    lg: "w-6 h-6",
   };
 
   return (
@@ -78,11 +80,12 @@ export function FavoriteButton({
       onClick={handleToggleFavorite}
       disabled={isPending}
       className={cn(
-        "relative group transition-all duration-200",
+        "relative inline-flex items-center justify-center",
         "rounded-full",
         "hover:bg-white/20 active:scale-95",
         "focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent",
         "disabled:opacity-50 disabled:cursor-not-allowed",
+        "transition-all duration-200",
         sizeClasses[size],
         className
       )}

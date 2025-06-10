@@ -54,7 +54,7 @@ export function CasinoRating({
           <FontAwesomeIcon
             key={`full-${i}`}
             icon={faStarSolid}
-            className="w-4 h-4 text-warning"
+            className="w-6 h-6 text-warning"
           />
         ))}
 
@@ -62,7 +62,7 @@ export function CasinoRating({
         {hasHalfStar && (
           <FontAwesomeIcon
             icon={faStarHalfAlt}
-            className="w-4 h-4 text-warning"
+            className="w-6 h-6 text-warning"
           />
         )}
 
@@ -71,7 +71,7 @@ export function CasinoRating({
           <FontAwesomeIcon
             key={`empty-${i}`}
             icon={faStar}
-            className="w-4 h-4 text-gray-300"
+            className="w-6 h-6 text-gray-300"
           />
         ))}
       </div>
