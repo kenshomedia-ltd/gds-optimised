@@ -16,6 +16,7 @@ import type {
   BlogData,
   CasinoData
 } from "@/types/strapi.types";
+import { getStrapiSort } from "../utils/sort-mappings";
 
 // Revalidation times for different content types
 const REVALIDATE_TIMES = {
@@ -24,19 +25,6 @@ const REVALIDATE_TIMES = {
   blogs: 600, // 10 minutes
   casinos: 600, // 10 minutes
 };
-
-// Map sortBy values to Strapi sort parameters
-const SORT_BY_MAP: Record<string, string> = {
-  Newest: "createdAt:desc",
-  Popular: "views:desc,ratingAvg:desc",
-  Rating: "ratingAvg:desc",
-  Alphabetical: "title:asc",
-  nuove: "createdAt:desc",
-  az: "title:asc",
-  za: "title:desc",
-  giocati: "views:desc",
-  votate: "ratingAvg:desc",
-} as const;
 
 /**
  * Extract game settings from homepage blocks
@@ -66,7 +54,9 @@ function extractGameSettings(homepage: Homepage): ExtractedGameSettings {
   const gamesQuotaPerProvider = gameBlock.numberOfGames || 6;
   const numProviders = Math.max(providers.length, 1);
   const totalGamesToDisplay = gamesQuotaPerProvider * numProviders;
-  const sortBy = SORT_BY_MAP[gameBlock.sortBy || "Newest"] || "createdAt:desc";
+
+  // Use the sort mapping utility
+  const sortBy = getStrapiSort(gameBlock.sortBy, "createdAt:desc");
 
   return {
     providers,

@@ -1,5 +1,5 @@
 // src/app/page.tsx
-import { getHomepageData } from "@/lib/strapi/homepage-data-loader";
+import { getHomepageDataSplit } from "@/lib/strapi/homepage-query-splitter";
 import { getLayoutData } from "@/lib/strapi/data-loader";
 import { DynamicBlock } from "@/components/common/DynamicBlock";
 import { generateMetadata as generateSEOMetadata } from "@/lib/utils/seo";
@@ -7,13 +7,13 @@ import type { Metadata } from "next";
 
 // Force dynamic rendering for ISR with on-demand revalidation
 export const dynamic = "force-static";
-export const revalidate = 300; // 5 minutes
+export const revalidate = 60; // 1 minute for edge cache
 
 // Generate metadata for the page
 export async function generateMetadata(): Promise<Metadata> {
   const [layoutData, homepageData] = await Promise.all([
     getLayoutData({ cached: true }),
-    getHomepageData({ cached: true }),
+    getHomepageDataSplit(),
   ]);
 
   const { translations } = layoutData;
@@ -25,7 +25,6 @@ export async function generateMetadata(): Promise<Metadata> {
       homepage.seo?.metaDescription || translations?.homePageDescription || "",
     keywords: homepage.seo?.keywords,
     canonicalUrl: process.env.NEXT_PUBLIC_SITE_URL,
-    // image: homepage.seo?.metaImage?.url,
   });
 }
 
@@ -41,10 +40,10 @@ export default async function HomePage() {
   // Performance timing
   const startTime = Date.now();
 
-  // Parallel data fetching
+  // Parallel data fetching with split queries
   const [layoutData, homepageData] = await Promise.all([
     getLayoutData({ cached: true }),
-    getHomepageData({ cached: true }),
+    getHomepageDataSplit(),
   ]);
 
   const { homepage, games, blogs, casinos } = homepageData;
@@ -122,7 +121,7 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* Main Content Section */}
+      {/* Main Content Section with Progressive Loading */}
       <main className="container mx-auto px-4 py-8">
         <div className="space-y-12">
           {mainBlocks.map((block, index) => (
