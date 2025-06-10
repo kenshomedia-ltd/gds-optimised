@@ -25,6 +25,7 @@ import { cn } from "@/lib/utils/cn";
  * - Optimized image loading
  * - Accessibility compliant
  * - Smooth animations
+ * - Fixed layout with consistent heights
  */
 export function Testimonials({ data, className }: TestimonialsProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -156,10 +157,7 @@ export function Testimonials({ data, className }: TestimonialsProps) {
 
   return (
     <section
-      className={cn(
-        "py-12 md:py-16 lg:py-20",
-        className
-      )}
+      className={cn("py-12 md:py-16 lg:py-20", className)}
       aria-label="Testimonials"
     >
       <div className="container mx-auto px-4">
@@ -322,50 +320,65 @@ function TestimonyCard({
     >
       <div
         className={cn(
-          "bg-white rounded-lg shadow-lg p-6 h-full flex flex-col",
+          "bg-white rounded-lg shadow-lg h-full flex flex-col",
           "transition-all duration-300",
           "hover:shadow-xl hover:-translate-y-1",
           "border border-gray-100"
         )}
       >
-        {/* Provider Logo */}
-        {testimony.provider && (
-          <div className="h-16 flex items-center justify-center mb-4">
-            <Image
-              src={testimony.provider.imageUrl}
-              alt={`${testimony.provider.title} logo`}
-              width={200}
-              height={100}
-              className="max-h-full max-w-full object-contain"
-              loading="lazy"
-              quality={80}
-            />
-          </div>
-        )}
-
-        {/* Testimony Content */}
-        <div className="flex-grow">
-          <h3 className="text-lg font-semibold mb-3 text-gray-900 line-clamp-2">
-            {testimony.title}
-          </h3>
-          <blockquote className="text-gray-600 text-sm mb-4 line-clamp-4 italic">
-            &ldquo;{testimony.testimony}&rdquo;
-          </blockquote>
-        </div>
-
-        {/* Testifier Info */}
-        <footer className="mt-auto pt-4 border-t border-gray-200">
-          <cite className="not-italic">
-            <p className="font-medium text-gray-900">
-              {testimony.testifierName}
-            </p>
-            {testimony.testifierTitle && (
-              <p className="text-sm text-gray-500">
-                {testimony.testifierTitle}
-              </p>
+        {/* Fixed height container for consistent layout */}
+        <div className="p-6 flex flex-col h-full">
+          {/* Provider Logo - Fixed height container */}
+          <div className="h-20 flex items-center justify-center mb-4 px-4">
+            {testimony.provider && testimony.provider.imageUrl ? (
+              <Image
+                src={testimony.provider.imageUrl}
+                alt={`${testimony.provider.title} logo`}
+                width={200}
+                height={80}
+                className="max-h-16 w-auto object-contain"
+                loading="lazy"
+                quality={80}
+                style={{
+                  maxWidth: "100%",
+                  height: "auto",
+                  objectFit: "contain",
+                }}
+              />
+            ) : (
+              <div className="h-16 w-full bg-gray-100 rounded flex items-center justify-center">
+                <span className="text-gray-400 text-sm">No logo</span>
+              </div>
             )}
-          </cite>
-        </footer>
+          </div>
+
+          {/* Testimony Content - Flex grow to push footer down */}
+          <div className="flex-grow flex flex-col">
+            {/* Title - Fixed height with line clamp */}
+            <h3 className="text-lg font-semibold mb-3 text-gray-900 line-clamp-2 min-h-[3.5rem]">
+              {testimony.title}
+            </h3>
+
+            {/* Quote - Flex grow with line clamp */}
+            <blockquote className="text-gray-600 text-sm mb-4 line-clamp-4 flex-grow italic">
+              &ldquo;{testimony.testimony}&rdquo;
+            </blockquote>
+          </div>
+
+          {/* Testifier Info - Always at bottom */}
+          <footer className="pt-4 border-t border-gray-200 mt-auto">
+            <cite className="not-italic">
+              <p className="font-medium mb-0 text-gray-900">
+                {testimony.testifierName}
+              </p>
+              {testimony.testifierTitle && (
+                <p className="text-sm text-gray-500">
+                  {testimony.testifierTitle}
+                </p>
+              )}
+            </cite>
+          </footer>
+        </div>
       </div>
     </article>
   );
