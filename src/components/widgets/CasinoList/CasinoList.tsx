@@ -39,7 +39,7 @@ export function CasinoList({
         {/* Title */}
         {block.casinoTableTitle && (
           <div className="mb-[30px]">
-            <h2 className="text-2xl md:text-3xl font-bold text-heading-text text-center casino-list-title">
+            <h2 className="text-2xl md:text-3xl font-bold text-heading-text text-center">
               {block.casinoTableTitle}
             </h2>
           </div>

@@ -5,18 +5,11 @@ import { Image } from "@/components/common/Image";
 import type { FeaturedProvidersProps } from "@/types/featured-providers.types";
 import { cn } from "@/lib/utils/cn";
 
-/**
- * FeaturedProvidersServer Component
- *
- * Server-side version of FeaturedProviders for better performance
- * This can be used in layouts or pages that need SSR
- */
 export function FeaturedProvidersServer({
   data,
   translations = {},
   className,
 }: FeaturedProvidersProps) {
-  // Extract and deduplicate providers
   const providersData = data?.homeFeaturedProviders?.providers || [];
   const seen = new Set<string>();
 
@@ -43,12 +36,10 @@ export function FeaturedProvidersServer({
       )}
       aria-label={data.title || "Featured Providers"}
     >
-      {/* Title */}
       {data.title && (
         <h2 className="text-white text-2xl font-bold mt-10">{data.title}</h2>
       )}
 
-      {/* Providers Grid */}
       <div
         className={cn(
           "grid gap-3 w-full max-w-7xl",
@@ -69,19 +60,16 @@ export function FeaturedProvidersServer({
               data-provider={providerSlug}
               aria-label={`View ${providerTitle} games`}
             >
+              {/* 1. Container updated to only handle layout */}
               <div
                 className={cn(
-                  "relative",
-                  "bg-white rounded-lg",
-                  "px-2 py-1 h-10",
-                  "flex items-center justify-center",
+                  "relative flex items-center justify-center",
                   "shadow-[0_0_12px_0_rgba(0,0,0,0.1)]",
                   "transition-all duration-300 ease-in-out",
                   "group-hover:shadow-none group-hover:scale-105",
                   "overflow-hidden"
                 )}
               >
-                {/* Hover gradient overlay */}
                 <div
                   className={cn(
                     "absolute inset-0",
@@ -91,18 +79,17 @@ export function FeaturedProvidersServer({
                   )}
                   aria-hidden="true"
                 />
-
-                {/* Provider Logo */}
-                <div className="relative z-10 w-full h-full flex items-center justify-center">
+                <div className="relative z-10 flex items-center justify-center">
                   {imageUrl ? (
                     <Image
                       src={imageUrl}
                       alt={`${providerTitle} logo`}
-                      width={imageData.width || 80}
-                      height={imageData.height || 32}
+                      width={120} // Matched from client component
+                      height={50} // Matched from client component
                       priority={index < 10}
                       loading={index < 10 ? "eager" : "lazy"}
-                      className="max-w-full max-h-[32px] w-auto h-auto object-contain"
+                      // 2. Styles applied directly to Image component
+                      className="bg-white rounded-lg object-contain max-h-[50px] overflow-hidden"
                       unoptimized={false}
                       quality={85}
                       sizes="(max-width: 640px) 40px, 80px"
@@ -114,8 +101,6 @@ export function FeaturedProvidersServer({
                   )}
                 </div>
               </div>
-
-              {/* Provider name tooltip on hover */}
               <div
                 className={cn(
                   "absolute left-1/2 -translate-x-1/2 -bottom-7",
@@ -134,8 +119,6 @@ export function FeaturedProvidersServer({
           );
         })}
       </div>
-
-      {/* View All Link */}
       <Link
         href={`${providerBaseUrl}/`}
         className={cn(

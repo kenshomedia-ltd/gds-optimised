@@ -146,7 +146,6 @@ function ProviderCard({ provider, providerBaseUrl, index }: ProviderCardProps) {
   const providerSlug = provider.slug;
   const providerTitle = provider.title || "Provider";
 
-  // Calculate animation delay based on index
   const animationDelay = index < 10 ? 100 : 200;
 
   return (
@@ -159,19 +158,17 @@ function ProviderCard({ provider, providerBaseUrl, index }: ProviderCardProps) {
         animation: `fadeIn 0.6s ease-out ${animationDelay}ms forwards`,
       }}
     >
+      {/* 1. Container now only handles layout, not size or background */}
       <div
         className={cn(
           "relative",
-          "bg-white rounded-lg",
-          "px-2 py-1 h-10",
-          "flex items-center justify-center",
+          "flex items-center justify-center", // No more bg-white, px, py, or h-10
           "shadow-[0_0_12px_0_rgba(0,0,0,0.1)]",
           "transition-all duration-300 ease-in-out",
           "group-hover:shadow-none group-hover:scale-105",
           "overflow-hidden"
         )}
       >
-        {/* Hover gradient overlay */}
         <div
           className={cn(
             "absolute inset-0",
@@ -182,25 +179,19 @@ function ProviderCard({ provider, providerBaseUrl, index }: ProviderCardProps) {
           aria-hidden="true"
         />
 
-        {/* Provider Logo */}
-        <div className="relative z-10 w-full h-full flex items-center justify-center">
+        {/* 2. Inner container also simplified */}
+        <div className="relative z-10 flex items-center justify-center">
           {imageUrl ? (
             <Image
               src={imageUrl}
               alt={`${providerTitle} logo`}
-              width={imageData.width || 80}
-              height={imageData.height || 32}
+              width={120}
+              height={50}
               priority={index < 10}
               loading={index < 10 ? "eager" : "lazy"}
-              className="max-w-full max-h-[32px] w-auto h-auto object-contain"
+              className="bg-white rounded-lg object-contain max-h-[50px] overflow-hidden "
               quality={85}
               sizes="(max-width: 640px) 40px, 80px"
-              style={{
-                width: "auto",
-                height: "auto",
-                maxWidth: "100%",
-                maxHeight: "32px",
-              }}
               unoptimized={imageUrl.endsWith(".svg")}
             />
           ) : (
