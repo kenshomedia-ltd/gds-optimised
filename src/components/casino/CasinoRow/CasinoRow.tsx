@@ -4,7 +4,6 @@
 import Link from "next/link";
 import { Image } from "@/components/common/Image";
 import { CasinoBadge } from "../CasinoBadge/CasinoBadge";
-// import { CasinoRating } from "../CasinoRating/CasinoRating";
 import { StarRatingDisplay } from "@/components/ui/StarRating/StarRatingDisplay";
 import { Collapsible } from "@/components/ui/Collapsible/Collapsible";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

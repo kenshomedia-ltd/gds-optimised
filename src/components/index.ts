@@ -47,7 +47,7 @@ export { Skeleton, SkeletonText, Collapsible } from "./ui";
 export { GameCard, GameCardSkeleton, GameList } from "./games";
 
 // Casino components
-export { CasinoTable, CasinoRow, CasinoBadge, CasinoRating } from "./casino";
+export { CasinoTable, CasinoRow, CasinoBadge } from "./casino";
 
 // Blog components
 export { BlogCard, BlogCardSkeleton, BlogList } from "./blog";
