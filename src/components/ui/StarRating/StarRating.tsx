@@ -174,7 +174,7 @@ export function StarRating({
               icon={faStar}
               className={cn(
                 sizeClass,
-                "text-yellow-400 transition-colors duration-150"
+                "text-accent-100 transition-colors duration-150"
               )}
             />
           </div>

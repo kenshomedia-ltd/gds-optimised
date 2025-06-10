@@ -52,7 +52,7 @@ export function StarRatingDisplay({
       >
         <FontAwesomeIcon
           icon={faStar}
-          className={cn(sizeClass, "text-yellow-400")}
+          className={cn(sizeClass, "text-accent-100")}
         />
         <span
           className={cn(
@@ -97,7 +97,7 @@ export function StarRatingDisplay({
           <FontAwesomeIcon
             key={`full-${i}`}
             icon={faStar}
-            className={cn(sizeClass, "text-yellow-400")}
+            className={cn(sizeClass, "text-accent-100")}
           />
         ))}
 
@@ -114,7 +114,7 @@ export function StarRatingDisplay({
             >
               <FontAwesomeIcon
                 icon={faStar}
-                className={cn(sizeClass, "text-yellow-400")}
+                className={cn(sizeClass, "text-accent-100")}
               />
             </div>
           </div>

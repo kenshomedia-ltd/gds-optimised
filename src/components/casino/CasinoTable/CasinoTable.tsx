@@ -35,8 +35,8 @@ export function CasinoTable({
     >
       <table className="w-full mb-2.5 overflow-hidden rounded-[6px] border-spacing-0 border-collapse">
         {showCasinoTableHeader && (
-          <thead className="hidden border-l-[12px] border-r-[12px] border-l-casino-table-header-bkg border-r-casino-table-header-bkg md:table-row-group">
-            <tr className="border-b-[12px] border-b-grey-100">
+          <thead className="hidden border-x-[12px] border-x-casino-table-header-bkg md:table-row-group">
+            <tr className="border-b-[12px] border-casino-table-tr-border">
               <th
                 scope="col"
                 className="px-3 text-white text-base text-center bg-casino-table-header-bkg font-bold capitalize py-[11px]"
