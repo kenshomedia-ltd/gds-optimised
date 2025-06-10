@@ -206,45 +206,69 @@ const getHomepageDataWithSplitQueries =
 
 /**
  * Fetch games for a specific block configuration
+ * Fetches 6 games per provider to ensure each row shows games from one provider
  */
-async function fetchGamesForBlock(
-  block: HomeGameListBlock
-): Promise<GameData[]> {
+async function fetchGamesForBlock(block: HomeGameListBlock): Promise<GameData[]> {
   const providers = block.providers
     ?.map((p) => p.slotProvider?.slug)
     .filter(Boolean) as string[];
 
   if (!providers.length) return [];
 
-  // Use the sort mapping utility
+  const gamesPerProvider = block.numberOfGames || 6;
   const sortParam = getStrapiSort(block.sortBy, "createdAt:desc");
 
-  const query = {
-    fields: ["title", "slug", "ratingAvg", "createdAt", "publishedAt"],
-    populate: {
-      images: {
-        fields: ["url", "alternativeText", "width", "height"],
+  // Fetch games for each provider separately to ensure we get the right distribution
+  const gamePromises = providers.map(async (providerSlug) => {
+    const query = {
+      fields: ["title", "slug", "ratingAvg", "createdAt", "publishedAt"],
+      populate: {
+        images: {
+          fields: ["url", "alternativeText", "width", "height"],
+        },
+        provider: { fields: ["title", "slug"] },
+        categories: { fields: ["title", "slug"] },
       },
-      provider: { fields: ["title", "slug"] },
-      categories: { fields: ["title", "slug"] },
-    },
-    filters: {
-      provider: { slug: { $in: providers } },
-    },
-    sort: [sortParam],
-    pagination: {
-      pageSize: block.numberOfGames || 6,
-      page: 1,
-    },
-  };
+      filters: {
+        provider: { slug: { $eq: providerSlug } },
+      },
+      sort: [sortParam],
+      pagination: {
+        pageSize: gamesPerProvider,
+        page: 1,
+      },
+    };
 
-  const response = await strapiClient.fetchWithCache<GamesListResponse>(
-    "games",
-    query,
-    CACHE_CONFIG.games.ttl
-  );
+    try {
+      const response = await strapiClient.fetchWithCache<GamesListResponse>(
+        `games`,
+        query,
+        CACHE_CONFIG.games.ttl
+      );
+      
+      return response.data || [];
+    } catch (error) {
+      console.error(`Failed to fetch games for provider ${providerSlug}:`, error);
+      return [];
+    }
+  });
 
-  return response.data || [];
+  // Wait for all provider queries to complete
+  const gamesPerProviderArray = await Promise.all(gamePromises);
+  
+  // Flatten the array of arrays into a single array
+  const allGames = gamesPerProviderArray.flat();
+
+  // Log for debugging
+  if (process.env.NODE_ENV === "development") {
+    console.log("Game fetching summary:");
+    providers.forEach((provider, index) => {
+      console.log(`- ${provider}: ${gamesPerProviderArray[index].length} games`);
+    });
+    console.log(`Total games fetched: ${allGames.length}`);
+  }
+
+  return allGames;
 }
 
 /**
