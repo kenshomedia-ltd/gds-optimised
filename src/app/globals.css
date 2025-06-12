@@ -249,39 +249,6 @@
       scroll-behavior: auto !important;
     }
   }
-
-  .animate-fadeIn {
-    animation: fadeIn 0.6s ease-out;
-  }
-
-  .animate-slideDown {
-    animation: slideDown 0.3s ease-out;
-  }
-
-  .animate-searchExpand {
-    animation: searchExpand 0.3s ease-out forwards;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes slideDown {
-    from { transform: translateY(-100%); }
-    to { transform: translateY(0); }
-  }
-
-  @keyframes searchExpand {
-    from { 
-      width: 2.5rem; 
-      opacity: 0; 
-    }
-    to { 
-      width: 20rem; 
-      opacity: 1; 
-    }
-  }
 }
 
 /* Component styles */
@@ -354,6 +321,280 @@
   /* Casino list title */
   .casino-list-title {
     text-shadow: 0px 0px 12px rgba(63, 230, 252, 0.6);
+  }
+}
+
+/* src/app/globals.css - Add these animations to your existing globals.css */
+
+@layer utilities {
+  /* Fade in animation for content sections */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Pulse animation for skeletons */
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  /* Slide animations for carousels */
+  @keyframes slideInLeft {
+    from {
+      transform: translateX(-100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideInRight {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+
+
+  @keyframes slideDown {
+    from { transform: translateY(-100%); }
+    to { transform: translateY(0); }
+  }
+
+  /* Search expand animation */
+  @keyframes searchExpand {
+    from { 
+      width: 2.5rem; 
+      opacity: 0; 
+    }
+    to { 
+      width: 20rem; 
+      opacity: 1; 
+    }
+  }
+
+  /* Shimmer effect for loading states */
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  /* Bounce animation for interactive elements */
+  @keyframes bounce {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  /* Spin animation for loading indicators */
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* Animation utility classes */
+  .animate-fadeIn {
+    animation: fadeIn 0.6s ease-out forwards;
+  }
+
+  .animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  .animate-slideDown {
+    animation: slideDown 0.3s ease-out;
+  }
+
+  .animate-slideInLeft {
+    animation: slideInLeft 0.5s ease-out forwards;
+  }
+
+  .animate-slideInRight {
+    animation: slideInRight 0.5s ease-out forwards;
+  }
+
+  .animate-shimmer {
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.1),
+      transparent
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  .animate-bounce {
+    animation: bounce 1s ease-in-out infinite;
+  }
+
+  .animate-spin {
+    animation: spin 1s linear infinite;
+  }
+
+  .animate-searchExpand {
+    animation: searchExpand 0.3s ease-out forwards;
+  }
+
+  /* Delayed animations */
+  .animation-delay-100 {
+    animation-delay: 100ms;
+  }
+
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+
+  .animation-delay-300 {
+    animation-delay: 300ms;
+  }
+
+  .animation-delay-400 {
+    animation-delay: 400ms;
+  }
+
+  .animation-delay-500 {
+    animation-delay: 500ms;
+  }
+
+  /* Remove scrollbar for carousel */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Smooth scroll behavior */
+  .scroll-smooth {
+    scroll-behavior: smooth;
+  }
+
+  /* Snap scrolling for carousels */
+  .snap-x {
+    scroll-snap-type: x mandatory;
+  }
+
+  .snap-start {
+    scroll-snap-align: start;
+  }
+
+  .snap-center {
+    scroll-snap-align: center;
+  }
+
+  .snap-mandatory {
+    scroll-snap-stop: always;
+  }
+
+  /* Gradient overlays for hero sections */
+  .gradient-overlay {
+    position: relative;
+  }
+
+  .gradient-overlay::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      rgba(0, 0, 0, 0.5)
+    );
+    pointer-events: none;
+  }
+
+  /* Backdrop blur for modals and overlays */
+  .backdrop-blur-sm {
+    backdrop-filter: blur(4px);
+  }
+
+  .backdrop-blur {
+    backdrop-filter: blur(8px);
+  }
+
+  .backdrop-blur-lg {
+    backdrop-filter: blur(16px);
+  }
+
+  /* Focus visible styles for accessibility */
+  .focus-visible-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2;
+  }
+
+  /* Text gradient effects */
+  .text-gradient {
+    background: linear-gradient(
+      135deg,
+      var(--color-primary-500),
+      var(--color-accent-500)
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Card hover effects */
+  .card-hover {
+    transition: all 0.3s ease;
+  }
+
+  .card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Image loading states */
+  .image-loading {
+    background: linear-gradient(
+      90deg,
+      var(--color-gray-200),
+      var(--color-gray-300),
+      var(--color-gray-200)
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  /* Dark mode image loading */
+  .dark .image-loading {
+    background: linear-gradient(
+      90deg,
+      var(--color-gray-700),
+      var(--color-gray-600),
+      var(--color-gray-700)
+    );
   }
 }
 

@@ -14,6 +14,16 @@ import { generateMetadata as generateSEOMetadata } from "@/lib/utils/seo";
 export const dynamic = "force-static";
 export const revalidate = 60; // 1 minute for edge cache
 
+// Hero block types configuration (same as homepage)
+const HERO_BLOCK_TYPES = [
+  "shared.introduction-with-image",
+  "homepage.home-game-list",
+  "homepage.home-featured-providers",
+  "shared.overview-block",
+  "games.games-carousel", // Also support custom page blocks in hero
+  "games.new-and-loved-slots",
+];
+
 // Generate static params for known pages
 export async function generateStaticParams() {
   // Implement this when you want to pre-generate pages
@@ -42,6 +52,7 @@ export async function generateMetadata({
     return generateSEOMetadata({
       title: metadata.seo?.metaTitle || metadata.title,
       description: metadata.seo?.metaDescription || "",
+      keywords: metadata.seo?.keywords,
       canonicalUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/${path}`,
     });
   } catch (error) {
@@ -69,7 +80,7 @@ export default async function CustomPage({
   try {
     // Get country code from environment or headers
     const casinoCountry = process.env.NEXT_PUBLIC_COUNTRY_CODE;
-    const localisation = !!casinoCountry;
+    const localisation = false; // Set based on your needs
 
     // Parallel data fetching with split queries
     const [layoutData, customPageResponse] = await Promise.all([
@@ -78,53 +89,66 @@ export default async function CustomPage({
     ]);
 
     const { pageData, games, casinos } = customPageResponse;
-    const { translations } = layoutData;
+    const { layout, translations } = layoutData;
 
     if (!pageData) {
-      console.log("No page data found for path:", path);
       notFound();
     }
+
+    // Additional data for blocks
+    const additionalData = {
+      games,
+      casinos,
+      translations,
+      country: casinoCountry,
+    };
+
+    // Separate blocks by section (same logic as homepage)
+    const blocks = pageData?.blocks || [];
+    const heroBlocks = blocks.filter(
+      (block, index) =>
+        index < 4 && HERO_BLOCK_TYPES.includes(block.__component)
+    );
+    const mainBlocks = blocks.filter(
+      (block, index) =>
+        !(index < 4 && HERO_BLOCK_TYPES.includes(block.__component))
+    );
 
     // Log performance in development
     if (process.env.NODE_ENV === "development") {
       console.log(
         `Custom page data fetching took: ${Date.now() - startTime}ms`
       );
-      console.log("Page data loaded:", {
-        title: pageData.title,
-        blocks: pageData.blocks?.length || 0,
-        games: games.length,
-        casinos: casinos.length,
-      });
     }
 
-    const { blocks = [], breadcrumbs, author, showContentDate } = pageData;
+    // Get all layout breadcrumb collections
+    const layoutBreadcrumbs: Record<string, any[]> = {};
+    Object.keys(layout).forEach((key) => {
+      if (key.endsWith("Breadcrumbs") && Array.isArray(layout[key])) {
+        layoutBreadcrumbs[key] = layout[key];
+      }
+    });
 
-    // Additional data for blocks (similar to homepage)
-    const additionalData = {
-      games,
-      casinos,
-      translations,
-      country: casinoCountry,
-      localisation,
-    };
-
-    // Schema.org structured data
+    // Schema.org structured data for custom pages
     const pageSchema = {
       "@context": "https://schema.org",
       "@type": "WebPage",
       name: pageData.title,
       url: `${process.env.NEXT_PUBLIC_SITE_URL}/${path}`,
       description: pageData.seo?.metaDescription || "",
-      ...(author && {
+      ...(pageData.author && {
         author: {
           "@type": "Person",
-          name: `${author.firstName} ${author.lastName}`,
-          jobTitle: author.jobTitle,
+          name: `${pageData.author.firstName} ${pageData.author.lastName}`,
+          ...(pageData.author.jobTitle && {
+            jobTitle: pageData.author.jobTitle,
+          }),
         },
       }),
-      ...(showContentDate && {
+      ...(pageData.updatedAt && {
         dateModified: pageData.updatedAt,
+      }),
+      ...(pageData.createdAt && {
         datePublished: pageData.createdAt,
       }),
     };
@@ -138,42 +162,75 @@ export default async function CustomPage({
         />
 
         {/* Breadcrumbs */}
-        {breadcrumbs && breadcrumbs.length > 0 && (
-          <nav aria-label="Breadcrumb" className="container mx-auto px-4 py-4">
-            <ol className="flex items-center space-x-2 text-sm">
-              {breadcrumbs.map((crumb, index) => (
-                <li key={index} className="flex items-center">
-                  {index > 0 && <span className="mx-2 text-gray-400">/</span>}
-                  {crumb.breadCrumbUrl ? (
-                    <a
-                      href={crumb.breadCrumbUrl}
-                      className="text-primary hover:underline"
-                    >
-                      {crumb.breadCrumbText}
-                    </a>
-                  ) : (
-                    <span className="text-gray-600">
-                      {crumb.breadCrumbText}
-                    </span>
-                  )}
-                </li>
+        <BreadcrumbsWithLayout
+          items={pageData.breadcrumbs || []}
+          breadcrumbKey="customPageBreadcrumbs"
+          layoutBreadcrumbs={layoutBreadcrumbs}
+          showHome={true}
+        />
+
+        {/* Hero Section with Featured Blocks (same structure as homepage) */}
+        {heroBlocks.length > 0 && (
+          <section className="featured-header relative overflow-hidden bg-gradient-to-b from-background-900 from-30% via-background-700 via-80% to-background-500 rounded-b-3xl">
+            <div className="container relative mx-auto px-4 z-10">
+              {heroBlocks.map((block, index) => (
+                <div
+                  key={`hero-${block.__component}-${index}`}
+                  className="mb-8"
+                >
+                  <DynamicBlock
+                    blockType={block.__component}
+                    blockData={block}
+                    additionalData={additionalData}
+                  />
+                </div>
               ))}
-            </ol>
-          </nav>
+            </div>
+
+            {/* Starry Sky Background Effect (same as homepage) */}
+            <div className="absolute top-0 left-0 w-full pointer-events-none">
+              <div className="h-[80vh] bg-[#0e1a2f]" />
+              <div className="h-[300px] bg-[#0e1a2f] rounded-b-[50%_300px]" />
+            </div>
+          </section>
         )}
 
-        {/* Page Content */}
-        <article className="custom-page">
-          <div className="space-y-8">
-            {blocks.map((block, index) => (
+        {/* Main Content Section (same structure as homepage) */}
+        <main className="container mx-auto px-4 py-8">
+          {/* Show author and date if enabled */}
+          {pageData.showContentDate && (
+            <div className="mb-8 flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+              {pageData.author && (
+                <div className="flex items-center gap-2">
+                  {pageData.author.photo && (
+                    <img
+                      src={pageData.author.photo.url}
+                      alt={`${pageData.author.firstName} ${pageData.author.lastName}`}
+                      className="w-8 h-8 rounded-full"
+                    />
+                  )}
+                  <span>
+                    {pageData.author.firstName} {pageData.author.lastName}
+                  </span>
+                </div>
+              )}
+              {pageData.updatedAt && (
+                <time dateTime={pageData.updatedAt}>
+                  {new Date(pageData.updatedAt).toLocaleDateString()}
+                </time>
+              )}
+            </div>
+          )}
+
+          <div className="space-y-12">
+            {mainBlocks.map((block, index) => (
               <section
-                key={`block-${block.__component}-${index}`}
-                className="block-section opacity-0 animate-[fadeIn_0.6s_ease-out_forwards]"
+                key={`main-${block.__component}-${index}`}
+                className="opacity-0 animate-[fadeIn_0.6s_ease-out_100ms_forwards]"
                 style={{
-                  animationDelay: `${Math.min(index * 50, 300)}ms`,
+                  animationDelay: `${index * 100}ms`,
+                  animationFillMode: "forwards",
                 }}
-                data-block-type={block.__component}
-                data-block-index={index}
               >
                 <DynamicBlock
                   blockType={block.__component}
@@ -183,11 +240,19 @@ export default async function CustomPage({
               </section>
             ))}
           </div>
-        </article>
+
+          {/* Sidebar if specified */}
+          {pageData.sideBarToShow && (
+            <aside className="mt-8 lg:mt-0 lg:ml-8 lg:w-1/3">
+              {/* Implement sidebar content based on sideBarToShow value */}
+              <div className="sticky top-4">{/* Sidebar content */}</div>
+            </aside>
+          )}
+        </main>
       </>
     );
   } catch (error) {
-    console.error("Error loading page:", error);
+    console.error("Error loading custom page:", error);
     notFound();
   }
 }
