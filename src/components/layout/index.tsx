@@ -12,6 +12,9 @@ export type { HeaderProps } from "./Header";
 export { Footer, FooterServer, FooterLinks, FooterImages, FooterBottom, FooterContent } from "./Footer";
 export type { FooterProps } from "./Footer";
 
+// Breadcrumbs
+export { Breadcrumbs } from "./Breadcrumbs";
+
 // Footer components (to be implemented)
 // export { Footer } from "./Footer";
 
