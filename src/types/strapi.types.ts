@@ -1,71 +1,48 @@
 // src/types/strapi.types.ts
 
-import { BaseHomepageBlock } from "./homepage.types";
+import type { BreadcrumbItem } from "./breadcrumbs.types";
 
 /**
- * Base Strapi response wrapper
+ * Basic Strapi image structure
  */
-export interface StrapiResponse<T> {
-  data: T;
-  meta?: {
-    pagination?: {
-      page: number;
-      pageSize: number;
-      pageCount: number;
-      total: number;
-    };
-  };
-}
-
-/**
- * Strapi media format
- */
-export interface StrapiImageFormat {
-  ext: string;
-  url: string;
-  hash: string;
-  mime: string;
-  name: string;
-  path: string | null;
-  size: number;
-  width: number;
-  height: number;
-}
-
-/**
- * Strapi image data
- */
-
-// Define a more specific type for the nested image structure
-export interface NestedStrapiImage {
-  data?: {
-    attributes?: StrapiImage;
-  };
-}
-
 export interface StrapiImage {
   id: number;
-  documentId: string;
-  name?: string;
-  alternativeText?: string | null;
-  caption?: string | null;
+  url: string;
   width: number;
   height: number;
-  formats?: {
-    large?: StrapiImageFormat;
-    medium?: StrapiImageFormat;
-    small?: StrapiImageFormat;
-    thumbnail?: StrapiImageFormat;
-  };
-  hash?: string;
-  ext?: string;
+  alternativeText?: string;
   mime?: string;
-  size?: number;
+  formats?: {
+    thumbnail?: StrapiImageFormat;
+    small?: StrapiImageFormat;
+    medium?: StrapiImageFormat;
+    large?: StrapiImageFormat;
+  };
+}
+
+export interface StrapiImageFormat {
   url: string;
-  previewUrl?: string | null;
-  provider?: string;
-  createdAt?: string;
-  updatedAt?: string;
+  width: number;
+  height: number;
+  size: number;
+  mime: string;
+}
+
+/**
+ * SEO data structure
+ */
+export interface SEOData {
+  metaTitle?: string;
+  metaDescription?: string;
+  keywords?: string;
+  canonicalURL?: string;
+  metaImage?: StrapiImage;
+  metaSocial?: Array<{
+    socialNetwork: string;
+    title: string;
+    description: string;
+    image?: StrapiImage;
+  }>;
 }
 
 /**
@@ -74,68 +51,59 @@ export interface StrapiImage {
 export interface NavigationItem {
   id: number;
   title: string;
-  url: string | null;
-  images: StrapiImage | null;
-  subMenu: NavigationItem[];
+  url?: string;
+  images?: StrapiImage;
+  subMenu?: NavigationItem[];
 }
 
 /**
- * Breadcrumb item
- */
-export interface BreadcrumbItem {
-  id: number;
-  breadCrumbText: string;
-  breadCrumbUrl: string;
-}
-
-/**
- * Footer image item
+ * Footer image item structure
  */
 export interface FooterImageItem {
   id: number;
   imageName: string;
-  imageLink: string | null;
+  imageLink?: string;
   image: StrapiImage;
 }
 
 /**
- * Layout data structure
+ * Layout data structure with breadcrumb support
  */
 export interface LayoutData {
   id: number;
-  documentId: string;
+  documentId?: string;
+  Logo: StrapiImage;
   legalText: string;
   footerContent: string;
-  cookiesHeaderText: string;
-  cookiesDescription: string;
-  cookiesUrl: string;
-  cookiesLinkText: string;
-  Logo: StrapiImage;
   footerImages: FooterImageItem[];
-  homeBreadcrumbs: BreadcrumbItem[];
+  // Breadcrumb collections - dynamic keys based on your CMS setup
+  homeBreadcrumbs?: BreadcrumbItem[];
+  casinoProvidersBreadcrumbs?: BreadcrumbItem[];
+  gameProvidersBreadcrumbs?: BreadcrumbItem[];
+  blogBreadcrumbs?: BreadcrumbItem[];
+  // Add more breadcrumb collections as needed
+  [key: string]: any; // Allow for dynamic breadcrumb keys
 }
 
 /**
  * Navigation data structure
  */
 export interface NavigationData {
-  id: number;
-  documentId: string;
   mainNavigation: NavigationItem[];
+  subNavigation: NavigationItem[];
   footerNavigation: NavigationItem[];
   footerNavigations: NavigationItem[];
-  subNavigation: NavigationItem[];
 }
 
 /**
- * Translation data
+ * Translation data structure
  */
 export interface TranslationData {
   [key: string]: string;
 }
 
 /**
- * Combined layout response
+ * Combined layout data response
  */
 export interface LayoutDataResponse {
   layout: LayoutData;
@@ -144,162 +112,41 @@ export interface LayoutDataResponse {
 }
 
 /**
- * Game provider
+ * Homepage data structure
  */
-export interface GameProvider {
-  id: number;
-  documentId?: string;
-  title: string;
-  slug: string;
-}
-
-/**
- * Game category
- */
-export interface GameCategory {
-  id: number;
-  documentId?: string;
-  title: string;
-  slug: string;
-}
-
-/**
- * Game author
- */
-export interface GameAuthor {
-  id: number;
-  documentId?: string;
-  firstName: string;
-  lastName: string;
-  slug: string;
-  photo?: StrapiImage;
-}
-
-/**
- * Game embed code
- */
-export interface GameEmbedCode {
-  desktopEmbedCode: string;
-  mobileEmbedCode: string;
-}
-
-/**
- * FAQ item
- */
-export interface Faqs {
-  id: number;
-  question: string;
-  answer: string;
-};
-
-/**
- * Game info table
- */
-export interface GameInfoTable {
-  rtp?: string;
-  volatilita?: string;
-  layout?: string;
-  lineeDiPuntata?: string;
-  puntataMinima?: string;
-  puntataMassima?: string;
-  jackpot?: boolean;
-  freeSpins?: boolean;
-  bonusGame?: boolean;
-}
-
-/**
- * SEO metadata
- */
-export interface SEOData {
-  metaTitle?: string;
-  metaDescription?: string;
-  keywords?: string;
-  canonicalURL?: string;
-  metaRobots?: string;
-  metaSocial?: {
-    socialNetwork: string;
-    title: string;
-    description: string;
-    image?: StrapiImage;
-  }[];
-}
-
-/**
- * FAQ item
- */
-export interface FAQItem {
-  id: number;
-  question: string;
-  answer: string;
-}
-
-export interface HowTo {
-  id: number;
-  heading: string;
-  copy: string;
-  image: StrapiImage;
-};
-
-export interface HowToGroup {
-  id: number;
-  title: string;
-  description: string;
-  howToGroup: HowTo[];
-};
-
-export interface ProsCons {
-  heading: string;
-  pros: {
-    list: string;
-  }[];
-  proImage: StrapiImage;
-  cons: {
-    list: string;
-  }[];
-  conImage: StrapiImage;
-};
-
-/**
- * Game data structure
- */
-export interface GameData {
+export interface HomepageData {
   id: number;
   documentId?: string;
   title: string;
   heading?: string;
-  slug: string;
-  introduction?: string;
-  content1?: string;
-  ratingAvg: number;
-  ratingCount: number;
-  views: number;
-  isGameDisabled?: boolean;
-  gameDisableText?: string;
-  gamesApiOverride?: string;
-  createdAt: string;
   updatedAt: string;
-  publishedAt: string;
-  images: StrapiImage[];
-  provider: GameProvider;
-  categories: GameCategory[];
-  author?: GameAuthor;
-  embedCode?: GameEmbedCode;
-  gameInfoTable?: GameInfoTable;
-  seo?: SEOData;
-  faqs?: FAQItem[];
-  howTo?: {
-    title: string;
-    howToGroup: HowToGroup;
-  };
-  proscons?: ProsCons;
-  blocks?: BaseHomepageBlock[];
+  blocks: any[]; // Dynamic block components
+  seo: SEOData;
 }
 
 /**
- * Games list response
+ * Custom page data structure
+ */
+export interface CustomPageData {
+  id: number;
+  documentId?: string;
+  title: string;
+  urlPath: string;
+  createdAt: string;
+  updatedAt: string;
+  showContentDate: boolean;
+  sideBarToShow?: string | null;
+  seo: SEOData;
+  breadcrumbs: BreadcrumbItem[];
+  author?: any; // Author structure
+  blocks: any[]; // Dynamic block components
+}
+
+/**
+ * Games list response structure
  */
 export interface GamesListResponse {
-  data: GameData[];
+  games: GameData[];
   meta: {
     pagination: {
       page: number;
@@ -311,65 +158,7 @@ export interface GamesListResponse {
 }
 
 /**
- * Casino data structure
- */
-export interface CasinoData {
-  id: number;
-  documentId?: string;
-  title: string;
-  slug: string;
-  description?: string;
-  rating: number;
-  ratingCount: number;
-  bonus?: string;
-  bonusPercentage?: number;
-  freeSpins?: number;
-  depositMin?: number;
-  website?: string;
-  established?: number;
-  license?: string[];
-  paymentMethods?: string[];
-  currencies?: string[];
-  languages?: string[];
-  supportEmail?: string;
-  supportPhone?: string;
-  supportChat?: boolean;
-  logo: StrapiImage;
-  images?: StrapiImage[];
-  pros?: string[];
-  cons?: string[];
-  termsAndConditions?: string;
-  seo?: SEOData;
-}
-
-/**
- * Blog/Article data structure
- */
-
-/**
- * Blog category
- */
-export interface BlogCategory {
-  id: number;
-  documentId?: string;
-  blogCategory: string;
-  slug: string;
-}
-
-/**
- * Blog author
- */
-export interface BlogAuthor {
-  id: number;
-  documentId?: string;
-  firstName: string;
-  lastName: string;
-  slug?: string;
-  photo?: StrapiImage;
-}
-
-/**
- * Blog/Article data structure
+ * Blog data structure
  */
 export interface BlogData {
   id: number;
@@ -379,17 +168,37 @@ export interface BlogData {
   blogBrief?: string;
   excerpt?: string;
   content?: string;
-  content1?: string;
   publishedAt: string;
   createdAt: string;
-  updatedAt: string;
-  minutesRead?: number;
-  readingTime?: number;
-  images?: StrapiImage[];
-  featuredImage?: StrapiImage;
-  author?: BlogAuthor;
-  blogCategory?: BlogCategory;
-  categories?: GameCategory[];
-  tags?: string[];
-  seo?: SEOData;
+  images?: StrapiImage;
+  author?: any;
+  blogCategory?: any;
+}
+
+/**
+ * Game data structure
+ */
+export interface GameData {
+  id: number;
+  documentId?: string;
+  title: string;
+  slug: string;
+  ratingAvg: number;
+  ratingCount?: number;
+  images?: StrapiImage;
+  provider?: any;
+  categories?: any[];
+}
+
+/**
+ * Casino data structure
+ */
+export interface CasinoData {
+  id: number;
+  documentId?: string;
+  title: string;
+  slug: string;
+  ratingAvg: number;
+  images?: StrapiImage;
+  casinoBonus?: any;
 }

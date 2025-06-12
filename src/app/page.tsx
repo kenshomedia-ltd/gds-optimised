@@ -2,6 +2,7 @@
 import { getHomepageDataSplit } from "@/lib/strapi/homepage-query-splitter";
 import { getLayoutData } from "@/lib/strapi/data-loader";
 import { DynamicBlock } from "@/components/common/DynamicBlock";
+import { BreadcrumbsWithLayout } from "@/components/layout/Breadcrumbs";
 import { generateMetadata as generateSEOMetadata } from "@/lib/utils/seo";
 import type { Metadata } from "next";
 
@@ -47,7 +48,7 @@ export default async function HomePage() {
   ]);
 
   const { homepage, games, blogs, casinos } = homepageData;
-  const { translations } = layoutData;
+  const { layout, translations } = layoutData;
 
   // Additional data for blocks
   const additionalData = {
@@ -90,12 +91,28 @@ export default async function HomePage() {
     },
   };
 
+  // Get all layout breadcrumb collections
+  const layoutBreadcrumbs: Record<string, any[]> = {};
+  Object.keys(layout).forEach((key) => {
+    if (key.endsWith("Breadcrumbs") && Array.isArray(layout[key])) {
+      layoutBreadcrumbs[key] = layout[key];
+    }
+  });
+
   return (
     <>
       {/* Structured Data */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(homepageSchema) }}
+      />
+
+      {/* Breadcrumbs for homepage */}
+      <BreadcrumbsWithLayout
+        items={[]}
+        breadcrumbKey="homeBreadcrumbs"
+        layoutBreadcrumbs={layoutBreadcrumbs}
+        showHome={false} // Don't show home on homepage
       />
 
       {/* Hero Section with Featured Blocks */}

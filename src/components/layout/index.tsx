@@ -13,7 +13,8 @@ export { Footer, FooterServer, FooterLinks, FooterImages, FooterBottom, FooterCo
 export type { FooterProps } from "./Footer";
 
 // Breadcrumbs
-export { Breadcrumbs } from "./Breadcrumbs";
+export { Breadcrumbs, BreadcrumbsWithLayout } from "./Breadcrumbs";
+export type { BreadcrumbItem } from "@/types/breadcrumbs.types";
 
 // Footer components (to be implemented)
 // export { Footer } from "./Footer";

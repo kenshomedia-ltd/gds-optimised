@@ -6,6 +6,7 @@ import {
   getCustomPageDataSplit,
 } from "@/lib/strapi/custom-page-split-query";
 import { getLayoutData } from "@/lib/strapi/data-loader";
+import { BreadcrumbsWithLayout } from "@/components/layout/Breadcrumbs";
 import { DynamicBlock } from "@/components/common/DynamicBlock";
 import { generateMetadata as generateSEOMetadata } from "@/lib/utils/seo";
 
@@ -24,10 +25,9 @@ export async function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string[] }>;
+  params: { slug: string[] };
 }): Promise<Metadata> {
-  const { slug } = await params;
-  const path = slug.join("/");
+  const path = params.slug.join("/");
 
   try {
     const metadata = await getCustomPageMetadata(path);
@@ -56,16 +56,13 @@ export async function generateMetadata({
 export default async function CustomPage({
   params,
 }: {
-  params: Promise<{ slug: string[] }>;
+  params: { slug: string[] };
 }) {
   // Performance timing
   const startTime = Date.now();
 
-  // Await params before using
-  const { slug } = await params;
-
   // Join the slug array without leading/trailing slashes for the API
-  const path = slug.join("/");
+  const path = params.slug.join("/");
 
   console.log("Loading custom page for path:", path);
 

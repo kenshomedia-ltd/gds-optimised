@@ -1,1 +1,2 @@
-export { Breadcrumbs } from "./Breadcrumbs";
+// src/components/navigation/Breadcrumbs/index.ts
+export { Breadcrumbs, BreadcrumbsWithLayout } from "./Breadcrumbs";
