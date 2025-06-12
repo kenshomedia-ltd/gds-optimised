@@ -2,21 +2,20 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import {
-  getCustomPageData,
   getCustomPageMetadata,
-} from "@/lib/strapi/custom-page-loader";
+  getCustomPageDataSplit,
+} from "@/lib/strapi/custom-page-split-query";
+import { getLayoutData } from "@/lib/strapi/data-loader";
 import { DynamicBlock } from "@/components/common/DynamicBlock";
-import { IntroWithImage } from "@/components/common/IntroWithImage";
-// import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
 import { generateMetadata as generateSEOMetadata } from "@/lib/utils/seo";
 
 // Force static generation with ISR
 export const dynamic = "force-static";
-export const revalidate = 300; // 5 minutes
+export const revalidate = 60; // 1 minute for edge cache
 
 // Generate static params for known pages
 export async function generateStaticParams() {
-  // This will be implemented when you want to pre-generate pages
+  // Implement this when you want to pre-generate pages
   // For now, return empty array to rely on on-demand generation
   return [];
 }
@@ -25,10 +24,10 @@ export async function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string[] };
+  params: Promise<{ slug: string[] }>;
 }): Promise<Metadata> {
-  // Join the slug array without leading/trailing slashes for the API
-  const path = params.slug.join("/");
+  const { slug } = await params;
+  const path = slug.join("/");
 
   try {
     const metadata = await getCustomPageMetadata(path);
@@ -54,13 +53,19 @@ export async function generateMetadata({
   }
 }
 
-export default async function CatchAllPage({
+export default async function CustomPage({
   params,
 }: {
-  params: { slug: string[] };
+  params: Promise<{ slug: string[] }>;
 }) {
+  // Performance timing
+  const startTime = Date.now();
+
+  // Await params before using
+  const { slug } = await params;
+
   // Join the slug array without leading/trailing slashes for the API
-  const path = params.slug.join("/");
+  const path = slug.join("/");
 
   console.log("Loading custom page for path:", path);
 
@@ -69,66 +74,117 @@ export default async function CatchAllPage({
     const casinoCountry = process.env.NEXT_PUBLIC_COUNTRY_CODE;
     const localisation = !!casinoCountry;
 
-    // Fetch page data with split queries for better caching
-    const pageData = await getCustomPageData(path, casinoCountry, localisation);
+    // Parallel data fetching with split queries
+    const [layoutData, customPageResponse] = await Promise.all([
+      getLayoutData({ cached: true }),
+      getCustomPageDataSplit(path, casinoCountry, localisation),
+    ]);
+
+    const { pageData, games, casinos } = customPageResponse;
+    const { translations } = layoutData;
 
     if (!pageData) {
       console.log("No page data found for path:", path);
       notFound();
     }
 
-    console.log("Page data loaded:", {
-      title: pageData.title,
-      blocks: pageData.blocks?.length || 0,
-      author: pageData.author?.firstName,
-    });
+    // Log performance in development
+    if (process.env.NODE_ENV === "development") {
+      console.log(
+        `Custom page data fetching took: ${Date.now() - startTime}ms`
+      );
+      console.log("Page data loaded:", {
+        title: pageData.title,
+        blocks: pageData.blocks?.length || 0,
+        games: games.length,
+        casinos: casinos.length,
+      });
+    }
 
     const { blocks = [], breadcrumbs, author, showContentDate } = pageData;
 
+    // Additional data for blocks (similar to homepage)
+    const additionalData = {
+      games,
+      casinos,
+      translations,
+      country: casinoCountry,
+      localisation,
+    };
+
+    // Schema.org structured data
+    const pageSchema = {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name: pageData.title,
+      url: `${process.env.NEXT_PUBLIC_SITE_URL}/${path}`,
+      description: pageData.seo?.metaDescription || "",
+      ...(author && {
+        author: {
+          "@type": "Person",
+          name: `${author.firstName} ${author.lastName}`,
+          jobTitle: author.jobTitle,
+        },
+      }),
+      ...(showContentDate && {
+        dateModified: pageData.updatedAt,
+        datePublished: pageData.createdAt,
+      }),
+    };
+
     return (
       <>
+        {/* Structured Data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(pageSchema) }}
+        />
+
         {/* Breadcrumbs */}
-        {/* {breadcrumbs && breadcrumbs.length > 0 && (
-          <Breadcrumbs
-            items={breadcrumbs}
-            className="container mx-auto px-4 mb-6"
-          />
-        )} */}
+        {breadcrumbs && breadcrumbs.length > 0 && (
+          <nav aria-label="Breadcrumb" className="container mx-auto px-4 py-4">
+            <ol className="flex items-center space-x-2 text-sm">
+              {breadcrumbs.map((crumb, index) => (
+                <li key={index} className="flex items-center">
+                  {index > 0 && <span className="mx-2 text-gray-400">/</span>}
+                  {crumb.breadCrumbUrl ? (
+                    <a
+                      href={crumb.breadCrumbUrl}
+                      className="text-primary hover:underline"
+                    >
+                      {crumb.breadCrumbText}
+                    </a>
+                  ) : (
+                    <span className="text-gray-600">
+                      {crumb.breadCrumbText}
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )}
 
         {/* Page Content */}
         <article className="custom-page">
-          {/* Render dynamic blocks */}
           <div className="space-y-8">
-            {blocks.map((block, index) => {
-              console.log(`Rendering block ${index}:`, block.__component);
-
-              // Handle introduction with image separately for better control
-              if (block.__component === "shared.introduction-with-image") {
-                return (
-                  <IntroWithImage
-                    key={`block-${index}`}
-                    heading={block.heading || pageData.title}
-                    introduction={block.introduction}
-                    image={block.image}
-                    timeDate={showContentDate ? pageData.updatedAt : undefined}
-                    authorData={author}
-                    isDateEnabled={showContentDate}
-                  />
-                );
-              }
-
-              return (
+            {blocks.map((block, index) => (
+              <section
+                key={`block-${block.__component}-${index}`}
+                className="block-section opacity-0 animate-[fadeIn_0.6s_ease-out_forwards]"
+                style={{
+                  animationDelay: `${Math.min(index * 50, 300)}ms`,
+                }}
+                data-block-type={block.__component}
+                data-block-index={index}
+              >
                 <DynamicBlock
-                  key={`block-${index}`}
                   blockType={block.__component}
                   blockData={block}
-                  additionalData={{
-                    translations: {},
-                    country: casinoCountry,
-                  }}
+                  additionalData={additionalData}
                 />
-              );
-            })}
+              </section>
+            ))}
           </div>
         </article>
       </>
