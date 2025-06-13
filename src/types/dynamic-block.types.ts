@@ -1,6 +1,7 @@
 // src/types/dynamic-block.types.ts
 
-// CHANGED: Imported the data types directly from the source
+import type { NewAndLovedSlotsBlock } from "./new-and-loved-slots.types";
+
 import type {
   StrapiImage,
   GameData,
@@ -136,7 +137,8 @@ export type BlockData =
   | SingleContentBlock
   | HomeCasinoListBlock
   | HomeTestimoniesBlock
-  | HomeBlogListBlock;
+  | HomeBlogListBlock
+  | NewAndLovedSlotsBlock;
 
 export type BlockType =
   | "homepage.home-game-list"
@@ -149,7 +151,8 @@ export type BlockType =
   | "shared.overview-block"
   | "shared.single-content"
   | "homepage.home-testimonies"
-  | "homepage.home-featured-categories";
+  | "homepage.home-featured-categories"
+  | "games.new-and-loved-slots";
 
 // REMOVED: The incorrect placeholder interfaces for Game, Casino, and Blog are no longer needed.
 
@@ -158,10 +161,17 @@ export interface DynamicBlockProps {
   blockData: BlockData;
   additionalData?: {
     translations?: Record<string, string>;
-    games?: GameData[]; // FIX: Using the imported GameData type
-    casinos?: CasinoData[]; // FIX: Using the imported CasinoData type
-    blogs?: BlogData[]; // FIX: Using the imported BlogData type
+    games?: GameData[];
+    casinos?: CasinoData[];
+    blogs?: BlogData[];
     country?: string;
+    dynamicGamesData?: {
+      [blockId: string]: {
+        newGames?: GameData[];
+        popularGames?: GameData[];
+        games?: GameData[];
+      };
+    };
   };
 }
 

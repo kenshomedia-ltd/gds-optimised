@@ -35,9 +35,11 @@ export async function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string[] };
+  params: Promise<{ slug: string[] }>;
 }): Promise<Metadata> {
-  const path = params.slug.join("/");
+  // Await params as required in Next.js 15
+  const { slug } = await params;
+  const path = slug.join("/");
 
   try {
     const metadata = await getCustomPageMetadata(path);
@@ -72,23 +74,19 @@ export default async function CustomPage({
   // Performance timing
   const startTime = Date.now();
 
-  // Join the slug array without leading/trailing slashes for the API
-  const path = params.slug.join("/");
-
-  console.log("Loading custom page for path:", path);
+  // Await params as required in Next.js 15
+  const { slug } = await params;
+  const path = slug.join("/");
 
   try {
-    // Get country code from environment or headers
-    const casinoCountry = process.env.NEXT_PUBLIC_COUNTRY_CODE;
-    const localisation = false; // Set based on your needs
 
     // Parallel data fetching with split queries
     const [layoutData, customPageResponse] = await Promise.all([
       getLayoutData({ cached: true }),
-      getCustomPageDataSplit(path, casinoCountry, localisation),
+      getCustomPageDataSplit(path),
     ]);
 
-    const { pageData, games, casinos } = customPageResponse;
+    const { pageData, games, casinos, dynamicGamesData } = customPageResponse;
     const { layout, translations } = layoutData;
 
     if (!pageData) {
@@ -100,7 +98,7 @@ export default async function CustomPage({
       games,
       casinos,
       translations,
-      country: casinoCountry,
+      dynamicGamesData,
     };
 
     // Separate blocks by section (same logic as homepage)

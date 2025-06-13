@@ -14,6 +14,7 @@ import type {
   OverviewBlock,
   SingleContentBlock,
 } from "@/types/dynamic-block.types";
+import type { NewAndLovedSlotsBlock } from "@/types/new-and-loved-slots.types";
 import { Skeleton } from "@/components/ui/Skeleton";
 
 // Lazy load components for better performance
@@ -82,6 +83,15 @@ const componentMap = {
         import("@/components/widgets/Testimonials").then((mod) => (
           <mod.TestimonialsSkeleton />
         )),
+    }
+  ),
+  "games.new-and-loved-slots": dynamic(
+    () =>
+      import("@/components/widgets/NewAndLovedSlots").then(
+        (mod) => mod.NewAndLovedSlots
+      ),
+    {
+      loading: () => <Skeleton className="h-64 w-full" />,
     }
   ),
 };
@@ -163,6 +173,18 @@ export function DynamicBlock({
       case "homepage.home-testimonies":
         return {
           data: blockData as HomeTestimoniesBlock,
+        };
+
+      case "games.new-and-loved-slots":
+        // Get the block-specific games data from dynamicGamesData
+        const newAndLovedData =
+          additionalData?.dynamicGamesData?.[`block-${blockData.id}`];
+
+        return {
+          blockData: blockData as NewAndLovedSlotsBlock,
+          translations: additionalData?.translations,
+          newGames: newAndLovedData?.newGames || [],
+          popularGames: newAndLovedData?.popularGames || [],
         };
 
       // Ensure all components in the map have a case here

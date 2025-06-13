@@ -270,3 +270,66 @@ export const blockQueryChunks = {
     },
   },
 };
+
+// Build games query with filters and sorting
+export function buildGamesQuery(options: {
+  limit?: number;
+  sort?: string;
+  page?: number;
+  providers?: string[];
+  categories?: string[];
+}) {
+  const {
+    limit = 24,
+    sort = 'createdAt:desc',
+    page = 1,
+    providers = [],
+    categories = [],
+  } = options;
+
+  const query: any = {
+    fields: [
+      "title",
+      "slug",
+      "ratingAvg",
+      "ratingCount",
+      "createdAt",
+      "publishedAt",
+    ],
+    populate: {
+      images: {
+        fields: ["url", "alternativeText", "width", "height"],
+      },
+      provider: {
+        fields: ["title", "slug"],
+      },
+      categories: {
+        fields: ["title", "slug"],
+      },
+    },
+    sort: [sort],
+    pagination: {
+      pageSize: limit,
+      page: page,
+    },
+  };
+
+  // Add filters if providers or categories are specified
+  if (providers.length > 0 || categories.length > 0) {
+    query.filters = {};
+    
+    if (providers.length > 0) {
+      query.filters.provider = {
+        slug: { $in: providers },
+      };
+    }
+    
+    if (categories.length > 0) {
+      query.filters.categories = {
+        slug: { $in: categories },
+      };
+    }
+  }
+
+  return query;
+}
