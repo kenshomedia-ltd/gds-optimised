@@ -5,14 +5,13 @@ import { unstable_cache } from "next/cache";
 import { cacheManager } from "@/lib/cache/cache-manager";
 import type {
   CustomPageData,
-  CustomPageMetadata,
-} from "@/types/custom-page.types";
-import type {
   GameData,
   CasinoData,
-  GamesListResponse,
+  SEOData,
 } from "@/types/strapi.types";
+import type { CustomPageBlock } from "@/types/custom-page.types";
 import type { NewAndLovedSlotsBlock } from "@/types/new-and-loved-slots.types";
+import type { GamesCarouselBlock } from "@/types/custom-page.types";
 
 // Cache configuration for different parts
 const CACHE_CONFIG = {
@@ -21,6 +20,17 @@ const CACHE_CONFIG = {
   casinos: { ttl: 300, swr: 600, tags: ["custom-page-casinos"] }, // 5min/10min
   metadata: { ttl: 600, swr: 1200, tags: ["custom-page-meta"] }, // 10min/20min
 };
+
+/**
+ * Custom metadata type for lightweight metadata queries
+ */
+interface CustomPageMetadata {
+  id: number;
+  title: string;
+  urlPath: string;
+  publishedAt?: string;
+  seo?: SEOData;
+}
 
 /**
  * Normalize path by removing leading and trailing slashes
@@ -82,7 +92,7 @@ async function fetchNewAndLovedSlotsGames(
   }
 
   // Build filters based on IDs
-  const filters: any = {};
+  const filters: Record<string, unknown> = {};
   if (providerIds.length > 0) {
     filters.provider = {
       id: { $in: providerIds },
@@ -96,72 +106,43 @@ async function fetchNewAndLovedSlotsGames(
 
   // Prepare queries for new and popular games
   const newGamesQuery = {
-    fields: [
-      "title",
-      "slug",
-      "ratingAvg",
-      "ratingCount",
-      "createdAt",
-      "publishedAt",
-    ],
+    fields: ["title", "slug", "ratingAvg", "createdAt"],
     populate: {
-      images: {
-        fields: ["url", "alternativeText", "width", "height"],
-      },
-      provider: {
-        fields: ["title", "slug"],
-      },
-      categories: {
-        fields: ["title", "slug"],
-      },
+      images: { fields: ["url", "width", "height"] },
+      provider: { fields: ["title", "slug"] },
+      categories: { fields: ["title", "slug"] },
     },
     ...(Object.keys(filters).length > 0 && { filters }),
     sort: ["createdAt:desc"],
-    pagination: {
-      pageSize: 3,
-      page: 1,
-    },
+    pagination: { pageSize: 3, page: 1 },
   };
 
   const popularGamesQuery = {
     ...newGamesQuery,
-    sort: ["ratingAvg:desc", "ratingCount:desc"],
+    sort: ["ratingAvg:desc"],
   };
 
-  console.log(
-    "Fetching new games with query:",
-    JSON.stringify(newGamesQuery, null, 2)
-  );
-  console.log(
-    "Fetching popular games with query:",
-    JSON.stringify(popularGamesQuery, null, 2)
-  );
-
-  // Fetch in parallel
-  const [newGamesResponse, popularGamesResponse] = await Promise.all([
-    strapiClient.fetchWithCache<{ data: GameData[] }>(
-      "games",
-      newGamesQuery,
-      CACHE_CONFIG.games.ttl
-    ),
-    strapiClient.fetchWithCache<{ data: GameData[] }>(
-      "games",
-      popularGamesQuery,
-      CACHE_CONFIG.games.ttl
-    ),
-  ]);
-
-  const result = {
-    newGames: newGamesResponse.data || [],
-    popularGames: popularGamesResponse.data || [],
-  };
-
-  console.log(
-    `Fetched ${result.newGames.length} new games and ${result.popularGames.length} popular games`
-  );
-
-  // Store in cache
   try {
+    // Fetch both in parallel
+    const [newGamesResponse, popularGamesResponse] = await Promise.all([
+      strapiClient.fetchWithCache<{ data: GameData[] }>(
+        "games",
+        newGamesQuery,
+        CACHE_CONFIG.games.ttl
+      ),
+      strapiClient.fetchWithCache<{ data: GameData[] }>(
+        "games",
+        popularGamesQuery,
+        CACHE_CONFIG.games.ttl
+      ),
+    ]);
+
+    const result = {
+      newGames: newGamesResponse.data || [],
+      popularGames: popularGamesResponse.data || [],
+    };
+
+    // Cache the results
     await Promise.all([
       cacheManager.set(newGamesCacheKey, result.newGames, {
         ttl: CACHE_CONFIG.games.ttl,
@@ -172,65 +153,50 @@ async function fetchNewAndLovedSlotsGames(
         swr: CACHE_CONFIG.games.swr,
       }),
     ]);
-  } catch (error) {
-    console.error("Cache set error:", error);
-  }
 
-  return result;
-} 
+    return result;
+  } catch (error) {
+    console.error("Failed to fetch games:", error);
+    return { newGames: [], popularGames: [] };
+  }
+}
 
 /**
- * Fetch games for games.games-carousel blocks
+ * Fetch games for Games Carousel blocks
  */
 async function fetchGamesCarouselGames(
-  block: any // You'll need to type this based on your carousel block structure
+  block: GamesCarouselBlock
 ): Promise<GameData[]> {
-  // Build filters based on the block configuration
-  const filters: any = {};
+  // Extract provider and category slugs
+  const providerSlugs =
+    block.gameProviders
+      ?.map((p) => p.slotProvider?.slug)
+      .filter((slug): slug is string => Boolean(slug)) || [];
 
-  // Extract provider IDs if present
-  if (block.gameProviders && block.gameProviders.length > 0) {
-    const providerIds = block.gameProviders
-      .map((p: any) => p.id)
-      .filter(Boolean);
-    if (providerIds.length > 0) {
-      filters.provider = { id: { $in: providerIds } };
-    }
+  const categorySlugs =
+    block.gameCategories
+      ?.map((c) => c.slotCategory?.slug)
+      .filter((slug): slug is string => Boolean(slug)) || [];
+
+  const filters: Record<string, unknown> = {};
+
+  if (providerSlugs.length > 0) {
+    filters.provider = { slug: { $in: providerSlugs } };
   }
 
-  // Extract category IDs if present
-  if (block.gameCategories && block.gameCategories.length > 0) {
-    const categoryIds = block.gameCategories
-      .map((c: any) => c.id)
-      .filter(Boolean);
-    if (categoryIds.length > 0) {
-      filters.categories = { id: { $in: categoryIds } };
-    }
+  if (categorySlugs.length > 0) {
+    filters.categories = { slug: { $in: categorySlugs } };
   }
 
   const query = {
-    fields: [
-      "title",
-      "slug",
-      "ratingAvg",
-      "ratingCount",
-      "createdAt",
-      "publishedAt",
-    ],
+    fields: ["title", "slug", "ratingAvg", "createdAt", "views"],
     populate: {
-      images: {
-        fields: ["url", "alternativeText", "width", "height"],
-      },
-      provider: {
-        fields: ["title", "slug"],
-      },
-      categories: {
-        fields: ["title", "slug"],
-      },
+      images: { fields: ["url", "width", "height"] },
+      provider: { fields: ["title", "slug"] },
+      categories: { fields: ["title", "slug"] },
     },
     ...(Object.keys(filters).length > 0 && { filters }),
-    sort:
-      block.sortBy === "Most Popular" ? ["ratingAvg:desc"] : ["createdAt:desc"],
+    sort: block.sortBy === "Popular" ? ["ratingAvg:desc"] : ["createdAt:desc"],
     pagination: {
       pageSize: block.numberOfGames || 24,
       page: 1,
@@ -250,7 +216,7 @@ async function fetchGamesCarouselGames(
  * Analyze blocks and fetch all required dynamic data
  */
 async function fetchDynamicDataForBlocks(
-  blocks: any[]
+  blocks: CustomPageBlock[]
 ): Promise<DynamicGamesData> {
   console.log("Analyzing blocks for dynamic data fetching...");
   const gamesData: DynamicGamesData = {};
@@ -260,17 +226,21 @@ async function fetchDynamicDataForBlocks(
   blocks.forEach((block) => {
     console.log(`Found block: ${block.__component} (ID: ${block.id})`);
 
-    if (block.__component === "games.new-and-loved-slots" && block.newSlots) {
-      console.log("Adding NewAndLovedSlots block to fetch queue");
-      fetchPromises.push(
-        fetchNewAndLovedSlotsGames(block).then((data) => {
-          gamesData[`block-${block.id}`] = data;
-        })
-      );
+    if (block.__component === "games.new-and-loved-slots") {
+      const typedBlock = block as NewAndLovedSlotsBlock;
+      if (typedBlock.newSlots) {
+        console.log("Adding NewAndLovedSlots block to fetch queue");
+        fetchPromises.push(
+          fetchNewAndLovedSlotsGames(typedBlock).then((data) => {
+            gamesData[`block-${block.id}`] = data;
+          })
+        );
+      }
     } else if (block.__component === "games.games-carousel") {
+      const typedBlock = block as GamesCarouselBlock;
       console.log("Adding GamesCarousel block to fetch queue");
       fetchPromises.push(
-        fetchGamesCarouselGames(block).then((games) => {
+        fetchGamesCarouselGames(typedBlock).then((games) => {
           gamesData[`block-${block.id}`] = { games };
         })
       );
@@ -291,9 +261,7 @@ async function fetchDynamicDataForBlocks(
  * Optimized custom page data fetching with split queries
  */
 const getCustomPageDataWithSplitQueries = async (
-  path: string,
-  casinoCountry?: string,
-  localisation: boolean = false
+  path: string
 ): Promise<{
   pageData: CustomPageData | null;
   games: GameData[];
@@ -363,14 +331,10 @@ const getCustomPageDataWithSplitQueries = async (
             fields: ["newSlots"],
             populate: {
               slot_categories: {
-                populate: {
-                  fields: ["title", "slug"],
-                },
+                fields: ["id"],
               },
               slot_providers: {
-                populate: {
-                  fields: ["title", "slug"],
-                },
+                fields: ["id"],
               },
             },
           },
@@ -444,7 +408,7 @@ const getCustomPageDataWithSplitQueries = async (
     }
 
     // 2. Analyze blocks and determine what dynamic data is needed
-    const blocks = pageData.blocks || [];
+    const blocks = (pageData.blocks || []) as CustomPageBlock[];
     const needsCasinos = blocks.some((block) =>
       ["casinos.casino-list", "casinos.casinos-comparison"].includes(
         block.__component
@@ -454,9 +418,7 @@ const getCustomPageDataWithSplitQueries = async (
     // 3. Fetch all dynamic data in parallel
     const [dynamicGamesData, casinos] = await Promise.all([
       fetchDynamicDataForBlocks(blocks),
-      needsCasinos
-        ? fetchCasinosForCustomPage(casinoCountry, localisation)
-        : [],
+      needsCasinos ? fetchCasinosForCustomPage() : [],
     ]);
 
     // Note: 'games' array is for backward compatibility
@@ -481,30 +443,14 @@ const getCustomPageDataWithSplitQueries = async (
 /**
  * Fetch casinos for custom page blocks
  */
-async function fetchCasinosForCustomPage(
-  casinoCountry?: string,
-  localisation: boolean = false
-): Promise<CasinoData[]> {
+async function fetchCasinosForCustomPage(): Promise<CasinoData[]> {
   const query = {
-    fields: ["name", "slug", "ratingAvg"],
+    fields: ["title", "slug", "ratingAvg"],
     populate: {
-      logoImageAlt: { fields: ["url"] },
-      bonuses: {
-        populate: {
-          mainImage: { fields: ["url"] },
-        },
+      images: { fields: ["url", "width", "height"] },
+      casinoBonus: {
+        fields: ["bonusValue", "bonusType"],
       },
-      casinoGeneralInfo: { fields: ["wageringRequirements"] },
-      termsAndConditions: { fields: ["copy", "gambleResponsibly"] },
-      countries: { fields: ["countryName", "shortCode"] },
-    },
-    filters: {
-      ...(localisation &&
-        casinoCountry && {
-          countries: {
-            shortCode: { $in: casinoCountry },
-          },
-        }),
     },
     sort: ["ratingAvg:desc"],
     pagination: { pageSize: 20, page: 1 },

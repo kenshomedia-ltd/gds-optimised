@@ -1,6 +1,7 @@
 // src/app/[...slug]/page.tsx
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
+import { Image } from "@/components/common/Image";
 import {
   getCustomPageMetadata,
   getCustomPageDataSplit,
@@ -9,6 +10,8 @@ import { getLayoutData } from "@/lib/strapi/data-loader";
 import { BreadcrumbsWithLayout } from "@/components/layout/Breadcrumbs";
 import { DynamicBlock } from "@/components/common/DynamicBlock";
 import { generateMetadata as generateSEOMetadata } from "@/lib/utils/seo";
+import type { CustomPageBlock } from "@/types/custom-page.types";
+import type { BreadcrumbItem } from "@/types/breadcrumbs.types";
 
 // Force static generation with ISR
 export const dynamic = "force-static";
@@ -66,21 +69,20 @@ export async function generateMetadata({
   }
 }
 
+// Main page component
 export default async function CustomPage({
   params,
 }: {
-  params: { slug: string[] };
+  params: Promise<{ slug: string[] }>;
 }) {
-  // Performance timing
-  const startTime = Date.now();
-
-  // Await params as required in Next.js 15
-  const { slug } = await params;
-  const path = slug.join("/");
-
   try {
+    const startTime = Date.now();
 
-    // Parallel data fetching with split queries
+    // Await params as required in Next.js 15
+    const { slug } = await params;
+    const path = slug.join("/");
+
+    // Parallel data fetching
     const [layoutData, customPageResponse] = await Promise.all([
       getLayoutData({ cached: true }),
       getCustomPageDataSplit(path),
@@ -101,14 +103,14 @@ export default async function CustomPage({
       dynamicGamesData,
     };
 
-    // Separate blocks by section (same logic as homepage)
-    const blocks = pageData?.blocks || [];
+    // Separate blocks by section with proper typing
+    const blocks = (pageData?.blocks || []) as CustomPageBlock[];
     const heroBlocks = blocks.filter(
-      (block, index) =>
+      (block: CustomPageBlock, index: number) =>
         index < 4 && HERO_BLOCK_TYPES.includes(block.__component)
     );
     const mainBlocks = blocks.filter(
-      (block, index) =>
+      (block: CustomPageBlock, index: number) =>
         !(index < 4 && HERO_BLOCK_TYPES.includes(block.__component))
     );
 
@@ -120,7 +122,7 @@ export default async function CustomPage({
     }
 
     // Get all layout breadcrumb collections
-    const layoutBreadcrumbs: Record<string, any[]> = {};
+    const layoutBreadcrumbs: Record<string, BreadcrumbItem[]> = {};
     Object.keys(layout).forEach((key) => {
       if (key.endsWith("Breadcrumbs") && Array.isArray(layout[key])) {
         layoutBreadcrumbs[key] = layout[key];
@@ -171,7 +173,7 @@ export default async function CustomPage({
         {heroBlocks.length > 0 && (
           <section className="featured-header relative overflow-hidden bg-gradient-to-b from-background-900 from-30% via-background-700 via-80% to-background-500 rounded-b-3xl">
             <div className="container relative mx-auto px-4 z-10">
-              {heroBlocks.map((block, index) => (
+              {heroBlocks.map((block: CustomPageBlock, index: number) => (
                 <div
                   key={`hero-${block.__component}-${index}`}
                   className="mb-8"
@@ -197,14 +199,18 @@ export default async function CustomPage({
         <main className="container mx-auto px-4 py-8">
           {/* Show author and date if enabled */}
           {pageData.showContentDate && (
-            <div className="mb-8 flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+            <div className="mb-8 flex items-center gap-4 text-sm text-muted-foreground">
               {pageData.author && (
                 <div className="flex items-center gap-2">
                   {pageData.author.photo && (
-                    <img
+                    <Image
                       src={pageData.author.photo.url}
                       alt={`${pageData.author.firstName} ${pageData.author.lastName}`}
-                      className="w-8 h-8 rounded-full"
+                      width={32}
+                      height={32}
+                      className="rounded-full"
+                      quality={90}
+                      loading="eager"
                     />
                   )}
                   <span>
@@ -221,10 +227,10 @@ export default async function CustomPage({
           )}
 
           <div className="space-y-12">
-            {mainBlocks.map((block, index) => (
+            {mainBlocks.map((block: CustomPageBlock, index: number) => (
               <section
                 key={`main-${block.__component}-${index}`}
-                className="opacity-0 animate-[fadeIn_0.6s_ease-out_100ms_forwards]"
+                className="opacity-0 animate-fadeIn"
                 style={{
                   animationDelay: `${index * 100}ms`,
                   animationFillMode: "forwards",

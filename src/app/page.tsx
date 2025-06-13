@@ -5,7 +5,7 @@ import { DynamicBlock } from "@/components/common/DynamicBlock";
 import { BreadcrumbsWithLayout } from "@/components/layout/Breadcrumbs";
 import { generateMetadata as generateSEOMetadata } from "@/lib/utils/seo";
 import type { Metadata } from "next";
-
+import type { BreadcrumbItem } from "@/types/breadcrumbs.types";
 // Force dynamic rendering for ISR with on-demand revalidation
 export const dynamic = "force-static";
 export const revalidate = 60; // 1 minute for edge cache
@@ -92,7 +92,7 @@ export default async function HomePage() {
   };
 
   // Get all layout breadcrumb collections
-  const layoutBreadcrumbs: Record<string, any[]> = {};
+  const layoutBreadcrumbs: Record<string, BreadcrumbItem[]> = {};
   Object.keys(layout).forEach((key) => {
     if (key.endsWith("Breadcrumbs") && Array.isArray(layout[key])) {
       layoutBreadcrumbs[key] = layout[key];

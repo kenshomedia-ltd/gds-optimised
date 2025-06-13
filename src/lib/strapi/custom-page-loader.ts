@@ -7,16 +7,76 @@ import {
   authorQueryChunk,
   blockQueryChunks,
 } from "./query-chunks/shared-chunks";
-import type {
-  CustomPageData,
-  CustomPageMetadata,
-} from "@/types/custom-page.types";
+import type { CustomPageData, SEOData } from "@/types/strapi.types";
+import type { CustomPageBlock } from "@/types/custom-page.types";
+import type { GameData } from "@/types/strapi.types";
 
 // Cache configuration
 const CACHE_CONFIG = {
   page: { ttl: 300, swr: 600, tags: ["custom-page"] }, // 5min/10min
   metadata: { ttl: 600, swr: 1200, tags: ["custom-page-meta"] }, // 10min/20min
 };
+
+/**
+ * Custom metadata type for lightweight metadata queries
+ */
+interface CustomPageMetadata {
+  id: number;
+  title: string;
+  urlPath: string;
+  publishedAt?: string;
+  seo?: SEOData;
+}
+
+/**
+ * Typed interfaces for game carousel blocks
+ */
+interface GameProvider {
+  id: number;
+  slotProvider?: {
+    id: number;
+    slug: string;
+    title: string;
+  };
+}
+
+interface GameCategory {
+  id: number;
+  slotCategory?: {
+    id: number;
+    slug: string;
+    title: string;
+  };
+}
+
+interface GameCarouselBlock {
+  id: number;
+  __component: "games.games-carousel";
+  gameProviders?: GameProvider[];
+  gameCategories?: GameCategory[];
+  sortBy?: string;
+  numberOfGames?: number;
+  games?: GameData[];
+}
+
+/**
+ * Type guard for game carousel blocks
+ */
+function isGameCarouselBlock(
+  block: CustomPageBlock
+): block is GameCarouselBlock {
+  return block.__component === "games.games-carousel";
+}
+
+/**
+ * Type for block query chunks entries
+ */
+type BlockQueryValue =
+  | {
+      fields?: string[];
+      populate?: Record<string, unknown>;
+    }
+  | Record<string, unknown>;
 
 /**
  * Normalize path by removing leading and trailing slashes
@@ -54,41 +114,69 @@ function buildFullPageQuery(
   const normalizedPath = normalizePath(path);
 
   // Build dynamic block queries
-  const blockQueries = Object.entries(blockQueryChunks).reduce(
-    (acc, [key, value]) => {
-      // Handle casino blocks that need country filtering
-      if (
-        key === "casinos.casino-list" ||
-        key === "casinos.casinos-comparison"
-      ) {
-        const baseQuery = { ...value };
-        // Apply country filters if needed
-        if (baseQuery.populate?.casinosList?.populate?.casino) {
-          baseQuery.populate.casinosList.populate.casino =
-            typeof baseQuery.populate.casinosList.populate.casino === "function"
-              ? baseQuery.populate.casinosList.populate.casino(
-                  casinoCountry,
-                  localisation
-                )
-              : baseQuery.populate.casinosList.populate.casino;
+  const blockQueries = Object.entries(
+    blockQueryChunks as Record<string, BlockQueryValue>
+  ).reduce((acc, [key, value]) => {
+    // Type guard to check if value has populate property
+    const hasPopulate = (
+      val: BlockQueryValue
+    ): val is { populate: Record<string, unknown> } => {
+      return typeof val === "object" && val !== null && "populate" in val;
+    };
+
+    // Handle casino blocks that need country filtering
+    if (
+      (key === "casinos.casino-list" || key === "casinos.casinos-comparison") &&
+      hasPopulate(value)
+    ) {
+      // Create a properly typed copy
+      const baseQuery = { ...value };
+
+      // Type-safe access to nested properties
+      if (baseQuery.populate && typeof baseQuery.populate === "object") {
+        const populate = baseQuery.populate as Record<string, unknown>;
+
+        // Handle casinosList
+        if (populate.casinosList && typeof populate.casinosList === "object") {
+          const casinosList = populate.casinosList as Record<string, unknown>;
+          if (
+            casinosList.populate &&
+            typeof casinosList.populate === "object"
+          ) {
+            const listPopulate = casinosList.populate as Record<
+              string,
+              unknown
+            >;
+            if (typeof listPopulate.casino === "function") {
+              listPopulate.casino = listPopulate.casino(
+                casinoCountry,
+                localisation
+              );
+            }
+          }
         }
-        if (baseQuery.populate?.casinos?.populate?.casino) {
-          baseQuery.populate.casinos.populate.casino =
-            typeof baseQuery.populate.casinos.populate.casino === "function"
-              ? baseQuery.populate.casinos.populate.casino(
-                  casinoCountry,
-                  localisation
-                )
-              : baseQuery.populate.casinos.populate.casino;
+
+        // Handle casinos
+        if (populate.casinos && typeof populate.casinos === "object") {
+          const casinos = populate.casinos as Record<string, unknown>;
+          if (casinos.populate && typeof casinos.populate === "object") {
+            const casinosPopulate = casinos.populate as Record<string, unknown>;
+            if (typeof casinosPopulate.casino === "function") {
+              casinosPopulate.casino = casinosPopulate.casino(
+                casinoCountry,
+                localisation
+              );
+            }
+          }
         }
-        acc[key] = baseQuery;
-      } else {
-        acc[key] = value;
       }
-      return acc;
-    },
-    {} as Record<string, any>
-  );
+
+      acc[key] = baseQuery;
+    } else {
+      acc[key] = value;
+    }
+    return acc;
+  }, {} as Record<string, unknown>);
 
   return {
     fields: [
@@ -122,10 +210,10 @@ function buildFullPageQuery(
 /**
  * Fetch games for carousel blocks (post-processing)
  */
-async function enrichGameCarousels(blocks: any[]): Promise<any[]> {
-  const gameCarouselBlocks = blocks.filter(
-    (block) => block.__component === "games.games-carousel"
-  );
+async function enrichGameCarousels(
+  blocks: CustomPageBlock[]
+): Promise<CustomPageBlock[]> {
+  const gameCarouselBlocks = blocks.filter(isGameCarouselBlock);
 
   if (gameCarouselBlocks.length === 0) return blocks;
 
@@ -134,13 +222,13 @@ async function enrichGameCarousels(blocks: any[]): Promise<any[]> {
     gameCarouselBlocks.map(async (block) => {
       const providers =
         block.gameProviders
-          ?.map((p: any) => p.slotProvider?.slug)
-          .filter(Boolean) || [];
+          ?.map((p) => p.slotProvider?.slug)
+          .filter((slug): slug is string => Boolean(slug)) || [];
 
       const categories =
         block.gameCategories
-          ?.map((c: any) => c.slotCategory?.slug)
-          .filter(Boolean) || [];
+          ?.map((c) => c.slotCategory?.slug)
+          .filter((slug): slug is string => Boolean(slug)) || [];
 
       const query = {
         fields: ["title", "slug", "ratingAvg", "createdAt", "publishedAt"],
@@ -168,7 +256,7 @@ async function enrichGameCarousels(blocks: any[]): Promise<any[]> {
 
       try {
         const response = await strapiClient.fetchWithCache<{
-          data: any[];
+          data: GameData[];
         }>("games", query, 60); // 1 minute cache for games
 
         // Inject games directly into the block
@@ -234,7 +322,9 @@ export const getCustomPageData = unstable_cache(
 
       // Enrich game carousel blocks with actual games
       if (pageData.blocks) {
-        pageData.blocks = await enrichGameCarousels(pageData.blocks);
+        pageData.blocks = await enrichGameCarousels(
+          pageData.blocks as CustomPageBlock[]
+        );
       }
 
       return pageData;

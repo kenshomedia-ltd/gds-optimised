@@ -1,7 +1,6 @@
 // src/types/dynamic-block.types.ts
 
 import type { NewAndLovedSlotsBlock } from "./new-and-loved-slots.types";
-
 import type {
   StrapiImage,
   GameData,
@@ -9,7 +8,16 @@ import type {
   CasinoData,
 } from "./strapi.types";
 
+// Define Provider and Category interfaces locally since they're not exported from strapi.types
 interface Provider {
+  id: number;
+  documentId?: string;
+  title: string;
+  slug: string;
+  images?: StrapiImage;
+}
+
+interface Category {
   id: number;
   documentId?: string;
   title: string;
@@ -22,13 +30,6 @@ interface Link {
   url: string;
 }
 
-interface Overview {
-  id: number;
-  title: string;
-  url: string;
-  card_img?: StrapiImage;
-}
-
 interface Testimony {
   id: number;
   title: string;
@@ -38,7 +39,7 @@ interface Testimony {
   provider?: Provider;
 }
 
-// Block-Specific Interfaces
+// Homepage Block Interfaces
 export interface IntroductionWithImageBlock {
   __component: "shared.introduction-with-image";
   id: number;
@@ -50,8 +51,13 @@ export interface IntroductionWithImageBlock {
 export interface OverviewBlock {
   __component: "shared.overview-block";
   id: number;
+  title?: string;
   overview_type?: string;
-  overviews?: Overview[];
+  overviews?: Array<{
+    title: string;
+    url: string;
+    card_img?: StrapiImage;
+  }>;
 }
 
 export interface HomeGameListBlock {
@@ -71,10 +77,14 @@ export interface HomeFeaturedProvidersBlock {
   __component: "homepage.home-featured-providers";
   id: number;
   title?: string;
-  homeFeaturedProviders?: Array<{
-    id: number;
-    providers?: Provider[];
-  }>;
+  homeFeaturedProviders?:
+    | Array<{
+        id: number;
+        providers?: Provider[];
+      }>
+    | {
+        providers?: Provider[];
+      };
 }
 
 export interface HomeProvidersBlock {
@@ -89,15 +99,14 @@ export interface HomeProvidersBlock {
 export interface HomeFeaturedCategoriesBlock {
   __component: "homepage.home-featured-categories";
   id: number;
-  homeCategoriesList?: Array<{
-    id: number;
-    slot_categories?: Array<{
-      id: number;
-      title: string;
-      slug: string;
-      images?: StrapiImage;
-    }>;
-  }>;
+  homeCategoriesList?:
+    | Array<{
+        id: number;
+        slot_categories?: Category[];
+      }>
+    | {
+        slot_categories?: Category[];
+      };
 }
 
 export interface SingleContentBlock {
@@ -126,8 +135,129 @@ export interface HomeBlogListBlock {
   link?: Link;
 }
 
+// Custom Page Specific Block Interfaces
+export interface ImageBlock {
+  __component: "shared.image";
+  id: number;
+  image?: StrapiImage;
+}
+
+export interface GamesCarouselBlock {
+  __component: "games.games-carousel";
+  id: number;
+  numberOfGames?: number;
+  sortBy?: string;
+  showGameFilterPanel?: boolean;
+  showGameMoreButton?: boolean;
+  gameProviders?: Array<{
+    id: number;
+    slotProvider?: {
+      id: number;
+      slug: string;
+      title: string;
+    };
+  }>;
+  gameCategories?: Array<{
+    id: number;
+    slotCategory?: {
+      id: number;
+      slug: string;
+      title: string;
+    };
+  }>;
+  games?: GameData[];
+}
+
+export interface CasinoListBlock {
+  __component: "casinos.casino-list";
+  id: number;
+  heading?: string;
+  casinosList?: Array<{
+    id: number;
+    casino?: CasinoData;
+  }>;
+}
+
+export interface CasinoComparisonBlock {
+  __component: "casinos.casinos-comparison";
+  id: number;
+  heading?: string;
+  casinos?: Array<{
+    id: number;
+    casino?: CasinoData;
+  }>;
+}
+
+export interface ProviderListBlock {
+  __component: "shared.provider-list";
+  id: number;
+  providers?: Provider[];
+}
+
+export interface HowToGroupBlock {
+  __component: "shared.how-to-group";
+  id: number;
+  title?: string;
+  description?: string;
+  howToGroup?: Array<{
+    id: number;
+    heading: string;
+    copy: string;
+    image?: StrapiImage;
+  }>;
+}
+
+export interface ImageWithParagraphBlock {
+  __component: "shared.image-with-paragraph";
+  id: number;
+  imageWithParagraph?: Array<{
+    id: number;
+    heading: string;
+    copy: string;
+    image?: StrapiImage;
+  }>;
+}
+
+export interface MediumImageWithContentBlock {
+  __component: "shared.medium-image-with-content";
+  id: number;
+  title?: string;
+  content?: string;
+  image?: StrapiImage;
+}
+
+export interface ProsAndConsBlock {
+  __component: "shared.pros-and-cons";
+  id: number;
+  heading?: string;
+  pros?: {
+    list?: string[];
+  };
+  cons?: {
+    list?: string[];
+  };
+  proImage?: StrapiImage;
+  conImage?: StrapiImage;
+}
+
+export interface ImageCarouselBlock {
+  __component: "shared.image-carousel";
+  id: number;
+  carouselTitle?: string;
+  image?: StrapiImage[];
+}
+
+export interface GamesNewAndLovedSlotsBlock {
+  __component: "games.new-and-loved-slots";
+  id: number;
+  newSlots?: boolean;
+  slot_categories?: Category[];
+  slot_providers?: Provider[];
+}
+
 // Union type for all possible block data structures
 export type BlockData =
+  // Homepage blocks
   | IntroductionWithImageBlock
   | OverviewBlock
   | HomeGameListBlock
@@ -138,23 +268,45 @@ export type BlockData =
   | HomeCasinoListBlock
   | HomeTestimoniesBlock
   | HomeBlogListBlock
-  | NewAndLovedSlotsBlock;
+  | NewAndLovedSlotsBlock
+  // Custom page blocks
+  | ImageBlock
+  | GamesCarouselBlock
+  | CasinoListBlock
+  | CasinoComparisonBlock
+  | ProviderListBlock
+  | HowToGroupBlock
+  | ImageWithParagraphBlock
+  | MediumImageWithContentBlock
+  | ProsAndConsBlock
+  | ImageCarouselBlock
+  | GamesNewAndLovedSlotsBlock;
 
 export type BlockType =
+  // Homepage block types
   | "homepage.home-game-list"
   | "homepage.home-casino-list"
   | "homepage.home-blog-list"
   | "shared.introduction-with-image"
-  | "casinos.casino-list"
   | "homepage.home-providers"
   | "homepage.home-featured-providers"
   | "shared.overview-block"
   | "shared.single-content"
   | "homepage.home-testimonies"
   | "homepage.home-featured-categories"
+  | "games.new-and-loved-slots"
+  // Custom page block types
+  | "shared.image"
+  | "games.games-carousel"
+  | "casinos.casino-list"
+  | "casinos.casinos-comparison"
+  | "shared.provider-list"
+  | "shared.how-to-group"
+  | "shared.image-with-paragraph"
+  | "shared.medium-image-with-content"
+  | "shared.pros-and-cons"
+  | "shared.image-carousel"
   | "games.new-and-loved-slots";
-
-// REMOVED: The incorrect placeholder interfaces for Game, Casino, and Blog are no longer needed.
 
 export interface DynamicBlockProps {
   blockType: BlockType | string;
