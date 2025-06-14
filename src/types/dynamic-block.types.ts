@@ -3,10 +3,10 @@
 import type { NewAndLovedSlotsBlock } from "./new-and-loved-slots.types";
 import type {
   StrapiImage,
-  GameData,
   BlogData,
-  CasinoData,
 } from "./strapi.types";
+import type { GameData } from "./game.types";
+import type { CasinoData } from "./casino.types";
 
 // Define Provider and Category interfaces locally since they're not exported from strapi.types
 interface Provider {

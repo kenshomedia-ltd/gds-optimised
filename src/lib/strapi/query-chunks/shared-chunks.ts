@@ -66,131 +66,111 @@ export const categoryQueryChunk = {
 
 export const casinoQueryChunk = (
   casinoCountry?: string,
-  localisation: boolean = false
+  includeFullData = false
 ) => ({
-  fields: ["title", "slug", "ratingAvg", "ratingCount", "publishedAt"],
+  fields: includeFullData
+    ? ["title", "slug", "ratingAvg", "ratingCount", "publishedAt", "Badges"]
+    : ["title", "slug", "ratingAvg"],
   populate: {
-    images: {
-      fields: ["url"],
-    },
-    logoIcon: {
-      fields: ["url"],
-    },
-    casinoBonus: {
-      fields: ["bonusUrl", "bonusLabel", "bonusCode"],
-    },
-    noDepositSection: {
-      fields: ["bonusAmount", "termsConditions"],
-    },
-    freeSpinsSection: {
-      fields: ["bonusAmount", "termsConditions"],
-    },
-    bonusSection: {
-      fields: ["bonusAmount", "termsConditions", "cashBack", "freeSpin"],
-    },
-    providers: {
-      fields: ["title"],
-      populate: {
-        images: {
-          fields: ["url"],
-        },
+    images: imageQueryChunk,
+    casinoBonus: { fields: ["bonusUrl", "bonusLabel", "bonusCode"] },
+    ...(includeFullData && {
+      noDepositSection: { fields: ["bonusAmount", "termsConditions"] },
+      freeSpinsSection: { fields: ["bonusAmount", "termsConditions"] },
+      termsAndConditions: { fields: ["copy", "gambleResponsibly"] },
+      bonusSection: {
+        fields: ["bonusAmount", "termsConditions", "cashBack", "freeSpin"],
       },
-    },
-    casinoGeneralInfo: {
-      fields: ["wageringRequirements"],
-    },
-    termsAndConditions: {
-      fields: ["copy", "gambleResponsibly"],
-    },
-    countries: {
-      fields: ["countryName", "shortCode"],
-    },
+    }),
   },
-  filters: {
-    ...(localisation &&
-      casinoCountry && {
+  filters: casinoCountry
+    ? {
         countries: {
-          shortCode: {
-            $in: casinoCountry,
-          },
+          $containsi: casinoCountry,
         },
-      }),
-  },
+      }
+    : undefined,
 });
 
-// Block-specific query chunks
-export const blockQueryChunks = {
+export const gameQueryChunk = {
+  basic: {
+    fields: ["title", "slug", "ratingAvg", "ratingCount"],
+    populate: {
+      images: { fields: ["url", "width", "height"] },
+      provider: providerQueryChunk,
+    },
+  },
+  full: {
+    fields: [
+      "title",
+      "slug",
+      "ratingAvg",
+      "ratingCount",
+      "views",
+      "createdAt",
+      "isGameDisabled",
+      "gameDisableText",
+    ],
+    populate: {
+      images: imageQueryChunk,
+      provider: providerQueryChunk,
+      categories: categoryQueryChunk,
+    },
+  },
+};
+
+export const blogQueryChunk = {
+  fields: [
+    "title",
+    "slug",
+    "blogBrief",
+    "excerpt",
+    "createdAt",
+    "updatedAt",
+    "publishedAt",
+    "minutesRead",
+  ],
+  populate: {
+    images: imageQueryChunk,
+    author: {
+      fields: ["firstName", "lastName"],
+      populate: {
+        photo: { fields: ["url", "width", "height"] },
+      },
+    },
+    blogCategory: { fields: ["blogCategory", "slug"] },
+  },
+};
+
+/**
+ * Define block query chunks with proper typing
+ */
+type BlockQueryChunk = {
+  fields?: string[];
+  populate?: Record<string, unknown>;
+};
+
+type BlockQueryChunks = {
+  [key: string]: BlockQueryChunk | Record<string, unknown>;
+};
+
+export const blockQueryChunks: BlockQueryChunks = {
+  "shared.single-content": {
+    populate: "*",
+  },
   "shared.introduction-with-image": {
     fields: ["heading", "introduction"],
     populate: {
       image: imageQueryChunk,
     },
   },
-  "games.new-and-loved-slots": {
-    fields: ["newSlots"],
-    populate: {
-      slot_categories: categoryQueryChunk,
-      slot_providers: providerQueryChunk,
-    },
-  },
-  "games.games-carousel": {
-    fields: [
-      "numberOfGames",
-      "sortBy",
-      "showGameFilterPanel",
-      "showGameMoreButton",
-    ],
-    populate: {
-      gameProviders: {
-        populate: {
-          slotProvider: {
-            fields: ["id", "slug", "title"],
-          },
-        },
-      },
-      gameCategories: {
-        populate: {
-          slotCategory: {
-            fields: ["id", "slug", "title"],
-          },
-        },
-      },
-    },
-  },
-  "shared.single-content": {
-    fields: ["content"],
-  },
   "shared.image": {
     populate: {
       image: imageQueryChunk,
     },
   },
-  "casinos.casino-list": {
-    fields: ["heading"],
-    populate: {
-      casinosList: {
-        fields: ["id"],
-        populate: {
-          casino: (casinoCountry?: string, localisation: boolean = false) =>
-            casinoQueryChunk(casinoCountry, localisation),
-        },
-      },
-    },
-  },
-  "casinos.casinos-comparison": {
-    fields: ["heading"],
-    populate: {
-      casinos: {
-        fields: ["id"],
-        populate: {
-          casino: (casinoCountry?: string, localisation: boolean = false) =>
-            casinoQueryChunk(casinoCountry, localisation),
-        },
-      },
-    },
-  },
   "shared.overview-block": {
-    fields: ["title"],
+    fields: ["overview_type"],
     populate: {
       overviews: {
         fields: ["title", "url"],
@@ -200,7 +180,31 @@ export const blockQueryChunks = {
       },
     },
   },
+  "homepage.home-game-list": {
+    fields: ["numberOfGames", "sortBy", "gameListTitle"],
+    populate: {
+      providers: {
+        populate: {
+          slotProvider: providerQueryChunk,
+        },
+      },
+      link: { fields: ["label", "url"] },
+    },
+  },
+  "homepage.home-casino-list": {
+    fields: ["casinoTableTitle"],
+  },
+  "homepage.home-providers": {
+    populate: {
+      providersList: {
+        populate: {
+          providers: providerQueryChunk,
+        },
+      },
+    },
+  },
   "homepage.home-featured-providers": {
+    fields: ["title"],
     populate: {
       homeFeaturedProviders: {
         populate: {
@@ -218,118 +222,107 @@ export const blockQueryChunks = {
       },
     },
   },
-  "shared.provider-list": {
+  "homepage.home-testimonies": {
+    fields: ["title"],
     populate: {
-      providers: providerQueryChunk,
-    },
-  },
-  "shared.how-to-group": {
-    fields: ["title", "description"],
-    populate: {
-      howToGroup: {
-        fields: ["heading", "copy"],
+      homeTestimonies: {
+        fields: ["title", "testimony", "testifierName", "testifierTitle"],
         populate: {
-          image: imageQueryChunk,
+          provider: providerQueryChunk,
         },
       },
     },
   },
-  "shared.image-with-paragraph": {
+  "homepage.home-blog-list": {
+    fields: ["numOfBlogs"],
     populate: {
-      imageWithParagraph: {
-        fields: ["heading", "copy"],
+      link: { fields: ["label", "url"] },
+    },
+  },
+  "games.games-carousel": {
+    fields: ["numberOfGames", "sortBy", "showGameFilterPanel"],
+    populate: {
+      gameProviders: {
         populate: {
-          image: imageQueryChunk,
+          slotProvider: providerQueryChunk,
+        },
+      },
+      gameCategories: {
+        populate: {
+          slotCategory: categoryQueryChunk,
         },
       },
     },
   },
-  "shared.medium-image-with-content": {
-    fields: ["title", "content"],
-    populate: {
-      image: imageQueryChunk,
-    },
+  "games.new-and-loved-slots": {
+    fields: ["newSlots", "slot_categories", "slot_providers"],
   },
-  "shared.pros-and-cons": {
-    fields: ["heading"],
+  "casinos.casino-list": {
+    fields: ["showCasinoTableHeader"],
     populate: {
-      pros: {
-        fields: ["list"],
+      casinosList: {
+        fields: ["casinoName"],
+        populate: {
+          casino: (casinoCountry?: string) =>
+            casinoQueryChunk(casinoCountry, true),
+        },
       },
-      cons: {
-        fields: ["list"],
-      },
-      proImage: imageQueryChunk,
-      conImage: imageQueryChunk,
-    },
-  },
-  "shared.image-carousel": {
-    fields: ["carouselTitle"],
-    populate: {
-      image: imageQueryChunk,
     },
   },
 };
 
-// Build games query with filters and sorting
-export function buildGamesQuery(options: {
-  limit?: number;
-  sort?: string;
-  page?: number;
-  providers?: string[];
-  categories?: string[];
-}) {
-  const {
-    limit = 24,
-    sort = 'createdAt:desc',
-    page = 1,
-    providers = [],
-    categories = [],
-  } = options;
+/**
+ * Get block query chunk by component type
+ */
+export function getBlockQueryChunk(
+  componentType: string,
+  casinoCountry?: string
+): BlockQueryChunk | Record<string, unknown> {
+  const chunk = blockQueryChunks[componentType];
 
-  const query: any = {
-    fields: [
-      "title",
-      "slug",
-      "ratingAvg",
-      "ratingCount",
-      "createdAt",
-      "publishedAt",
-    ],
-    populate: {
-      images: {
-        fields: ["url", "alternativeText", "width", "height"],
-      },
-      provider: {
-        fields: ["title", "slug"],
-      },
-      categories: {
-        fields: ["title", "slug"],
-      },
-    },
-    sort: [sort],
-    pagination: {
-      pageSize: limit,
-      page: page,
-    },
-  };
+  // Special handling for casino-list with dynamic country filter
+  if (
+    componentType === "casinos.casino-list" &&
+    chunk &&
+    typeof chunk === "object" &&
+    "populate" in chunk
+  ) {
+    const populateObj = chunk.populate as Record<string, unknown>;
+    if (
+      populateObj.casinosList &&
+      typeof populateObj.casinosList === "object"
+    ) {
+      const casinosListPopulate = populateObj.casinosList as Record<
+        string,
+        unknown
+      >;
+      const casinosPopulate = casinosListPopulate.populate;
 
-  // Add filters if providers or categories are specified
-  if (providers.length > 0 || categories.length > 0) {
-    query.filters = {};
-    
-    if (providers.length > 0) {
-      query.filters.provider = {
-        slug: { $in: providers },
-      };
-    }
-    
-    if (categories.length > 0) {
-      query.filters.categories = {
-        slug: { $in: categories },
-      };
+      if (
+        casinosPopulate &&
+        typeof casinosPopulate === "object" &&
+        "casino" in casinosPopulate &&
+        typeof (casinosPopulate as Record<string, unknown>).casino ===
+          "function"
+      ) {
+        const casinoFunction = (
+          casinosPopulate as { casino: (country?: string) => unknown }
+        ).casino;
+        return {
+          ...chunk,
+          populate: {
+            ...populateObj,
+            casinosList: {
+              ...casinosListPopulate,
+              populate: {
+                casino: casinoFunction(casinoCountry),
+              },
+            },
+          },
+        };
+      }
     }
   }
 
-  return query;
+  return chunk || {};
 }

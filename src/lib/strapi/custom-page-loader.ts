@@ -1,4 +1,5 @@
 // src/lib/strapi/custom-page-loader.ts
+
 import { unstable_cache } from "next/cache";
 import { strapiClient } from "./strapi-client";
 import {
@@ -6,10 +7,17 @@ import {
   breadcrumbsQueryChunk,
   authorQueryChunk,
   blockQueryChunks,
+  getBlockQueryChunk,
 } from "./query-chunks/shared-chunks";
-import type { CustomPageData, SEOData } from "@/types/strapi.types";
-import type { CustomPageBlock } from "@/types/custom-page.types";
-import type { GameData } from "@/types/strapi.types";
+import type { BlockComponent } from "@/types/strapi.types";
+import type {
+  CustomPageData,
+  CustomPageMetadata,
+  CustomPageBlock,
+  GamesCarouselBlock,
+} from "@/types/custom-page.types";
+import type { GameData } from "@/types/game.types";
+import type { CasinoData } from "@/types/casino.types";
 
 // Cache configuration
 const CACHE_CONFIG = {
@@ -18,65 +26,13 @@ const CACHE_CONFIG = {
 };
 
 /**
- * Custom metadata type for lightweight metadata queries
- */
-interface CustomPageMetadata {
-  id: number;
-  title: string;
-  urlPath: string;
-  publishedAt?: string;
-  seo?: SEOData;
-}
-
-/**
- * Typed interfaces for game carousel blocks
- */
-interface GameProvider {
-  id: number;
-  slotProvider?: {
-    id: number;
-    slug: string;
-    title: string;
-  };
-}
-
-interface GameCategory {
-  id: number;
-  slotCategory?: {
-    id: number;
-    slug: string;
-    title: string;
-  };
-}
-
-interface GameCarouselBlock {
-  id: number;
-  __component: "games.games-carousel";
-  gameProviders?: GameProvider[];
-  gameCategories?: GameCategory[];
-  sortBy?: string;
-  numberOfGames?: number;
-  games?: GameData[];
-}
-
-/**
  * Type guard for game carousel blocks
  */
-function isGameCarouselBlock(
-  block: CustomPageBlock
-): block is GameCarouselBlock {
+function isGamesCarouselBlock(
+  block: CustomPageBlock | BlockComponent
+): block is GamesCarouselBlock {
   return block.__component === "games.games-carousel";
 }
-
-/**
- * Type for block query chunks entries
- */
-type BlockQueryValue =
-  | {
-      fields?: string[];
-      populate?: Record<string, unknown>;
-    }
-  | Record<string, unknown>;
 
 /**
  * Normalize path by removing leading and trailing slashes
@@ -113,54 +69,26 @@ function buildFullPageQuery(
 ) {
   const normalizedPath = normalizePath(path);
 
-  // Build dynamic block queries
-  const blockQueries = Object.entries(
-    blockQueryChunks as Record<string, BlockQueryValue>
-  ).reduce((acc, [key, value]) => {
-    // Type guard to check if value has populate property
-    const hasPopulate = (
-      val: BlockQueryValue
-    ): val is { populate: Record<string, unknown> } => {
-      return typeof val === "object" && val !== null && "populate" in val;
-    };
+  // Build block queries dynamically
+  const blockQueries = Object.entries(blockQueryChunks).reduce(
+    (acc, [key, value]) => {
+      const baseQuery = getBlockQueryChunk(key, casinoCountry);
 
-    // Handle casino blocks that need country filtering
-    if (
-      (key === "casinos.casino-list" || key === "casinos.casinos-comparison") &&
-      hasPopulate(value)
-    ) {
-      // Create a properly typed copy
-      const baseQuery = { ...value };
-
-      // Type-safe access to nested properties
-      if (baseQuery.populate && typeof baseQuery.populate === "object") {
+      // Special handling for blocks with dynamic data
+      if (typeof baseQuery === "object" && "populate" in baseQuery) {
         const populate = baseQuery.populate as Record<string, unknown>;
 
-        // Handle casinosList
-        if (populate.casinosList && typeof populate.casinosList === "object") {
+        // Handle casino country filtering
+        if (key === "casinos.casino-list" && populate.casinosList) {
           const casinosList = populate.casinosList as Record<string, unknown>;
           if (
             casinosList.populate &&
             typeof casinosList.populate === "object"
           ) {
-            const listPopulate = casinosList.populate as Record<
+            const casinosPopulate = casinosList.populate as Record<
               string,
               unknown
             >;
-            if (typeof listPopulate.casino === "function") {
-              listPopulate.casino = listPopulate.casino(
-                casinoCountry,
-                localisation
-              );
-            }
-          }
-        }
-
-        // Handle casinos
-        if (populate.casinos && typeof populate.casinos === "object") {
-          const casinos = populate.casinos as Record<string, unknown>;
-          if (casinos.populate && typeof casinos.populate === "object") {
-            const casinosPopulate = casinos.populate as Record<string, unknown>;
             if (typeof casinosPopulate.casino === "function") {
               casinosPopulate.casino = casinosPopulate.casino(
                 casinoCountry,
@@ -169,14 +97,15 @@ function buildFullPageQuery(
             }
           }
         }
-      }
 
-      acc[key] = baseQuery;
-    } else {
-      acc[key] = value;
-    }
-    return acc;
-  }, {} as Record<string, unknown>);
+        acc[key] = baseQuery;
+      } else {
+        acc[key] = value;
+      }
+      return acc;
+    },
+    {} as Record<string, unknown>
+  );
 
   return {
     fields: [
@@ -211,9 +140,9 @@ function buildFullPageQuery(
  * Fetch games for carousel blocks (post-processing)
  */
 async function enrichGameCarousels(
-  blocks: CustomPageBlock[]
-): Promise<CustomPageBlock[]> {
-  const gameCarouselBlocks = blocks.filter(isGameCarouselBlock);
+  blocks: BlockComponent[]
+): Promise<BlockComponent[]> {
+  const gameCarouselBlocks = blocks.filter(isGamesCarouselBlock);
 
   if (gameCarouselBlocks.length === 0) return blocks;
 
@@ -321,10 +250,12 @@ export const getCustomPageData = unstable_cache(
       }
 
       // Enrich game carousel blocks with actual games
-      if (pageData.blocks) {
-        pageData.blocks = await enrichGameCarousels(
-          pageData.blocks as CustomPageBlock[]
+      if (pageData.blocks && pageData.blocks.length > 0) {
+        // Cast to BlockComponent[] for enrichment, then cast back
+        const enrichedBlocks = await enrichGameCarousels(
+          pageData.blocks as unknown as BlockComponent[]
         );
+        pageData.blocks = enrichedBlocks as unknown as CustomPageBlock[];
       }
 
       return pageData;
@@ -339,6 +270,203 @@ export const getCustomPageData = unstable_cache(
     tags: CACHE_CONFIG.page.tags,
   }
 );
+
+/**
+ * Fetch custom page data with split queries
+ */
+export const getCustomPageDataSplit = unstable_cache(
+  async (
+    path: string,
+    casinoCountry?: string,
+    localisation: boolean = false
+  ) => {
+    try {
+      // Fetch page structure without heavy data
+      const structureQuery = {
+        ...buildFullPageQuery(path, casinoCountry, localisation),
+        populate: {
+          seo: seoQueryChunk,
+          breadcrumbs: breadcrumbsQueryChunk,
+          author: authorQueryChunk,
+          blocks: {
+            populate: {
+              // Only get block structure, not full data
+              "games.games-carousel": {
+                fields: ["numberOfGames", "sortBy"],
+                populate: {
+                  gameProviders: {
+                    populate: {
+                      slotProvider: { fields: ["slug"] },
+                    },
+                  },
+                  gameCategories: {
+                    populate: {
+                      slotCategory: { fields: ["slug"] },
+                    },
+                  },
+                },
+              },
+              "casinos.casino-list": {
+                fields: ["showCasinoTableHeader"],
+              },
+            },
+          },
+        },
+      };
+
+      const response = await strapiClient.fetchWithCache<{
+        data: CustomPageData[];
+      }>("custom-pages", structureQuery, CACHE_CONFIG.page.ttl);
+
+      const pageData = response.data?.[0];
+      if (!pageData) return { pageData: null, games: [], casinos: [] };
+
+      // Analyze blocks to determine what data is needed
+      const needsGames = pageData.blocks?.some(
+        (block) => block.__component === "games.games-carousel"
+      );
+      const needsCasinos = pageData.blocks?.some(
+        (block) => block.__component === "casinos.casino-list"
+      );
+
+      // Fetch dynamic content in parallel
+      const [games, casinos] = await Promise.all([
+        needsGames ? fetchGamesForPage(pageData.blocks) : [],
+        needsCasinos ? fetchCasinosForPage(pageData.blocks, casinoCountry) : [],
+      ]);
+
+      return { pageData, games, casinos };
+    } catch (error) {
+      console.error(
+        "Failed to fetch custom page data with split queries:",
+        error
+      );
+      return { pageData: null, games: [], casinos: [] };
+    }
+  },
+  ["custom-page-data-split"],
+  {
+    revalidate: CACHE_CONFIG.page.ttl,
+    tags: ["custom-page", "custom-page-split"],
+  }
+);
+
+/**
+ * Helper to fetch games for page blocks
+ */
+async function fetchGamesForPage(
+  blocks: CustomPageBlock[]
+): Promise<GameData[]> {
+  const gameCarouselBlocks = blocks.filter(
+    (block): block is GamesCarouselBlock =>
+      block.__component === "games.games-carousel"
+  );
+
+  if (gameCarouselBlocks.length === 0) return [];
+
+  const allGames: GameData[] = [];
+
+  await Promise.all(
+    gameCarouselBlocks.map(async (block) => {
+      const providers =
+        block.gameProviders
+          ?.map((p) => p.slotProvider?.slug)
+          .filter((slug): slug is string => Boolean(slug)) || [];
+
+      const categories =
+        block.gameCategories
+          ?.map((c) => c.slotCategory?.slug)
+          .filter((slug): slug is string => Boolean(slug)) || [];
+
+      const query = {
+        fields: ["title", "slug", "ratingAvg", "createdAt", "publishedAt"],
+        populate: {
+          images: { fields: ["url", "alternativeText", "width", "height"] },
+          provider: { fields: ["title", "slug"] },
+          categories: { fields: ["title", "slug"] },
+        },
+        filters: {
+          ...(providers.length > 0 && {
+            provider: { slug: { $in: providers } },
+          }),
+          ...(categories.length > 0 && {
+            categories: { slug: { $in: categories } },
+          }),
+        },
+        sort: [block.sortBy || "createdAt:desc"],
+        pagination: {
+          pageSize: block.numberOfGames || 24,
+          page: 1,
+        },
+      };
+
+      try {
+        const response = await strapiClient.fetchWithCache<{
+          data: GameData[];
+        }>("games", query, 60);
+
+        if (response.data) {
+          allGames.push(...response.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch games for page:", error);
+      }
+    })
+  );
+
+  return allGames;
+}
+
+/**
+ * Helper to fetch casinos for page blocks
+ */
+async function fetchCasinosForPage(
+  blocks: CustomPageBlock[],
+  casinoCountry?: string
+): Promise<CasinoData[]> {
+  const casinoListBlocks = blocks.filter(
+    (block) => block.__component === "casinos.casino-list"
+  );
+
+  if (casinoListBlocks.length === 0) return [];
+
+  try {
+    const query = {
+      fields: [
+        "title",
+        "slug",
+        "ratingAvg",
+        "ratingCount",
+        "publishedAt",
+        "Badges",
+      ],
+      populate: {
+        images: { fields: ["url", "width", "height"] },
+        casinoBonus: { fields: ["bonusUrl", "bonusLabel", "bonusCode"] },
+        noDepositSection: { fields: ["bonusAmount", "termsConditions"] },
+        freeSpinsSection: { fields: ["bonusAmount", "termsConditions"] },
+        termsAndConditions: { fields: ["copy", "gambleResponsibly"] },
+        bonusSection: {
+          fields: ["bonusAmount", "termsConditions", "cashBack", "freeSpin"],
+        },
+      },
+      filters: casinoCountry
+        ? { countries: { $containsi: casinoCountry } }
+        : undefined,
+      sort: ["ratingAvg:desc"],
+      pagination: { pageSize: 20, page: 1 },
+    };
+
+    const response = await strapiClient.fetchWithCache<{
+      data: CasinoData[];
+    }>("casinos", query, 300); // 5 minute cache
+
+    return response.data || [];
+  } catch (error) {
+    console.error("Failed to fetch casinos for page:", error);
+    return [];
+  }
+}
 
 /**
  * Fetch all custom page paths (for static generation)

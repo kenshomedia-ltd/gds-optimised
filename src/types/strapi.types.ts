@@ -1,6 +1,8 @@
 // src/types/strapi.types.ts
 
 import type { BreadcrumbItem } from "./breadcrumbs.types";
+import type { GameData } from "./game.types";
+import type { CasinoData } from "./casino.types";
 
 /**
  * Basic Strapi image structure
@@ -82,7 +84,7 @@ export interface LayoutData {
   gameProvidersBreadcrumbs?: BreadcrumbItem[];
   blogBreadcrumbs?: BreadcrumbItem[];
   // Add more breadcrumb collections as needed
-  [key: string]: any; // Allow for dynamic breadcrumb keys
+  [key: string]: unknown; // Changed from 'any' to 'unknown' for dynamic breadcrumb keys
 }
 
 /**
@@ -112,6 +114,57 @@ export interface LayoutDataResponse {
 }
 
 /**
+ * Nested Strapi image structure (for related fields)
+ */
+export interface NestedStrapiImage {
+  data: {
+    id: number;
+    attributes: {
+      url: string;
+      width: number;
+      height: number;
+      alternativeText?: string;
+      mime?: string;
+      formats?: {
+        thumbnail?: StrapiImageFormat;
+        small?: StrapiImageFormat;
+        medium?: StrapiImageFormat;
+        large?: StrapiImageFormat;
+      };
+    };
+  };
+}
+
+/**
+ * Author structure
+ */
+export interface Author {
+  id: number;
+  documentId?: string;
+  firstName: string;
+  lastName: string;
+  slug?: string;
+  linkedInLink?: string;
+  twitterLink?: string;
+  facebookLink?: string;
+  content1?: string;
+  jobTitle?: string;
+  experience?: string;
+  areaOfWork?: string;
+  specialization?: string;
+  photo?: StrapiImage;
+}
+
+/**
+ * Dynamic block component interface
+ * Each block component should extend this base interface
+ */
+export interface BlockComponent {
+  id: number;
+  __component: string;
+}
+
+/**
  * Homepage data structure
  */
 export interface HomepageData {
@@ -120,7 +173,7 @@ export interface HomepageData {
   title: string;
   heading?: string;
   updatedAt: string;
-  blocks: any[]; // Dynamic block components
+  blocks: BlockComponent[]; // Changed from 'any[]' to 'BlockComponent[]'
   seo: SEOData;
 }
 
@@ -138,8 +191,8 @@ export interface CustomPageData {
   sideBarToShow?: string | null;
   seo: SEOData;
   breadcrumbs: BreadcrumbItem[];
-  author?: any; // Author structure
-  blocks: any[]; // Dynamic block components
+  author?: Author; // Changed from 'any' to 'Author'
+  blocks: BlockComponent[]; // Changed from 'any[]' to 'BlockComponent[]'
 }
 
 /**
@@ -158,6 +211,48 @@ export interface GamesListResponse {
 }
 
 /**
+ * Game provider structure
+ */
+export interface GameProvider {
+  id: number;
+  documentId?: string;
+  title: string;
+  slug: string;
+  images?: StrapiImage;
+}
+
+/**
+ * Game category structure
+ */
+export interface GameCategory {
+  id: number;
+  documentId?: string;
+  title: string;
+  slug: string;
+  images?: StrapiImage;
+}
+
+/**
+ * Casino bonus structure
+ */
+export interface CasinoBonus {
+  id: number;
+  bonusUrl: string;
+  bonusLabel: string;
+  bonusCode?: string | null;
+}
+
+/**
+ * Blog category structure
+ */
+export interface BlogCategory {
+  id: number;
+  documentId?: string;
+  blogCategory: string;
+  slug: string;
+}
+
+/**
  * Blog data structure
  */
 export interface BlogData {
@@ -171,34 +266,11 @@ export interface BlogData {
   publishedAt: string;
   createdAt: string;
   images?: StrapiImage;
-  author?: any;
-  blogCategory?: any;
+  author?: Author;
+  blogCategory?: BlogCategory;
 }
 
 /**
- * Game data structure
+ * Re-export game and casino types to maintain consistency
  */
-export interface GameData {
-  id: number;
-  documentId?: string;
-  title: string;
-  slug: string;
-  ratingAvg: number;
-  ratingCount?: number;
-  images?: StrapiImage;
-  provider?: any;
-  categories?: any[];
-}
-
-/**
- * Casino data structure
- */
-export interface CasinoData {
-  id: number;
-  documentId?: string;
-  title: string;
-  slug: string;
-  ratingAvg: number;
-  images?: StrapiImage;
-  casinoBonus?: any;
-}
+export type { GameData, CasinoData };
