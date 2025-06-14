@@ -12,7 +12,6 @@ import type {
   GameData,
   BlogData,
   CasinoData,
-  GamesListResponse,
 } from "@/types/strapi.types";
 
 // Cache configuration for different parts
@@ -240,11 +239,10 @@ async function fetchGamesForBlock(block: HomeGameListBlock): Promise<GameData[]>
     };
 
     try {
-      const response = await strapiClient.fetchWithCache<GamesListResponse>(
-        `games`,
-        query,
-        CACHE_CONFIG.games.ttl
-      );
+      const response = await strapiClient.fetchWithCache<{
+        data: GameData[];
+        meta: { pagination: { total: number } };
+      }>(`games`, query, CACHE_CONFIG.games.ttl);
       
       return response.data || [];
     } catch (error) {

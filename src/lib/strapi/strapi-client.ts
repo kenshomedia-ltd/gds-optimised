@@ -169,106 +169,54 @@ class StrapiClient {
       queryString ? `?${queryString}` : ""
     }`;
 
-    if (process.env.NODE_ENV === "development") {
-      console.log("Fetching URL:", url);
-    }
+    let lastError: Error | null = null;
 
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 10000); // 10s timeout
+    for (let i = 0; i < retries; i++) {
+      try {
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${this.token}`,
+            "Content-Type": "application/json",
+          },
+          next: {
+            revalidate: 60, // 1 minute default ISR
+          },
+        });
 
-    try {
-      const response = await fetch(url, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${this.token}`,
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        signal: controller.signal,
-        // Next.js specific caching
-        next: {
-          revalidate: REVALIDATE_TIMES.layout,
-        },
-      });
-
-      clearTimeout(timeout);
-
-      // Check content type before parsing
-      const contentType = response.headers.get("content-type");
-
-      if (!response.ok) {
-        let errorMessage = `API call failed: ${response.status} ${response.statusText}`;
-
-        // Try to get error details
-        if (contentType?.includes("application/json")) {
-          try {
-            const errorData = await response.json();
-            errorMessage += ` - ${
-              errorData.error?.message || JSON.stringify(errorData)
-            }`;
-          } catch {
-            const errorText = await response.text();
-            errorMessage += ` - ${errorText}`;
-          }
-        } else {
-          const errorText = await response.text();
-          errorMessage += ` - ${errorText.substring(0, 200)}...`; // Limit error text
+        if (!response.ok) {
+          throw new Error(
+            `Strapi API error: ${response.status} ${response.statusText}`
+          );
         }
 
-        throw new Error(errorMessage);
+        const data = await response.json();
+        return data as T;
+      } catch (error) {
+        lastError = error as Error;
+        console.error(`Attempt ${i + 1} failed:`, error);
+
+        if (i < retries - 1) {
+          // Exponential backoff: 100ms, 200ms, 400ms
+          await new Promise((resolve) =>
+            setTimeout(resolve, Math.pow(2, i) * 100)
+          );
+        }
       }
-
-      // Ensure we're getting JSON
-      if (!contentType?.includes("application/json")) {
-        const text = await response.text();
-        throw new Error(
-          `Expected JSON response but got ${contentType}. Response: ${text.substring(
-            0,
-            200
-          )}...`
-        );
-      }
-
-      return response.json();
-    } catch (error: unknown) {
-      clearTimeout(timeout);
-
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
-
-      // Don't retry JSON parse errors
-      if (
-        errorMessage.includes("JSON") ||
-        errorMessage.includes("Expected JSON")
-      ) {
-        console.error(`Invalid response format from ${endpoint}:`, error);
-        throw error;
-      }
-
-      // Retry logic for network errors
-      if (
-        retries > 0 &&
-        error instanceof Error &&
-        (error.name === "AbortError" || errorMessage.includes("fetch"))
-      ) {
-        console.warn(`Retrying ${endpoint}, attempts left: ${retries}`);
-        await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait 1s before retry
-        return this.fetch<T>(endpoint, query, retries - 1);
-      }
-
-      console.error(`Failed to fetch ${endpoint}:`, error);
-      throw error;
     }
+
+    throw lastError || new Error("Failed to fetch from Strapi API");
   }
 
   /**
-   * Invalidate cache for specific patterns
+   * Invalidate cache by pattern
    */
   async invalidateCache(pattern: string): Promise<void> {
     try {
       const keys = await redis.keys(`strapi:${pattern}*`);
       if (keys.length > 0) {
         await redis.del(...keys);
+        console.log(`Invalidated ${keys.length} cache entries`);
       }
     } catch (error) {
       console.error("Cache invalidation error:", error);
@@ -276,10 +224,11 @@ class StrapiClient {
   }
 
   /**
-   * Get layout critical data with optimized query
+   * Get layout data with critical fields only
    */
   async getLayoutCritical(): Promise<LayoutData> {
     const query: StrapiQuery = {
+      fields: ["legalText", "footerContent"],
       populate: {
         Logo: {
           fields: ["url", "width", "height"],
@@ -558,11 +507,10 @@ class StrapiClient {
       },
     };
 
-    const response = await this.fetchWithCache<GamesListResponse>(
-      "games",
-      query,
-      CACHE_TTL.gameDetail
-    );
+    const response = await this.fetchWithCache<{
+      data: GameData[];
+      meta: { pagination: { total: number } };
+    }>("games", query, CACHE_TTL.gameDetail);
     return response.data?.[0] || null;
   }
 

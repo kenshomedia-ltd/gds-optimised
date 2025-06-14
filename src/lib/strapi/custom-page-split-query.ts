@@ -9,8 +9,10 @@ import type {
   CasinoData,
   SEOData,
 } from "@/types/strapi.types";
-import type { CustomPageBlock } from "@/types/custom-page.types";
-import type { NewAndLovedSlotsBlock } from "@/types/new-and-loved-slots.types";
+import type {
+  CustomPageBlock,
+  NewAndLovedSlotsBlock as CustomPageNewAndLovedSlotsBlock,
+} from "@/types/custom-page.types";
 import type { GamesCarouselBlock } from "@/types/custom-page.types";
 
 // Cache configuration for different parts
@@ -52,15 +54,18 @@ interface DynamicGamesData {
 
 /**
  * Fetch games for NewAndLovedSlots blocks
+ * This function now accepts the block from custom-page types and extracts IDs
  */
 async function fetchNewAndLovedSlotsGames(
-  block: NewAndLovedSlotsBlock
+  block: CustomPageNewAndLovedSlotsBlock
 ): Promise<{ newGames: GameData[]; popularGames: GameData[] }> {
   console.log("Fetching games for NewAndLovedSlots block:", block.id);
 
-  // Extract provider and category IDs
-  const providerIds = block.slot_providers || [];
-  const categoryIds = block.slot_categories || [];
+  // Extract provider and category IDs from the objects
+  const providerIds =
+    block.slot_providers?.map((provider) => provider.id) || [];
+  const categoryIds =
+    block.slot_categories?.map((category) => category.id) || [];
 
   console.log("Provider IDs:", providerIds);
   console.log("Category IDs:", categoryIds);
@@ -94,29 +99,25 @@ async function fetchNewAndLovedSlotsGames(
   // Build filters based on IDs
   const filters: Record<string, unknown> = {};
   if (providerIds.length > 0) {
-    filters.provider = {
-      id: { $in: providerIds },
-    };
+    filters.provider = { id: { $in: providerIds } };
   }
   if (categoryIds.length > 0) {
-    filters.categories = {
-      id: { $in: categoryIds },
-    };
+    filters.categories = { id: { $in: categoryIds } };
   }
 
-  // Prepare queries for new and popular games
+  // Build query for new games
   const newGamesQuery = {
     fields: ["title", "slug", "ratingAvg", "createdAt"],
     populate: {
-      images: { fields: ["url", "width", "height"] },
+      images: { fields: ["url", "width", "height", "alternativeText"] },
       provider: { fields: ["title", "slug"] },
-      categories: { fields: ["title", "slug"] },
     },
-    ...(Object.keys(filters).length > 0 && { filters }),
+    filters,
     sort: ["createdAt:desc"],
     pagination: { pageSize: 3, page: 1 },
   };
 
+  // Build query for popular games
   const popularGamesQuery = {
     ...newGamesQuery,
     sort: ["ratingAvg:desc"],
@@ -156,34 +157,31 @@ async function fetchNewAndLovedSlotsGames(
 
     return result;
   } catch (error) {
-    console.error("Failed to fetch games:", error);
+    console.error("Failed to fetch games for NewAndLovedSlots:", error);
     return { newGames: [], popularGames: [] };
   }
 }
 
 /**
- * Fetch games for Games Carousel blocks
+ * Fetch games for GamesCarousel blocks
  */
 async function fetchGamesCarouselGames(
   block: GamesCarouselBlock
 ): Promise<GameData[]> {
+  console.log("Fetching games for GamesCarousel block:", block.id);
+
   // Extract provider and category slugs
   const providerSlugs =
-    block.gameProviders
-      ?.map((p) => p.slotProvider?.slug)
-      .filter((slug): slug is string => Boolean(slug)) || [];
-
+    block.gameProviders?.map((p) => p.slotProvider?.slug).filter(Boolean) || [];
   const categorySlugs =
-    block.gameCategories
-      ?.map((c) => c.slotCategory?.slug)
-      .filter((slug): slug is string => Boolean(slug)) || [];
+    block.gameCategories?.map((c) => c.slotCategory?.slug).filter(Boolean) ||
+    [];
 
+  // Build filters
   const filters: Record<string, unknown> = {};
-
   if (providerSlugs.length > 0) {
     filters.provider = { slug: { $in: providerSlugs } };
   }
-
   if (categorySlugs.length > 0) {
     filters.categories = { slug: { $in: categorySlugs } };
   }
@@ -191,12 +189,13 @@ async function fetchGamesCarouselGames(
   const query = {
     fields: ["title", "slug", "ratingAvg", "createdAt", "views"],
     populate: {
-      images: { fields: ["url", "width", "height"] },
+      images: { fields: ["url", "width", "height", "alternativeText"] },
       provider: { fields: ["title", "slug"] },
       categories: { fields: ["title", "slug"] },
     },
-    ...(Object.keys(filters).length > 0 && { filters }),
-    sort: block.sortBy === "Popular" ? ["ratingAvg:desc"] : ["createdAt:desc"],
+    filters,
+    sort:
+      block.sortBy === "mostPlayed" ? ["ratingAvg:desc"] : ["createdAt:desc"],
     pagination: {
       pageSize: block.numberOfGames || 24,
       page: 1,
@@ -227,7 +226,7 @@ async function fetchDynamicDataForBlocks(
     console.log(`Found block: ${block.__component} (ID: ${block.id})`);
 
     if (block.__component === "games.new-and-loved-slots") {
-      const typedBlock = block as NewAndLovedSlotsBlock;
+      const typedBlock = block as CustomPageNewAndLovedSlotsBlock;
       if (typedBlock.newSlots) {
         console.log("Adding NewAndLovedSlots block to fetch queue");
         fetchPromises.push(
@@ -270,7 +269,7 @@ const getCustomPageDataWithSplitQueries = async (
 }> => {
   const normalizedPath = normalizePath(path);
 
-  // 1. Fetch page structure (lightweight)
+  // 1. Fetch page structure with minimal fields
   const structureQuery = {
     fields: [
       "title",

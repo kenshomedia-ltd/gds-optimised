@@ -2,15 +2,15 @@
 
 import React from "react";
 import { GameCard } from "@/components/games/GameCard";
-import type { Game } from "@/types/games";
-import type { TranslationData } from "@/types/common";
-import type { NewAndLovedSlotsBlock } from "@/types/widgets/new-and-loved-slots.types";
+import type { GameData } from "@/types/game.types";
+import type { TranslationData } from "@/types/strapi.types";
+import type { NewAndLovedSlotsBlock } from "@/types/custom-page.types";
 
 interface NewAndLovedSlotsProps {
   blockData: NewAndLovedSlotsBlock;
   translations: TranslationData;
-  newGames?: Game[];
-  popularGames?: Game[];
+  newGames?: GameData[];
+  popularGames?: GameData[];
 }
 
 /**

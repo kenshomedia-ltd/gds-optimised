@@ -33,7 +33,14 @@ function extractImageData(
   if (!image) return undefined;
 
   if (isNestedImage(image)) {
-    return image.data?.attributes;
+    // For nested images, we need to combine the id from data with attributes
+    if (image.data?.attributes) {
+      return {
+        id: image.data.id,
+        ...image.data.attributes,
+      };
+    }
+    return undefined;
   }
 
   return image as StrapiImage;
@@ -86,105 +93,112 @@ export function IntroWithImage({
           className={cn(
             "col-span-12 lg:z-20",
             hasValidImage
-              ? "order-2 lg:order-1 lg:col-span-7"
-              : "lg:col-span-12"
+              ? "order-2 lg:order-1 lg:col-span-6 lg:max-w-xl"
+              : "lg:col-span-10 lg:col-start-2 text-center mx-auto max-w-4xl"
           )}
         >
-          <div className="mx-auto lg:mx-0">
-            {/* Title */}
-            <h1 className="text-3xl lg:text-4xl xl:text-5xl font-bold text-heading-text mb-4">
-              {heading}
-            </h1>
+          {/* Time and Author Info */}
+          {(timeDate || authorData) && (
+            <div className="flex flex-wrap items-center gap-4 mb-4">
+              {timeDate && isDateEnabled && (
+                <TimeDate timeDate={timeDate} translations={translations} />
+              )}
+              {authorData && (
+                <HeaderAuthor author={authorData} translations={translations} />
+              )}
+            </div>
+          )}
 
-            {/* Meta Information */}
-            {!isHomePage && isDateEnabled && (timeDate || authorData) && (
-              <div className="flex flex-col sm:flex-row gap-2 sm:items-center mb-4">
-                {timeDate && (
-                  <TimeDate timeDate={timeDate} translations={translations} />
-                )}
-                {authorData && isDateEnabled && (
-                  <HeaderAuthor
-                    author={authorData}
-                    translations={translations}
-                  />
-                )}
-              </div>
+          {/* Heading */}
+          <h1
+            className={cn(
+              "text-3xl font-bold leading-tight tracking-tight lg:text-5xl",
+              "text-gray-900 dark:text-white",
+              "mb-4 lg:mb-6"
             )}
+          >
+            {heading}
+          </h1>
 
-            {/* Introduction Content with Read More */}
-            {introduction && (
-              <div className="relative">
-                {shouldTruncate ? (
-                  <>
-                    <div
-                      className={cn(
-                        "max-w-none text-white",
-                        "prose prose-lg prose-invert max-w-none",
-                        "[&>p]:mb-4 [&>p:last-child]:mb-0",
-                        "[&_a]:text-primary [&_a:hover]:text-primary/80 [&_a]:transition-colors",
-                        "[&_strong]:font-semibold [&_strong]:text-heading-text",
-                        !isExpanded && "line-clamp-3 lg:line-clamp-none"
-                      )}
-                      dangerouslySetInnerHTML={{ __html: introduction }}
-                    />
+          {/* Introduction Text */}
+          {introduction && (
+            <div className="space-y-4">
+              <p
+                className={cn(
+                  "text-base lg:text-lg text-gray-700 dark:text-gray-300",
+                  "leading-relaxed",
+                  shouldTruncate &&
+                    !isExpanded &&
+                    "line-clamp-4 lg:line-clamp-none"
+                )}
+                dangerouslySetInnerHTML={{ __html: introduction }}
+              />
 
-                    <button
-                      onClick={() => setIsExpanded(!isExpanded)}
-                      className={cn(
-                        "font-semibold text-sm text-primary",
-                        "underline underline-offset-4",
-                        "mt-2 transition-opacity",
-                        "lg:hidden",
-                        isExpanded && "hidden"
-                      )}
-                      aria-expanded={isExpanded}
-                      aria-label={translations.showMore || "Show more"}
-                    >
-                      {translations.showMore || "Read more"}
-                    </button>
-                  </>
-                ) : (
-                  <div
+              {/* Read More Button (Mobile Only) */}
+              {shouldTruncate && (
+                <button
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  className={cn(
+                    "inline-flex items-center gap-2 text-sm font-medium",
+                    "text-primary-600 hover:text-primary-700",
+                    "dark:text-primary-400 dark:hover:text-primary-300",
+                    "transition-colors duration-200",
+                    "lg:hidden" // Hide on desktop
+                  )}
+                  aria-expanded={isExpanded}
+                  aria-label={
+                    isExpanded
+                      ? translations.readLess || "Read less"
+                      : translations.readMore || "Read more"
+                  }
+                >
+                  {isExpanded
+                    ? translations.readLess || "Read less"
+                    : translations.readMore || "Read more"}
+                  <svg
                     className={cn(
-                      "max-w-none text-white",
-                      "prose prose-lg prose-invert max-w-none",
-                      "[&>p]:mb-4 [&>p:last-child]:mb-0",
-                      "[&_a]:text-primary [&_a:hover]:text-primary/80 [&_a]:transition-colors",
-                      "[&_strong]:font-semibold [&_strong]:text-heading-text"
+                      "w-4 h-4 transition-transform duration-200",
+                      isExpanded && "rotate-180"
                     )}
-                    dangerouslySetInnerHTML={{ __html: introduction }}
-                  />
-                )}
-              </div>
-            )}
-          </div>
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Image Column */}
-        {hasValidImage && imageUrl && imageData && (
+        {hasValidImage && imageUrl && (
           <div
             className={cn(
-              "col-span-12 lg:col-span-5",
+              "col-span-12 lg:col-span-6",
               "order-1 lg:order-2",
-              "relative flex items-center justify-center lg:justify-end",
-              "mb-4 md:mb-0"
+              "relative aspect-[16/9] lg:aspect-auto lg:h-full",
+              "overflow-hidden rounded-xl lg:rounded-2xl",
+              "shadow-lg"
             )}
           >
-            <div className="relative w-full max-w-[515px] lg:max-w-none">
-              <Image
-                src={imageUrl}
-                alt={imageAlt}
-                width={imageData.width || 515}
-                height={imageData.height || 290}
-                className="w-full h-auto rounded-lg shadow-xl"
-                priority={isHomePage}
-                progressive={true}
-                quality={90}
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 515px"
-                placeholder="blur"
-                responsive={true}
-              />
-            </div>
+            <Image
+              src={imageUrl}
+              alt={imageAlt}
+              width={imageData?.width || 800}
+              height={imageData?.height || 450}
+              priority={true}
+              className="w-full h-full object-cover"
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              quality={90}
+              placeholder="blur"
+            />
           </div>
         )}
       </div>
