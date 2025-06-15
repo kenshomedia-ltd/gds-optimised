@@ -1,4 +1,5 @@
 // src/lib/cache/cache-manager.ts
+import "server-only";
 import { Redis } from "ioredis";
 import { unstable_cache } from "next/cache";
 import { cache } from "react";

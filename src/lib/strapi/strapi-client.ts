@@ -1,6 +1,6 @@
 // src/lib/strapi/strapi-client.ts
 import qs from "qs";
-import { Redis } from "ioredis";
+import { cacheManager } from "@/lib/cache/cache-manager"; // Import the centralized cache manager
 import type {
   LayoutData,
   NavigationData,
@@ -44,16 +44,6 @@ interface TranslationResponse {
       | Record<string, string>;
   };
 }
-
-// Initialize Redis client
-const redis = new Redis({
-  host: process.env.REDIS_HOST || "localhost",
-  port: parseInt(process.env.REDIS_PORT || "6379"),
-  password: process.env.REDIS_PASSWORD,
-  maxRetriesPerRequest: 3,
-  enableReadyCheck: true,
-  enableOfflineQueue: true,
-});
 
 // Cache configuration
 const CACHE_TTL = {
@@ -109,6 +99,7 @@ class StrapiClient {
 
   /**
    * Fetch with automatic caching and error handling
+   * --- REFACTORED TO USE cacheManager ---
    */
   async fetchWithCache<T>(
     endpoint: string,
@@ -116,18 +107,16 @@ class StrapiClient {
     ttl?: number
   ): Promise<T> {
     const cacheKey = this.getCacheKey(endpoint, query);
+    const cacheOptions = { ttl: ttl || 60, swr: (ttl || 60) * 2 };
 
     // Try to get from cache first
-    try {
-      const cached = await redis.get(cacheKey);
-      if (cached) {
-        if (process.env.NODE_ENV === "development") {
-          console.log(`Cache hit for ${endpoint}`);
-        }
-        return JSON.parse(cached);
+    const { data: cachedData, isStale } = await cacheManager.get<T>(cacheKey);
+
+    if (cachedData && !isStale) {
+      if (process.env.NODE_ENV === "development") {
+        console.log(`Cache hit for ${endpoint}`);
       }
-    } catch (error) {
-      console.warn("Cache read error:", error);
+      return cachedData;
     }
 
     // Fetch from API
@@ -135,11 +124,7 @@ class StrapiClient {
 
     // Cache the result
     if (ttl && ttl > 0) {
-      try {
-        await redis.setex(cacheKey, ttl, JSON.stringify(data));
-      } catch (error) {
-        console.warn("Cache write error:", error);
-      }
+      await cacheManager.set(cacheKey, data, cacheOptions);
     }
 
     return data;
@@ -212,15 +197,7 @@ class StrapiClient {
    * Invalidate cache by pattern
    */
   async invalidateCache(pattern: string): Promise<void> {
-    try {
-      const keys = await redis.keys(`strapi:${pattern}*`);
-      if (keys.length > 0) {
-        await redis.del(...keys);
-        console.log(`Invalidated ${keys.length} cache entries`);
-      }
-    } catch (error) {
-      console.error("Cache invalidation error:", error);
-    }
+    await cacheManager.delete(`strapi:${pattern}*`);
   }
 
   /**
