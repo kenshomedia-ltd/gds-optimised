@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { Suspense } from "react";
 import type {
   DynamicBlockProps,
+  GamesCarouselBlock,
   HomeBlogListBlock,
   HomeCasinoListBlock,
   HomeFeaturedProvidersBlock,
@@ -93,6 +94,13 @@ const componentMap = {
     {
       loading: () => <Skeleton className="h-64 w-full" />,
     }
+  ),
+  "games.games-carousel": dynamic(
+    () =>
+      import("@/components/widgets/GameListWidget").then(
+        (mod) => mod.GameListWidget
+      ),
+    { loading: () => <Skeleton className="h-96 w-full" /> }
   ),
 };
 
@@ -185,6 +193,21 @@ export function DynamicBlock({
           translations: additionalData?.translations,
           newGames: newAndLovedData?.newGames || [],
           popularGames: newAndLovedData?.popularGames || [],
+        };
+
+      case "games.games-carousel":
+        const gamesCarouselData = blockData as GamesCarouselBlock;
+        // Extract games from dynamicGamesData if available
+        const carouselGames =
+          additionalData?.dynamicGamesData?.[`block-${gamesCarouselData.id}`]
+            ?.games ||
+          gamesCarouselData.games ||
+          additionalData?.games ||
+          [];
+        return {
+          block: gamesCarouselData,
+          games: carouselGames,
+          translations: additionalData?.translations,
         };
 
       // Ensure all components in the map have a case here

@@ -35,6 +35,18 @@ export const SORT_MAPPINGS = {
 export type SortKey = keyof typeof SORT_MAPPINGS;
 
 /**
+ * Game-specific sort options for UI dropdowns
+ * Each option has a value (key) and a label for display
+ */
+export const GAME_SORT_OPTIONS = [
+  { value: "Newest", label: "Newest" },
+  { value: "Most Popular", label: "Most Popular" },
+  { value: "Top Rated", label: "Top Rated" },
+  { value: "Alphabetical", label: "A-Z" },
+  { value: "Reverse Alphabetical", label: "Z-A" },
+] as const;
+
+/**
  * Get Strapi sort parameter from display value
  * @param sortKey - The display value from CMS
  * @param defaultSort - Default sort to use if key not found
