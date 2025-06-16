@@ -13,6 +13,7 @@ import type {
   HomeTestimoniesBlock,
   IntroductionWithImageBlock,
   OverviewBlock,
+  QuicklinksBlock,
   SingleContentBlock,
 } from "@/types/dynamic-block.types";
 import type { NewAndLovedSlotsBlock } from "@/types/new-and-loved-slots.types";
@@ -101,6 +102,18 @@ const componentMap = {
         (mod) => mod.GameListWidget
       ),
     { loading: () => <Skeleton className="h-96 w-full" /> }
+  ),
+  "shared.quicklinks": dynamic(
+    () =>
+      import("@/components/widgets/QuicklinksWidget").then(
+        (mod) => mod.QuicklinksWidget
+      ),
+    {
+      loading: () =>
+        import("@/components/ui/QuicklinksCollapsible").then((mod) => (
+          <mod.QuicklinksCollapsibleSkeleton />
+        )),
+    }
   ),
 };
 
@@ -208,6 +221,11 @@ export function DynamicBlock({
           block: gamesCarouselData,
           games: carouselGames,
           translations: additionalData?.translations,
+        };
+
+      case "shared.quicklinks":
+        return {
+          block: blockData as QuicklinksBlock,
         };
 
       // Ensure all components in the map have a case here

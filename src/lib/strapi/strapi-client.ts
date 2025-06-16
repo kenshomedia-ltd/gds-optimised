@@ -154,6 +154,8 @@ class StrapiClient {
       queryString ? `?${queryString}` : ""
     }`;
 
+    console.log("url", url);
+
     let lastError: Error | null = null;
 
     for (let i = 0; i < retries; i++) {

@@ -135,6 +135,14 @@ export interface NewAndLovedSlotsBlock extends BaseCustomPageBlock {
 }
 
 /**
+ * Quicklinks block
+ */
+export interface QuicklinksBlock extends BaseCustomPageBlock {
+  __component: "shared.quicklinks";
+  showQuickLinks: boolean;
+}
+
+/**
  * Union type for all custom page blocks
  */
 export type CustomPageBlock =
@@ -144,7 +152,8 @@ export type CustomPageBlock =
   | GamesCarouselBlock
   | CasinoListBlock
   | OverviewBlock
-  | NewAndLovedSlotsBlock;
+  | NewAndLovedSlotsBlock
+  | QuicklinksBlock;
 
 /**
  * Custom page data structure
@@ -227,4 +236,10 @@ export function isNewAndLovedSlotsBlock(
   block: CustomPageBlock
 ): block is NewAndLovedSlotsBlock {
   return block.__component === "games.new-and-loved-slots";
+}
+
+export function isQuicklinksBlock(
+  block: CustomPageBlock
+): block is QuicklinksBlock {
+  return block.__component === "shared.quicklinks";
 }

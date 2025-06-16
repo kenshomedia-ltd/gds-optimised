@@ -363,6 +363,9 @@ const getCustomPageDataWithSplitQueries = async (
               },
             },
           },
+          "shared.quicklinks": {
+            fields: ["showQuickLinks"],
+          },
           "shared.single-content": {
             fields: ["content"],
           },

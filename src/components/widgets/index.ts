@@ -18,6 +18,9 @@ export {
 
 export { Testimonials, TestimonialsSkeleton } from "./Testimonials";
 
+// Quicklinks widget
+export { QuicklinksWidget } from "./QuicklinksWidget";
+
 // Add other widget exports as they are created:
 // export { PopularGames } from "./PopularGames";
 // export { FeaturedCasinos } from "./FeaturedCasinos";

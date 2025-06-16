@@ -3,6 +3,10 @@
 // Skeleton components for loading states
 export { Skeleton, SkeletonText } from "./Skeleton";
 export { Collapsible } from "./Collapsible";
+export {
+  QuicklinksCollapsible,
+  QuicklinksCollapsibleSkeleton,
+} from "./QuicklinksCollapsible";
 export { StarRating } from "./StarRating/StarRating";
 export { StarRatingDisplay } from "./StarRating/StarRatingDisplay";
 export { StarRatingProgressive } from "./StarRating/StarRatingProgressive";

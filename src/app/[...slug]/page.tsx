@@ -95,6 +95,8 @@ export default async function CustomPage({
       notFound();
     }
 
+    console.log("pageData", pageData);
+
     // Additional data for blocks
     const additionalData = {
       games,
@@ -196,7 +198,7 @@ export default async function CustomPage({
         )}
 
         {/* Main Content Section (same structure as homepage) */}
-        <main className="container mx-auto px-4 py-8">
+        <section className="main container mx-auto px-4 py-8">
           {/* Show author and date if enabled */}
           {pageData.showContentDate && (
             <div className="mb-8 flex items-center gap-4 text-sm text-muted-foreground">
@@ -252,7 +254,7 @@ export default async function CustomPage({
               <div className="sticky top-4">{/* Sidebar content */}</div>
             </aside>
           )}
-        </main>
+        </section>
       </>
     );
   } catch (error) {

@@ -100,6 +100,8 @@ export function blockComponentToCustomPageBlock(
     "games.games-carousel",
     "casinos.casino-list",
     "shared.overview-block",
+    "games.new-and-loved-slots",
+    "shared.quicklinks",
   ];
 
   if (validComponents.includes(block.__component)) {
@@ -152,6 +154,8 @@ export function isCustomPageBlock(
     "games.games-carousel",
     "casinos.casino-list",
     "shared.overview-block",
+    "games.new-and-loved-slots",
+    "shared.quicklinks",
   ];
 
   return customPageComponents.includes(block.__component);

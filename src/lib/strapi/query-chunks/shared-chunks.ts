@@ -180,6 +180,9 @@ export const blockQueryChunks: BlockQueryChunks = {
       },
     },
   },
+  "shared.quicklinks": {
+    fields: ["showQuickLinks"],
+  },
   "homepage.home-game-list": {
     fields: ["numberOfGames", "sortBy", "gameListTitle"],
     populate: {
