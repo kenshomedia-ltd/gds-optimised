@@ -8,12 +8,11 @@ import {
   getCustomPageDataSplit,
 } from "@/lib/strapi/custom-page-split-query";
 import { getLayoutData } from "@/lib/strapi/data-loader";
-import { BreadcrumbsWithLayout } from "@/components/layout/Breadcrumbs";
+import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { DynamicBlock } from "@/components/common/DynamicBlock";
 import { generateMetadata as generateSEOMetadata } from "@/lib/utils/seo";
 import { CasinoSidebar } from "@/components/casino";
 import type { CustomPageBlock } from "@/types/custom-page.types";
-import type { BreadcrumbItem } from "@/types/breadcrumbs.types";
 
 // Force static generation with ISR
 export const dynamic = "force-static";
@@ -105,7 +104,7 @@ export default async function CustomPage({
         : Promise.resolve(null),
     ]);
 
-    const { layout, translations } = layoutData;
+    const { translations } = layoutData;
 
     console.log("pageData", casinos);
 
@@ -134,14 +133,6 @@ export default async function CustomPage({
         `Custom page data fetching took: ${Date.now() - startTime}ms`
       );
     }
-
-    // Get all layout breadcrumb collections
-    const layoutBreadcrumbs: Record<string, BreadcrumbItem[]> = {};
-    Object.keys(layout).forEach((key) => {
-      if (key.endsWith("Breadcrumbs") && Array.isArray(layout[key])) {
-        layoutBreadcrumbs[key] = layout[key];
-      }
-    });
 
     // Schema.org structured data for custom pages
     const pageSchema = {
@@ -176,11 +167,9 @@ export default async function CustomPage({
         />
 
         {/* Breadcrumbs */}
-        <BreadcrumbsWithLayout
+        <Breadcrumbs
           items={pageData.breadcrumbs || []}
-          breadcrumbKey="customPageBreadcrumbs"
-          layoutBreadcrumbs={layoutBreadcrumbs}
-          showHome={true}
+          showHome={false} // Home is already included in the breadcrumbs from API
         />
 
         {/* Hero Section with Featured Blocks (same structure as homepage) */}

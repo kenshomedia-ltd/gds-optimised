@@ -1,13 +1,7 @@
-// src/components/navigation/Breadcrumbs/Breadcrumbs.tsx
+// src/components/layout/Breadcrumbs/Breadcrumbs.tsx
 import Link from "next/link";
-import type { BreadcrumbItem } from "@/types/breadcrumbs.types";
+import type { BreadcrumbsProps, BreadcrumbsWithLayoutProps } from "@/types/breadcrumbs.types";
 import { cn } from "@/lib/utils/cn";
-
-interface BreadcrumbsProps {
-  items: BreadcrumbItem[];
-  className?: string;
-  showHome?: boolean;
-}
 
 /**
  * Breadcrumbs Component
@@ -24,10 +18,8 @@ export function Breadcrumbs({
   className,
   showHome = true,
 }: BreadcrumbsProps) {
-  // Filter out any empty items
-  const validItems = items.filter(
-    (item) => item.breadCrumbText && item.breadCrumbUrl !== null
-  );
+  // Filter out any empty items (but keep items with null URLs as they represent current page)
+  const validItems = items.filter((item) => item.breadCrumbText);
 
   // Don't render if we have no items and home is not shown
   if (!showHome && validItems.length === 0) {
@@ -48,9 +40,11 @@ export function Breadcrumbs({
       "@type": "ListItem",
       position: index + 1,
       name: item.breadCrumbText,
-      item: item.breadCrumbUrl.startsWith("http")
-        ? item.breadCrumbUrl
-        : `${siteUrl}${item.breadCrumbUrl}`,
+      ...(item.breadCrumbUrl && {
+        item: item.breadCrumbUrl.startsWith("http")
+          ? item.breadCrumbUrl
+          : `${siteUrl}${item.breadCrumbUrl}`,
+      }),
     })),
   };
 
@@ -75,25 +69,23 @@ export function Breadcrumbs({
 
               return (
                 <li
-                  key={`${item.breadCrumbUrl}-${index}`}
+                  key={`${item.breadCrumbText}-${index}`}
                   className="flex items-center text-white"
                 >
-                  {isLast ? (
+                  {isLast || !item.breadCrumbUrl ? (
+                    // Current page or item without URL
                     <span aria-current="page" className="font-medium">
                       {item.breadCrumbText}
                     </span>
                   ) : (
+                    // Linked breadcrumb item
                     <>
-                      {item.breadCrumbUrl ? (
-                        <Link
-                          href={item.breadCrumbUrl}
-                          className="underline transition-opacity hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-breadcrumb-bkg"
-                        >
-                          {item.breadCrumbText}
-                        </Link>
-                      ) : (
-                        <span className="underline">{item.breadCrumbText}</span>
-                      )}
+                      <Link
+                        href={item.breadCrumbUrl}
+                        className="underline transition-opacity hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-breadcrumb-bkg"
+                      >
+                        {item.breadCrumbText}
+                      </Link>
                       <span
                         className="mx-1 text-breadcrumb-separator"
                         aria-hidden="true"
@@ -110,12 +102,6 @@ export function Breadcrumbs({
       </nav>
     </>
   );
-}
-
-// Server Component for breadcrumbs with layout data
-interface BreadcrumbsWithLayoutProps extends BreadcrumbsProps {
-  breadcrumbKey?: string;
-  layoutBreadcrumbs?: Record<string, BreadcrumbItem[]>;
 }
 
 export function BreadcrumbsWithLayout({
