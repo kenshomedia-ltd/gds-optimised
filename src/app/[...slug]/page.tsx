@@ -2,6 +2,7 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { Image } from "@/components/common/Image";
+import { AuthorBox } from "@/components/common";
 import {
   getCustomPageMetadata,
   getCustomPageDataSplit,
@@ -10,6 +11,7 @@ import { getLayoutData } from "@/lib/strapi/data-loader";
 import { BreadcrumbsWithLayout } from "@/components/layout/Breadcrumbs";
 import { DynamicBlock } from "@/components/common/DynamicBlock";
 import { generateMetadata as generateSEOMetadata } from "@/lib/utils/seo";
+import { CasinoSidebar } from "@/components/casino";
 import type { CustomPageBlock } from "@/types/custom-page.types";
 import type { BreadcrumbItem } from "@/types/breadcrumbs.types";
 
@@ -82,20 +84,30 @@ export default async function CustomPage({
     const { slug } = await params;
     const path = slug.join("/");
 
-    // Parallel data fetching
-    const [layoutData, customPageResponse] = await Promise.all([
-      getLayoutData({ cached: true }),
-      getCustomPageDataSplit(path),
-    ]);
-
+    // First, fetch page data to check if we need casino sidebar
+    const customPageResponse = await getCustomPageDataSplit(path);
     const { pageData, games, casinos, dynamicGamesData } = customPageResponse;
-    const { layout, translations } = layoutData;
 
     if (!pageData) {
       notFound();
     }
 
-    console.log("pageData", pageData);
+    // Conditionally fetch casino sidebar data ONLY if needed
+    const [layoutData, sidebarCasinos] = await Promise.all([
+      getLayoutData({ cached: true }),
+      // Only fetch casino sidebar if the page requires it
+      pageData.sideBarToShow === "casinos" ||
+      pageData.sideBarToShow === "casino" ||
+      !pageData.sideBarToShow
+        ? import("@/lib/strapi/casino-sidebar-loader").then((mod) =>
+            mod.getCasinoSidebarData({ cached: true })
+          )
+        : Promise.resolve(null),
+    ]);
+
+    const { layout, translations } = layoutData;
+
+    console.log("pageData", casinos);
 
     // Additional data for blocks
     const additionalData = {
@@ -197,63 +209,96 @@ export default async function CustomPage({
           </section>
         )}
 
-        {/* Main Content Section (same structure as homepage) */}
+        {/* Main Content Section with Sidebar Layout */}
         <section className="main container mx-auto px-4 py-8">
-          {/* Show author and date if enabled */}
-          {pageData.showContentDate && (
-            <div className="mb-8 flex items-center gap-4 text-sm text-muted-foreground">
-              {pageData.author && (
-                <div className="flex items-center gap-2">
-                  {pageData.author.photo && (
-                    <Image
-                      src={pageData.author.photo.url}
-                      alt={`${pageData.author.firstName} ${pageData.author.lastName}`}
-                      width={32}
-                      height={32}
-                      className="rounded-full"
-                      quality={90}
-                      loading="eager"
-                    />
+          <div
+            className={
+              !pageData.sideBarToShow ||
+              pageData.sideBarToShow === "casinos" ||
+              pageData.sideBarToShow === "casino"
+                ? "lg:flex lg:gap-8"
+                : ""
+            }
+          >
+            {/* Main Content */}
+            <div
+              className={
+                !pageData.sideBarToShow ||
+                pageData.sideBarToShow === "casinos" ||
+                pageData.sideBarToShow === "casino"
+                  ? "flex-1 min-w-0"
+                  : ""
+              }
+            >
+              {/* Show author and date if enabled */}
+              {pageData.showContentDate && (
+                <div className="mb-8 flex items-center gap-4 text-sm text-muted-foreground">
+                  {pageData.author && (
+                    <div className="flex items-center gap-2">
+                      {pageData.author.photo && (
+                        <Image
+                          src={pageData.author.photo.url}
+                          alt={`${pageData.author.firstName} ${pageData.author.lastName}`}
+                          width={32}
+                          height={32}
+                          className="rounded-full"
+                          quality={90}
+                          loading="eager"
+                        />
+                      )}
+                      <span>
+                        {pageData.author.firstName} {pageData.author.lastName}
+                      </span>
+                    </div>
                   )}
-                  <span>
-                    {pageData.author.firstName} {pageData.author.lastName}
-                  </span>
+                  {pageData.updatedAt && (
+                    <time dateTime={pageData.updatedAt}>
+                      {new Date(pageData.updatedAt).toLocaleDateString()}
+                    </time>
+                  )}
                 </div>
               )}
-              {pageData.updatedAt && (
-                <time dateTime={pageData.updatedAt}>
-                  {new Date(pageData.updatedAt).toLocaleDateString()}
-                </time>
+
+              <div className="space-y-12">
+                {mainBlocks.map((block: CustomPageBlock, index: number) => (
+                  <section
+                    key={`main-${block.__component}-${index}`}
+                    className="opacity-0 animate-fadeIn"
+                    style={{
+                      animationDelay: `${index * 100}ms`,
+                      animationFillMode: "forwards",
+                    }}
+                  >
+                    <DynamicBlock
+                      blockType={block.__component}
+                      blockData={block}
+                      additionalData={additionalData}
+                    />
+                  </section>
+                ))}
+              </div>
+
+              {/* Author Box - Show after main content if author exists */}
+              {pageData.author && (
+                <div className="mt-12">
+                  <AuthorBox author={pageData.author} />
+                </div>
               )}
             </div>
-          )}
 
-          <div className="space-y-12">
-            {mainBlocks.map((block: CustomPageBlock, index: number) => (
-              <section
-                key={`main-${block.__component}-${index}`}
-                className="opacity-0 animate-fadeIn"
-                style={{
-                  animationDelay: `${index * 100}ms`,
-                  animationFillMode: "forwards",
-                }}
-              >
-                <DynamicBlock
-                  blockType={block.__component}
-                  blockData={block}
-                  additionalData={additionalData}
-                />
-              </section>
-            ))}
+            {/* Casino Sidebar */}
+            {(!pageData.sideBarToShow ||
+              pageData.sideBarToShow === "casinos" ||
+              pageData.sideBarToShow === "casino") &&
+              sidebarCasinos && (
+                <aside className="mt-8 lg:mt-0 lg:w-80 xl:w-96">
+                  <CasinoSidebar
+                    casinos={sidebarCasinos}
+                    translations={translations}
+                  />
+                </aside>
+              )}
           </div>
-
-          {/* Sidebar if specified */}
-          {pageData.sideBarToShow && (
-            <aside className="mt-8 lg:mt-0 lg:ml-8 lg:w-1/3">
-              {/* Implement sidebar content based on sideBarToShow value */}
-              <div className="sticky top-4">{/* Sidebar content */}</div>
-            </aside>
-          )}
         </section>
       </>
     );

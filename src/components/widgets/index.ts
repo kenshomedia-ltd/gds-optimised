@@ -21,6 +21,9 @@ export { Testimonials, TestimonialsSkeleton } from "./Testimonials";
 // Quicklinks widget
 export { QuicklinksWidget } from "./QuicklinksWidget";
 
+// HowTo widget
+export { HowTo, HowToSkeleton, HowToServer } from "./HowTo";
+
 // Add other widget exports as they are created:
 // export { PopularGames } from "./PopularGames";
 // export { FeaturedCasinos } from "./FeaturedCasinos";

@@ -11,6 +11,7 @@ import type {
   HomeFeaturedProvidersBlock,
   HomeGameListBlock,
   HomeTestimoniesBlock,
+  HowToGroupBlock,
   IntroductionWithImageBlock,
   OverviewBlock,
   QuicklinksBlock,
@@ -112,6 +113,15 @@ const componentMap = {
       loading: () =>
         import("@/components/ui/QuicklinksCollapsible").then((mod) => (
           <mod.QuicklinksCollapsibleSkeleton />
+        )),
+    }
+  ),
+  "shared.how-to-group": dynamic(
+    () => import("@/components/widgets/HowTo").then((mod) => mod.HowTo),
+    {
+      loading: () =>
+        import("@/components/widgets/HowTo").then((mod) => (
+          <mod.HowToSkeleton />
         )),
     }
   ),
@@ -226,6 +236,12 @@ export function DynamicBlock({
       case "shared.quicklinks":
         return {
           block: blockData as QuicklinksBlock,
+        };
+
+      case "shared.how-to-group":
+        return {
+          block: blockData as HowToGroupBlock,
+          translations: additionalData?.translations,
         };
 
       // Ensure all components in the map have a case here

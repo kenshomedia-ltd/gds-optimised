@@ -331,3 +331,11 @@ export interface BlockComponentProps {
   translations?: Record<string, string>;
   [key: string]: unknown;
 }
+
+/**
+ * Quicklinks block type
+ */
+export interface QuicklinksBlock extends BaseBlock {
+  __component: "shared.quicklinks";
+  showQuickLinks: boolean;
+}

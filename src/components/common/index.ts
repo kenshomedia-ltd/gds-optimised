@@ -21,6 +21,7 @@ export type { SingleContentProps, SingleContentSkeletonProps } from "./SingleCon
 // Time and Author components
 export { TimeDate } from "./TimeDate/TimeDate";
 export { HeaderAuthor } from "./HeaderAuthor/HeaderAuthor";
+export { AuthorBox } from "./AuthorBox/AuthorBox";
 
 // Error handling
 export { ErrorBoundary, GlobalErrorBoundary } from "./ErrorBoundary/ErrorBoundary";
