@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Image } from "@/components/common/Image";
+import { Button } from "@/components/ui";
 import type { CasinoSidebarItemProps } from "@/types/sidebar.types";
 import { formatWelcomeBonus, formatNoDepositBonus } from "@/lib/utils/casino";
 
@@ -58,14 +59,16 @@ export function CasinoSidebarItem({
       </div>
 
       {/* CTA Button */}
-      <Link
+      <Button
+        variant="link"
         href={casino.casinoBonus.bonusUrl}
-        className="shrink-0 px-4 py-2 bg-primary text-primary-foreground rounded text-xs font-semibold hover:bg-primary/90 transition-colors"
         rel="sponsored"
         target="_blank"
+        className="bg-btn-misc"
+        size="sm"
       >
         {translations.review || "RECENSIONE"}
-      </Link>
+      </Button>
     </div>
   );
 }

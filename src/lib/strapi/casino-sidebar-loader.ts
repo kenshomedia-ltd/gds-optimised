@@ -3,6 +3,7 @@ import { unstable_cache } from "next/cache";
 import { cache } from "react";
 import { strapiClient, REVALIDATE_TIMES } from "./strapi-client";
 import type { SidebarCasinoSections } from "@/types/sidebar.types";
+import type { CasinoData } from "@/types/casino.types";
 
 /**
  * Build query for casino sidebar sections from layout endpoint
@@ -67,9 +68,9 @@ const getCasinoSidebarDataCached = cache(
 
       const response = await strapiClient.fetchWithCache<{
         data: {
-          most_loved_casinos?: any[];
-          no_deposit_casinos?: any[];
-          free_spin_casinos?: any[];
+          most_loved_casinos?: CasinoData[];
+          no_deposit_casinos?: CasinoData[];
+          free_spin_casinos?: CasinoData[];
         };
       }>("layout", query, REVALIDATE_TIMES.layout);
 

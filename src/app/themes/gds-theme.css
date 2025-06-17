@@ -86,7 +86,28 @@
   --site-featured-heading-text: #ffffff;
   --site-subnavbar-bkg: #013D6D;
   --site-nav-hover-bkg: #013D6D;
-  --site-casino-table-header-bkg: #01579B;
+  --site-table-header-bkg: #101C34;
+
+  /* Button colors */
+  --site-button-primary: #01579B;
+  --site-button-primary-hover: #01467C;
+  --site-button-primary-text: #ffffff;
+  --site-button-secondary: #FF5B14;
+  --site-button-secondary-hover: #FF9035;
+  --site-button-secondary-text: #ffffff;
+  --site-button-misc: #00BCD4;
+  --site-button-misc-hover: #3FE6FC;
+  --site-button-misc-text: #000000;
+  --site-button-success: #22C55E;
+  --site-button-success-hover: #22C55E;
+  --site-button-success-text: #ffffff;
+  --site-button-warning: #F59E0B;
+  --site-button-warning-hover: #FF9035;
+  --site-button-warning-text: #ffffff;
+  --site-button-danger: #EF4444;
+  --site-button-danger-hover: #EF4444;
+  --site-button-danger-text: #ffffff;
+  
   
   /* Semantic colors */
   --site-secondary-tint: #FF9035;

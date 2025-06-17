@@ -20,7 +20,7 @@ export function CasinoSidebarStack({
   return (
     <div className="bg-white rounded-lg shadow-sm border border-border">
       {/* Stack Header */}
-      <div className="bg-[#1F154C] text-white p-4 rounded-t-lg">
+      <div className="bg-table-header-bkg text-white p-4 rounded-t-lg">
         <h3 className="text-lg font-bold text-center">{title}</h3>
       </div>
 

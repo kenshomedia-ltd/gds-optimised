@@ -98,7 +98,28 @@
   --color-featured-heading-text: var(--site-featured-heading-text);
   --color-subnavbar-bkg: var(--site-subnavbar-bkg);
   --color-nav-hover-bkg: var(--site-nav-hover-bkg);
-  --color-casino-table-header-bkg: var(--site-casino-table-header-bkg);
+  --color-table-header-bkg: var(--site-table-header-bkg);
+
+  /* Button colors */
+  --color-btn-primary: var(--site-button-primary);
+  --color-btn-primary-hover: var(--site-button-primary-hover);
+  --color-btn-primary-text: var(--site-button-primary-text);
+  --color-btn-secondary: var(--site-button-secondary);
+  --color-btn-secondary-hover: var(--site-button-secondary-hover);
+  --color-btn-secondary-text: var(--site-button-secondary-text);
+  --color-btn-misc: var(--site-button-misc);
+  --color-btn-misc-hover: var(--site-button-misc-hover);
+  --color-btn-misc-text: var(--site-button-misc-text);
+  --color-btn-success: var(--site-button-success);
+  --color-btn-success-hover: var(--site-button-success-hover);
+  --color-btn-success-text: var(--site-button-success-text);
+  --color-btn-warning: var(--site-button-warning);
+  --color-btn-warning-hover: var(--site-button-warning-hover);
+  --color-btn-warning-text: var(--site-button-warning-text);
+  --color-btn-danger: var(--site-button-danger);
+  --color-btn-danger-hover: var(--site-button-danger-hover);
+  --color-btn-danger-text: var(--site-button-danger-text);
+
   /* Semantic colors */
   --color-secondary-tint: var(--site-secondary-tint);
   --color-secondary-text: var(--site-secondary-text);
@@ -204,6 +225,7 @@
   .bg-legal-bkg { background-color: var(--site-legal-bkg); }
   .bg-subnavbar-bkg { background-color: var(--site-subnavbar-bkg); }
   .bg-nav-hover-bkg { background-color: var(--site-nav-hover-bkg); }
+  .bg-table-heading { background-color: var(--site-heading-text); }
   
   /* Text color utilities */
   .text-body-text { color: var(--site-body-text); }
@@ -227,6 +249,60 @@
   .text-success { color: var(--site-success); }
   .text-warning { color: var(--site-warning); }
   .text-danger { color: var(--site-danger); }
+
+  /* buttons */
+  .btn-primary {
+    background-color: var(--color-btn-primary);
+    color: var(--color-btn-primary-text);
+  }
+
+  .btn-primary:hover {
+    background-color: var(--color-btn-primary-hover);
+  }
+
+  .btn-secondary {
+    background-color: var(--color-btn-secondary);
+    color: var(--color-btn-secondary-text);
+  }
+  .btn-secondary:hover {
+    background-color: var(--color-btn-secondary-hover);
+  }
+
+  .btn-misc {
+    background-color: var(--color-btn-misc);
+    color: var(--color-btn-misc-text);
+  }
+
+  .btn-misc:hover {
+    background-color: var(--color-btn-misc-hover);
+  }
+  
+  .btn-success {
+    background-color: var(--color-btn-success);
+    color: var(--color-btn-success-text);
+  }
+
+  .btn-success:hover {
+    background-color: var(--color-btn-success-hover);
+  }
+
+  .btn-warning {
+    background-color: var(--color-btn-warning);
+    color: var(--color-btn-warning-text);
+  }
+
+  .btn-warning:hover {
+    background-color: var(--color-btn-warning-hover);
+  }
+  
+  .btn-danger {
+    background-color: var(--color-btn-danger);
+    color: var(--color-btn-danger-text);
+  }
+
+  .btn-danger:hover {
+    background-color: var(--color-btn-danger-hover);
+  }
   
   /* Border utilities */
   .border-primary { border-color: var(--site-primary); }

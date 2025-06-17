@@ -297,20 +297,6 @@ export function GameListWidget({
         {/* Load More Button */}
         {showLoadMore && hasMore && games.length > 0 && (
           <div className="text-center mt-8 space-y-3">
-            {/* Pagination Info */}
-            {totalPages > 0 && (
-              <p className="text-sm text-muted-foreground">
-                {translations?.page || "Page"} {page} {translations?.of || "of"}{" "}
-                {totalPages}
-                {totalGames > 0 && (
-                  <span className="ml-2">
-                    ({games.length} {translations?.of || "of"} {totalGames}{" "}
-                    {translations?.games || "games"})
-                  </span>
-                )}
-              </p>
-            )}
-
             {/* Load More Button */}
             <button
               onClick={loadMoreGames}
@@ -332,6 +318,19 @@ export function GameListWidget({
                 translations?.loadMore || "Load More Games"
               )}
             </button>
+            {/* Pagination Info */}
+            {totalPages > 0 && (
+              <p className="text-xs text-white">
+                {translations?.page || "Page"} {page} {translations?.of || "of"}{" "}
+                {totalPages}
+                {totalGames > 0 && (
+                  <span className="ml-2">
+                    ({games.length} {translations?.of || "of"} {totalGames})
+                    {/* {translations?.games || "games"}) */}
+                  </span>
+                )}
+              </p>
+            )}
           </div>
         )}
       </div>

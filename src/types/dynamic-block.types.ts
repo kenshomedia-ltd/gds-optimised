@@ -280,7 +280,8 @@ export type BlockData =
   | MediumImageWithContentBlock
   | ProsAndConsBlock
   | ImageCarouselBlock
-  | GamesNewAndLovedSlotsBlock;
+  | GamesNewAndLovedSlotsBlock
+  | QuicklinksBlock;
 
 export type BlockType =
   // Homepage block types
@@ -306,7 +307,8 @@ export type BlockType =
   | "shared.medium-image-with-content"
   | "shared.pros-and-cons"
   | "shared.image-carousel"
-  | "games.new-and-loved-slots";
+  | "games.new-and-loved-slots"
+  | "shared.quicklinks";
 
 export interface DynamicBlockProps {
   blockType: BlockType | string;
@@ -335,7 +337,8 @@ export interface BlockComponentProps {
 /**
  * Quicklinks block type
  */
-export interface QuicklinksBlock extends BaseBlock {
+export interface QuicklinksBlock {
+  id: number;
   __component: "shared.quicklinks";
   showQuickLinks: boolean;
 }

@@ -12,6 +12,8 @@ export { StarRatingDisplay } from "./StarRating/StarRatingDisplay";
 export { StarRatingProgressive } from "./StarRating/StarRatingProgressive";
 export { StarRatingServer } from "./StarRating/StarRatingServer";
 
+export { Button } from "./Button";
+
 // Add other UI components as they are created:
 // export { Button } from "./Button";
 // export { Card } from "./Card";

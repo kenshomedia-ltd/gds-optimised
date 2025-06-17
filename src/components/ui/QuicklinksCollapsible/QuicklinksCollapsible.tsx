@@ -113,14 +113,15 @@ export function QuicklinksCollapsible({
   }
 
   return (
-    <div className={cn("w-full bg-gray-900 rounded-lg", containerClass)}>
+    <div className={cn("w-full bg-white rounded-lg", containerClass)}>
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
           "flex items-center justify-between w-full text-left p-4",
-          "text-white hover:bg-gray-800 transition-colors rounded-lg",
+          "text-white bg-table-header-bkg transition-colors",
           "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+          isOpen ? "rounded-t-lg" : "rounded-lg",
           labelClass
         )}
         aria-expanded={isOpen}
@@ -163,7 +164,7 @@ export function QuicklinksCollapsible({
                   <button
                     onClick={() => handleScrollToSection(heading.id)}
                     className={cn(
-                      "w-full text-left text-sm text-gray-300 hover:text-white",
+                      "w-full text-left text-md text-body-text hover:text-grey-500",
                       "hover:underline transition-colors py-1.5 px-2 rounded",
                       "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                     )}
