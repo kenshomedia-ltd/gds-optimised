@@ -4,6 +4,9 @@
 /* Import your site-specific theme */
 @import "./themes/base-theme.css";
 
+/* Import plugins */
+@plugin "@tailwindcss/typography";
+
 /* Define custom utilities that Tailwind doesn't recognize */
 @theme {
 

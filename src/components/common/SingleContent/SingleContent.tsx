@@ -133,7 +133,7 @@ export function SingleContent({
           "prose prose-lg max-w-none",
 
           // Headings
-          "prose-headings:font-bold prose-headings:text-heading-text",
+          "prose-headings:font-bold prose-headings:text-heading-text prose-headings:text-center",
           "prose-h2:text-3xl prose-h2:mt-8 prose-h2:mb-4",
           "prose-h3:text-2xl prose-h3:mt-6 prose-h3:mb-3",
           "prose-h4:text-xl prose-h4:mt-4 prose-h4:mb-2",
@@ -184,17 +184,6 @@ export function SingleContent({
 
           // Horizontal rules
           "prose-hr:border-gray-300 prose-hr:my-8",
-
-          // Dark mode support (if needed)
-          "dark:prose-invert",
-          "dark:prose-headings:text-white",
-          "dark:prose-p:text-gray-300",
-          "dark:prose-a:text-primary",
-          "dark:prose-strong:text-white",
-          "dark:prose-code:bg-gray-800",
-          "dark:prose-pre:bg-gray-950",
-          "dark:prose-th:bg-gray-800",
-          "dark:hover:prose-tr:bg-gray-800",
 
           // Reduced motion support
           "motion-reduce:prose-a:transition-none",
