@@ -133,7 +133,7 @@ export function GameFilters({
   return (
     <div
       className={cn(
-        "bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4",
+        "bg-white/30 rounded-lg backdrop-blur-sm border border-white/30 shadow-sm p-4",
         className
       )}
     >
@@ -152,9 +152,8 @@ export function GameFilters({
               placeholder={translations?.searchGames || "Search games..."}
               className={cn(
                 "w-full pl-10 pr-8 py-2 rounded-lg border transition-colors",
-                "bg-transparent placeholder-gray-500",
-                "border-gray-300 dark:border-gray-600",
-                "hover:border-gray-400 dark:hover:border-gray-500",
+                "bg-gray-300 placeholder-gray-500 border-gray-300",
+                "hover:border-gray-400 hover:bg-gray-200",
                 "focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
               )}
             />
@@ -194,8 +193,8 @@ export function GameFilters({
               onBlur={() => setTimeout(() => setShowSort(false), 200)}
               className={cn(
                 "flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors",
-                "hover:bg-gray-50 dark:hover:bg-gray-700",
-                "border-gray-300 dark:border-gray-600"
+                "bg-gray-300 hover:bg-gray-200",
+                "border-gray-300"
               )}
             >
               <span>
@@ -211,15 +210,15 @@ export function GameFilters({
             </button>
 
             {showSort && (
-              <div className="absolute z-50 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
+              <div className="absolute z-50 mt-2 w-48 bg-gray-300 hover:bg-gray-200 rounded-lg shadow-lg border border-gray-300">
                 {sortOptions.map((option) => (
                   <button
                     key={option.value}
                     onClick={() => handleSortSelect(option.value)}
                     className={cn(
-                      "w-full text-left px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors",
+                      "w-full text-left px-4 py-2 bg-gray-300 hover:bg-gray-200 transition-colors",
                       selectedSort === option.value &&
-                        "bg-gray-100 dark:bg-gray-700 font-medium"
+                        "bg-gray-100 font-medium"
                     )}
                   >
                     {option.label}
@@ -237,10 +236,10 @@ export function GameFilters({
                 onBlur={() => setTimeout(() => setShowProviders(false), 200)}
                 className={cn(
                   "flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors",
-                  "hover:bg-gray-50 dark:hover:bg-gray-700",
+                  "bg-gray-300 hover:bg-gray-200",
                   selectedProviders.length > 0
                     ? "border-primary bg-primary/5 text-primary"
-                    : "border-gray-300 dark:border-gray-600"
+                    : "border-gray-300"
                 )}
               >
                 <span>
@@ -258,11 +257,11 @@ export function GameFilters({
               </button>
 
               {showProviders && (
-                <div className="absolute z-50 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 max-h-64 overflow-y-auto">
+                <div className="absolute z-50 mt-2 w-64 bg-gray-300 hover:bg-gray-200 rounded-lg shadow-lg border border-gray-300 max-h-64 overflow-y-auto">
                   {providers.map((provider) => (
                     <label
                       key={provider.slug}
-                      className="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
+                      className="flex items-center gap-3 px-4 py-2 bg-gray-300 hover:bg-gray-200 cursor-pointer"
                     >
                       <input
                         type="checkbox"
@@ -286,10 +285,10 @@ export function GameFilters({
                 onBlur={() => setTimeout(() => setShowCategories(false), 200)}
                 className={cn(
                   "flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors",
-                  "hover:bg-gray-50 dark:hover:bg-gray-700",
+                  "bg-gray-300 hover:bg-gray-200",
                   selectedCategories.length > 0
                     ? "border-primary bg-primary/5 text-primary"
-                    : "border-gray-300 dark:border-gray-600"
+                    : "border-gray-300"
                 )}
               >
                 <span>
@@ -307,11 +306,11 @@ export function GameFilters({
               </button>
 
               {showCategories && (
-                <div className="absolute z-50 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 max-h-64 overflow-y-auto">
+                <div className="absolute z-50 mt-2 w-64 bg-gray-300 hover:bg-gray-200 rounded-lg shadow-lg border border-gray-300 max-h-64 overflow-y-auto">
                   {categories.map((category) => (
                     <label
                       key={category.slug}
-                      className="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
+                      className="flex items-center gap-3 px-4 py-2 bg-gray-300 hover:bg-gray-200 cursor-pointer"
                     >
                       <input
                         type="checkbox"
