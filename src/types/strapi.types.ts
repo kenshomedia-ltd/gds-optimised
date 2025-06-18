@@ -30,6 +30,41 @@ export interface StrapiImageFormat {
   mime: string;
 }
 
+// Define types for Strapi queries
+export interface StrapiQuery {
+  fields?: string[];
+  populate?: Record<string, unknown> | string;
+  filters?: Record<string, unknown>;
+  sort?: string | string[];
+  pagination?: {
+    page?: number;
+    pageSize?: number;
+    withCount?: boolean;
+  };
+}
+
+export interface StrapiMetaResponse {
+  pagination?: {
+    page: number;
+    pageSize: number;
+    pageCount: number;
+    total: number;
+  };
+}
+
+export interface StrapiDataResponse<T> {
+  data: T;
+  meta?: StrapiMetaResponse;
+}
+
+export interface TranslationResponse {
+  data: {
+    translation?:
+      | Array<{ key: string; value: string }>
+      | Record<string, string>;
+  };
+}
+
 /**
  * SEO data structure
  */

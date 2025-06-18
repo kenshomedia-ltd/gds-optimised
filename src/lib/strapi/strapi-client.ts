@@ -8,42 +8,10 @@ import type {
   GameData,
   // BlogData,
   GamesListResponse,
+  StrapiQuery,
+  StrapiDataResponse,
+  TranslationResponse,
 } from "@/types/strapi.types";
-
-// Define types for Strapi queries
-interface StrapiQuery {
-  fields?: string[];
-  populate?: Record<string, unknown> | string;
-  filters?: Record<string, unknown>;
-  sort?: string | string[];
-  pagination?: {
-    page?: number;
-    pageSize?: number;
-    withCount?: boolean;
-  };
-}
-
-interface StrapiMetaResponse {
-  pagination?: {
-    page: number;
-    pageSize: number;
-    pageCount: number;
-    total: number;
-  };
-}
-
-interface StrapiDataResponse<T> {
-  data: T;
-  meta?: StrapiMetaResponse;
-}
-
-interface TranslationResponse {
-  data: {
-    translation?:
-      | Array<{ key: string; value: string }>
-      | Record<string, string>;
-  };
-}
 
 // Cache configuration
 const CACHE_TTL = {
@@ -122,6 +90,8 @@ class StrapiClient {
     // Fetch from API
     const data = await this.fetch<T>(endpoint, query);
 
+    console.log("data", data, query);
+    
     // Cache the result
     if (ttl && ttl > 0) {
       await cacheManager.set(cacheKey, data, cacheOptions);
@@ -154,7 +124,13 @@ class StrapiClient {
       queryString ? `?${queryString}` : ""
     }`;
 
-    console.log("url", url);
+    // Enhanced logging for game queries
+    if (endpoint === "games") {
+      console.log(`[STRAPI GAMES API] Fetching from: ${url}`);
+      console.log(`[STRAPI GAMES API] Query String:`, queryString);
+    } else {
+      console.log("url", url);
+    }
 
     let lastError: Error | null = null;
 
