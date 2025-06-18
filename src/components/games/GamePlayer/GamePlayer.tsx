@@ -8,7 +8,7 @@ import {
   faChevronDown,
   faExpand,
   faRotateRight,
-  faCircleInfo,
+  faInfo,
   faExclamationTriangle,
   faXmark,
 } from "@awesome.me/kit-0e07a43543/icons/duotone/light";
@@ -147,7 +147,7 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
   const hasImage = gameImage && gameImage.url;
 
   // Generate provider URLs
-  const siteId = process.env.NEXT_PUBLIC_SITE_ID;
+//   const siteId = process.env.NEXT_PUBLIC_SITE_ID;
   const providerPagePath = `/provider-pages/${game.provider?.slug}`;
   const casinoProviderPagePath = `/casino-providers-page/${game.provider?.slug}`;
 
@@ -165,16 +165,24 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
           <div className="absolute top-5 right-5 z-[999] flex flex-col bg-background-800/90 rounded-lg overflow-hidden hover:h-auto h-10">
             <div className="flex flex-col p-2.5 gap-1">
               <button
-                className="w-[30px] h-[30px] rounded-full bg-gameplayer-meta-btn-bkg border border-gameplayer-meta-btn-border flex items-center justify-center"
+                className="w-[30px] h-[30px] rounded-full border border-gameplayer-meta-btn-border flex items-center justify-center"
                 onClick={() => {}}
               >
-                <FontAwesomeIcon icon={faChevronDown} className="w-4 h-4" />
+                <FontAwesomeIcon
+                  icon={faChevronDown}
+                  className="w-4 h-4 fill-none"
+                  style={{ "--fa-secondary-opacity": 0 }}
+                />
               </button>
               <button
-                className="w-[30px] h-[30px] rounded-full bg-gameplayer-meta-btn-bkg border border-gameplayer-meta-btn-border flex items-center justify-center"
+                className="w-[30px] h-[30px] rounded-full border border-gameplayer-meta-btn-border flex items-center justify-center"
                 onClick={handleReload}
               >
-                <FontAwesomeIcon icon={faRotateRight} className="w-4 h-4" />
+                <FontAwesomeIcon
+                  icon={faRotateRight}
+                  className="w-4 h-4"
+                  style={{ "--fa-secondary-opacity": 0 }}
+                />
               </button>
               <FavoriteButton
                 gameId={game.id}
@@ -195,19 +203,20 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
                 }}
                 translations={translations}
                 size="sm"
-                className="!w-[30px] !h-[30px] bg-gameplayer-meta-btn-bkg mb-[5px]"
+                className="!w-[30px] !h-[30px] mb-[5px]"
               />
               <button
-                className="w-[30px] h-[30px] rounded-full bg-gameplayer-report-issue-bkg border border-gameplayer-report-issue-bdr flex items-center justify-center"
+                className="w-[30px] h-[30px] rounded-full flex items-center justify-center"
                 onClick={handleReportGame}
               >
                 <FontAwesomeIcon
                   icon={faExclamationTriangle}
                   className="w-4 h-4 text-gameplayer-report-issue-fill"
+                  style={{ "--fa-secondary-opacity": 0 }}
                 />
               </button>
               <button
-                className="w-[30px] h-[30px] rounded-full bg-gameplayer-meta-btn-bkg border border-gameplayer-meta-btn-border flex items-center justify-center"
+                className="w-[30px] h-[30px] rounded-full flex items-center justify-center"
                 onClick={handleFullscreen}
               >
                 <FontAwesomeIcon icon={faXmark} className="w-4 h-4" />
@@ -330,9 +339,9 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
       </div>
 
       {/* Control Bar */}
-      <div className="rounded-b-lg md:p-1.5 flex flex-wrap items-center bg-transparent md:bg-slate-400 justify-between md:justify-center w-full">
+      <div className="rounded-b-lg md:p-1.5 flex flex-wrap items-center bg-gray-100 justify-between md:justify-center w-full">
         {/* Game Title */}
-        <div className="p-2.5 md:p-0 flex order-1 bg-white grow md:grow-0">
+        <div className="p-2.5 md:p-0 flex order-1 grow md:grow-0">
           <div className="flex items-center md:w-[105px] md:w-auto">
             <h2 className="leading-tight text-base m-0">{game.title}</h2>
           </div>
@@ -340,12 +349,12 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
 
         {/* Center Section - Rating and Play Button */}
         <div className="px-2.5 shrink-0 justify-between basis-full flex items-center order-3 grow-0 md:basis-[300px] md:grow mt-4 md:mt-0 md:order-2">
-          <div className="bg-grey-100 p-2.5 md:p-0 md:bg-white shrink-0 justify-between basis-full flex items-center order-3 grow-0 md:basis-[300px] md:grow rounded-lg md:rounded-none md:border-0 md:order-2">
+          <div className="p-2.5 md:p-0 shrink-0 justify-between basis-full flex items-center order-3 grow-0 md:basis-[300px] md:grow rounded-lg md:rounded-none md:border-0 md:order-2">
             <div className="ml-0 md:ml-4">
               <StarRating
                 initialRating={game.ratingAvg}
                 onRatingChange={handleRatingChange}
-                size="sm"
+                size="md"
                 showValue
                 valuePosition="bottom"
                 className="flex-col"
@@ -370,7 +379,7 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
                   onFocus={() => setShowInfo(true)}
                   onBlur={() => setShowInfo(false)}
                 >
-                  <FontAwesomeIcon icon={faCircleInfo} className="w-4 h-4" />
+                  <FontAwesomeIcon icon={faInfo} className="w-4 h-4" />
                 </button>
 
                 {showInfo && game.gameInfoTable && (
@@ -428,7 +437,7 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
 
         {/* Right Section - Action Buttons */}
         {!game.isGameDisabled && (
-          <div className="order-2 md:order-3 pr-2.5 md:pr-0 flex items-center bg-white grow md:grow-0 justify-end">
+          <div className="order-2 md:order-3 p-2.5 md:pr-0 flex items-center grow md:grow-0 justify-end">
             <div className="flex gap-x-1">
               {/* Fullscreen Button */}
               <div className="relative">
@@ -440,7 +449,11 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
                   onFocus={() => setShowFullscreenTooltip(true)}
                   onBlur={() => setShowFullscreenTooltip(false)}
                 >
-                  <FontAwesomeIcon icon={faExpand} className="w-4 h-4" />
+                  <FontAwesomeIcon
+                    icon={faExpand}
+                    className="w-4 h-4"
+                    style={{ "--fa-secondary-opacity": 0 }}
+                  />
                 </button>
                 {showFullscreenTooltip && (
                   <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-5 py-2 bg-grey-100 text-black text-sm rounded shadow-lg z-20 w-[150px]">
@@ -459,7 +472,11 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
                   onFocus={() => setShowReloadTooltip(true)}
                   onBlur={() => setShowReloadTooltip(false)}
                 >
-                  <FontAwesomeIcon icon={faRotateRight} className="w-4 h-4" />
+                  <FontAwesomeIcon
+                    icon={faRotateRight}
+                    className="w-4 h-4"
+                    style={{ "--fa-secondary-opacity": 0 }}
+                  />
                 </button>
                 {showReloadTooltip && (
                   <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-5 py-2 bg-grey-100 text-black text-sm rounded shadow-lg z-20 w-[150px]">
@@ -507,7 +524,7 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
               {/* Report Button */}
               <div className="relative">
                 <button
-                  className="w-[30px] h-[30px] rounded-[5px] bg-gameplayer-report-issue-bkg border border-gameplayer-report-issue-bdr flex items-center justify-center"
+                  className="w-[30px] h-[30px] rounded-[5px] bg-danger border flex items-center justify-center"
                   onClick={handleReportGame}
                   onMouseEnter={() => setShowReportTooltip(true)}
                   onMouseLeave={() => setShowReportTooltip(false)}
@@ -516,8 +533,8 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
                 >
                   <FontAwesomeIcon
                     icon={faExclamationTriangle}
-                    className="w-4 h-4"
-                    style={{ color: "var(--gameplayer-report-issue-fill)" }}
+                    className="w-4 h-4 text-white"
+                    style={{ "--fa-secondary-opacity": 0 }}
                   />
                 </button>
                 {showReportTooltip && (

@@ -161,7 +161,7 @@ export function StarRating({
             icon={faStar}
             className={cn(
               sizeClass,
-              "text-gray-300 transition-colors duration-150"
+              "text-gray-400 transition-colors duration-150"
             )}
           />
 
@@ -215,8 +215,8 @@ export function StarRating({
           className={cn(
             "font-medium text-gray-600 tabular-nums",
             valuePosition === "right"
-              ? "ml-2 text-sm"
-              : "mt-1 text-center text-sm"
+              ? "text-sm"
+              : "text-center text-sm"
           )}
           aria-live="polite"
           aria-atomic="true"
