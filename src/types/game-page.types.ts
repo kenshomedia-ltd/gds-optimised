@@ -97,6 +97,7 @@ export interface GameCategory {
   id: number;
   documentId: string;
   title: string;
+  slug: string;
 }
 
 /**
@@ -137,6 +138,10 @@ export interface GamePageData {
   images?: StrapiImage;
   provider?: GameProvider;
   seo?: SEOData;
+  // Date fields that were missing
+  createdAt?: string;
+  updatedAt?: string;
+  publishedAt?: string;
 }
 
 /**
@@ -162,6 +167,8 @@ export interface GamePlayerState {
  */
 export interface GamePageSplitData {
   staticData: {
+    id: number;
+    documentId?: string;
     title: string;
     heading?: string;
     slug: string;
@@ -174,6 +181,9 @@ export interface GamePageSplitData {
     faqs?: FAQ[];
     gameInfoTable?: GameInfoTable;
     seo?: SEOData;
+    createdAt?: string;
+    updatedAt?: string;
+    publishedAt?: string;
   };
   dynamicData: {
     ratingAvg: number;

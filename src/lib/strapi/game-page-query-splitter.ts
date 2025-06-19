@@ -6,11 +6,16 @@ import type { GamePageData, GamePageSplitData } from "@/types/game-page.types";
  * Static fields that rarely change (good for ISR)
  */
 export const GAME_STATIC_FIELDS = [
+  "id",
+  "documentId",
   "title",
   "heading",
   "slug",
   "introduction",
   "content1",
+  "createdAt",
+  "updatedAt",
+  "publishedAt",
 ] as const;
 
 /**
@@ -186,6 +191,8 @@ export function createGameDynamicQuery(slug: string) {
 export function splitGamePageData(data: GamePageData): GamePageSplitData {
   return {
     staticData: {
+      id: data.id,
+      documentId: data.documentId,
       title: data.title,
       heading: data.heading,
       slug: data.slug,
@@ -198,6 +205,9 @@ export function splitGamePageData(data: GamePageData): GamePageSplitData {
       faqs: data.faqs,
       gameInfoTable: data.gameInfoTable,
       seo: data.seo,
+      createdAt: data.createdAt,
+      updatedAt: data.updatedAt,
+      publishedAt: data.publishedAt,
     },
     dynamicData: {
       ratingAvg: data.ratingAvg,
@@ -224,10 +234,5 @@ export function mergeGamePageData(
   return {
     ...staticData,
     ...dynamicData,
-    id: 0, // These will be set from the actual data
-    documentId: "",
-    createdAt: "",
-    updatedAt: "",
-    publishedAt: "",
-  } as GamePageData;
+  };
 }

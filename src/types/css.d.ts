@@ -24,8 +24,11 @@ declare module "csstype" {
 }
 
 // Extend React's CSSProperties to ensure objectFit is recognized
-declare module 'react' {
+declare module "react" {
   interface CSSProperties {
-    objectFit?: CSS.Property.ObjectFit;
+    objectFit?: import("csstype").Property.ObjectFit;
   }
 }
+
+// This line ensures the file is treated as a module and allows for module augmentation.
+export {};

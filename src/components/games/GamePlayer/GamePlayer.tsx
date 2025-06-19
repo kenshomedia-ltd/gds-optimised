@@ -146,8 +146,25 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
   const gameImage = Array.isArray(game.images) ? game.images[0] : game.images;
   const hasImage = gameImage && gameImage.url;
 
+  // Create a normalized game object with default values for optional date fields
+  const normalizedGame = {
+    id: game.id,
+    documentId: game.documentId,
+    title: game.title,
+    slug: game.slug,
+    ratingAvg: game.ratingAvg,
+    ratingCount: game.ratingCount,
+    publishedAt: game.publishedAt,
+    provider: game.provider,
+    images: gameImage,
+    categories: game.categories,
+    // Provide default values for optional date fields
+    createdAt: game.createdAt || new Date().toISOString(),
+    updatedAt: game.updatedAt || new Date().toISOString(),
+  };
+
   // Generate provider URLs
-//   const siteId = process.env.NEXT_PUBLIC_SITE_ID;
+  //   const siteId = process.env.NEXT_PUBLIC_SITE_ID;
   const providerPagePath = `/provider-pages/${game.provider?.slug}`;
   const casinoProviderPagePath = `/casino-providers-page/${game.provider?.slug}`;
 
@@ -187,20 +204,7 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
               <FavoriteButton
                 gameId={game.id}
                 gameTitle={game.title}
-                game={{
-                  id: game.id,
-                  documentId: game.documentId,
-                  title: game.title,
-                  slug: game.slug,
-                  ratingAvg: game.ratingAvg,
-                  ratingCount: game.ratingCount,
-                  publishedAt: game.publishedAt,
-                  provider: game.provider,
-                  images: gameImage,
-                  categories: game.categories,
-                  createdAt: game.createdAt,
-                  updatedAt: game.updatedAt,
-                }}
+                game={normalizedGame}
                 translations={translations}
                 size="sm"
                 className="!w-[30px] !h-[30px] mb-[5px]"
@@ -496,20 +500,7 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
                 <FavoriteButton
                   gameId={game.id}
                   gameTitle={game.title}
-                  game={{
-                    id: game.id,
-                    documentId: game.documentId,
-                    title: game.title,
-                    slug: game.slug,
-                    ratingAvg: game.ratingAvg,
-                    ratingCount: game.ratingCount,
-                    publishedAt: game.publishedAt,
-                    provider: game.provider,
-                    images: gameImage,
-                    categories: game.categories,
-                    createdAt: game.createdAt,
-                    updatedAt: game.updatedAt,
-                  }}
+                  game={normalizedGame}
                   translations={translations}
                   size="sm"
                   className="!w-[30px] !h-[30px] bg-grey-300 rounded-[5px] border border-grey-500"

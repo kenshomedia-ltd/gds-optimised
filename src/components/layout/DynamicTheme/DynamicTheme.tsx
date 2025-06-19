@@ -17,12 +17,6 @@ const DynamicTheme = async ({ siteId }: { siteId: string }) => {
     console.log(
       `'${siteId}-theme.css' not found. Falling back to 'gds-theme.css'. | Error: ${error}`
     );
-
-    try {
-      await import("@/app/themes/gds-theme.css");
-    } catch (fallbackError) {
-      console.error(`Failed to load default theme: ${fallbackError}`);
-    }
   }
 
   // This component doesn't render any JSX.

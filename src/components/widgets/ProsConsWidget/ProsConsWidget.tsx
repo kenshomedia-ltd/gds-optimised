@@ -2,10 +2,10 @@
 "use client";
 
 import { cn } from "@/lib/utils/cn";
-import type { ProsCons } from "@/types/game-page.types";
+import type { ProsConsSection } from "@/types/game-page.types";
 
 interface ProsConsWidgetProps {
-  proscons: ProsCons;
+  proscons: ProsConsSection;
   className?: string;
 }
 
@@ -57,26 +57,12 @@ export function ProsConsWidget({ proscons, className }: ProsConsWidgetProps) {
               Pros
             </h3>
             <ul className="space-y-3">
-              {proscons.pros.map((pro, index) => {
-                // Handle both string and object formats
-                const proText = typeof pro === "string" ? pro : pro.list || "";
-                return (
-                  <li key={index} className="flex items-start">
-                    <svg
-                      className="w-5 h-5 text-green-600 mt-0.5 mr-3 flex-shrink-0"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    <span className="text-gray-700">{proText}</span>
-                  </li>
-                );
-              })}
+              {proscons.pros.map((pro, index) => (
+                <li key={index} className="flex items-start text-green-700">
+                  <span className="mr-2 mt-1 flex-shrink-0">•</span>
+                  <span>{pro.list}</span>
+                </li>
+              ))}
             </ul>
           </div>
         )}
@@ -99,26 +85,12 @@ export function ProsConsWidget({ proscons, className }: ProsConsWidgetProps) {
               Cons
             </h3>
             <ul className="space-y-3">
-              {proscons.cons.map((con, index) => {
-                // Handle both string and object formats
-                const conText = typeof con === "string" ? con : con.list || "";
-                return (
-                  <li key={index} className="flex items-start">
-                    <svg
-                      className="w-5 h-5 text-red-600 mt-0.5 mr-3 flex-shrink-0"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    <span className="text-gray-700">{conText}</span>
-                  </li>
-                );
-              })}
+              {proscons.cons.map((con, index) => (
+                <li key={index} className="flex items-start text-red-700">
+                  <span className="mr-2 mt-1 flex-shrink-0">•</span>
+                  <span>{con.list}</span>
+                </li>
+              ))}
             </ul>
           </div>
         )}

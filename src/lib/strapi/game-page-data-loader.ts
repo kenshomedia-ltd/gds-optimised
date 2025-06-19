@@ -10,7 +10,7 @@ import {
   createGameDynamicQuery,
   mergeGamePageData,
 } from "./game-page-query-splitter";
-import type { GamePageData } from "@/types/game-page.types";
+import type { GamePageData, GamePageSplitData } from "@/types/game-page.types";
 
 /**
  * Revalidation times for different data types
@@ -24,7 +24,10 @@ const REVALIDATE_TIMES = {
  * Fetch static game data with caching
  */
 const getGameStaticDataCached = cache(
-  async (slug: string, forceRefresh: boolean = false) => {
+  async (
+    slug: string,
+    forceRefresh: boolean = false
+  ): Promise<GamePageSplitData["staticData"] | null> => {
     const cacheKey = `game-static-${slug}`;
 
     console.log(
@@ -36,8 +39,22 @@ const getGameStaticDataCached = cache(
       if (!forceRefresh) {
         const cached = await cacheManager.get(cacheKey);
         if (cached.data !== null && cached.data !== undefined) {
-          console.log(`Game static data cache hit for: ${slug}`);
-          return cached.data;
+          // Validate the cached data has the expected structure
+          if (
+            typeof cached.data === "object" &&
+            "title" in cached.data &&
+            "slug" in cached.data &&
+            "id" in cached.data
+          ) {
+            console.log(`Game static data cache hit for: ${slug}`);
+            return cached.data as GamePageSplitData["staticData"];
+          } else {
+            console.warn(
+              `Invalid cached static data for ${slug}, refetching...`
+            );
+            // Invalid cache data, delete it
+            await cacheManager.delete(cacheKey);
+          }
         }
       } else {
         console.log(
@@ -74,7 +91,9 @@ const getGameStaticDataCached = cache(
         return null;
       }
 
-      const staticData = {
+      const staticData: GamePageSplitData["staticData"] = {
+        id: response.data[0].id,
+        documentId: response.data[0].documentId,
         title: response.data[0].title,
         heading: response.data[0].heading,
         slug: response.data[0].slug,
@@ -87,6 +106,9 @@ const getGameStaticDataCached = cache(
         faqs: response.data[0].faqs,
         gameInfoTable: response.data[0].gameInfoTable,
         seo: response.data[0].seo,
+        createdAt: response.data[0].createdAt,
+        updatedAt: response.data[0].updatedAt,
+        publishedAt: response.data[0].publishedAt,
       };
 
       console.log(
@@ -112,7 +134,10 @@ const getGameStaticDataCached = cache(
  * Fetch dynamic game data with caching
  */
 const getGameDynamicDataCached = cache(
-  async (slug: string, forceRefresh: boolean = false) => {
+  async (
+    slug: string,
+    forceRefresh: boolean = false
+  ): Promise<GamePageSplitData["dynamicData"] | null> => {
     const cacheKey = `game-dynamic-${slug}`;
 
     console.log(
@@ -124,8 +149,22 @@ const getGameDynamicDataCached = cache(
       if (!forceRefresh) {
         const cached = await cacheManager.get(cacheKey);
         if (cached.data !== null && cached.data !== undefined) {
-          console.log(`Game dynamic data cache hit for: ${slug}`);
-          return cached.data;
+          // Validate the cached data has the expected structure
+          if (
+            typeof cached.data === "object" &&
+            "ratingAvg" in cached.data &&
+            "ratingCount" in cached.data &&
+            "views" in cached.data
+          ) {
+            console.log(`Game dynamic data cache hit for: ${slug}`);
+            return cached.data as GamePageSplitData["dynamicData"];
+          } else {
+            console.warn(
+              `Invalid cached dynamic data for ${slug}, refetching...`
+            );
+            // Invalid cache data, delete it
+            await cacheManager.delete(cacheKey);
+          }
         }
       } else {
         console.log(
@@ -174,7 +213,7 @@ const getGameDynamicDataCached = cache(
         return null;
       }
 
-      const dynamicData = {
+      const dynamicData: GamePageSplitData["dynamicData"] = {
         ratingAvg: response.data[0].ratingAvg,
         ratingCount: response.data[0].ratingCount,
         views: response.data[0].views,
@@ -237,8 +276,10 @@ const getGameDynamicDataCached = cache(
  * Next.js unstable_cache for persistent static data
  */
 const getGameStaticDataPersistent = unstable_cache(
-  async (slug: string) => {
-    return getGameStaticDataCached(slug);
+  async (slug: string): Promise<GamePageSplitData["staticData"] | null> => {
+    const result = await getGameStaticDataCached(slug);
+    // Ensure we return null if result is falsy
+    return result || null;
   },
   ["game-static"],
   {
@@ -251,8 +292,10 @@ const getGameStaticDataPersistent = unstable_cache(
  * Next.js unstable_cache for persistent dynamic data
  */
 const getGameDynamicDataPersistent = unstable_cache(
-  async (slug: string) => {
-    return getGameDynamicDataCached(slug);
+  async (slug: string): Promise<GamePageSplitData["dynamicData"] | null> => {
+    const result = await getGameDynamicDataCached(slug);
+    // Ensure we return null if result is falsy
+    return result || null;
   },
   ["game-dynamic"],
   {
@@ -298,33 +341,23 @@ export async function getGamePageData(
     console.log(`[Game Page Data Loader] Static data value:`, staticData);
     console.log(`[Game Page Data Loader] Dynamic data value:`, dynamicData);
 
-    if (!staticData || !dynamicData) {
-      console.log(
-        `[Game Page Data Loader] Missing data - Static: ${!!staticData}, Dynamic: ${!!dynamicData}`
-      );
+    // Type guard to ensure we have the right data
+    if (
+      !staticData ||
+      typeof staticData !== "object" ||
+      !("title" in staticData) ||
+      !("slug" in staticData)
+    ) {
+      console.log(`[Game Page Data Loader] Invalid static data structure`);
+      return null;
+    }
 
-      // Log what we got back to debug
-      if (staticData !== null && staticData !== undefined) {
-        console.log(
-          `[Game Page Data Loader] Static data type:`,
-          typeof staticData
-        );
-        console.log(
-          `[Game Page Data Loader] Static data structure:`,
-          Object.keys(staticData)
-        );
-      }
-      if (dynamicData !== null && dynamicData !== undefined) {
-        console.log(
-          `[Game Page Data Loader] Dynamic data type:`,
-          typeof dynamicData
-        );
-        console.log(
-          `[Game Page Data Loader] Dynamic data structure:`,
-          Object.keys(dynamicData)
-        );
-      }
-
+    if (
+      !dynamicData ||
+      typeof dynamicData !== "object" ||
+      !("ratingAvg" in dynamicData)
+    ) {
+      console.log(`[Game Page Data Loader] Invalid dynamic data structure`);
       return null;
     }
 
