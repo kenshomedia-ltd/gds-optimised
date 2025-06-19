@@ -3,10 +3,7 @@
 import { unstable_cache } from "next/cache";
 import { cache } from "react";
 import { strapiClient } from "./strapi-client";
-import {
-  splitCasinoPageData,
-  mergeCasinoPageData,
-} from "./casino-page-query-splitter";
+import { mergeCasinoPageData } from "./casino-page-query-splitter";
 import type {
   CasinoPageData,
   CasinoPageDataResponse,
@@ -33,6 +30,8 @@ function buildStaticCasinoQuery(slug: string) {
       "slug",
       "createdAt",
       "updatedAt",
+      "publishedAt",
+      "documentId",
       "heading",
       "introduction",
       "content1",
@@ -305,20 +304,24 @@ async function fetchStaticCasinoData(
 ): Promise<CasinoPageSplitData["staticData"] | null> {
   const staticQuery = buildStaticCasinoQuery(slug);
 
+  // Use a more flexible type for the response
   const response = await strapiClient.fetchWithCache<{
-    data: Array<Partial<CasinoPageData>>;
+    data: Array<CasinoPageData & { updatedAt?: string; publishedAt: string }>;
   }>("casinos", staticQuery, REVALIDATE_TIMES.structure);
 
   const data = response.data?.[0];
 
-  if (!data) return null;
+  if (!data) {
+    return null;
+  }
 
-  // Return only static fields
+  // Return only static fields with proper type checking
   return {
-    id: data.id!,
-    documentId: data.documentId!,
-    title: data.title!,
-    slug: data.slug!,
+    id: data.id,
+    documentId: data.documentId,
+    title: data.title,
+    slug: data.slug,
+    publishedAt: data.publishedAt,
     heading: data.heading,
     introduction: data.introduction,
     content1: data.content1,
@@ -350,25 +353,27 @@ async function fetchDynamicCasinoData(
   const dynamicQuery = buildDynamicCasinoQuery(slug);
 
   const response = await strapiClient.fetchWithCache<{
-    data: Array<Partial<CasinoPageData>>;
+    data: CasinoPageData[];
   }>("casinos", dynamicQuery, REVALIDATE_TIMES.dynamic);
 
   const data = response.data?.[0];
 
-  if (!data) return null;
+  if (!data) {
+    return null;
+  }
 
-  // Return only dynamic fields
+  // Return only dynamic fields with proper type checking
   return {
-    ratingAvg: data.ratingAvg!,
-    ratingCount: data.ratingCount!,
+    ratingAvg: data.ratingAvg,
+    ratingCount: data.ratingCount,
     authorRatings: data.authorRatings,
     playthrough: data.playthrough,
-    images: data.images!,
-    bonusSection: data.bonusSection!,
+    images: data.images,
+    bonusSection: data.bonusSection,
     noDepositSection: data.noDepositSection,
     freeSpinsSection: data.freeSpinsSection,
-    termsAndConditions: data.termsAndConditions!,
-    casinoBonus: data.casinoBonus!,
+    termsAndConditions: data.termsAndConditions,
+    casinoBonus: data.casinoBonus,
     providers: undefined, // Will be fetched separately
     casinoComparison: undefined, // Will be fetched separately
   };

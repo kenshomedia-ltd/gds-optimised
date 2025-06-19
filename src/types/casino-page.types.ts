@@ -141,6 +141,7 @@ export interface CasinoPageData extends CasinoData {
   casinoComparison?: CasinoData[];
   paymentChannels?: PaymentChannel[];
   blocks?: ImageCarouselBlock[];
+  updatedAt?: string;
 }
 
 /**
@@ -152,6 +153,7 @@ export interface CasinoPageSplitData {
     documentId: string;
     title: string;
     slug: string;
+    publishedAt: string;
     heading?: string;
     introduction?: string;
     content1?: string;

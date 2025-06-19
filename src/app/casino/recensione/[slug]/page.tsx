@@ -244,7 +244,7 @@ export default async function CasinoReviewPage({
         <p className="text-sm text-yellow-800">
           <strong>Note:</strong> This is a dummy implementation that displays
           the casino data structure. Replace this with actual casino review
-          components following the project's component patterns.
+          components following the project&apos;s component patterns.
         </p>
       </div>
     </div>

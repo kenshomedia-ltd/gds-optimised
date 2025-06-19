@@ -7,8 +7,6 @@ import type {
   CasinoPageSplitData,
   CasinoPageDataResponse,
 } from "@/types/casino-page.types";
-import type { GameProvider } from "@/types/game.types";
-import type { CasinoData } from "@/types/casino.types";
 
 // Cache configuration for different parts
 const CACHE_CONFIG = {
@@ -243,6 +241,7 @@ export function splitCasinoPageData(data: CasinoPageData): CasinoPageSplitData {
       documentId: data.documentId,
       title: data.title,
       slug: data.slug,
+      publishedAt: data.publishedAt,
       heading: data.heading,
       introduction: data.introduction,
       content1: data.content1,
@@ -295,10 +294,11 @@ export function mergeCasinoPageData(
 
 /**
  * Fetch casino page data with split queries
+ * This function is internal and not exported directly
  */
-const getCasinoPageDataWithSplitQueries = async (
+async function getCasinoPageDataWithSplitQueries(
   slug: string
-): Promise<CasinoPageDataResponse> => {
+): Promise<CasinoPageDataResponse> {
   try {
     // Fetch the main casino data
     const query = buildCasinoPageQuery(slug);
@@ -334,7 +334,19 @@ const getCasinoPageDataWithSplitQueries = async (
       comparisonCasinos: [],
     };
   }
-};
+}
+
+/**
+ * Export the cached version of the split query
+ */
+export const getCasinoPageDataSplit = unstable_cache(
+  getCasinoPageDataWithSplitQueries,
+  ["casino-page-data-split"],
+  {
+    revalidate: 60, // 1 minute base revalidation
+    tags: ["casino-page"],
+  }
+);
 
 /**
  * Cached metadata fetcher
