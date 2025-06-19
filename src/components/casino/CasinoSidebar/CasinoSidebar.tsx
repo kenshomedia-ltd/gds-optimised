@@ -11,9 +11,9 @@ import { cn } from "@/lib/utils/cn";
  *
  * Features:
  * - Three sections: Most Loved, No Deposit, Free Spins
- * - Sticky positioning within container bounds
+ * - Sticky positioning within container bounds (desktop only)
  * - Stops before footer
- * - Responsive behavior
+ * - Responsive behavior - no sticky on mobile
  */
 export function CasinoSidebar({
   casinos,
@@ -25,10 +25,25 @@ export function CasinoSidebar({
   const containerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
+    // Check if we're on mobile/tablet (lg breakpoint is 1024px)
+    const checkIfMobile = () => window.innerWidth < 1024;
+
+    // If mobile, don't apply any sticky behavior
+    if (checkIfMobile()) {
+      setStickyStyles({});
+      return;
+    }
+
     // Find the main container
     containerRef.current = sidebarRef.current?.closest(".main") as HTMLElement;
 
     const handleScroll = () => {
+      // Double-check we're not on mobile
+      if (checkIfMobile()) {
+        setStickyStyles({});
+        return;
+      }
+
       if (!sidebarRef.current || !containerRef.current) return;
 
       const sidebar = sidebarRef.current;
@@ -70,13 +85,22 @@ export function CasinoSidebar({
       }
     };
 
+    const handleResize = () => {
+      // If window is resized to mobile, remove sticky styles
+      if (checkIfMobile()) {
+        setStickyStyles({});
+      } else {
+        handleScroll();
+      }
+    };
+
     window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("resize", handleScroll, { passive: true });
+    window.addEventListener("resize", handleResize, { passive: true });
     handleScroll(); // Initial check
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", handleScroll);
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
 

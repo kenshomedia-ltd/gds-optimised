@@ -64,8 +64,7 @@ export const categoryQueryChunk = {
   },
 };
 
-export const casinoQueryChunk = (
-  casinoCountry?: string,
+export const casinoTableQueryChunk = (
   includeFullData = false
 ) => ({
   fields: includeFullData
@@ -83,13 +82,6 @@ export const casinoQueryChunk = (
       },
     }),
   },
-  filters: casinoCountry
-    ? {
-        countries: {
-          $containsi: casinoCountry,
-        },
-      }
-    : undefined,
 });
 
 export const gameQueryChunk = {
@@ -266,8 +258,8 @@ export const blockQueryChunks: BlockQueryChunks = {
       casinosList: {
         fields: ["casinoName"],
         populate: {
-          casino: (casinoCountry?: string) =>
-            casinoQueryChunk(casinoCountry, true),
+          casino: () =>
+            casinoTableQueryChunk(true),
         },
       },
     },

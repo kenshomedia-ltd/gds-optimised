@@ -35,13 +35,9 @@ const getGameStaticDataCached = cache(
       // Try to get from Redis cache first (unless force refresh)
       if (!forceRefresh) {
         const cached = await cacheManager.get(cacheKey);
-        if (cached) {
+        if (cached.data !== null && cached.data !== undefined) {
           console.log(`Game static data cache hit for: ${slug}`);
-          // Check if it's the new cache format with data/isStale
-          if (cached.data !== undefined) {
-            return cached.data;
-          }
-          return cached;
+          return cached.data;
         }
       } else {
         console.log(
@@ -74,6 +70,7 @@ const getGameStaticDataCached = cache(
 
       if (!response?.data?.[0]) {
         console.log(`[Game Static Query] No data found for slug: ${slug}`);
+        // Don't cache null results
         return null;
       }
 
@@ -98,7 +95,10 @@ const getGameStaticDataCached = cache(
       );
 
       // Cache the result
-      await cacheManager.set(cacheKey, staticData, REVALIDATE_TIMES.static);
+      await cacheManager.set(cacheKey, staticData, {
+        ttl: REVALIDATE_TIMES.static,
+        swr: REVALIDATE_TIMES.static * 2,
+      });
 
       return staticData;
     } catch (error) {
@@ -123,13 +123,9 @@ const getGameDynamicDataCached = cache(
       // Try to get from Redis cache first (unless force refresh)
       if (!forceRefresh) {
         const cached = await cacheManager.get(cacheKey);
-        if (cached) {
+        if (cached.data !== null && cached.data !== undefined) {
           console.log(`Game dynamic data cache hit for: ${slug}`);
-          // Check if it's the new cache format with data/isStale
-          if (cached.data !== undefined) {
-            return cached.data;
-          }
-          return cached;
+          return cached.data;
         }
       } else {
         console.log(
@@ -174,6 +170,7 @@ const getGameDynamicDataCached = cache(
 
       if (!response?.data?.[0]) {
         console.log(`[Game Dynamic Query] No data found for slug: ${slug}`);
+        // Don't cache null results
         return null;
       }
 
@@ -223,7 +220,10 @@ const getGameDynamicDataCached = cache(
       }
 
       // Cache the result
-      await cacheManager.set(cacheKey, dynamicData, REVALIDATE_TIMES.dynamic);
+      await cacheManager.set(cacheKey, dynamicData, {
+        ttl: REVALIDATE_TIMES.dynamic,
+        swr: REVALIDATE_TIMES.dynamic * 2,
+      });
 
       return dynamicData;
     } catch (error) {
@@ -365,4 +365,19 @@ export async function prefetchGameData(slug: string) {
   } catch (error) {
     console.error(`Failed to prefetch game data for ${slug}:`, error);
   }
+}
+
+/**
+ * Clear game cache for a specific slug
+ */
+export async function clearGameCache(slug: string) {
+  const staticKey = `game-static-${slug}`;
+  const dynamicKey = `game-dynamic-${slug}`;
+
+  await Promise.all([
+    cacheManager.delete(staticKey),
+    cacheManager.delete(dynamicKey),
+  ]);
+
+  console.log(`[Game Cache] Cleared cache for slug: ${slug}`);
 }

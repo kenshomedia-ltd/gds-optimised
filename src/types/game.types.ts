@@ -6,7 +6,7 @@ import type { StrapiImage } from "./strapi.types";
  * Game provider structure
  */
 export interface GameProvider {
-  id: number;
+  id?: number;
   documentId?: string;
   title: string;
   slug: string;

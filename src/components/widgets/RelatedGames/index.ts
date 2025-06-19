@@ -1,0 +1,1 @@
+export { RelatedGames } from "./RelatedGames";

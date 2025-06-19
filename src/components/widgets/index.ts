@@ -21,6 +21,12 @@ export { Testimonials, TestimonialsSkeleton } from "./Testimonials";
 // Quicklinks widget
 export { QuicklinksWidget } from "./QuicklinksWidget";
 
+// FAQ widget
+export { FAQWidget } from "./FAQWidget";
+
+// ProsCons widget
+export { ProsConsWidget } from "./ProsConsWidget";
+
 // HowTo widget
 export { HowTo, HowToSkeleton, HowToServer } from "./HowTo";
 
