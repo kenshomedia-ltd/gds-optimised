@@ -9,3 +9,23 @@ declare module "@/app/themes/*.css" {
   const content: { [className: string]: string };
   export default content;
 }
+
+declare module "csstype" {
+  interface Properties {
+    // FontAwesome custom properties
+    "--fa-primary-opacity"?: number | string;
+    "--fa-secondary-opacity"?: number | string;
+    "--fa-primary-color"?: string;
+    "--fa-secondary-color"?: string;
+
+    // Add other custom properties your project uses
+    [key: `--${string}`]: string | number | undefined;
+  }
+}
+
+// Extend React's CSSProperties to ensure objectFit is recognized
+declare module 'react' {
+  interface CSSProperties {
+    objectFit?: CSS.Property.ObjectFit;
+  }
+}

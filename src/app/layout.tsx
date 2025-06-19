@@ -7,6 +7,7 @@ import DynamicTheme from "@/components/layout/DynamicTheme/DynamicTheme";
 import { Header } from "@/components/layout/Header";
 import { FooterServer } from "@/components/layout/Footer";
 import { ClientProviders } from "@/components/providers/ClientProviders";
+import { BackToTop } from "@/components/common/BackToTop/BackToTop";
 import { Toaster } from "sonner";
 
 // Font Awesome
@@ -155,6 +156,8 @@ export default async function RootLayout({
             },
           }}
         />
+        {/* Back to Top Button */}
+        <BackToTop />
       </body>
     </html>
   );

@@ -1,5 +1,4 @@
 // src/components/blog/BlogList/BlogList.tsx
-"use client";
 
 import { BlogCard } from "../BlogCard/BlogCard";
 import type { BlogListProps } from "@/types/blog.types";
@@ -9,6 +8,7 @@ import { cn } from "@/lib/utils/cn";
  * BlogList Component
  *
  * Features:
+ * - Server-side rendered for better performance
  * - Responsive grid layout
  * - Progressive loading
  * - Optimized rendering

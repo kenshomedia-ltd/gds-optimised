@@ -61,7 +61,7 @@ export function GameCard({
     : null;
 
   // Generate URLs
-  const gamePagePath = process.env.NEXT_PUBLIC_GAME_PAGE_PATH || "/games";
+  const gamePagePath = process.env.NEXT_PUBLIC_GAME_PAGE_PATH || "/slot-machines";
   const providerPagePath =
     process.env.NEXT_PUBLIC_PROVIDER_PAGE_PATH || "/providers";
   const gameUrl = `${gamePagePath}/${game.slug}`;

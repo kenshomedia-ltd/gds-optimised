@@ -2,17 +2,15 @@
 
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
 import { getGamePageData } from "@/lib/strapi/game-page-data-loader";
 import { getLayoutData } from "@/lib/strapi/data-loader";
 import { getCasinoSidebarData } from "@/lib/strapi/casino-sidebar-loader";
 import { fetchRelatedGames } from "@/lib/strapi/fetch-related-games";
-import { GamePlayer, GamePlayerSkeleton } from "@/components/games/GamePlayer";
+import { GamePlayer } from "@/components/games/GamePlayer";
 import { RelatedGames } from "@/components/widgets/RelatedGames";
 import { DynamicBlock } from "@/components/common/DynamicBlock";
 import { BreadcrumbsWithLayout } from "@/components/layout/Breadcrumbs";
 import { SingleContent } from "@/components/common/SingleContent";
-import { HeaderAuthor } from "@/components/common/HeaderAuthor";
 import { FAQWidget } from "@/components/widgets/FAQWidget";
 import { ProsConsWidget } from "@/components/widgets/ProsConsWidget";
 import { AuthorBox } from "@/components/common/AuthorBox/AuthorBox";
@@ -337,21 +335,25 @@ async function GameContent({ game }: { game: GamePageData }) {
                     <h2 className="text-2xl font-bold mb-4">
                       {game.howTo!.title}
                     </h2>
-                    {game.howTo!.howToIntro && (
+                    {game.howTo!.description && (
                       <p className="text-gray-700 mb-6">
-                        {game.howTo!.howToIntro}
+                        {game.howTo!.description}
                       </p>
                     )}
                     <div className="space-y-6">
-                      {game.howTo!.howToGroup.map((item) => (
+                      {game.howTo!.howToGroup!.map((item) => (
                         <div
                           key={item.id}
                           className="border-l-4 border-blue-500 pl-4"
                         >
-                          <h3 className="text-lg font-semibold mb-2">
-                            {item.title}
-                          </h3>
-                          <p className="text-gray-700">{item.description}</p>
+                          {item.heading && (
+                            <h3 className="text-lg font-semibold mb-2">
+                              {item.heading}
+                            </h3>
+                          )}
+                          {item.copy && (
+                            <p className="text-gray-700">{item.copy}</p>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -442,10 +444,8 @@ export default async function GamePage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(gameSchema) }}
       />
 
-      {/* Main Content with Suspense */}
-      <Suspense fallback={<GamePlayerSkeleton />}>
-        <GameContent game={game} />
-      </Suspense>
+      {/* Main Content - No Suspense needed for server components */}
+      <GameContent game={game} />
     </>
   );
 }

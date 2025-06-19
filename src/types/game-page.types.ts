@@ -1,13 +1,12 @@
 // src/types/game-page.types.ts
 
-import type { StrapiBaseEntity, ImageData, SEOData } from "./strapi.types";
-import type { GameData } from "./game.types";
-import type { AuthorData } from "./author.types";
+import type { StrapiImage, SEOData, Author } from "./strapi.types";
 
 /**
  * Game info table structure from Strapi
  */
 export interface GameInfoTable {
+  id: number;
   rtp?: string;
   volatilita?: string;
   layout?: string;
@@ -37,13 +36,21 @@ export interface FAQ {
 }
 
 /**
+ * Pros/cons item structure
+ */
+export interface ProConItem {
+  id: number;
+  list: string;
+}
+
+/**
  * How-to group structure
  */
 export interface HowToGroup {
   id: number;
   heading?: string;
   copy?: string;
-  image?: ImageData;
+  image?: StrapiImage;
 }
 
 /**
@@ -61,10 +68,11 @@ export interface HowToSection {
  */
 export interface ProsConsSection {
   id: number;
-  pros?: Array<string | { id: number; list: string }>;
-  cons?: Array<string | { id: number; list: string }>;
-  proImage?: ImageData;
-  conImage?: ImageData;
+  heading?: string;
+  pros?: ProConItem[];
+  cons?: ProConItem[];
+  proImage?: StrapiImage;
+  conImage?: StrapiImage;
 }
 
 /**
@@ -74,7 +82,7 @@ export interface ImageCarouselBlock {
   id: number;
   __component: "shared.image-carousel";
   carouselTitle?: string;
-  image?: ImageData[];
+  image?: StrapiImage[];
 }
 
 /**
@@ -83,9 +91,30 @@ export interface ImageCarouselBlock {
 export type GamePageBlock = ImageCarouselBlock;
 
 /**
+ * Category structure
+ */
+export interface GameCategory {
+  id: number;
+  documentId: string;
+  title: string;
+}
+
+/**
+ * Provider structure
+ */
+export interface GameProvider {
+  id: number;
+  documentId: string;
+  title: string;
+  slug: string;
+}
+
+/**
  * Complete game page data structure
  */
-export interface GamePageData extends StrapiBaseEntity {
+export interface GamePageData {
+  id: number;
+  documentId?: string;
   title: string;
   heading?: string;
   slug: string;
@@ -93,23 +122,20 @@ export interface GamePageData extends StrapiBaseEntity {
   content1?: string;
   ratingAvg: number;
   ratingCount: number;
-  views?: number;
+  views: number;
   isGameDisabled?: boolean;
   gameDisableText?: string;
-  gamesApiOverride?: string;
+  gamesApiOverride?: boolean;
   blocks?: GamePageBlock[];
-  author?: AuthorData;
+  author?: Author;
   howTo?: HowToSection;
   proscons?: ProsConsSection;
-  categories?: Array<{ title: string }>;
+  categories?: GameCategory[];
   embedCode?: EmbedCode;
   faqs?: FAQ[];
   gameInfoTable?: GameInfoTable;
-  images?: ImageData[];
-  provider?: {
-    title: string;
-    slug: string;
-  };
+  images?: StrapiImage;
+  provider?: GameProvider;
   seo?: SEOData;
 }
 
@@ -142,7 +168,7 @@ export interface GamePageSplitData {
     introduction?: string;
     content1?: string;
     blocks?: GamePageBlock[];
-    author?: AuthorData;
+    author?: Author;
     howTo?: HowToSection;
     proscons?: ProsConsSection;
     faqs?: FAQ[];
@@ -152,16 +178,13 @@ export interface GamePageSplitData {
   dynamicData: {
     ratingAvg: number;
     ratingCount: number;
-    views?: number;
+    views: number;
     isGameDisabled?: boolean;
     gameDisableText?: string;
-    gamesApiOverride?: string;
+    gamesApiOverride?: boolean;
     embedCode?: EmbedCode;
-    images?: ImageData[];
-    provider?: {
-      title: string;
-      slug: string;
-    };
-    categories?: Array<{ title: string }>;
+    images?: StrapiImage;
+    provider?: GameProvider;
+    categories?: GameCategory[];
   };
 }

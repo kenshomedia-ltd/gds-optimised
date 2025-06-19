@@ -1,7 +1,5 @@
 // src/components/blog/BlogCard/BlogCard.tsx
-"use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { Image } from "@/components/common/Image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -13,11 +11,12 @@ import { cn } from "@/lib/utils/cn";
  * BlogCard Component
  *
  * Features:
+ * - Server-side rendered for better performance
  * - Responsive card layout with image overlay
  * - Author and category metadata
  * - Reading time indicator
  * - Optimized image loading with blur placeholder
- * - Hover effects
+ * - Hover effects (CSS only)
  * - Accessibility compliant
  * - Date formatting
  * - Content excerpt with HTML stripping
@@ -29,8 +28,6 @@ export function BlogCard({
   priority = false,
   className,
 }: BlogCardProps) {
-  const [imageError, setImageError] = useState(false);
-
   // Extract blog data
   const {
     title,
@@ -80,6 +77,9 @@ export function BlogCard({
     ? `/blog/category/${blogCategory.slug}/`
     : "#";
 
+  // Default image for missing images
+  const hasValidImage = images?.url;
+
   return (
     <article
       className={cn(
@@ -94,7 +94,7 @@ export function BlogCard({
       {/* Image container with overlay */}
       <div className="relative h-96 rounded-t overflow-hidden bg-blue-900">
         <figure className="h-full m-0 p-0 overflow-hidden">
-          {!imageError && images?.url ? (
+          {hasValidImage ? (
             <Image
               src={images.url}
               alt={images.alternativeText || title}
@@ -109,7 +109,6 @@ export function BlogCard({
                 "transition-all duration-300",
                 "group-hover:opacity-70 group-hover:scale-110"
               )}
-              onError={() => setImageError(true)}
             />
           ) : (
             <div className="w-full h-full bg-gray-300 flex items-center justify-center">
@@ -231,7 +230,11 @@ export function BlogCard({
             prefetch={false}
           >
             {translations.readMore || "Read More"}
-            <FontAwesomeIcon icon={faChevronRight} className="w-4 h-4" />
+            <FontAwesomeIcon
+              icon={faChevronRight}
+              className="w-4 h-4"
+              style={{ "--fa-secondary-opacity": 0 } as React.CSSProperties}
+            />
           </Link>
         </div>
       </div>
