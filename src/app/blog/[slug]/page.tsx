@@ -13,7 +13,7 @@ import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { Image } from "@/components/common/Image";
 import { TimeDate } from "@/components/common/TimeDate";
 import { BlogList } from "@/components/blog/BlogList/BlogList";
-import { HeaderAuthor } from "@/components/common/HeaderAuthor";
+import { AuthorBox } from "@/components/common/AuthorBox/AuthorBox";
 import { cn } from "@/lib/utils/cn";
 
 // Force static generation with ISR
@@ -82,22 +82,8 @@ export default async function BlogPage({ params }: BlogPageProps) {
   const breadcrumbs = [
     { label: "Home", url: "/" },
     { label: "Blog", url: "/blog" },
-    ...(blog.blogCategory
-      ? [
-          {
-            label: blog.blogCategory.blogCategory,
-            url: `/blog/category/${blog.blogCategory.slug}`,
-          },
-        ]
-      : []),
     { label: blog.title, url: `/blog/${blog.slug}` },
   ];
-
-  // Generate author URL
-  const authorSlug = blog.author
-    ? `${blog.author.firstName.toLowerCase()}.${blog.author.lastName.toLowerCase()}`
-    : "";
-  const authorUrl = authorSlug ? `/author/${authorSlug}/` : "#";
 
   // Schema.org structured data
   const articleSchema = {
@@ -147,93 +133,101 @@ export default async function BlogPage({ params }: BlogPageProps) {
       {/* Breadcrumbs */}
       <Breadcrumbs items={breadcrumbs} />
 
-      <article className="container mx-auto px-4 py-8">
-        {/* Article Header */}
-        <header className="max-w-4xl mx-auto mb-8">
-          {/* Category */}
-          {blog.blogCategory && (
-            <Link
-              href={`/blog/category/${blog.blogCategory.slug}`}
-              className={cn(
-                "inline-block mb-4",
-                "text-primary hover:text-primary/80",
-                "font-medium transition-colors"
+      {/* Hero Section */}
+      <section className="featured-header relative overflow-hidden bg-gradient-to-b from-background-900 from-30% via-background-700 via-80% to-background-500 rounded-b-3xl">
+        <div className="container relative mx-auto px-4 z-10 py-12">
+          <article className="max-w-6xl mx-auto">
+            {/* Article Header */}
+            <header className="max-w-4xl mx-auto mb-8 text-center">
+              {/* Category */}
+              {blog.blogCategory && (
+                <div className="inline-block mb-4 text-primary-tint font-medium">
+                  {blog.blogCategory.blogCategory}
+                </div>
               )}
-              prefetch={false}
-            >
-              {blog.blogCategory.blogCategory}
-            </Link>
-          )}
 
-          {/* Title */}
-          <h1 className="text-4xl lg:text-5xl font-bold mb-6">{blog.title}</h1>
+              {/* Title */}
+              <h1 className="text-4xl lg:text-5xl font-bold mb-6 text-white">
+                {blog.title}
+              </h1>
 
-          {/* Meta Information */}
-          <div className="flex flex-wrap items-center gap-4 text-gray-600 mb-8">
-            {blog.author && (
-              <div className="flex items-center gap-2">
-                {blog.author.photo?.url && (
-                  <div className="relative w-10 h-10 rounded-full overflow-hidden">
-                    <Image
-                      src={blog.author.photo.url}
-                      alt={`${blog.author.firstName} ${blog.author.lastName}`}
-                      fill
-                      sizes="40px"
-                      className="object-cover"
-                    />
+              {/* Blog Brief */}
+              {blog.blogBrief && (
+                <p className="text-xl text-gray-300 mb-6 leading-relaxed">
+                  {blog.blogBrief}
+                </p>
+              )}
+
+              {/* Meta Information */}
+              <div className="flex flex-wrap items-center justify-center gap-4 text-gray-400">
+                {blog.author && (
+                  <div className="flex items-center gap-2">
+                    {blog.author.photo?.url && (
+                      <div className="relative w-10 h-10 rounded-full overflow-hidden">
+                        <Image
+                          src={blog.author.photo.url}
+                          alt={`${blog.author.firstName} ${blog.author.lastName}`}
+                          fill
+                          sizes="40px"
+                          className="object-cover"
+                        />
+                      </div>
+                    )}
+                    <div className="font-medium text-white">
+                      {blog.author.firstName} {blog.author.lastName}
+                    </div>
                   </div>
                 )}
-                <Link
-                  href={authorUrl}
-                  className="font-medium hover:text-primary transition-colors"
-                  prefetch={false}
-                >
-                  {blog.author.firstName} {blog.author.lastName}
-                </Link>
+
+                <TimeDate timeDate={blog.createdAt} />
+
+                {blog.minutesRead && (
+                  <span className="flex items-center gap-1">
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    {blog.minutesRead} min read
+                  </span>
+                )}
               </div>
+            </header>
+
+            {/* Featured Image */}
+            {blog.images?.url && (
+              <figure className="relative aspect-[16/9] rounded-xl overflow-hidden mb-0">
+                <Image
+                  src={blog.images.url}
+                  alt={blog.images.alternativeText || blog.title}
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1200px"
+                  priority
+                  quality={85}
+                  className="object-cover"
+                />
+              </figure>
             )}
+          </article>
+        </div>
 
-            <TimeDate timeDate={blog.createdAt} />
+        {/* Starry Sky Background Effect */}
+        <div className="absolute top-0 left-0 w-full pointer-events-none">
+          <div className="h-[80vh] bg-[#0e1a2f]" />
+          <div className="h-[300px] bg-[#0e1a2f] rounded-b-[50%_300px]" />
+        </div>
+      </section>
 
-            {blog.minutesRead && (
-              <span className="flex items-center gap-1">
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-                {blog.minutesRead} min read
-              </span>
-            )}
-          </div>
-        </header>
-
-        {/* Featured Image */}
-        {blog.images?.url && (
-          <figure className="max-w-6xl mx-auto mb-12">
-            <div className="relative aspect-[16/9] rounded-xl overflow-hidden">
-              <Image
-                src={blog.images.url}
-                alt={blog.images.alternativeText || blog.title}
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1200px"
-                priority
-                quality={85}
-                className="object-cover"
-              />
-            </div>
-          </figure>
-        )}
-
-        {/* Article Content */}
+      {/* Article Content */}
+      <section className="main container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
           <div
             className="prose prose-lg max-w-none"
@@ -241,27 +235,29 @@ export default async function BlogPage({ params }: BlogPageProps) {
           />
 
           {/* Author Bio */}
-          {blog.author && blog.author.content1 && (
+          {blog.author && (
             <div className="mt-12 pt-8 border-t">
-              <HeaderAuthor
+              <AuthorBox
                 author={{
-                  ...blog.author,
-                  description: blog.author.content1,
-                  socialLinks: {
-                    linkedin: blog.author.linkedInLink,
-                    twitter: blog.author.twitterLink,
-                    facebook: blog.author.facebookLink,
-                  },
+                  id: blog.author.id,
+                  firstName: blog.author.firstName,
+                  lastName: blog.author.lastName,
+                  jobTitle: blog.author.jobTitle,
+                  photo: blog.author.photo,
+                  content1: blog.author.content1,
+                  linkedInLink: blog.author.linkedInLink,
+                  twitterLink: blog.author.twitterLink,
+                  facebookLink: blog.author.facebookLink,
                 }}
               />
             </div>
           )}
         </div>
-      </article>
+      </section>
 
       {/* Related Articles */}
       {relatedBlogs.length > 0 && (
-        <section className="bg-gray-50 py-12 mt-12">
+        <section className="bg-gray-50 py-12">
           <div className="container mx-auto px-4">
             <h2 className="text-3xl font-bold mb-8 text-center">
               Related Articles
