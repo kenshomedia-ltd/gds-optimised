@@ -1,14 +1,16 @@
 // src/components/widgets/CasinoComparison/CasinoComparison.tsx
-"use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { Image } from "@/components/common/Image";
 import { StarRatingDisplay } from "@/components/ui/StarRating";
 import { Button } from "@/components/ui";
 import { Collapsible } from "@/components/ui/Collapsible";
 import { cn } from "@/lib/utils/cn";
-import { formatWelcomeBonus, formatNoDepositBonus } from "@/lib/utils/casino";
+import {
+  formatWelcomeBonus,
+  formatNoDepositBonus,
+  getCasinoBadge,
+} from "@/lib/utils/casino";
 import type { CasinoData } from "@/types/casino.types";
 
 interface CasinoComparisonProps {
@@ -18,91 +20,98 @@ interface CasinoComparisonProps {
 }
 
 /**
- * CasinoComparison Widget Component
+ * CasinoComparison Component
  *
- * Displays a comparison table of up to 3 casinos
+ * Server-side rendered casino comparison widget
+ * Displays up to 3 casinos side by side with bonus information
+ *
  * Features:
- * - Responsive grid layout
- * - Badge indicators for top 3 positions
- * - Bonus information display
- * - Mobile-optimized collapsibles
- * - Progressive enhancement
+ * - Position badges for top casinos
+ * - Welcome and no deposit bonuses
+ * - Responsive layout
+ * - Collapsible terms on mobile
  */
 export function CasinoComparison({
   casinos,
   translations,
   className,
 }: CasinoComparisonProps) {
-  if (!casinos || casinos.length === 0) {
-    return null;
-  }
+  // Only show first 3 casinos
+  const displayCasinos = casinos.slice(0, 3);
 
-  // Limit to first 3 casinos for comparison
-  const comparisonCasinos = casinos.slice(0, 3);
-
-  // Badge colors for positions
-  const badgeGradients = [
-    "from-[#ffd976] to-[#ffbb38]", // Gold
-    "from-[#dbe5ef] to-[#b1bbc6]", // Silver
-    "from-[#de7d45] to-[#9b4e22]", // Bronze
-  ];
+  // Helper to get badge gradient based on position
+  const getBadgeGradient = (position: number) => {
+    switch (position) {
+      case 0:
+        return "from-[#FFD700] to-[#FFA500]"; // Gold
+      case 1:
+        return "from-[#C0C0C0] to-[#808080]"; // Silver
+      case 2:
+        return "from-[#CD7F32] to-[#8B4513]"; // Bronze
+      default:
+        return "";
+    }
+  };
 
   return (
-    <div className={cn("rounded-[6px]", className)}>
-      {/* Header */}
-      <div className="text-center px-3 py-[11px] bg-table-header-bkg rounded-tr-[6px] rounded-tl-[6px] md:text-start">
-        <span className="text-[20px] leading-[24px] font-bold text-white">
-          {translations.casinoTableHeading || "Confronta i Casino"}
-        </span>
-      </div>
+    <div
+      className={cn("grid grid-cols-1 md:grid-cols-3 gap-4 my-8", className)}
+    >
+      {displayCasinos.map((casino, index) => {
+        const badgeGradient = getBadgeGradient(index);
+        const noDepositData = formatNoDepositBonus(casino, translations);
 
-      {/* Comparison Grid */}
-      <div className="p-3 rounded-br-[6px] rounded-bl-[6px] bg-grey-100 gap-y-3 md:flex md:gap-y-0 md:gap-x-3">
-        {comparisonCasinos.map((casino, index) => (
-          <CasinoComparisonItem
+        return (
+          <div
             key={casino.id}
-            casino={casino}
-            position={index}
-            badgeGradient={badgeGradients[index]}
-            translations={translations}
-          />
-        ))}
-      </div>
+            className="flex flex-col border-2 border-grey-300 rounded-lg overflow-hidden"
+          >
+            <CasinoCard
+              casino={casino}
+              position={index}
+              badgeGradient={badgeGradient}
+              noDepositData={noDepositData}
+              translations={translations}
+            />
+          </div>
+        );
+      })}
     </div>
   );
 }
 
-interface CasinoComparisonItemProps {
+// Separate component to keep the main component clean
+interface CasinoCardProps {
   casino: CasinoData;
   position: number;
   badgeGradient: string;
+  noDepositData: { bonus: string | null; terms: string | null };
   translations: Record<string, string>;
 }
 
-function CasinoComparisonItem({
+function CasinoCard({
   casino,
   position,
   badgeGradient,
+  noDepositData,
   translations,
-}: CasinoComparisonItemProps) {
-  const isNew =
-    casino.createdAt &&
-    new Date().getTime() - new Date(casino.createdAt).getTime() <
-      14 * 24 * 60 * 60 * 1000;
+}: CasinoCardProps) {
+  // Use the getCasinoBadge utility to determine badge
+  const badge = getCasinoBadge(casino, translations);
 
   return (
-    <div className="flex flex-col basis-1 md:basis-1/3 mb-4 md:mb-0">
-      {/* Casino Logo Section */}
-      <div className="h-full px-3 py-2 bg-white rounded-tl-lg relative overflow-hidden">
-        {/* Badge for new or exclusive casinos */}
-        {(casino.Badges || isNew) && (
+    <>
+      {/* Casino Header with Image */}
+      <div className="relative bg-grey-100 p-4">
+        {/* Exclusive/New badge */}
+        {badge && (
           <span
             className={cn(
-              "z-10 rotate-45 absolute text-white text-xs px-[36.4px] uppercase top-[25px] -right-[40px]",
-              casino.Badges ? "bg-primary" : "bg-success"
+              "absolute top-2 right-2 px-2 py-1 text-xs font-bold text-white rounded z-10",
+              badge.type === "exclusive" ? "bg-primary" : "bg-success"
             )}
           >
-            {casino.Badges ? translations.exclusive : translations.newCasino}
+            {badge.text}
           </span>
         )}
 
@@ -147,7 +156,7 @@ function CasinoComparisonItem({
         <div className="py-2">
           <StarRatingDisplay
             rating={casino.ratingAvg}
-            totalReviews={casino.ratingCount}
+            count={casino.ratingCount}
             showCount={true}
             size="sm"
           />
@@ -184,7 +193,7 @@ function CasinoComparisonItem({
         {/* Desktop wagering info */}
         <span
           className="hidden md:flex items-center cursor-help text-xs text-grey-500 underline"
-          title={casino.bonusSection?.termsConditions}
+          title={casino.bonusSection?.termsConditions || undefined}
         >
           {translations.wageringRequirement || "Requisiti di puntata"}
           <svg className="w-3 h-3 ml-1 fill-grey-500" viewBox="0 0 16 16">
@@ -215,13 +224,13 @@ function CasinoComparisonItem({
           rel="sponsored"
           target="_blank"
         >
-          {formatNoDepositBonus(casino, translations).bonus || "-"}
+          {noDepositData.bonus || "-"}
         </Link>
 
         {/* Desktop no deposit wagering info */}
         <span
           className="hidden md:flex items-center cursor-help text-xs text-grey-500 underline"
-          title={formatNoDepositBonus(casino, translations).terms}
+          title={noDepositData.terms || undefined}
         >
           {translations.wageringRequirement || "Requisiti di puntata"}
           <svg className="w-3 h-3 ml-1 fill-grey-500" viewBox="0 0 16 16">
@@ -234,7 +243,7 @@ function CasinoComparisonItem({
           <Collapsible
             id={`noDepositBonus${casino.id}`}
             label={translations.wageringRequirement || "Requisiti di puntata"}
-            content={formatNoDepositBonus(casino, translations).terms || ""}
+            content={noDepositData.terms || ""}
             containerClass="w-full mt-2"
             labelClass="text-sm items-center text-grey-500"
           />
@@ -244,50 +253,20 @@ function CasinoComparisonItem({
       {/* CTA Section */}
       <div className="flex flex-col border-t border-grey-300 bg-white items-center justify-center h-full px-3 py-6">
         <div className="h-full w-full flex flex-col justify-end items-center sm:justify-center">
-          {/* Bonus code if available */}
-          {casino.casinoBonus.bonusCode && (
-            <div className="mb-[7px] text-[#212529] text-[14px] font-bold">
-              {translations.bonusCode || "Codice Bonus"}
-            </div>
-          )}
-
-          {/* CTA Button */}
           <Button
-            variant="link"
+            variant="default"
             href={casino.casinoBonus.bonusUrl}
+            className="w-full max-w-[200px] uppercase"
             rel="sponsored"
             target="_blank"
-            className="w-full mb-[7px] uppercase font-extrabold"
-            size="lg"
           >
-            {casino.casinoBonus.bonusCode ||
-              translations.visitSite ||
-              "VISITA IL SITO"}
+            {translations.playCasino || "GIOCA AL CASINÒ"}
           </Button>
-
-          {/* Desktop terms info */}
-          <span
-            className="hidden md:flex items-center cursor-help text-xs text-grey-500 underline"
-            title={casino.termsAndConditions?.copy}
-          >
-            {translations.termsConditions || "Termini e Condizioni"}
-            <svg className="w-3 h-3 ml-1 fill-grey-500" viewBox="0 0 16 16">
-              <path d="M8 0a8 8 0 100 16A8 8 0 008 0zm1 12H7v-2h2v2zm0-3H7V4h2v5z" />
-            </svg>
+          <span className="text-xs text-grey-500 mt-2 text-center">
+            {translations.termsConditions || "*Si applicano T&C"}
           </span>
-
-          {/* Mobile terms collapsible */}
-          <div className="w-full md:hidden">
-            <Collapsible
-              id={`terms${casino.id}`}
-              label={translations.termsConditions || "Termini e Condizioni"}
-              content={casino.termsAndConditions?.copy || ""}
-              containerClass="w-full mt-2"
-              labelClass="text-sm items-center text-grey-500"
-            />
-          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

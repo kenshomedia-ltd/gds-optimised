@@ -18,9 +18,9 @@ export const dynamic = "force-static";
 export const revalidate = 300; // 5 minutes
 
 interface CasinoPageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 // Generate static params for all casino pages
@@ -34,7 +34,8 @@ export async function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: CasinoPageProps): Promise<Metadata> {
-  const { slug } = params;
+  // Await params as required in Next.js 15
+  const { slug } = await params;
 
   try {
     // Use lightweight metadata query for better performance
@@ -61,7 +62,8 @@ export async function generateMetadata({
 }
 
 export default async function CasinoPage({ params }: CasinoPageProps) {
-  const { slug } = params;
+  // Await params as required in Next.js 15
+  const { slug } = await params;
 
   // Fetch casino data with games and layout data in parallel
   const [casinoResponse, layoutData] = await Promise.all([
@@ -97,7 +99,7 @@ export default async function CasinoPage({ params }: CasinoPageProps) {
   ];
 
   // Generate structured data for SEO
-  const structuredData = generateStructuredData(casinoData, translations);
+  const structuredData = generateStructuredData(casinoData);
 
   return (
     <>
@@ -121,49 +123,52 @@ export default async function CasinoPage({ params }: CasinoPageProps) {
         </div>
 
         {/* Starry Sky Background Effect - Same as other pages */}
-        <div className="absolute top-0 left-0 w-full pointer-events-none">
-          <div className="h-[80vh] bg-[#0e1a2f]" />
-          <div className="h-[300px] bg-[#0e1a2f] rounded-b-[50%_300px]" />
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="stars absolute inset-0" />
+          <div className="twinkling absolute inset-0" />
         </div>
       </section>
 
-      {/* Main Content Section */}
-      <CasinoContent
-        casino={casinoData}
-        games={games}
-        translations={translations}
-      />
+      {/* Main Content */}
+      <main className="container mx-auto px-4 py-8">
+        <CasinoContent
+          casino={casinoData}
+          games={games}
+          translations={translations}
+        />
+      </main>
     </>
   );
 }
 
-// Generate structured data for better SEO
+/**
+ * Generate structured data for SEO
+ */
 function generateStructuredData(
-  casino: CasinoPageData,
-  _translations: Record<string, string>
-) {
-  const schemas = [];
+  casino: CasinoPageData
+): object[] {
+  const schemas: object[] = [];
 
-  // Organization Schema
-  schemas.push({
+  // Organization schema
+  const organizationSchema = {
     "@context": "https://schema.org",
-    "@type": "OnlineGamblingService",
+    "@type": "OnlineGamingWebsite",
     name: casino.title,
-    url: casino.casinoGeneralInfo?.website,
-    description: casino.introduction,
-    image: casino.images?.url,
+    url: casino.casinoGeneralInfo?.website || "",
+    description: casino.introduction || "",
     aggregateRating: {
       "@type": "AggregateRating",
       ratingValue: casino.ratingAvg,
-      ratingCount: casino.ratingCount,
+      reviewCount: casino.ratingCount,
       bestRating: 5,
       worstRating: 1,
     },
-  });
+  };
+  schemas.push(organizationSchema);
 
   // FAQ Schema
   if (casino.faqs && casino.faqs.length > 0) {
-    schemas.push({
+    const faqSchema = {
       "@context": "https://schema.org",
       "@type": "FAQPage",
       mainEntity: casino.faqs.map((faq: FAQ) => ({
@@ -174,12 +179,13 @@ function generateStructuredData(
           text: faq.answer,
         },
       })),
-    });
+    };
+    schemas.push(faqSchema);
   }
 
-  // How-To Schema
+  // HowTo Schema
   if (casino.howTo?.howToGroup && casino.howTo.howToGroup.length > 0) {
-    schemas.push({
+    const howToSchema = {
       "@context": "https://schema.org",
       "@type": "HowTo",
       name: casino.howTo.title,
@@ -190,7 +196,8 @@ function generateStructuredData(
         name: step.heading,
         text: step.copy,
       })),
-    });
+    };
+    schemas.push(howToSchema);
   }
 
   return schemas;
