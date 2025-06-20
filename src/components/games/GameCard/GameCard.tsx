@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils/cn";
  * - Badge system for new/hot games
  * - Lazy loading by default
  * - Fixed favorite button positioning
+ * - Container query based responsive hover button
  */
 export function GameCard({
   game,
@@ -61,7 +62,8 @@ export function GameCard({
     : null;
 
   // Generate URLs
-  const gamePagePath = process.env.NEXT_PUBLIC_GAME_PAGE_PATH || "/slot-machines";
+  const gamePagePath =
+    process.env.NEXT_PUBLIC_GAME_PAGE_PATH || "/slot-machines";
   const providerPagePath =
     process.env.NEXT_PUBLIC_PROVIDER_PAGE_PATH || "/providers";
   const gameUrl = `${gamePagePath}/${game.slug}`;
@@ -72,10 +74,11 @@ export function GameCard({
   return (
     <article
       className={cn(
-        "relative rounded-lg aspect-[235/244] w-full",
+        "game-card-container relative rounded-lg aspect-[235/244] w-full overflow-hidden",
         "transition-all duration-300",
         "hover:shadow-lg hover:scale-[1.02]",
         "focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2",
+        "[container-type:inline-size]",
         className
       )}
       data-game-id={game.id}
@@ -146,23 +149,29 @@ export function GameCard({
           </div>
         )}
 
-        {/* Desktop play button */}
+        {/* Desktop play button - responsive based on card size using container queries */}
         <div
           className={cn(
-            "action-buttons absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
-            "opacity-0 scale-75",
-            "transition-all duration-300",
-            "group-hover:opacity-100 group-hover:scale-100",
-            "hidden md:flex flex-col items-center gap-3"
+            "action-buttons absolute inset-0 flex items-center justify-center p-4",
+            "opacity-0",
+            "transition-opacity duration-300",
+            "group-hover:opacity-100",
+            "hidden md:flex"
           )}
         >
           <Link
             href={gameUrl}
             className={cn(
-              "px-8 py-2 rounded font-bold text-sm whitespace-nowrap",
+              "game-card-button rounded font-bold whitespace-nowrap",
               "bg-secondary text-secondary-text uppercase",
               "hover:bg-secondary-tint transition-colors",
-              "focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              "focus:outline-none focus-visible:ring-2 focus-visible:ring-white",
+              "overflow-hidden text-ellipsis",
+              "max-w-full",
+              // Container query classes for responsive sizing
+              "[@container_(max-width:150px)]:px-2 [@container_(max-width:150px)]:py-0.5 [@container_(max-width:150px)]:text-[10px]",
+              "[@container_(min-width:151px)]:[@container_(max-width:200px)]:px-3 [@container_(min-width:151px)]:[@container_(max-width:200px)]:py-1 [@container_(min-width:151px)]:[@container_(max-width:200px)]:text-xs",
+              "[@container_(min-width:201px)]:px-6 [@container_(min-width:201px)]:py-2 [@container_(min-width:201px)]:text-sm"
             )}
             prefetch={false}
           >

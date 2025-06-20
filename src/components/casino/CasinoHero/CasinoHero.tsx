@@ -1,10 +1,10 @@
 // src/components/casino/CasinoHero/CasinoHero.tsx
+"use client";
 
 import Link from "next/link";
 import { Image } from "@/components/common/Image";
 import { TimeDate } from "@/components/common/TimeDate";
 import { HeaderAuthor } from "@/components/common/HeaderAuthor";
-import { StarRatingServer } from "@/components/ui/StarRating";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { CasinoFeaturesTable, CasinoGeneralInfoTable, CasinoTestimonial, CasinoPaymentSoftware } from "@/components/casino";
 import {
@@ -15,6 +15,7 @@ import {
 import { Collapsible } from "@/components/ui/Collapsible";
 import type { CasinoPageData } from "@/types/casino-page.types";
 import type { BonusSection } from "@/types/casino.types";
+import { Button, StarRating } from "@/components/ui";
 
 interface CasinoHeroProps {
   casino: CasinoPageData;
@@ -69,6 +70,18 @@ export function CasinoHero({ casino, translations }: CasinoHeroProps) {
   const reloadBonus = formatBonus(casino.bonusSection);
   const noDepositBonus = formatNoDepositBonus();
 
+  // Handle rating change
+  const handleRatingChange = async (newRating: number) => {
+    // TODO: Implement the API call to update the rating
+    console.log(`New rating for casino ${casino.id}: ${newRating}`);
+    // You would typically call an API endpoint here to save the rating
+    // Example:
+    // await fetch('/api/casino-ratings', {
+    //   method: 'POST',
+    //   body: JSON.stringify({ casinoId: casino.id, rating: newRating }),
+    // });
+  };
+
   return (
     <div className="casino-hero-section bg-gradient-to-b from-background-900 via-background-700 to-background-500 rounded-b-3xl pb-3">
       <div className="container mx-auto px-4">
@@ -105,13 +118,14 @@ export function CasinoHero({ casino, translations }: CasinoHeroProps) {
 
             {/* Rating */}
             <div className="mt-4 flex flex-col items-center justify-center">
-              <StarRatingServer
-                rating={casino.ratingAvg}
+              <StarRating
+                initialRating={casino.ratingAvg}
                 maxRating={5}
                 size="md"
                 showValue={true}
-                showCount={true}
-                count={casino.ratingCount}
+                valuePosition="bottom"
+                onRatingChange={handleRatingChange}
+                ariaLabel={`Rate ${casino.title}`}
               />
               <a
                 href="#casino-review"
@@ -187,14 +201,14 @@ export function CasinoHero({ casino, translations }: CasinoHeroProps) {
 
             {/* CTA Button */}
             <div className="mb-5">
-              <Link
+              <Button
                 href={casino.casinoBonus?.bonusUrl || "#"}
-                className="btn btn-primary block w-full text-center uppercase font-bold py-3 px-4 rounded bg-primary text-white hover:bg-primary-600 transition-colors"
+                className="bg-misc hover:bg-misc-hover py-3 px-4 rounded transition-colors"
                 target="_blank"
                 rel="sponsored"
               >
                 {translations.accessWebsite || "Access Website"}
-              </Link>
+              </Button>
             </div>
 
             {/* Terms and conditions */}

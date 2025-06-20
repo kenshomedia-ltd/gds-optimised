@@ -256,7 +256,7 @@ function CasinoCard({
           <Button
             variant="default"
             href={casino.casinoBonus.bonusUrl}
-            className="w-full max-w-[200px] uppercase"
+            className="w-full max-w-[200px] uppercase bg-misc hover:bg-misc-hover"
             rel="sponsored"
             target="_blank"
           >

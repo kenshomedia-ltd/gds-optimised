@@ -112,7 +112,7 @@ export function AuthorBox({ author, className }: AuthorBoxProps) {
           </h3>
 
           {/* Professional Details - Mobile */}
-          <div className="flex flex-wrap justify-center gap-2 mb-4">
+          <div className="flex flex-wrap justify-center gap-2 mb-4 text-sm">
             {author.jobTitle && (
               <span className="inline-block px-3 py-1 bg-gray-100 text-gray-700 rounded-md text-sm">
                 Ruolo: {author.jobTitle}
@@ -147,8 +147,8 @@ export function AuthorBox({ author, className }: AuthorBoxProps) {
               <Image
                 src={author.photo.url}
                 alt={author.photo.alternativeText || authorName}
-                width={author.photo.width || 150}
-                height={author.photo.height || 150}
+                width={150}
+                height={150}
                 className="w-36 h-36 rounded-2xl object-cover mb-4"
                 quality={90}
               />
@@ -211,7 +211,7 @@ export function AuthorBox({ author, className }: AuthorBoxProps) {
             </h3>
 
             {/* Professional Details - Desktop */}
-            <div className="flex flex-wrap gap-4 mb-6">
+            <div className="flex flex-wrap gap-4 mb-6 text-sm">
               {author.jobTitle && (
                 <div className="flex items-center gap-2">
                   <span className="text-gray-500">Ruolo:</span>

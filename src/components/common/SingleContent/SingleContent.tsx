@@ -132,6 +132,10 @@ export function SingleContent({
         className={cn(
           "prose prose-lg max-w-none",
 
+          // Table wrapper (figure) centering
+          "[&_figure.table]:flex [&_figure.table]:justify-center [&_figure.table]:mx-auto",
+          "[&_figure.table_table]:w-auto",
+
           // Headings
           "prose-headings:font-bold prose-headings:text-heading-text prose-headings:text-center",
           "prose-h2:text-3xl prose-h2:mt-8 prose-h2:mb-4",
@@ -166,14 +170,13 @@ export function SingleContent({
           "prose-img:rounded-lg prose-img:shadow-md prose-img:my-6",
           "prose-img:max-w-full prose-img:h-auto",
 
-          // Tables
-          "prose-table:border-collapse prose-table:w-full prose-table:my-6",
+          // Tables - with center alignment
+          "prose-table:border-collapse prose-table:my-6",
           "prose-thead:border-b-2 prose-thead:border-gray-300",
-          "prose-th:text-left prose-th:p-3 prose-th:font-semibold",
-          "prose-th:bg-gray-50 prose-th:text-heading-text",
+          "prose-th:text-center prose-th:p-3 prose-th:font-semibold prose-th:bg-table-header-bkg prose-th:text-white",
           "prose-tbody:divide-y prose-tbody:divide-gray-200",
-          "prose-td:p-3 prose-td:text-body-text",
-          "prose-tr:transition-colors hover:prose-tr:bg-gray-50",
+          "prose-td:p-3 prose-td:text-body-text prose-td:text-center",
+          "prose-tr:transition-colors prose-tr:bg-white hover:prose-tr:bg-gray-50",
 
           // Code blocks
           "prose-code:bg-gray-100 prose-code:px-1 prose-code:py-0.5",
