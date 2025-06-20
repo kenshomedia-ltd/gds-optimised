@@ -51,8 +51,8 @@ export function AuthorBox({ author, className }: AuthorBoxProps) {
             <Image
               src={author.photo.url}
               alt={author.photo.alternativeText || authorName}
-              width={author.photo.width || 120}
-              height={author.photo.height || 120}
+              width={120}
+              height={120}
               className="w-32 h-32 rounded-2xl object-cover mb-4"
               quality={90}
             />

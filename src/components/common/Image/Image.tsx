@@ -182,7 +182,7 @@ export function Image({
       : currentSrc;
 
   const containerClasses = cn(
-    "relative inline-block",
+    "relative flex overflow-hidden",
     fill ? "w-full h-full" : "",
     className
   );

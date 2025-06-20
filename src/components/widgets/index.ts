@@ -30,6 +30,12 @@ export { ProsConsWidget } from "./ProsConsWidget";
 // HowTo widget
 export { HowTo, HowToSkeleton, HowToServer } from "./HowTo";
 
+// Casino comparison widget
+export { CasinoComparison } from "./CasinoComparison";
+
+// Casino detail sidebar widget
+export { CasinoDetailSidebar, CasinoDetailMobileFooter } from "./CasinoDetailSidebar";
+
 // Add other widget exports as they are created:
 // export { PopularGames } from "./PopularGames";
 // export { FeaturedCasinos } from "./FeaturedCasinos";

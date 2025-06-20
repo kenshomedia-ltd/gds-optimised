@@ -53,7 +53,7 @@ export function CasinoTestimonial({
                     alt="Reviewer Image"
                     width={60}
                     height={60}
-                    className="rounded-full"
+                    className="rounded-md"
                   />
                 </div>
                 <div className="flex flex-col details-container">
@@ -83,7 +83,7 @@ export function CasinoTestimonial({
                       alt="Approver image"
                       width={60}
                       height={60}
-                      className="rounded-full"
+                      className="rounded-md"
                     />
                   </div>
                   <div className="flex flex-col details-container">
@@ -108,7 +108,7 @@ export function CasinoTestimonial({
             </div>
 
             {/* Desktop Logo */}
-            <div className="hidden md:block">
+            <div className="hidden md:flex items-center">
               <Image
                 src="/images/adm-icons.svg"
                 alt="ADM Icons"

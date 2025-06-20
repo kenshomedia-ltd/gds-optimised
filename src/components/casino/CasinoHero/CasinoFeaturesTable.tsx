@@ -25,10 +25,12 @@ export function CasinoFeaturesTable({
           <tr>
             <th colSpan={2} className="p-0 text-white">
               <div className="summary-table-heading -mt-2 -mr-2 -ml-2 mb-2 rounded-t-lg flex p-3 bg-purple-700 items-center">
-                <span className="block mr-4 bg-white rounded-full p-1">
+                {/* Fixed: Use flex container with fixed dimensions */}
+                <span className="flex items-center justify-center w-8 h-8 mr-4 bg-white rounded-full flex-shrink-0">
                   <FontAwesomeIcon
                     icon={faGlobe}
-                    className="w-6 h-6 text-purple-700"
+                    className="text-purple-700"
+                    style={{ fontSize: "1.25rem" }} // Use inline style for precise control
                   />
                 </span>
                 <div className="font-bold">
@@ -47,10 +49,14 @@ export function CasinoFeaturesTable({
               }
             >
               <td className="p-2 w-10">
-                <FontAwesomeIcon
-                  icon={faCheckCircle}
-                  className="w-6 h-6 text-green-600"
-                />
+                {/* Fixed: Use consistent sizing approach */}
+                <div className="flex items-center justify-center w-6 h-6">
+                  <FontAwesomeIcon
+                    icon={faCheckCircle}
+                    className="text-green-600"
+                    style={{ fontSize: "1.5rem" }} // Match the visual size
+                  />
+                </div>
               </td>
               <td className="p-2">{feature.feature}</td>
             </tr>

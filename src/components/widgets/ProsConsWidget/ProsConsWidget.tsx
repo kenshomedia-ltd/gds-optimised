@@ -2,10 +2,18 @@
 "use client";
 
 import { cn } from "@/lib/utils/cn";
-import type { ProsConsSection } from "@/types/game-page.types";
+import type { StrapiImage } from "@/types/strapi.types";
 
+// Support both game page and casino page formats
 interface ProsConsWidgetProps {
-  proscons: ProsConsSection;
+  proscons: {
+    id?: number;
+    heading?: string;
+    pros?: Array<string | { id?: number; list: string }>;
+    cons?: Array<string | { id?: number; list: string }>;
+    proImage?: StrapiImage;
+    conImage?: StrapiImage;
+  };
   className?: string;
 }
 
@@ -17,12 +25,22 @@ interface ProsConsWidgetProps {
  * - Clean visual separation between pros and cons
  * - Responsive grid layout
  * - Color-coded sections
- * - Handles both string and object formats
+ * - Handles both string and object formats (for compatibility with both game and casino pages)
  */
 export function ProsConsWidget({ proscons, className }: ProsConsWidgetProps) {
   if (!proscons || (!proscons.pros?.length && !proscons.cons?.length)) {
     return null;
   }
+
+  // Helper function to get the text from either string or object format
+  const getItemText = (
+    item: string | { id?: number; list: string }
+  ): string => {
+    if (typeof item === "string") {
+      return item;
+    }
+    return item.list;
+  };
 
   return (
     <section
@@ -60,7 +78,7 @@ export function ProsConsWidget({ proscons, className }: ProsConsWidgetProps) {
               {proscons.pros.map((pro, index) => (
                 <li key={index} className="flex items-start text-green-700">
                   <span className="mr-2 mt-1 flex-shrink-0">•</span>
-                  <span>{pro.list}</span>
+                  <span>{getItemText(pro)}</span>
                 </li>
               ))}
             </ul>
@@ -88,7 +106,7 @@ export function ProsConsWidget({ proscons, className }: ProsConsWidgetProps) {
               {proscons.cons.map((con, index) => (
                 <li key={index} className="flex items-start text-red-700">
                   <span className="mr-2 mt-1 flex-shrink-0">•</span>
-                  <span>{con.list}</span>
+                  <span>{getItemText(con)}</span>
                 </li>
               ))}
             </ul>
