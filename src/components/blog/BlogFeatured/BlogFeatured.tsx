@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Image } from "@/components/common/Image";
 import { TimeDate } from "@/components/common/TimeDate";
-import type { BlogData } from "@/types/strapi.types";
+import type { BlogData } from "@/types/blog.types";
 import { cn } from "@/lib/utils/cn";
 
 interface BlogFeaturedProps {

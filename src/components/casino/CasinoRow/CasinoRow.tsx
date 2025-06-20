@@ -35,7 +35,8 @@ export function CasinoRow({
   const welcomeBonus = formatWelcomeBonus(casino, translations.reloadBonus);
 
   const siteId = process.env.NEXT_PUBLIC_SITE_ID || "default";
-  const casinoPagePath = process.env.NEXT_PUBLIC_CASINO_PAGE_PATH || "/casinos";
+  const casinoPagePath =
+    process.env.NEXT_PUBLIC_CASINO_PAGE_PATH || "/casino/recensione/";
 
   // Position badge styles
   const positionStyles = {

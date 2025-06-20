@@ -2,7 +2,6 @@
 
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
-import Link from "next/link";
 import {
   getBlogSingleData,
   getBlogMetadata,
@@ -12,18 +11,18 @@ import { generateMetadata as generateSEOMetadata } from "@/lib/utils/seo";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { Image } from "@/components/common/Image";
 import { TimeDate } from "@/components/common/TimeDate";
+import { SingleContent } from "@/components/common/SingleContent";
 import { BlogList } from "@/components/blog/BlogList/BlogList";
 import { AuthorBox } from "@/components/common/AuthorBox/AuthorBox";
-import { cn } from "@/lib/utils/cn";
 
 // Force static generation with ISR
 export const dynamic = "force-static";
 export const revalidate = 300; // 5 minutes
 
 interface BlogPageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 // Generate static params for all blog pages
@@ -37,7 +36,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: BlogPageProps): Promise<Metadata> {
-  const { slug } = params;
+  const { slug } = await params;
 
   try {
     const blogMetadata = await getBlogMetadata(slug);
@@ -63,7 +62,7 @@ export async function generateMetadata({
 }
 
 export default async function BlogPage({ params }: BlogPageProps) {
-  const { slug } = params;
+  const { slug } = await params;
 
   // Fetch data
   const [layoutData, blogPageData] = await Promise.all([
@@ -78,11 +77,11 @@ export default async function BlogPage({ params }: BlogPageProps) {
   const { translations } = layoutData;
   const { blog, relatedBlogs } = blogPageData;
 
-  // Generate breadcrumbs
+  // Generate breadcrumbs - Updated to use correct property names
   const breadcrumbs = [
-    { label: "Home", url: "/" },
-    { label: "Blog", url: "/blog" },
-    { label: blog.title, url: `/blog/${blog.slug}` },
+    { breadCrumbText: "Home", breadCrumbUrl: "/" },
+    { breadCrumbText: "Blog", breadCrumbUrl: "/blog" },
+    { breadCrumbText: blog.title, breadCrumbUrl: "" }, // Empty URL for current page
   ];
 
   // Schema.org structured data
@@ -147,74 +146,42 @@ export default async function BlogPage({ params }: BlogPageProps) {
               )}
 
               {/* Title */}
-              <h1 className="text-4xl lg:text-5xl font-bold mb-6 text-white">
+              <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white">
                 {blog.title}
               </h1>
 
-              {/* Blog Brief */}
-              {blog.blogBrief && (
-                <p className="text-xl text-gray-300 mb-6 leading-relaxed">
-                  {blog.blogBrief}
-                </p>
-              )}
-
               {/* Meta Information */}
-              <div className="flex flex-wrap items-center justify-center gap-4 text-gray-400">
+              <div className="flex items-center justify-center gap-4 text-sm text-gray-300">
                 {blog.author && (
-                  <div className="flex items-center gap-2">
-                    {blog.author.photo?.url && (
-                      <div className="relative w-10 h-10 rounded-full overflow-hidden">
-                        <Image
-                          src={blog.author.photo.url}
-                          alt={`${blog.author.firstName} ${blog.author.lastName}`}
-                          fill
-                          sizes="40px"
-                          className="object-cover"
-                        />
-                      </div>
-                    )}
-                    <div className="font-medium text-white">
-                      {blog.author.firstName} {blog.author.lastName}
-                    </div>
-                  </div>
-                )}
-
-                <TimeDate timeDate={blog.createdAt} />
-
-                {blog.minutesRead && (
-                  <span className="flex items-center gap-1">
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                    {blog.minutesRead} min read
+                  <span>
+                    By {blog.author.firstName} {blog.author.lastName}
                   </span>
+                )}
+                <span>•</span>
+                <TimeDate
+                  timeDate={blog.publishedAt || blog.createdAt}
+                  className="text-gray-300"
+                />
+                {blog.minutesRead && (
+                  <>
+                    <span>•</span>
+                    <span>{blog.minutesRead} min read</span>
+                  </>
                 )}
               </div>
             </header>
 
             {/* Featured Image */}
             {blog.images?.url && (
-              <figure className="relative aspect-[16/9] rounded-xl overflow-hidden mb-0">
+              <div className="relative aspect-[16/9] mb-8 rounded-xl overflow-hidden">
                 <Image
                   src={blog.images.url}
                   alt={blog.images.alternativeText || blog.title}
                   fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1200px"
-                  priority
-                  quality={85}
                   className="object-cover"
+                  priority
                 />
-              </figure>
+              </div>
             )}
           </article>
         </div>
@@ -226,46 +193,51 @@ export default async function BlogPage({ params }: BlogPageProps) {
         </div>
       </section>
 
-      {/* Article Content */}
+      {/* Main Content Section */}
       <section className="main container mx-auto px-4 py-12">
-        <div className="max-w-4xl mx-auto">
-          <div
-            className="prose prose-lg max-w-none"
-            dangerouslySetInnerHTML={{ __html: blog.content1 || "" }}
-          />
+        <article className="max-w-4xl mx-auto">
+          {/* Article Content - Using SingleContent component */}
+          {blog.content1 && (
+            <SingleContent
+              block={{
+                content: blog.content1,
+              }}
+              className="mb-8"
+            />
+          )}
 
-          {/* Author Bio */}
+          {/* Author Box */}
           {blog.author && (
-            <div className="mt-12 pt-8 border-t">
+            <div className="mt-12 pt-8 border-t border-gray-200">
               <AuthorBox
                 author={{
-                  id: blog.author.id,
-                  firstName: blog.author.firstName,
-                  lastName: blog.author.lastName,
-                  jobTitle: blog.author.jobTitle,
-                  photo: blog.author.photo,
-                  content1: blog.author.content1,
-                  linkedInLink: blog.author.linkedInLink,
-                  twitterLink: blog.author.twitterLink,
-                  facebookLink: blog.author.facebookLink,
+                  ...blog.author,
+                  // Convert null to undefined for twitterLink and facebookLink
+                  twitterLink: blog.author.twitterLink || undefined,
+                  facebookLink: blog.author.facebookLink || undefined,
+                  areaOfWork: blog.author.areaOfWork || undefined,
                 }}
               />
             </div>
           )}
-        </div>
-      </section>
+        </article>
 
-      {/* Related Articles */}
-      {relatedBlogs.length > 0 && (
-        <section className="bg-gray-50 py-12">
-          <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold mb-8 text-center">
-              Related Articles
-            </h2>
-            <BlogList blogs={relatedBlogs} translations={translations} />
-          </div>
-        </section>
-      )}
+        {/* Related Articles */}
+        {relatedBlogs.length > 0 && (
+          <section className="mt-16 pt-12 border-t border-gray-200">
+            <div className="max-w-6xl mx-auto">
+              <h2 className="text-3xl font-bold mb-8 text-center">
+                {translations?.relatedArticles || "Related Articles"}
+              </h2>
+              <BlogList
+                blogs={relatedBlogs}
+                translations={translations}
+                className="max-w-none"
+              />
+            </div>
+          </section>
+        )}
+      </section>
     </>
   );
 }

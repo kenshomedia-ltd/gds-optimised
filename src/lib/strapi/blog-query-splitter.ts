@@ -1,8 +1,8 @@
 // src/lib/strapi/blog-query-splitter.ts
 import { strapiClient } from "./strapi-client";
 import { unstable_cache } from "next/cache";
-import type { BlogData, SEOData } from "@/types/strapi.types";
-import type { BlogAuthor, BlogCategory } from "@/types/blog.types";
+import type { SEOData } from "@/types/strapi.types";
+import type { BlogData } from "@/types/blog.types";
 
 // Cache configuration for different parts
 const CACHE_CONFIG = {
@@ -43,6 +43,7 @@ async function fetchBlogsForIndex(
       "createdAt",
       "publishedAt",
       "minutesRead",
+      "updatedAt", // Add updatedAt to index query as well
     ],
     populate: {
       images: {
@@ -58,6 +59,9 @@ async function fetchBlogsForIndex(
       },
       blogCategory: {
         fields: ["blogCategory", "slug"],
+      },
+      seo: {
+        fields: ["metaTitle", "metaDescription"],
       },
     },
     sort: ["publishedAt:desc", "createdAt:desc"],
@@ -175,7 +179,14 @@ async function fetchRelatedBlogs(
   limit: number = 3
 ): Promise<BlogData[]> {
   const query = {
-    fields: ["title", "slug", "blogBrief", "createdAt", "minutesRead"],
+    fields: [
+      "title",
+      "slug",
+      "blogBrief",
+      "createdAt",
+      "minutesRead",
+      "updatedAt",
+    ],
     populate: {
       images: {
         fields: ["url", "alternativeText", "width", "height"],
@@ -257,44 +268,53 @@ export const getBlogSingleData = unstable_cache(
 /**
  * Get blog metadata for SEO (lightweight query)
  */
-export async function getBlogMetadata(slug: string): Promise<{
-  title: string;
-  description: string;
-  seo?: SEOData;
-} | null> {
-  const query = {
-    fields: ["title", "blogBrief"],
-    populate: {
-      seo: {
-        fields: ["metaTitle", "metaDescription", "keywords", "canonicalURL"],
-        populate: {
-          metaImage: {
-            fields: ["url", "width", "height"],
+export const getBlogMetadata = unstable_cache(
+  async (
+    slug: string
+  ): Promise<{
+    title: string;
+    description: string;
+    seo?: SEOData;
+  } | null> => {
+    const query = {
+      fields: ["title", "blogBrief"],
+      populate: {
+        seo: {
+          fields: ["metaTitle", "metaDescription", "keywords", "canonicalURL"],
+          populate: {
+            metaImage: {
+              fields: ["url", "width", "height"],
+            },
           },
         },
       },
-    },
-    filters: {
-      slug: {
-        $eq: slug,
+      filters: {
+        slug: {
+          $eq: slug,
+        },
       },
-    },
-  };
+    };
 
-  const response = await strapiClient.fetchWithCache<{
-    data: BlogData[];
-  }>("blogs", query, 600); // 10 minutes cache
+    const response = await strapiClient.fetchWithCache<{
+      data: BlogData[];
+    }>("blogs", query, 600); // 10 minutes cache
 
-  const blog =
-    response.data && response.data.length > 0 ? response.data[0] : null;
+    const blog =
+      response.data && response.data.length > 0 ? response.data[0] : null;
 
-  if (!blog) {
-    return null;
+    if (!blog) {
+      return null;
+    }
+
+    return {
+      title: blog.title,
+      description: blog.blogBrief || "",
+      seo: blog.seo,
+    };
+  },
+  ["blog-metadata"],
+  {
+    revalidate: 600, // 10 minutes
+    tags: ["blog-metadata"],
   }
-
-  return {
-    title: blog.title,
-    description: blog.blogBrief || "",
-    seo: blog.seo,
-  };
-}
+);

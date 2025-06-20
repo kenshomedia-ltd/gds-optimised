@@ -12,6 +12,14 @@ export interface BlogAuthor {
   lastName: string;
   slug?: string;
   photo?: StrapiImage;
+  linkedInLink?: string;
+  twitterLink?: string | null;
+  facebookLink?: string | null;
+  jobTitle?: string;
+  content1?: string;
+  experience?: string;
+  areaOfWork?: string | null;
+  specialization?: string;
 }
 
 /**
@@ -22,6 +30,7 @@ export interface BlogCategory {
   documentId?: string;
   blogCategory: string;
   slug: string;
+  seo?: SEOData;
 }
 
 /**
@@ -39,7 +48,7 @@ export interface BlogData {
   publishedAt: string;
   createdAt: string;
   updatedAt?: string;
-  minutesRead?: number;
+  minutesRead?: number | null;
   readingTime?: number;
   images?: StrapiImage;
   featuredImage?: StrapiImage;
@@ -47,7 +56,7 @@ export interface BlogData {
   blogCategory?: BlogCategory;
   categories?: BlogCategory[];
   tags?: string[];
-  seo: SEOData;
+  seo?: SEOData;
 }
 
 /**
@@ -97,4 +106,21 @@ export interface HomeLatestBlogsProps {
   blogs: BlogData[];
   translations?: Record<string, string>;
   className?: string;
+}
+
+
+
+/**
+ * Type-safe signature interface for ETag generation
+ */
+export interface BlogETagSignature {
+  // For index pages
+  page?: number;
+  total?: number;
+  blogIds?: number[];
+  featuredId?: number;
+  // For single pages
+  blogId?: number;
+  updatedAt?: string;
+  relatedIds?: number[];
 }

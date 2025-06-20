@@ -1,5 +1,6 @@
 // src/app/blog/page.tsx
 
+import React from "react";
 import { Metadata } from "next";
 import Link from "next/link";
 import { getBlogIndexData } from "@/lib/strapi/blog-data-loader";
@@ -15,9 +16,9 @@ export const dynamic = "force-static";
 export const revalidate = 300; // 5 minutes
 
 interface BlogIndexPageProps {
-  searchParams?: {
+  searchParams?: Promise<{
     page?: string;
-  };
+  }>;
 }
 
 // Generate metadata for SEO
@@ -36,8 +37,10 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function BlogIndexPage({
   searchParams,
 }: BlogIndexPageProps) {
+  // Await searchParams if it's a Promise
+  const params = searchParams ? await searchParams : undefined;
   // Get page number from search params
-  const currentPage = Number(searchParams?.page) || 1;
+  const currentPage = Number(params?.page) || 1;
   const pageSize = 12; // Number of blogs per page (excluding featured)
 
   // Fetch data
@@ -55,10 +58,10 @@ export default async function BlogIndexPage({
       ? blogs.filter((blog) => blog.slug !== featuredBlog.slug)
       : blogs;
 
-  // Breadcrumbs
+  // Breadcrumbs - Updated to use correct property names
   const breadcrumbs = [
-    { label: "Home", url: "/" },
-    { label: "Blog", url: "/blog" },
+    { breadCrumbText: "Home", breadCrumbUrl: "/" },
+    { breadCrumbText: "Blog", breadCrumbUrl: "" }, // Empty URL for current page
   ];
 
   // Schema.org structured data
@@ -143,61 +146,60 @@ export default async function BlogIndexPage({
                   currentPage === 2 ? "/blog" : `/blog?page=${currentPage - 1}`
                 }
                 className={cn(
-                  "px-4 py-2 rounded-lg",
-                  "bg-gray-100 hover:bg-gray-200",
-                  "text-gray-700 font-medium",
-                  "transition-colors",
-                  "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                  "px-4 py-2 rounded-lg font-medium",
+                  "bg-primary text-white",
+                  "hover:bg-primary-shade transition-colors",
+                  "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                 )}
-                aria-label="Previous page"
               >
-                Previous
+                {translations?.previous || "Previous"}
               </Link>
             )}
 
             {/* Page Numbers */}
-            <div className="flex items-center gap-1">
-              {Array.from(
-                { length: pagination.pageCount },
-                (_, i) => i + 1
-              ).map((pageNum) => {
-                // Show first page, last page, current page, and pages around current
-                const showPage =
-                  pageNum === 1 ||
-                  pageNum === pagination.pageCount ||
-                  Math.abs(pageNum - currentPage) <= 1;
-
-                if (!showPage && pageNum === currentPage - 2) {
+            <div className="flex items-center gap-2">
+              {Array.from({ length: pagination.pageCount }, (_, i) => i + 1)
+                .filter((page) => {
+                  // Show first page, last page, current page, and pages adjacent to current
                   return (
-                    <span key={pageNum} className="px-2">
-                      ...
-                    </span>
+                    page === 1 ||
+                    page === pagination.pageCount ||
+                    Math.abs(page - currentPage) <= 1
                   );
-                }
-
-                if (!showPage) {
-                  return null;
-                }
-
-                return (
-                  <Link
-                    key={pageNum}
-                    href={pageNum === 1 ? "/blog" : `/blog?page=${pageNum}`}
-                    className={cn(
-                      "px-4 py-2 rounded-lg font-medium",
-                      "transition-colors",
-                      "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary",
-                      pageNum === currentPage
-                        ? "bg-primary text-white"
-                        : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                })
+                .map((page, index, array) => (
+                  <React.Fragment key={page}>
+                    {/* Add ellipsis if there's a gap */}
+                    {index > 0 && array[index - 1] !== page - 1 && (
+                      <span className="px-2 text-gray-500">...</span>
                     )}
-                    aria-label={`Page ${pageNum}`}
-                    aria-current={pageNum === currentPage ? "page" : undefined}
-                  >
-                    {pageNum}
-                  </Link>
-                );
-              })}
+
+                    {page === currentPage ? (
+                      <span
+                        className={cn(
+                          "px-4 py-2 rounded-lg font-medium",
+                          "bg-primary text-white",
+                          "cursor-default"
+                        )}
+                        aria-current="page"
+                      >
+                        {page}
+                      </span>
+                    ) : (
+                      <Link
+                        href={page === 1 ? "/blog" : `/blog?page=${page}`}
+                        className={cn(
+                          "px-4 py-2 rounded-lg font-medium",
+                          "bg-gray-200 text-gray-700",
+                          "hover:bg-gray-300 transition-colors",
+                          "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                        )}
+                      >
+                        {page}
+                      </Link>
+                    )}
+                  </React.Fragment>
+                ))}
             </div>
 
             {/* Next Page */}
@@ -205,26 +207,17 @@ export default async function BlogIndexPage({
               <Link
                 href={`/blog?page=${currentPage + 1}`}
                 className={cn(
-                  "px-4 py-2 rounded-lg",
-                  "bg-gray-100 hover:bg-gray-200",
-                  "text-gray-700 font-medium",
-                  "transition-colors",
-                  "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                  "px-4 py-2 rounded-lg font-medium",
+                  "bg-primary text-white",
+                  "hover:bg-primary-shade transition-colors",
+                  "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                 )}
-                aria-label="Next page"
               >
-                Next
+                {translations?.next || "Next"}
               </Link>
             )}
           </nav>
         )}
-
-        {/* Page Info */}
-        <div className="text-center mt-8 text-sm text-gray-600">
-          Showing {(currentPage - 1) * pageSize + 1} -{" "}
-          {Math.min(currentPage * pageSize, pagination.total)} of{" "}
-          {pagination.total} articles
-        </div>
       </section>
     </>
   );

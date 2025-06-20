@@ -9,7 +9,7 @@ import {
   type BlogIndexPageData,
   type BlogSinglePageData,
 } from "./blog-query-splitter";
-
+import { BlogETagSignature } from "@/types/blog.types";
 // Revalidation times for different content types
 const REVALIDATE_TIMES = {
   blogList: 300, // 5 minutes
@@ -218,7 +218,7 @@ export async function generateBlogETag(
   data: BlogIndexPageData | BlogSinglePageData,
   type: "index" | "single"
 ): Promise<string> {
-  let signature: any;
+  let signature: BlogETagSignature;
 
   if (type === "index") {
     const indexData = data as BlogIndexPageData;
