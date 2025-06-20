@@ -7,6 +7,30 @@ import type {
 } from "@/types/image.types";
 
 /**
+ * Check if the image is a local file (in public folder)
+ * Local files are identified by:
+ * - Starting with "/" but not containing "http" or "https"
+ * - Not containing a domain name (no .com, .net, etc)
+ * - Optional: specific prefix like "/images/" or "/assets/"
+ */
+export function isLocalImage(url: string): boolean {
+  if (!url) return false;
+  
+  // Check if it starts with / (indicating public folder)
+  if (!url.startsWith('/')) return false;
+  
+  // Make sure it's not an external URL that happens to have a path
+  if (url.includes('http://') || url.includes('https://')) return false;
+  
+  // Check it doesn't contain common domain extensions
+  const domainExtensions = ['.com', '.net', '.org', '.io', '.dev', '.app'];
+  if (domainExtensions.some(ext => url.includes(ext))) return false;
+  
+  return true;
+}
+
+
+/**
  * Get the image handler base URL from environment
  */
 export function getImageHandlerUrl(): string {
@@ -53,6 +77,9 @@ export function buildImageUrl(
 ): string {
   // Don't transform SVGs
   if (isSvgUrl(src)) return src;
+
+  // Don't transform local images - return as-is
+  if (isLocalImage(src)) return src;
 
   const basePath = extractBasePath(src);
   const imageHandlerUrl = getImageHandlerUrl();
@@ -137,7 +164,7 @@ export function generateBlurDataURL(
   width: number,
   height: number
 ): string | undefined {
-  if (isSvgUrl(src)) return undefined;
+  if (isSvgUrl(src) || isLocalImage(src)) return undefined;
 
   const placeholderWidth = 40;
   const placeholderHeight = Math.round((placeholderWidth / width) * height);
@@ -159,7 +186,7 @@ export function generateSrcSet(
   height?: number,
   quality: number = 85
 ): string {
-  if (isSvgUrl(src)) return "";
+  if (isSvgUrl(src) || isLocalImage(src)) return "";
 
   const densities = [1, 2];
 
@@ -197,6 +224,10 @@ export function imageLoader({
   src: string;
   width: number;
   quality?: number;
-}): string {
-  return buildImageUrl(src, { width, quality, format: "webp" });
-}
+  }): string {
+    // For local images, return the src as-is
+    if (isLocalImage(src)) return src;
+  
+    // For remote images, build the URL
+    return buildImageUrl(src, { width, quality, format: "webp" });
+  }

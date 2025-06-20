@@ -3,250 +3,290 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import {
-  getCasinoPageData,
+  getCasinoPageDataWithGames,
   getCasinoMetadata,
 } from "@/lib/strapi/casino-data-loader";
+import { getLayoutData } from "@/lib/strapi/data-loader";
 import { generateMetadata as generateSEOMetadata } from "@/lib/utils/seo";
+import { CasinoHero } from "@/components/casino/CasinoHero/CasinoHero";
+import { CasinoContent } from "@/components/casino/CasinoContent/CasinoContent";
+import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
+import type { CasinoPageData, FAQ, HowToStep } from "@/types/casino-page.types";
 
 // Force static generation with ISR
 export const dynamic = "force-static";
-export const revalidate = 60; // 1 minute for edge cache
+export const revalidate = 300; // 5 minutes
 
-// Generate metadata
+interface CasinoPageProps {
+  params: {
+    slug: string;
+  };
+}
+
+// Generate static params for all casino pages
+export async function generateStaticParams() {
+  // This would fetch all casino slugs from Strapi
+  // For now, return empty array to allow dynamic generation
+  return [];
+}
+
+// Generate metadata for SEO
 export async function generateMetadata({
   params,
-}: {
-  params: Promise<{ slug: string }>;
-}): Promise<Metadata> {
-  // Await params as required in Next.js 15
-  const { slug } = await params;
+}: CasinoPageProps): Promise<Metadata> {
+  const { slug } = params;
 
   try {
     // Use lightweight metadata query for better performance
     const casinoMetadata = await getCasinoMetadata(slug);
 
     if (!casinoMetadata) {
-      return {
-        title: "Casino Not Found",
-        description: "The requested casino could not be found.",
-      };
+      return {};
     }
+
+    const canonicalUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/casino/recensione/${slug}`;
 
     return generateSEOMetadata({
       title: casinoMetadata.seo?.metaTitle || `${casinoMetadata.title} Review`,
       description:
         casinoMetadata.seo?.metaDescription ||
-        casinoMetadata.introduction ||
-        `Read our comprehensive review of ${casinoMetadata.title}`,
+        casinoMetadata.introduction?.substring(0, 160),
       keywords: casinoMetadata.seo?.keywords,
-      canonicalUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/casino/recensione/${slug}`,
+      canonicalUrl,
     });
   } catch (error) {
     console.error("Error generating metadata:", error);
-    return {
-      title: "Casino Not Found",
-      description: "The requested casino could not be found.",
-    };
+    return {};
   }
 }
 
-export default async function CasinoReviewPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
-  // Await params as required in Next.js 15
-  const { slug } = await params;
+export default async function CasinoPage({ params }: CasinoPageProps) {
+  const { slug } = params;
 
-  // Performance timing
-  const startTime = Date.now();
+  // Fetch casino data with games and layout data in parallel
+  const [casinoResponse, layoutData] = await Promise.all([
+    getCasinoPageDataWithGames(slug, { cached: true, gamesLimit: 12 }),
+    getLayoutData({ cached: true }),
+  ]);
 
-  // Fetch casino data using the split query approach with proper data loader
-  const { casinoData, relatedProviders, comparisonCasinos } =
-    await getCasinoPageData(slug, { cached: true });
-
-  // Log the fetched data to console as requested
-  console.log("=== CASINO PAGE DATA (SPLIT QUERIES) ===");
-  console.log("Slug:", slug);
-  console.log("Fetch time:", Date.now() - startTime, "ms");
-  console.log("\n--- Casino Data ---");
-  console.log(JSON.stringify(casinoData, null, 2));
-  console.log("\n--- Related Providers ---");
-  console.log(JSON.stringify(relatedProviders, null, 2));
-  console.log("\n--- Comparison Casinos ---");
-  console.log(JSON.stringify(comparisonCasinos, null, 2));
-  console.log("=====================================\n");
-
-  // Log performance in development
-  if (process.env.NODE_ENV === "development") {
-    console.log(`Casino page data fetching took: ${Date.now() - startTime}ms`);
+  if (!casinoResponse.casinoData) {
+    notFound();
   }
 
-  // Handle not found
+  const { casinoData, games } = casinoResponse;
+  const { translations } = layoutData;
+
   if (!casinoData) {
     notFound();
   }
 
-  // For now, just render a simple page with the data
+  // Generate breadcrumbs
+  const breadcrumbItems = [
+    {
+      breadCrumbText: translations.home || "Home",
+      breadCrumbUrl: "/",
+    },
+    {
+      breadCrumbText: translations.casinos || "Casinos",
+      breadCrumbUrl: "/casino",
+    },
+    {
+      breadCrumbText: casinoData.title,
+      breadCrumbUrl: "", // Empty string for current page
+    },
+  ];
+
+  // Generate structured data for SEO
+  const structuredData = generateStructuredData(casinoData, translations);
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold mb-4">
-        {casinoData.heading || casinoData.title}
-      </h1>
+    <>
+      {/* Structured Data */}
+      {structuredData.map((schema, index) => (
+        <script
+          key={index}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        />
+      ))}
 
-      <div className="bg-gray-100 p-4 rounded-lg mb-8">
-        <h2 className="text-xl font-semibold mb-2">Debug Information</h2>
-        <p className="text-sm text-gray-600">
-          This is a dummy page that logs casino data to the console.
-        </p>
-        <p className="text-sm text-gray-600">
-          Check your browser console or terminal for the full data structure.
-        </p>
-      </div>
+      {/* Breadcrumbs */}
+      <Breadcrumbs items={breadcrumbItems} />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div>
-          <h3 className="text-lg font-semibold mb-2">Basic Information</h3>
-          <ul className="space-y-1 text-sm">
-            <li>
-              <strong>Title:</strong> {casinoData.title}
-            </li>
-            <li>
-              <strong>Slug:</strong> {casinoData.slug}
-            </li>
-            <li>
-              <strong>Rating:</strong> {casinoData.ratingAvg}/5 (
-              {casinoData.ratingCount} reviews)
-            </li>
-            <li>
-              <strong>Author Ratings:</strong>{" "}
-              {casinoData.authorRatings || "N/A"}
-            </li>
-            <li>
-              <strong>Playthrough:</strong> {casinoData.playthrough || "N/A"}
-            </li>
-          </ul>
-        </div>
+      {/* Hero Section */}
+      <CasinoHero casino={casinoData} translations={translations} />
 
-        <div>
-          <h3 className="text-lg font-semibold mb-2">Content Sections</h3>
-          <ul className="space-y-1 text-sm">
-            <li>
-              <strong>Introduction:</strong>{" "}
-              {casinoData.introduction ? "✓" : "✗"}
-            </li>
-            <li>
-              <strong>Content 1:</strong> {casinoData.content1 ? "✓" : "✗"}
-            </li>
-            <li>
-              <strong>Content 2:</strong> {casinoData.content2 ? "✓" : "✗"}
-            </li>
-            <li>
-              <strong>Content 3:</strong> {casinoData.content3 ? "✓" : "✗"}
-            </li>
-            <li>
-              <strong>Content 4:</strong> {casinoData.content4 ? "✓" : "✗"}
-            </li>
-          </ul>
-        </div>
+      {/* Main Content */}
+      <CasinoContent
+        casino={casinoData}
+        games={games}
+        translations={translations}
+      />
 
-        <div>
-          <h3 className="text-lg font-semibold mb-2">Features & Sections</h3>
-          <ul className="space-y-1 text-sm">
-            <li>
-              <strong>Casino Features:</strong>{" "}
-              {casinoData.casinoFeatures?.length || 0} items
-            </li>
-            <li>
-              <strong>How To:</strong> {casinoData.howTo ? "✓" : "✗"}
-            </li>
-            <li>
-              <strong>Pros/Cons:</strong> {casinoData.proscons ? "✓" : "✗"}
-            </li>
-            <li>
-              <strong>FAQs:</strong> {casinoData.faqs?.length || 0} items
-            </li>
-            <li>
-              <strong>Testimonial:</strong> {casinoData.testimonial ? "✓" : "✗"}
-            </li>
-          </ul>
-        </div>
-
-        <div>
-          <h3 className="text-lg font-semibold mb-2">Bonuses</h3>
-          <ul className="space-y-1 text-sm">
-            <li>
-              <strong>Bonus Section:</strong>{" "}
-              {casinoData.bonusSection ? "✓" : "✗"}
-            </li>
-            <li>
-              <strong>No Deposit:</strong>{" "}
-              {casinoData.noDepositSection ? "✓" : "✗"}
-            </li>
-            <li>
-              <strong>Free Spins:</strong>{" "}
-              {casinoData.freeSpinsSection ? "✓" : "✗"}
-            </li>
-            <li>
-              <strong>Casino Bonus:</strong>{" "}
-              {casinoData.casinoBonus ? "✓" : "✗"}
-            </li>
-          </ul>
-        </div>
-
-        <div>
-          <h3 className="text-lg font-semibold mb-2">Additional Data</h3>
-          <ul className="space-y-1 text-sm">
-            <li>
-              <strong>Author:</strong>{" "}
-              {casinoData.author
-                ? `${casinoData.author.firstName} ${casinoData.author.lastName}`
-                : "N/A"}
-            </li>
-            <li>
-              <strong>Providers:</strong> {relatedProviders.length} providers
-            </li>
-            <li>
-              <strong>Comparison Casinos:</strong> {comparisonCasinos.length}{" "}
-              casinos
-            </li>
-            <li>
-              <strong>Payment Channels:</strong>{" "}
-              {casinoData.paymentChannels?.length || 0} channels
-            </li>
-            <li>
-              <strong>Blocks:</strong> {casinoData.blocks?.length || 0} blocks
-            </li>
-          </ul>
-        </div>
-
-        <div>
-          <h3 className="text-lg font-semibold mb-2">SEO & Meta</h3>
-          <ul className="space-y-1 text-sm">
-            <li>
-              <strong>Meta Title:</strong>{" "}
-              {casinoData.seo?.metaTitle || "Not set"}
-            </li>
-            <li>
-              <strong>Meta Description:</strong>{" "}
-              {casinoData.seo?.metaDescription
-                ? "✓ " + casinoData.seo.metaDescription.substring(0, 50) + "..."
-                : "Not set"}
-            </li>
-            <li>
-              <strong>Keywords:</strong> {casinoData.seo?.keywords || "Not set"}
-            </li>
-          </ul>
-        </div>
-      </div>
-
-      <div className="mt-8 p-4 bg-yellow-100 rounded-lg">
-        <p className="text-sm text-yellow-800">
-          <strong>Note:</strong> This is a dummy implementation that displays
-          the casino data structure. Replace this with actual casino review
-          components following the project&apos;s component patterns.
-        </p>
-      </div>
-    </div>
+      {/* Mobile Sticky Footer - will be implemented later */}
+      {/* <CasinoMobileFooter casino={casinoData} translations={translations} /> */}
+    </>
   );
+}
+
+// Generate structured data for the review
+function generateStructuredData(
+  casino: CasinoPageData,
+  translations: Record<string, string>
+): object[] {
+  const schemas: object[] = [];
+
+  // Review Schema
+  const reviewSchema = {
+    "@context": "https://schema.org/",
+    "@type": "Review",
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      url: `${process.env.NEXT_PUBLIC_SITE_URL}/casino/recensione/${casino.slug}`,
+      "@id": `${process.env.NEXT_PUBLIC_SITE_URL}/casino/recensione/${casino.slug}`,
+    },
+    datePublished: casino.createdAt,
+    dateModified: casino.updatedAt,
+    description: casino.introduction?.replace(/(<([^>]+)>)/gi, "") || "",
+    itemReviewed: {
+      "@type": "Organization",
+      image: casino.images?.url,
+      name: casino.title,
+      makesOffer: casino.casinoBonus
+        ? [
+            {
+              "@type": "Offer",
+              "@id": process.env.NEXT_PUBLIC_SITE_URL,
+              name: casino.casinoBonus.bonusLabel,
+              description: `${
+                translations.reviewAndBonus || "Review and Bonus"
+              } ${casino.title}`,
+              url: casino.casinoBonus.bonusUrl,
+            },
+          ]
+        : undefined,
+    },
+    reviewRating: {
+      "@type": "Rating",
+      ratingValue: casino.authorRatings || casino.ratingAvg,
+      bestRating: "5",
+      worstRating: "0",
+    },
+    name: `${translations.reviewAndBonus || "Review and Bonus"} ${
+      casino.title
+    }`,
+    author: casino.author
+      ? {
+          "@type": "Person",
+          name: `${casino.author.firstName} ${casino.author.lastName}`,
+          url: `${
+            process.env.NEXT_PUBLIC_SITE_URL
+          }/author/${casino.author.firstName.toLowerCase()}.${casino.author.lastName.toLowerCase()}`,
+        }
+      : undefined,
+    ...(casino.proscons && {
+      positiveNotes: {
+        "@type": "ItemList",
+        itemListElement: casino.proscons.pros.map((pro: string, i: number) => ({
+          "@type": "ListItem",
+          position: i + 1,
+          name: pro,
+        })),
+      },
+      negativeNotes: {
+        "@type": "ItemList",
+        itemListElement: casino.proscons.cons.map((con: string, i: number) => ({
+          "@type": "ListItem",
+          position: i + 1,
+          name: con,
+        })),
+      },
+    }),
+    ...(casino.testimonial && {
+      contributor: {
+        "@type": "Person",
+        name: `${casino.testimonial.approvedBy?.firstName} ${casino.testimonial.approvedBy?.lastName}`,
+        url: `${
+          process.env.NEXT_PUBLIC_SITE_URL
+        }/author/${casino.testimonial.approvedBy?.firstName.toLowerCase()}.${casino.testimonial.approvedBy?.lastName.toLowerCase()}`,
+        sameAs: [casino.testimonial.approvedBy?.jobTitle].filter(Boolean),
+        worksFor: {
+          "@type": "Organization",
+          "@id": process.env.NEXT_PUBLIC_SITE_URL,
+        },
+      },
+      reviewBody: casino.testimonial.testimonial,
+    }),
+    publisher: {
+      "@type": "Organization",
+      name: process.env.NEXT_PUBLIC_SITE_NAME,
+      url: process.env.NEXT_PUBLIC_SITE_URL,
+      logo: casino.images?.url,
+    },
+  };
+
+  schemas.push(reviewSchema);
+
+  // Add FAQ schema if FAQs exist
+
+  if (casino.faqs && casino.faqs.length > 0) {
+    const faqSchema = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntityOfPage: {
+        "@type": "WebPage",
+        url: `${process.env.NEXT_PUBLIC_SITE_URL}/casino/recensione/${casino.slug}`,
+        "@id": `${process.env.NEXT_PUBLIC_SITE_URL}/casino/recensione/${casino.slug}`,
+      },
+      mainEntity: casino.faqs.map((faq: FAQ) => ({
+        "@type": "Question",
+        name: faq.question,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: faq.answer,
+        },
+      })),
+    };
+    schemas.push(faqSchema);
+  }
+
+  // Add HowTo schema if exists
+  if (casino.howTo) {
+    const howToSchema = {
+      "@context": "https://schema.org",
+      "@type": "HowTo",
+      mainEntityOfPage: {
+        "@type": "WebPage",
+        url: `${process.env.NEXT_PUBLIC_SITE_URL}/casino/recensione/${casino.slug}`,
+        "@id": `${process.env.NEXT_PUBLIC_SITE_URL}/casino/recensione/${casino.slug}`,
+      },
+      name: casino.howTo.title,
+      totalTime: "PT15M",
+      description: casino.howTo.title,
+      tool: [
+        {
+          "@type": "HowToTool",
+          name: "smartphone, PC, tablet, payment method",
+        },
+      ],
+      step: casino.howTo.howToGroup.map((step: HowToStep, i: number) => ({
+        "@type": "HowToStep",
+        url: `${casino.slug}#step0${i + 1}`,
+        name: step.heading,
+        itemListElement: {
+          "@type": "HowToDirection",
+          text: step.copy,
+        },
+        ...(step.image && {
+          image: {
+            "@type": "ImageObject",
+            url: step.image.url,
+          },
+        }),
+      })),
+    };
+    schemas.push(howToSchema);
+  }
+
+  return schemas;
 }

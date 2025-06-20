@@ -1,27 +1,32 @@
 // src/lib/strapi/casino-data-loader.ts
 
-import { unstable_cache } from "next/cache";
 import { cache } from "react";
+import { unstable_cache } from "next/cache";
 import { strapiClient } from "./strapi-client";
-import { mergeCasinoPageData } from "./casino-page-query-splitter";
+import {
+  splitCasinoPageData,
+  mergeCasinoPageData,
+} from "./casino-page-query-splitter";
 import type {
   CasinoPageData,
-  CasinoPageDataResponse,
   CasinoPageSplitData,
+  CasinoPageDataResponse,
 } from "@/types/casino-page.types";
 import type { GameProvider } from "@/types/game.types";
 import type { CasinoData } from "@/types/casino.types";
+import type { GameData } from "@/types/game.types";
 
-// Revalidation times for different content types
+// Revalidation times for different content types (in seconds)
 const REVALIDATE_TIMES = {
   structure: 600, // 10 minutes for static content
-  dynamic: 60, // 1 minute for dynamic content (ratings, bonuses)
-  providers: 300, // 5 minutes for provider data
+  dynamic: 60, // 1 minute for ratings/bonuses
+  providers: 300, // 5 minutes for provider lists
   comparison: 300, // 5 minutes for comparison casinos
+  games: 300, // 5 minutes for games
 };
 
 /**
- * Build static casino query (structure, content, author)
+ * Build static casino query (structure, content, metadata)
  */
 function buildStaticCasinoQuery(slug: string) {
   return {
@@ -31,7 +36,6 @@ function buildStaticCasinoQuery(slug: string) {
       "createdAt",
       "updatedAt",
       "publishedAt",
-      "documentId",
       "heading",
       "introduction",
       "content1",
@@ -57,9 +61,14 @@ function buildStaticCasinoQuery(slug: string) {
         },
       },
       proscons: {
+        fields: ["heading"],
         populate: {
-          pros: true,
-          cons: true,
+          pros: {
+            fields: ["list"],
+          },
+          cons: {
+            fields: ["list"],
+          },
           proImage: {
             fields: ["url", "width", "height"],
           },
@@ -170,22 +179,16 @@ function buildDynamicCasinoQuery(slug: string) {
         fields: ["url", "width", "height", "alternativeText"],
       },
       bonusSection: {
-        fields: [
-          "bonusAmount",
-          "availability",
-          "speed",
-          "cashBack",
-          "freeSpin",
-        ],
+        fields: ["bonusAmount", "termsConditions", "cashBack", "freeSpin"],
       },
       noDepositSection: {
-        fields: ["bonusAmount", "availability", "speed"],
+        fields: ["bonusAmount", "termsConditions"],
       },
       freeSpinsSection: {
-        fields: ["bonusAmount", "availability", "speed"],
+        fields: ["bonusAmount", "termsConditions"],
       },
       termsAndConditions: {
-        fields: ["heading", "copy", "gambleResponsibly"],
+        fields: ["copy", "gambleResponsibly"],
       },
       casinoBonus: {
         fields: ["bonusLabel", "bonusUrl", "bonusCode"],
@@ -240,14 +243,7 @@ async function fetchComparisonCasinos(casinoId: number): Promise<CasinoData[]> {
     fields: ["id"],
     populate: {
       casinoComparison: {
-        fields: [
-          "title",
-          "slug",
-          "ratingAvg",
-          "ratingCount",
-          "playthrough",
-          "publishedAt",
-        ],
+        fields: ["title", "slug", "ratingAvg", "ratingCount", "publishedAt"],
         populate: {
           images: {
             fields: ["url", "width", "height"],
@@ -304,9 +300,8 @@ async function fetchStaticCasinoData(
 ): Promise<CasinoPageSplitData["staticData"] | null> {
   const staticQuery = buildStaticCasinoQuery(slug);
 
-  // Use a more flexible type for the response
   const response = await strapiClient.fetchWithCache<{
-    data: Array<CasinoPageData & { updatedAt?: string; publishedAt: string }>;
+    data: CasinoPageData[];
   }>("casinos", staticQuery, REVALIDATE_TIMES.structure);
 
   const data = response.data?.[0];
@@ -315,33 +310,9 @@ async function fetchStaticCasinoData(
     return null;
   }
 
-  // Return only static fields with proper type checking
-  return {
-    id: data.id,
-    documentId: data.documentId,
-    title: data.title,
-    slug: data.slug,
-    publishedAt: data.publishedAt,
-    heading: data.heading,
-    introduction: data.introduction,
-    content1: data.content1,
-    content2: data.content2,
-    content3: data.content3,
-    content4: data.content4,
-    casinoFeatures: data.casinoFeatures,
-    howTo: data.howTo,
-    proscons: data.proscons,
-    paymentOptions: data.paymentOptions,
-    casinoGeneralInfo: data.casinoGeneralInfo,
-    testimonial: data.testimonial,
-    faqs: data.faqs,
-    author: data.author,
-    seo: data.seo,
-    paymentChannels: data.paymentChannels,
-    blocks: data.blocks,
-    createdAt: data.createdAt,
-    updatedAt: data.updatedAt,
-  };
+  // Extract static fields
+  const { staticData } = splitCasinoPageData(data);
+  return staticData;
 }
 
 /**
@@ -362,21 +333,52 @@ async function fetchDynamicCasinoData(
     return null;
   }
 
-  // Return only dynamic fields with proper type checking
-  return {
-    ratingAvg: data.ratingAvg,
-    ratingCount: data.ratingCount,
-    authorRatings: data.authorRatings,
-    playthrough: data.playthrough,
-    images: data.images,
-    bonusSection: data.bonusSection,
-    noDepositSection: data.noDepositSection,
-    freeSpinsSection: data.freeSpinsSection,
-    termsAndConditions: data.termsAndConditions,
-    casinoBonus: data.casinoBonus,
-    providers: undefined, // Will be fetched separately
-    casinoComparison: undefined, // Will be fetched separately
-  };
+  // Extract dynamic fields
+  const { dynamicData } = splitCasinoPageData(data);
+  return dynamicData;
+}
+
+/**
+ * Fetch games for casino providers
+ */
+export async function fetchGamesForCasino(
+  providerSlugs: string[],
+  limit: number = 12
+): Promise<GameData[]> {
+  if (!providerSlugs.length) return [];
+
+  try {
+    const query = {
+      fields: ["title", "slug", "ratingAvg", "ratingCount"],
+      populate: {
+        images: {
+          fields: ["url", "width", "height", "alternativeText"],
+        },
+        provider: {
+          fields: ["title", "slug"],
+        },
+      },
+      filters: {
+        provider: {
+          slug: { $in: providerSlugs },
+        },
+      },
+      sort: ["ratingAvg:desc"],
+      pagination: {
+        pageSize: limit,
+        page: 1,
+      },
+    };
+
+    const response = await strapiClient.fetchWithCache<{
+      data: GameData[];
+    }>("games", query, REVALIDATE_TIMES.games);
+
+    return response.data || [];
+  } catch (error) {
+    console.error("Failed to fetch games for casino:", error);
+    return [];
+  }
 }
 
 /**
@@ -412,12 +414,10 @@ async function fetchCasinoDataWithSplitQueries(
       };
     }
 
-    // Step 3: Use the merger function to combine data
-    // Update dynamic data with providers and comparison
+    // Step 3: Merge data
     dynamicData.providers = providers;
     dynamicData.casinoComparison = comparisonCasinos;
 
-    // Merge using the splitter's merge function
     const casinoData = mergeCasinoPageData(staticData, dynamicData);
 
     return {
@@ -471,6 +471,76 @@ export async function getCasinoPageData(
 }
 
 /**
+ * Get casino page data with games
+ * Convenience function that includes games fetching
+ */
+export async function getCasinoPageDataWithGames(
+  slug: string,
+  options: { cached?: boolean; gamesLimit?: number } = {}
+): Promise<CasinoPageDataResponse & { games: GameData[] }> {
+  const { gamesLimit = 12 } = options;
+
+  // Get casino data
+  const casinoResponse = await getCasinoPageData(slug, options);
+
+  if (!casinoResponse.casinoData) {
+    return {
+      ...casinoResponse,
+      games: [],
+    };
+  }
+
+  // Extract provider slugs
+  const providerSlugs = casinoResponse.relatedProviders
+    .map((provider) => provider.slug)
+    .filter(Boolean);
+
+  // Fetch games
+  const games = await fetchGamesForCasino(providerSlugs, gamesLimit);
+
+  return {
+    ...casinoResponse,
+    games,
+  };
+}
+
+/**
+ * Lightweight metadata fetcher
+ */
+export const getCasinoPageMetadata = unstable_cache(
+  async (slug: string): Promise<CasinoPageData | null> => {
+    try {
+      const query = {
+        fields: ["title", "slug", "introduction"],
+        populate: {
+          seo: {
+            fields: ["metaTitle", "metaDescription", "keywords"],
+          },
+        },
+        filters: {
+          slug: { $eq: slug },
+        },
+        pagination: { page: 1, pageSize: 1 },
+      };
+
+      const response = await strapiClient.fetchWithCache<{
+        data: CasinoPageData[];
+      }>("casinos", query, REVALIDATE_TIMES.structure);
+
+      return response.data?.[0] || null;
+    } catch (error) {
+      console.error("Failed to fetch casino page metadata:", error);
+      return null;
+    }
+  },
+  ["casino-page-metadata"],
+  {
+    revalidate: REVALIDATE_TIMES.structure,
+    tags: ["casino-metadata"],
+  }
+);
+
+/**
  * Revalidate casino cache
  * Use in webhook handlers or server actions
  */
@@ -485,7 +555,5 @@ export async function revalidateCasinoCache(slug: string) {
   await strapiClient.invalidateCache(`casino:${slug}`);
 }
 
-/**
- * Re-export getCasinoMetadata from query splitter for convenience
- */
-export { getCasinoPageMetadata as getCasinoMetadata } from "./casino-page-query-splitter";
+// Re-export the metadata function for convenience
+export { getCasinoPageMetadata as getCasinoMetadata };

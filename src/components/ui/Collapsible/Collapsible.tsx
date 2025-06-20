@@ -13,6 +13,7 @@ interface CollapsibleProps {
   containerClass?: string;
   labelClass?: string;
   contentClass?: string;
+  defaultOpen?: boolean;
 }
 
 /**
@@ -22,6 +23,7 @@ interface CollapsibleProps {
  * - Smooth expand/collapse animation
  * - Accessible with ARIA attributes
  * - Mobile-optimized
+ * - Configurable initial state
  */
 export function Collapsible({
   id,
@@ -30,8 +32,9 @@ export function Collapsible({
   containerClass,
   labelClass,
   contentClass,
+  defaultOpen = false,
 }: CollapsibleProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(defaultOpen);
 
   if (!content) return null;
 

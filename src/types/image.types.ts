@@ -30,6 +30,7 @@ export interface ImageProps {
   rootMargin?: string;
   // Responsive height option
   responsive?: boolean;
+  isLocal?: boolean;
 }
 
 /**

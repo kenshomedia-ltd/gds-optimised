@@ -43,8 +43,8 @@ export function HeaderAuthor({
         <Image
           src={author.photo.url}
           alt={author.photo.alternativeText || authorName}
-          width={author.photo.width || 24}
-          height={author.photo.height || 24}
+          width={24}
+          height={24}
           className="w-6 h-6 rounded-full object-cover"
           quality={85}
         />

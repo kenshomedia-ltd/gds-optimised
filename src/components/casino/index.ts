@@ -6,3 +6,12 @@ export { CasinoBadge } from "./CasinoBadge/CasinoBadge";
 export { CasinoSidebar } from "./CasinoSidebar/CasinoSidebar";
 export { CasinoSidebarStack } from "./CasinoSidebarStack/CasinoSidebarStack";
 export { CasinoSidebarItem } from "./CasinoSidebarItem/CasinoSidebarItem";
+
+// Hero components
+export {
+  CasinoHero,
+  CasinoFeaturesTable,
+  CasinoGeneralInfoTable,
+  CasinoTestimonial,
+  CasinoPaymentSoftware,
+} from "./CasinoHero";

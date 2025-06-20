@@ -9,6 +9,7 @@ import {
   isSvgUrl,
   isExternalUrl,
   buildImageUrl,
+  isLocalImage,
   generateBlurDataURL,
   imageLoader,
 } from "@/lib/utils/image";
@@ -47,6 +48,7 @@ export function Image({
   unoptimized,
   embedSvg = false,
   svgProps,
+  isLocal,
   // New progressive loading props
   progressive = false,
   lowQualityUrl,
@@ -54,7 +56,7 @@ export function Image({
   rootMargin = "50px",
   // New responsive prop
   responsive = false,
-}: ImageProps & { responsive?: boolean }) {
+}: ImageProps & { responsive?: boolean; isLocal?: boolean }) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState(false);
   const [blurUrl, setBlurUrl] = useState<string | undefined>(blurDataURL);
@@ -64,10 +66,11 @@ export function Image({
 
   const isSvg = isSvgUrl(src);
   const isExternal = isExternalUrl(src);
+   const isLocalFile = isLocal || isLocalImage(src);
 
   // Generate low quality URL if progressive and not provided
   useEffect(() => {
-    if (progressive && !lowQualityUrl && !isSvg) {
+    if (progressive && !lowQualityUrl && !isSvg && !isLocalFile) {
       const lqUrl = buildImageUrl(src, {
         width: 40,
         height: height && width ? Math.round((40 / width) * height) : undefined,
@@ -76,15 +79,22 @@ export function Image({
       });
       setCurrentSrc(lqUrl);
     }
-  }, [progressive, lowQualityUrl, src, width, height, isSvg]);
+  }, [progressive, lowQualityUrl, src, width, height, isSvg, isLocalFile]);
 
   // Generate blur data URL if needed
   useEffect(() => {
-    if (!blurUrl && placeholder === "blur" && width && height && !isSvg) {
+    if (
+      !blurUrl &&
+      placeholder === "blur" &&
+      width &&
+      height &&
+      !isSvg &&
+      !isLocalFile
+    ) {
       const url = generateBlurDataURL(src, width, height);
       setBlurUrl(url);
     }
-  }, [src, width, height, placeholder, blurUrl, isSvg]);
+  }, [src, width, height, placeholder, blurUrl, isSvg, isLocalFile]);
 
   // Intersection Observer for progressive loading
   useEffect(() => {
@@ -167,7 +177,7 @@ export function Image({
 
   // Build optimized URL for non-Next.js optimized images
   const optimizedSrc =
-    isExternal && !unoptimized
+    isExternal && !unoptimized && !isLocalFile
       ? buildImageUrl(currentSrc, { width, height, quality, format: "webp" })
       : currentSrc;
 
@@ -252,7 +262,7 @@ export function Image({
             }
             blurDataURL={blurUrl}
             loader={isExternal ? imageLoader : undefined}
-            unoptimized={unoptimized || isSvg}
+            unoptimized={unoptimized || isSvg || isLocalFile}
             className={imageClasses}
             style={imageStyles}
             onLoad={handleLoad}
