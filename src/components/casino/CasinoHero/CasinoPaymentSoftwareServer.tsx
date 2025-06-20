@@ -15,7 +15,7 @@ interface CasinoPaymentSoftwareServerProps {
 
 /**
  * Server-side version of CasinoPaymentSoftware
- * Shows all providers without interactive features
+ * Shows limited providers to prevent CLS when client component loads
  * The client component will progressively enhance this
  */
 export function CasinoPaymentSoftwareServer({
@@ -107,6 +107,10 @@ export function CasinoPaymentSoftwareServer({
   };
 
   const providers = casino.providers || [];
+  // Limit server-side display to prevent CLS
+  // Show only 4 on mobile, 7 on desktop (matching client defaults)
+  const visibleProviders = providers.slice(0, 7);
+  const remainingCount = Math.max(0, providers.length - 7);
 
   return (
     <div className="grid md:grid-cols-2 mt-5">
@@ -137,29 +141,44 @@ export function CasinoPaymentSoftwareServer({
           </h5>
         </div>
 
-        {/* Show all providers in a wrapping layout for server-side */}
-        <div className="flex flex-wrap gap-1">
-          {providers.map((provider) => (
-            <div
-              key={provider.id}
-              className="provider-icon bg-white rounded p-1 w-[55px] h-[35px] flex items-center justify-center"
-              title={provider.title}
-            >
-              {provider.images?.url ? (
-                <Image
-                  src={provider.images.url}
-                  alt={provider.title || "Provider"}
-                  width={45}
-                  height={28}
-                  className="object-contain"
-                />
-              ) : (
-                <span className="text-xs text-gray-500 text-center">
-                  {provider.title || "Provider"}
-                </span>
+        {/* Match client component layout structure */}
+        <div className="relative">
+          <div className="flex items-center gap-1 max-w-full">
+            {/* Visible provider icons - limit to prevent CLS */}
+            <div className="flex gap-1 flex-shrink-0">
+              {visibleProviders.map((provider) => (
+                <div
+                  key={provider.id}
+                  className="bg-white rounded p-1 w-[55px] h-[35px] flex items-center justify-center flex-shrink-0"
+                  title={provider.title}
+                >
+                  {provider.images?.url ? (
+                    <Image
+                      src={provider.images.url}
+                      alt={provider.title || "Provider"}
+                      width={45}
+                      height={28}
+                      className="object-contain"
+                    />
+                  ) : (
+                    <span className="text-xs text-gray-500 text-center">
+                      {provider.title || "Provider"}
+                    </span>
+                  )}
+                </div>
+              ))}
+
+              {/* Show static overflow indicator if there are more providers */}
+              {remainingCount > 0 && (
+                <div
+                  className="flex items-center justify-center bg-white rounded p-1 w-[55px] h-[35px] text-primary font-semibold"
+                  aria-label={`${remainingCount} more providers`}
+                >
+                  +{remainingCount}
+                </div>
               )}
             </div>
-          ))}
+          </div>
         </div>
       </div>
     </div>

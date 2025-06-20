@@ -179,7 +179,8 @@ export function CasinoPaymentSoftwareClient({
       </div>
 
       {/* Software Providers */}
-      <div className="md:ml-4">
+      <div className="md:ml-4 relative">
+        {/* Added relative here for popup positioning context */}
         <div className="flex py-3 text-white items-center mb-3">
           <FontAwesomeIcon
             icon={faGamepad}
@@ -190,14 +191,15 @@ export function CasinoPaymentSoftwareClient({
           </h5>
         </div>
 
-        <div ref={containerRef} className="relative overflow-hidden">
+        {/* Container with relative positioning for the popup */}
+        <div ref={containerRef} className="relative z-0">
           <div className="flex items-center gap-1 max-w-full">
             {/* Visible provider icons */}
             <div ref={providersRef} className="flex gap-1 flex-shrink-0">
               {visibleProviders.map((provider) => (
                 <div
                   key={provider.id}
-                  className="provider-icon bg-white rounded p-1 w-[55px] h-[35px] flex items-center justify-center flex-shrink-0"
+                  className="bg-white rounded p-1 w-[55px] h-[35px] flex items-center justify-center flex-shrink-0"
                   title={provider.title}
                 >
                   {provider.images?.url ? (
@@ -227,9 +229,11 @@ export function CasinoPaymentSoftwareClient({
                   "bg-white rounded p-1 w-[55px] h-[35px]",
                   "text-primary font-semibold",
                   "hover:bg-gray-100 transition-colors duration-200",
-                  "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                  "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
+                  "cursor-pointer select-none"
                 )}
                 aria-label={`Show ${remainingCount} more providers`}
+                aria-expanded={showAllProviders}
                 type="button"
               >
                 +{remainingCount}
@@ -237,14 +241,29 @@ export function CasinoPaymentSoftwareClient({
             )}
           </div>
 
-          {/* Provider popup */}
+          {/* Provider popup - positioned absolutely relative to container */}
           {showAllProviders && remainingCount > 0 && (
-            <div className="provider-popup absolute top-full mt-2 left-0 right-0 bg-white rounded-lg shadow-xl p-4 z-50 max-h-60 overflow-y-auto">
+            <div
+              className={cn(
+                "provider-popup",
+                "absolute top-full mt-2 left-0 right-auto",
+                "bg-white rounded-lg shadow-2xl border border-gray-200",
+                "p-4 z-[9999] max-h-60 overflow-y-auto",
+                "min-w-[200px] max-w-[400px] w-max",
+                "transition-all duration-200 ease-out",
+                showAllProviders
+                  ? "opacity-100 translate-y-0"
+                  : "opacity-0 -translate-y-1"
+              )}
+              style={{ isolation: "isolate" }}
+              role="dialog"
+              aria-label="Additional software providers"
+            >
               <div className="flex flex-wrap gap-2">
                 {remainingProviders.map((provider) => (
                   <div
                     key={provider.id}
-                    className="provider-icon bg-gray-100 rounded p-2 w-[60px] h-[40px] flex items-center justify-center"
+                    className="bg-gray-100 rounded p-2 w-[60px] h-[40px] flex items-center justify-center hover:bg-gray-200 transition-colors"
                     title={provider.title}
                   >
                     {provider.images?.url ? (

@@ -110,134 +110,62 @@ export default async function CasinoPage({ params }: CasinoPageProps) {
         />
       ))}
 
-      {/* Breadcrumbs */}
-      <Breadcrumbs items={breadcrumbItems} />
+      {/* Breadcrumbs - Outside hero section to match other pages */}
+      <Breadcrumbs items={breadcrumbItems} showHome={false} />
 
-      {/* Hero Section */}
-      <CasinoHero casino={casinoData} translations={translations} />
+      {/* Hero Section - Consistent with other pages */}
+      <section className="featured-header relative overflow-hidden bg-gradient-to-b from-background-900 from-30% via-background-700 via-80% to-background-500 rounded-b-3xl">
+        <div className="container relative mx-auto px-4 z-10">
+          {/* Casino Hero Component */}
+          <CasinoHero casino={casinoData} translations={translations} />
+        </div>
 
-      {/* Main Content */}
+        {/* Starry Sky Background Effect - Same as other pages */}
+        <div className="absolute top-0 left-0 w-full pointer-events-none">
+          <div className="h-[80vh] bg-[#0e1a2f]" />
+          <div className="h-[300px] bg-[#0e1a2f] rounded-b-[50%_300px]" />
+        </div>
+      </section>
+
+      {/* Main Content Section */}
       <CasinoContent
         casino={casinoData}
         games={games}
         translations={translations}
       />
-
-      {/* Mobile Sticky Footer - will be implemented later */}
-      {/* <CasinoMobileFooter casino={casinoData} translations={translations} /> */}
     </>
   );
 }
 
-// Generate structured data for the review
+// Generate structured data for better SEO
 function generateStructuredData(
   casino: CasinoPageData,
-  translations: Record<string, string>
-): object[] {
-  const schemas: object[] = [];
+  _translations: Record<string, string>
+) {
+  const schemas = [];
 
-  // Review Schema
-  const reviewSchema = {
-    "@context": "https://schema.org/",
-    "@type": "Review",
-    mainEntityOfPage: {
-      "@type": "WebPage",
-      url: `${process.env.NEXT_PUBLIC_SITE_URL}/casino/recensione/${casino.slug}`,
-      "@id": `${process.env.NEXT_PUBLIC_SITE_URL}/casino/recensione/${casino.slug}`,
+  // Organization Schema
+  schemas.push({
+    "@context": "https://schema.org",
+    "@type": "OnlineGamblingService",
+    name: casino.title,
+    url: casino.casinoGeneralInfo?.website,
+    description: casino.introduction,
+    image: casino.images?.url,
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: casino.ratingAvg,
+      ratingCount: casino.ratingCount,
+      bestRating: 5,
+      worstRating: 1,
     },
-    datePublished: casino.createdAt,
-    dateModified: casino.updatedAt,
-    description: casino.introduction?.replace(/(<([^>]+)>)/gi, "") || "",
-    itemReviewed: {
-      "@type": "Organization",
-      image: casino.images?.url,
-      name: casino.title,
-      makesOffer: casino.casinoBonus
-        ? [
-            {
-              "@type": "Offer",
-              "@id": process.env.NEXT_PUBLIC_SITE_URL,
-              name: casino.casinoBonus.bonusLabel,
-              description: `${
-                translations.reviewAndBonus || "Review and Bonus"
-              } ${casino.title}`,
-              url: casino.casinoBonus.bonusUrl,
-            },
-          ]
-        : undefined,
-    },
-    reviewRating: {
-      "@type": "Rating",
-      ratingValue: casino.authorRatings || casino.ratingAvg,
-      bestRating: "5",
-      worstRating: "0",
-    },
-    name: `${translations.reviewAndBonus || "Review and Bonus"} ${
-      casino.title
-    }`,
-    author: casino.author
-      ? {
-          "@type": "Person",
-          name: `${casino.author.firstName} ${casino.author.lastName}`,
-          url: `${
-            process.env.NEXT_PUBLIC_SITE_URL
-          }/author/${casino.author.firstName.toLowerCase()}.${casino.author.lastName.toLowerCase()}`,
-        }
-      : undefined,
-    ...(casino.proscons && {
-      positiveNotes: {
-        "@type": "ItemList",
-        itemListElement: casino.proscons.pros.map((pro: string, i: number) => ({
-          "@type": "ListItem",
-          position: i + 1,
-          name: pro,
-        })),
-      },
-      negativeNotes: {
-        "@type": "ItemList",
-        itemListElement: casino.proscons.cons.map((con: string, i: number) => ({
-          "@type": "ListItem",
-          position: i + 1,
-          name: con,
-        })),
-      },
-    }),
-    ...(casino.testimonial && {
-      contributor: {
-        "@type": "Person",
-        name: `${casino.testimonial.approvedBy?.firstName} ${casino.testimonial.approvedBy?.lastName}`,
-        url: `${
-          process.env.NEXT_PUBLIC_SITE_URL
-        }/author/${casino.testimonial.approvedBy?.firstName.toLowerCase()}.${casino.testimonial.approvedBy?.lastName.toLowerCase()}`,
-        sameAs: [casino.testimonial.approvedBy?.jobTitle].filter(Boolean),
-        worksFor: {
-          "@type": "Organization",
-          "@id": process.env.NEXT_PUBLIC_SITE_URL,
-        },
-      },
-      reviewBody: casino.testimonial.testimonial,
-    }),
-    publisher: {
-      "@type": "Organization",
-      name: process.env.NEXT_PUBLIC_SITE_NAME,
-      url: process.env.NEXT_PUBLIC_SITE_URL,
-      logo: casino.images?.url,
-    },
-  };
+  });
 
-  schemas.push(reviewSchema);
-
-  // Add FAQ schema if FAQs exist
-
+  // FAQ Schema
   if (casino.faqs && casino.faqs.length > 0) {
-    const faqSchema = {
+    schemas.push({
       "@context": "https://schema.org",
       "@type": "FAQPage",
-      mainEntityOfPage: {
-        "@type": "WebPage",
-        url: `${process.env.NEXT_PUBLIC_SITE_URL}/casino/recensione/${casino.slug}`,
-        "@id": `${process.env.NEXT_PUBLIC_SITE_URL}/casino/recensione/${casino.slug}`,
-      },
       mainEntity: casino.faqs.map((faq: FAQ) => ({
         "@type": "Question",
         name: faq.question,
@@ -246,46 +174,23 @@ function generateStructuredData(
           text: faq.answer,
         },
       })),
-    };
-    schemas.push(faqSchema);
+    });
   }
 
-  // Add HowTo schema if exists
-  if (casino.howTo) {
-    const howToSchema = {
+  // How-To Schema
+  if (casino.howTo?.howToGroup && casino.howTo.howToGroup.length > 0) {
+    schemas.push({
       "@context": "https://schema.org",
       "@type": "HowTo",
-      mainEntityOfPage: {
-        "@type": "WebPage",
-        url: `${process.env.NEXT_PUBLIC_SITE_URL}/casino/recensione/${casino.slug}`,
-        "@id": `${process.env.NEXT_PUBLIC_SITE_URL}/casino/recensione/${casino.slug}`,
-      },
       name: casino.howTo.title,
-      totalTime: "PT15M",
-      description: casino.howTo.title,
-      tool: [
-        {
-          "@type": "HowToTool",
-          name: "smartphone, PC, tablet, payment method",
-        },
-      ],
-      step: casino.howTo.howToGroup.map((step: HowToStep, i: number) => ({
+      description: casino.howTo.description,
+      step: casino.howTo.howToGroup.map((step: HowToStep, index: number) => ({
         "@type": "HowToStep",
-        url: `${casino.slug}#step0${i + 1}`,
+        position: index + 1,
         name: step.heading,
-        itemListElement: {
-          "@type": "HowToDirection",
-          text: step.copy,
-        },
-        ...(step.image && {
-          image: {
-            "@type": "ImageObject",
-            url: step.image.url,
-          },
-        }),
+        text: step.copy,
       })),
-    };
-    schemas.push(howToSchema);
+    });
   }
 
   return schemas;
