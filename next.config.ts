@@ -126,6 +126,16 @@ const nextConfig: NextConfig = {
     return {
       beforeFiles: [],
       afterFiles: [
+        // Rewrite for slot-machine page
+        {
+          source: "/slot-machine/nuove",
+          destination: "/pages/slot-machine/nuove",
+        },
+        // Rewrite for slot-machine page
+        {
+          source: "/slot-machine",
+          destination: "/pages/slot-machine",
+        },
         // Rewrite for AWS Image Handler if needed
         {
           source: "/images/:path*",

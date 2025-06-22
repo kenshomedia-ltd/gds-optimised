@@ -38,12 +38,21 @@ export function CasinoRow({
   const casinoPagePath =
     process.env.NEXT_PUBLIC_CASINO_PAGE_PATH || "/casino/recensione/";
 
-  // Position badge styles
-  const positionStyles = {
-    0: "casino-logo__first",
-    1: "casino-logo__second",
-    2: "casino-logo__third",
+  // Helper to get badge gradient based on position
+  const getBadgeGradient = (position: number) => {
+    switch (position) {
+      case 0:
+        return "from-[#FFD700] to-[#FFA500]"; // Gold
+      case 1:
+        return "from-[#C0C0C0] to-[#808080]"; // Silver
+      case 2:
+        return "from-[#CD7F32] to-[#8B4513]"; // Bronze
+      default:
+        return "";
+    }
   };
+
+  const badgeGradient = getBadgeGradient(index);
 
   return (
     <tr className="flex flex-wrap md:table-row border-[12px] border-casino-table-tr-border bg-white">
@@ -54,7 +63,6 @@ export function CasinoRow({
         <div
           className={cn(
             "h-full flex items-center bg-white rounded-tl-lg md:rounded-bl-lg relative max-w-[368px]",
-            positionStyles[index as keyof typeof positionStyles]
           )}
         >
           {/* Position badge */}
@@ -63,7 +71,8 @@ export function CasinoRow({
               className={cn(
                 "casino-logo__tag w-[28px] h-6 absolute flex justify-center items-center",
                 "p-[2px] top-0 left-[18px] rounded-bl rounded-br z-10",
-                "text-white text-sm font-bold bg-gradient-to-b"
+                "text-white text-sm font-bold bg-gradient-to-b",
+                `${badgeGradient}`
               )}
             >
               #{index + 1}
