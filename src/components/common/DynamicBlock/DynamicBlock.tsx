@@ -16,6 +16,7 @@ import type {
   OverviewBlock,
   QuicklinksBlock,
   SingleContentBlock,
+  CasinoListBlock,
 } from "@/types/dynamic-block.types";
 import type { NewAndLovedSlotsBlock } from "@/types/new-and-loved-slots.types";
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -49,6 +50,11 @@ const componentMap = {
     { loading: () => <Skeleton className="h-48 w-full" /> }
   ),
   "homepage.home-casino-list": dynamic(
+    () =>
+      import("@/components/widgets/CasinoList").then((mod) => mod.CasinoList),
+    { loading: () => <Skeleton className="h-96 w-full" /> }
+  ),
+  "casinos.casino-list": dynamic(
     () =>
       import("@/components/widgets/CasinoList").then((mod) => mod.CasinoList),
     { loading: () => <Skeleton className="h-96 w-full" /> }
@@ -175,6 +181,26 @@ export function DynamicBlock({
           translations: additionalData?.translations,
         };
 
+      case "casinos.casino-list":
+        const casinoListData = blockData as CasinoListBlock;
+        // Get casinos from dynamicCasinosData based on block ID
+        const blockCasinos =
+          additionalData?.dynamicCasinosData?.[`block-${blockData.id}`] || [];
+
+        // Transform to HomeCasinoListBlock format for the CasinoList component
+        const homeCasinoListBlock: HomeCasinoListBlock = {
+          id: casinoListData.id,
+          __component: "homepage.home-casino-list",
+          casinoTableTitle: undefined, // No title field in casino-list
+          showCasinoTableHeader: casinoListData.showCasinoTableHeader !== false,
+        };
+
+        return {
+          block: homeCasinoListBlock,
+          casinos: blockCasinos,
+          translations: additionalData?.translations,
+        };
+
       case "shared.introduction-with-image":
         const introData = blockData as IntroductionWithImageBlock;
         return {
@@ -254,7 +280,6 @@ export function DynamicBlock({
   const TypedComponent = Component as unknown as React.FC<
     Record<string, unknown>
   >;
-
 
   return (
     <Suspense fallback={<Skeleton className="h-48 w-full animate-pulse" />}>

@@ -87,7 +87,8 @@ export default async function CustomPage({
 
     // First, fetch page data to check if we need casino sidebar
     const customPageResponse = await getCustomPageDataSplit(path);
-    const { pageData, games, casinos, dynamicGamesData } = customPageResponse;
+    const { pageData, games, casinos, dynamicGamesData, dynamicCasinosData } =
+      customPageResponse;
 
     if (!pageData) {
       notFound();
@@ -116,6 +117,7 @@ export default async function CustomPage({
       casinos,
       translations,
       dynamicGamesData,
+      dynamicCasinosData,
     };
 
     // Separate blocks by section with proper typing

@@ -171,7 +171,12 @@ export interface GamesCarouselBlock {
 export interface CasinoListBlock {
   __component: "casinos.casino-list";
   id: number;
-  heading?: string;
+  showCasinoTableHeader?: boolean;
+  casinoSort?: string;
+  casinoFilters?: string;
+  showCasinoFilters?: boolean;
+  showLoadMore?: boolean;
+  numberPerLoadMore?: number;
   casinosList?: Array<{
     id: number;
     casino?: CasinoData;
@@ -325,6 +330,10 @@ export interface DynamicBlockProps {
         popularGames?: GameData[];
         games?: GameData[];
       };
+    };
+    dynamicCasinosData?: {
+      // Add this
+      [blockId: string]: CasinoData[];
     };
   };
 }

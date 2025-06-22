@@ -143,6 +143,32 @@ export interface QuicklinksBlock extends BaseCustomPageBlock {
 }
 
 /**
+ * Casino list block
+ */
+export interface CasinoListBlock extends BaseCustomPageBlock {
+  __component: "casinos.casino-list";
+  showCasinoTableHeader?: boolean;
+  casinoSort?: string;
+  casinoFilters?: string;
+  showCasinoFilters?: boolean;
+  showLoadMore?: boolean;
+  numberPerLoadMore?: number;
+  casinosList?: Array<{
+    id: number;
+    casino?: {
+      id: number;
+    };
+  }>;
+}
+
+/**
+ * Dynamic casinos data structure
+ */
+export interface DynamicCasinosData {
+  [blockId: string]: CasinoData[];
+}
+
+/**
  * Union type for all custom page blocks
  */
 export type CustomPageBlock =
@@ -189,9 +215,11 @@ export interface CustomPageMetadata {
  * Custom page response with split queries
  */
 export interface CustomPageResponse {
-  pageData: CustomPageData;
-  games?: GameData[];
-  casinos?: CasinoData[];
+  pageData: CustomPageData | null;
+  games?: GameData[]; // Deprecated - for backward compatibility
+  casinos?: CasinoData[]; // Deprecated - for backward compatibility
+  dynamicGamesData?: DynamicGamesData;
+  dynamicCasinosData?: DynamicCasinosData; // Add this
   relatedPages?: CustomPageMetadata[];
 }
 
