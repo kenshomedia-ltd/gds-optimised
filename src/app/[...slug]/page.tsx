@@ -26,6 +26,7 @@ const HERO_BLOCK_TYPES = [
   "shared.overview-block",
   "games.games-carousel", // Also support custom page blocks in hero
   "games.new-and-loved-slots",
+  "casinos.casino-list",
 ];
 
 // Generate static params for known pages
@@ -119,6 +120,8 @@ export default async function CustomPage({
       dynamicGamesData,
       dynamicCasinosData,
     };
+
+    console.log("additionalData", additionalData);
 
     // Separate blocks by section with proper typing
     const blocks = (pageData?.blocks || []) as CustomPageBlock[];
