@@ -45,6 +45,8 @@ export async function generateMetadata({
   const { slug } = await params;
   const path = slug.join("/");
 
+  console.log("path", path);
+
   try {
     const metadata = await getCustomPageMetadata(path);
 
