@@ -73,11 +73,15 @@ export function IntroWithImage({
   const imageData = extractImageData(image);
   const imageUrl = imageData?.url;
   const imageAlt = imageData?.alternativeText || heading || "";
-  const hasValidImage = Boolean(imageUrl); // Renamed for clarity
+  const hasValidImage = Boolean(imageUrl);
+
+  // Handle empty string introduction - convert to undefined
+  const hasIntroduction = introduction && introduction.trim().length > 0;
+  const sanitizedIntroduction = hasIntroduction ? introduction : undefined;
 
   // Determine if content should be truncated on mobile
   const shouldTruncate =
-    !isHomePage && introduction && introduction.length > 300;
+    !isHomePage && sanitizedIntroduction && sanitizedIntroduction.length > 300;
 
   return (
     <section className="relative z-20" aria-label={heading}>
@@ -120,18 +124,23 @@ export function IntroWithImage({
             {heading}
           </h1>
 
-          {/* Introduction Text */}
-          {introduction && (
+          {/* Introduction Text - Only render if there's actual content */}
+          {sanitizedIntroduction && (
             <div className="space-y-4">
-              <p
+              <div
                 className={cn(
                   "text-base lg:text-lg text-gray-700 dark:text-gray-300",
                   "leading-relaxed",
                   shouldTruncate &&
                     !isExpanded &&
-                    "line-clamp-4 lg:line-clamp-none"
+                    "line-clamp-4 lg:line-clamp-none",
+                  // Prose styles for content
+                  "[&>p]:mb-4 [&>p:last-child]:mb-0",
+                  "[&>ul]:list-disc [&>ul]:ml-6 [&>ul]:mb-4",
+                  "[&>ol]:list-decimal [&>ol]:ml-6 [&>ol]:mb-4",
+                  "[&>li]:mb-2"
                 )}
-                dangerouslySetInnerHTML={{ __html: introduction }}
+                dangerouslySetInnerHTML={{ __html: sanitizedIntroduction }}
               />
 
               {/* Read More Button (Mobile Only) */}

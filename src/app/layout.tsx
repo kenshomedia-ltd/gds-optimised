@@ -19,6 +19,7 @@ import { Toaster } from "sonner";
 // config.autoAddCss = false;
 
 import "./globals.css";
+import { cn } from "@/lib/utils/cn";
 
 // Configure Lato for headings with font metrics for reduced CLS
 const lato = Lato({
@@ -119,7 +120,14 @@ export default async function RootLayout({
         />
       </head>
 
-      <body className="min-h-screen bg-body-bg text-body-text antialiased font-body">
+      <body
+        className={cn(
+          "min-h-screen bg-body-bg text-body-text antialiased font-body",
+          roboto.className
+        )}
+        // Add suppressHydrationWarning to prevent browser extension warnings
+        suppressHydrationWarning={true}
+      >
         {/* Legal bar at the very top */}
         <LegalServer legalText={layoutData.layout.legalText} />
 

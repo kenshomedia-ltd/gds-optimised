@@ -2,288 +2,213 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { Suspense } from "react";
+import type { DynamicBlockProps } from "@/types/dynamic-block.types";
 import type {
-  DynamicBlockProps,
-  GamesCarouselBlock,
-  HomeBlogListBlock,
-  HomeCasinoListBlock,
-  HomeFeaturedProvidersBlock,
   HomeGameListBlock,
-  HomeTestimoniesBlock,
-  HowToGroupBlock,
+  HomeCasinoListBlock,
+  HomeBlogListBlock,
   IntroductionWithImageBlock,
   OverviewBlock,
-  QuicklinksBlock,
   SingleContentBlock,
-  CasinoListBlock,
+  GamesCarouselBlock,
+  NewAndLovedSlotsBlock,
+  QuicklinksBlock,
 } from "@/types/dynamic-block.types";
-import type { NewAndLovedSlotsBlock } from "@/types/new-and-loved-slots.types";
-import { Skeleton } from "@/components/ui/Skeleton";
+import type { CasinoListBlock } from "@/types/casino-filters.types";
+import { Skeleton } from "@/components/ui";
 
-// Lazy load components for better performance
-const componentMap = {
-  "homepage.home-game-list": dynamic(
-    () =>
-      import("@/components/widgets/HomeGameList").then(
-        (mod) => mod.HomeGameList
-      ),
-    { loading: () => <Skeleton className="h-96 w-full" /> }
-  ),
-  "homepage.home-blog-list": dynamic(
-    () =>
-      import("@/components/widgets/HomeLatestBlogs").then(
-        (mod) => mod.HomeLatestBlogs
-      ),
-    {
-      loading: () =>
-        import("@/components/widgets/HomeLatestBlogs").then((mod) => (
-          <mod.HomeLatestBlogsSkeleton />
-        )),
-    }
-  ),
-  "shared.introduction-with-image": dynamic(
-    () =>
-      import("@/components/common/IntroWithImage").then(
-        (mod) => mod.IntroWithImage
-      ),
-    { loading: () => <Skeleton className="h-48 w-full" /> }
-  ),
-  "homepage.home-casino-list": dynamic(
-    () =>
-      import("@/components/widgets/CasinoList").then((mod) => mod.CasinoList),
-    { loading: () => <Skeleton className="h-96 w-full" /> }
-  ),
-  "casinos.casino-list": dynamic(
-    () =>
-      import("@/components/widgets/CasinoList").then((mod) => mod.CasinoList),
-    { loading: () => <Skeleton className="h-96 w-full" /> }
-  ),
-  "homepage.home-featured-providers": dynamic(
-    () =>
-      import("@/components/widgets/FeaturedProviders").then(
-        (mod) => mod.FeaturedProviders
-      ),
-    {
-      loading: () =>
-        import("@/components/widgets/FeaturedProviders").then((mod) => (
-          <mod.FeaturedProvidersSkeleton />
-        )),
-    }
-  ),
-  "shared.overview-block": dynamic(
-    () => import("@/components/widgets/Overview").then((mod) => mod.Overview),
-    { loading: () => <Skeleton className="h-48 w-full" /> }
-  ),
-  "shared.single-content": dynamic(
-    () =>
-      import("@/components/common/SingleContent").then(
-        (mod) => mod.SingleContent
-      ),
-    { loading: () => <Skeleton className="h-32 w-full" /> }
-  ),
-  "homepage.home-testimonies": dynamic(
-    () =>
-      import("@/components/widgets/Testimonials").then(
-        (mod) => mod.Testimonials
-      ),
-    {
-      loading: () =>
-        import("@/components/widgets/Testimonials").then((mod) => (
-          <mod.TestimonialsSkeleton />
-        )),
-    }
-  ),
-  "games.new-and-loved-slots": dynamic(
-    () =>
-      import("@/components/widgets/NewAndLovedSlots").then(
-        (mod) => mod.NewAndLovedSlots
-      ),
-    {
-      loading: () => <Skeleton className="h-64 w-full" />,
-    }
-  ),
-  "games.games-carousel": dynamic(
-    () =>
-      import("@/components/widgets/GameListWidget").then(
-        (mod) => mod.GameListWidget
-      ),
-    { loading: () => <Skeleton className="h-96 w-full" /> }
-  ),
-  "shared.quicklinks": dynamic(
-    () =>
-      import("@/components/widgets/QuicklinksWidget").then(
-        (mod) => mod.QuicklinksWidget
-      ),
-    {
-      loading: () =>
-        import("@/components/ui/QuicklinksCollapsible").then((mod) => (
-          <mod.QuicklinksCollapsibleSkeleton />
-        )),
-    }
-  ),
-  "shared.how-to-group": dynamic(
-    () => import("@/components/widgets/HowTo").then((mod) => mod.HowTo),
-    {
-      loading: () =>
-        import("@/components/widgets/HowTo").then((mod) => (
-          <mod.HowToSkeleton />
-        )),
-    }
-  ),
-};
+// Lazy load all widget components
+const IntroWithImage = dynamic(
+  () =>
+    import("@/components/common/IntroWithImage").then(
+      (mod) => mod.IntroWithImage
+    ),
+  { loading: () => <Skeleton className="h-96" /> }
+);
+
+const Overview = dynamic(
+  () => import("@/components/widgets/Overview").then((mod) => mod.Overview),
+  { loading: () => <Skeleton className="h-96" /> }
+);
+
+const HomeGameList = dynamic(
+  () =>
+    import("@/components/widgets/HomeGameList").then((mod) => mod.HomeGameList),
+  { loading: () => <Skeleton className="h-96" /> }
+);
+
+const CasinoList = dynamic(
+  () => import("@/components/widgets/CasinoList").then((mod) => mod.CasinoList),
+  { loading: () => <Skeleton className="h-96" /> }
+);
+
+const CasinoListWidget = dynamic(
+  () =>
+    import("@/components/widgets/CasinoList").then(
+      (mod) => mod.CasinoListWidget
+    ),
+  { loading: () => <Skeleton className="h-96" /> }
+);
+
+const HomeLatestBlogs = dynamic(
+  () =>
+    import("@/components/widgets/HomeLatestBlogs").then(
+      (mod) => mod.HomeLatestBlogs
+    ),
+  { loading: () => <Skeleton className="h-96" /> }
+);
+
+const SingleContent = dynamic(
+  () =>
+    import("@/components/common/SingleContent").then(
+      (mod) => mod.SingleContent
+    ),
+  { loading: () => <Skeleton className="h-64" /> }
+);
+
+const NewAndLovedSlots = dynamic(
+  () =>
+    import("@/components/widgets/NewAndLovedSlots").then(
+      (mod) => mod.NewAndLovedSlots
+    ),
+  { loading: () => <Skeleton className="h-96" /> }
+);
+
+const GameListWidget = dynamic(
+  () =>
+    import("@/components/widgets/GameListWidget").then(
+      (mod) => mod.GameListWidget
+    ),
+  { loading: () => <Skeleton className="h-96" /> }
+);
+
+const QuicklinksWidget = dynamic(
+  () =>
+    import("@/components/widgets/QuicklinksWidget").then(
+      (mod) => mod.QuicklinksWidget
+    ),
+  { loading: () => <Skeleton className="h-32" /> }
+);
 
 /**
  * DynamicBlock Component
  *
- * Renders different components based on the block type
+ * Renders different block components based on the block type.
+ * Handles both homepage and custom page blocks.
+ *
  * Features:
- * - Lazy loading for better performance
- * - Type-safe component mapping
- * - Loading states for each component
- * - Error boundary support
+ * - Dynamic component loading
+ * - Type-safe block rendering
+ * - Loading states
+ * - Support for additional data (translations, games, casinos, etc.)
  */
 export function DynamicBlock({
   blockType,
   blockData,
-  additionalData,
+  additionalData = {},
 }: DynamicBlockProps) {
-  const Component = componentMap[blockType as keyof typeof componentMap];
+  const { translations = {}, games = [], casinos = [] } = additionalData;
 
-  if (!Component) {
-    console.warn(`Unknown block type: ${blockType}`);
+  // Handle unknown block types
+  if (!blockType) {
+    console.warn("DynamicBlock: No block type provided");
     return null;
   }
 
-  // Prepare props based on block type
-  const getComponentProps = () => {
-    // Removed baseProps to ensure type safety within each case.
+  switch (blockType) {
+    // Homepage blocks
+    case "homepage.home-game-list":
+      return (
+        <HomeGameList
+          block={blockData as HomeGameListBlock}
+          translations={translations}
+          games={games}
+        />
+      );
 
-    switch (blockType) {
-      case "homepage.home-game-list":
-        return {
-          block: blockData as HomeGameListBlock,
-          games: additionalData?.games || [],
-          translations: additionalData?.translations,
-        };
+    case "homepage.home-casino-list":
+      // Use the original CasinoList for homepage (no filters)
+      return (
+        <CasinoList
+          block={blockData as HomeCasinoListBlock}
+          casinos={casinos}
+          translations={translations}
+        />
+      );
 
-      case "homepage.home-blog-list":
-        return {
-          block: blockData as HomeBlogListBlock,
-          blogs: additionalData?.blogs || [],
-          translations: additionalData?.translations,
-        };
+    case "homepage.home-blog-list":
+      return (
+        <HomeLatestBlogs
+          block={blockData as HomeBlogListBlock}
+          blogs={additionalData.blogs || []}
+          translations={translations}
+        />
+      );
 
-      case "homepage.home-casino-list":
-        return {
-          block: blockData as HomeCasinoListBlock,
-          casinos: additionalData?.casinos || [],
-          translations: additionalData?.translations,
-        };
+    // Shared blocks
+    case "shared.introduction-with-image":
+      const introBlock = blockData as IntroductionWithImageBlock;
+      return (
+        <IntroWithImage
+          heading={introBlock.heading || ""}
+          introduction={introBlock.introduction}
+          image={introBlock.image}
+          translations={translations}
+        />
+      );
 
-      case "casinos.casino-list":
-        const casinoListData = blockData as CasinoListBlock;
-        // Get casinos from dynamicCasinosData based on block ID
-        const blockCasinos =
-          additionalData?.dynamicCasinosData?.[`block-${blockData.id}`] || [];
+    case "shared.overview-block":
+      return <Overview data={blockData as OverviewBlock} />;
 
-        // Transform to HomeCasinoListBlock format for the CasinoList component
-        const homeCasinoListBlock: HomeCasinoListBlock = {
-          id: casinoListData.id,
-          __component: "homepage.home-casino-list",
-          casinoTableTitle: undefined, // No title field in casino-list
-          showCasinoTableHeader: casinoListData.showCasinoTableHeader !== false,
-        };
+    case "shared.single-content":
+      return <SingleContent block={blockData as SingleContentBlock} />;
 
-        return {
-          block: homeCasinoListBlock,
-          casinos: blockCasinos,
-          translations: additionalData?.translations,
-        };
+    // Custom page blocks
+    case "games.games-carousel":
+      return (
+        <GameListWidget
+          block={blockData as GamesCarouselBlock}
+          games={games}
+          translations={translations}
+        />
+      );
 
-      case "shared.introduction-with-image":
-        const introData = blockData as IntroductionWithImageBlock;
-        return {
-          heading: introData.heading,
-          introduction: introData.introduction,
-          image: introData.image,
-          translations: additionalData?.translations,
-          isHomePage: true,
-        };
+    case "casinos.casino-list":
+      // For custom pages, check if filters should be shown
+      const casinoBlock = blockData as CasinoListBlock;
+      return (
+        <CasinoListWidget
+          block={casinoBlock}
+          casinos={casinos}
+          translations={translations}
+          showCasinoFilters={casinoBlock.showCasinoFilters || false}
+        />
+      );
 
-      case "homepage.home-featured-providers":
-        return {
-          data: blockData as HomeFeaturedProvidersBlock,
-          translations: additionalData?.translations,
-        };
+    case "games.new-and-loved-slots":
+      return (
+        <NewAndLovedSlots
+          blockData={blockData as NewAndLovedSlotsBlock}
+          translations={translations}
+          newGames={additionalData.dynamicGamesData?.[blockData.id]?.newGames}
+          popularGames={
+            additionalData.dynamicGamesData?.[blockData.id]?.popularGames
+          }
+        />
+      );
 
-      case "shared.overview-block":
-        return {
-          data: blockData as OverviewBlock,
-        };
+    case "shared.quicklinks":
+      return (
+        <QuicklinksWidget
+          block={blockData as QuicklinksBlock}
+          translations={translations}
+        />
+      );
 
-      case "shared.single-content":
-        return {
-          block: blockData as SingleContentBlock,
-        };
+    // Add other custom page block cases as needed...
 
-      case "homepage.home-testimonies":
-        return {
-          data: blockData as HomeTestimoniesBlock,
-        };
-
-      case "games.new-and-loved-slots":
-        // Get the block-specific games data from dynamicGamesData
-        const newAndLovedData =
-          additionalData?.dynamicGamesData?.[`block-${blockData.id}`];
-
-        return {
-          blockData: blockData as NewAndLovedSlotsBlock,
-          translations: additionalData?.translations,
-          newGames: newAndLovedData?.newGames || [],
-          popularGames: newAndLovedData?.popularGames || [],
-        };
-
-      case "games.games-carousel":
-        const gamesCarouselData = blockData as GamesCarouselBlock;
-        // Extract games from dynamicGamesData if available
-        const carouselGames =
-          additionalData?.dynamicGamesData?.[`block-${gamesCarouselData.id}`]
-            ?.games ||
-          gamesCarouselData.games ||
-          additionalData?.games ||
-          [];
-        return {
-          block: gamesCarouselData,
-          games: carouselGames,
-          translations: additionalData?.translations,
-        };
-
-      case "shared.quicklinks":
-        return {
-          block: blockData as QuicklinksBlock,
-        };
-
-      case "shared.how-to-group":
-        return {
-          block: blockData as HowToGroupBlock,
-          translations: additionalData?.translations,
-        };
-
-      // Ensure all components in the map have a case here
-      default:
-        return { data: blockData };
-    }
-  };
-
-  // The type-safe alternative to using 'any'
-  const TypedComponent = Component as unknown as React.FC<
-    Record<string, unknown>
-  >;
-
-  return (
-    <Suspense fallback={<Skeleton className="h-48 w-full animate-pulse" />}>
-      <TypedComponent {...getComponentProps()} />
-    </Suspense>
-  );
+    default:
+      console.warn(`DynamicBlock: Unknown block type "${blockType}"`);
+      return null;
+  }
 }

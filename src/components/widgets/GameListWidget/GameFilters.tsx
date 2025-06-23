@@ -133,7 +133,7 @@ export function GameFilters({
   return (
     <div
       className={cn(
-        "bg-white/30 rounded-lg backdrop-blur-sm border border-white/30 shadow-sm p-4",
+        "bg-white/30 rounded-lg backdrop-blur-sm relative z-10 border border-white/30 shadow-sm p-4",
         className
       )}
     >
