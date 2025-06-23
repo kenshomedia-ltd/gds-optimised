@@ -2,7 +2,7 @@
 
 import { strapiClient } from "./strapi-client";
 import { unstable_cache } from "next/cache";
-// import { cacheManager } from "@/lib/cache/cache-manager";
+import { cacheManager } from "@/lib/cache/cache-manager";
 import type {
   CategoryPageData,
   CategoryPageMetadata,
@@ -146,6 +146,89 @@ function buildGamesQuery(slug: string) {
 }
 
 /**
+ * Fetch category games with Redis caching
+ */
+async function fetchCategoryGames(slug: string): Promise<GameData[]> {
+  const cacheKey = `category-games:${slug}`;
+
+  try {
+    // Try to get from Redis cache first
+    const cached = await cacheManager.get<GameData[]>(cacheKey);
+    if (cached.data && !cached.isStale) {
+      console.log(`Category games cache hit for: ${slug}`);
+      return cached.data;
+    }
+
+    // If stale, we'll fetch fresh data
+    if (cached.isStale) {
+      console.log(`Category games cache stale for: ${slug}`);
+    }
+  } catch (error) {
+    console.error("Cache error:", error);
+  }
+
+  // Fetch fresh data
+  const response = await strapiClient.fetchWithCache<{ data: GameData[] }>(
+    "games",
+    buildGamesQuery(slug),
+    CACHE_CONFIG.games.ttl
+  );
+
+  const games = response.data || [];
+
+  // Cache the results
+  try {
+    await cacheManager.set(cacheKey, games, {
+      ttl: CACHE_CONFIG.games.ttl,
+      swr: CACHE_CONFIG.games.swr,
+    });
+  } catch (error) {
+    console.error("Failed to cache category games:", error);
+  }
+
+  return games;
+}
+
+/**
+ * Fetch related casinos with Redis caching
+ */
+async function fetchRelatedCasinos(): Promise<CasinoData[]> {
+  const cacheKey = `category-casinos:related`;
+
+  try {
+    // Try to get from Redis cache first
+    const cached = await cacheManager.get<CasinoData[]>(cacheKey);
+    if (cached.data && !cached.isStale) {
+      console.log("Related casinos cache hit");
+      return cached.data;
+    }
+  } catch (error) {
+    console.error("Cache error:", error);
+  }
+
+  // Fetch fresh data
+  const response = await strapiClient.fetchWithCache<{ data: CasinoData[] }>(
+    "casinos",
+    buildCasinosQuery(),
+    CACHE_CONFIG.casinos.ttl
+  );
+
+  const casinos = response.data || [];
+
+  // Cache the results
+  try {
+    await cacheManager.set(cacheKey, casinos, {
+      ttl: CACHE_CONFIG.casinos.ttl,
+      swr: CACHE_CONFIG.casinos.swr,
+    });
+  } catch (error) {
+    console.error("Failed to cache related casinos:", error);
+  }
+
+  return casinos;
+}
+
+/**
  * Fetch category page data with split queries
  */
 const getCategoryPageDataWithSplitQueries = async (
@@ -156,6 +239,23 @@ const getCategoryPageDataWithSplitQueries = async (
   casinos: CasinoData[];
 }> => {
   try {
+    // Check if we have the complete page data in cache
+    const pageCacheKey = `category-page-complete:${slug}`;
+    try {
+      const cached = await cacheManager.get<{
+        pageData: CategoryPageData;
+        games: GameData[];
+        casinos: CasinoData[];
+      }>(pageCacheKey);
+
+      if (cached.data && !cached.isStale) {
+        console.log(`Complete category page cache hit for: ${slug}`);
+        return cached.data;
+      }
+    } catch (error) {
+      console.error("Cache error:", error);
+    }
+
     // 1. Fetch page structure
     const structureQuery = buildStructureQuery(slug);
     const pageResponse = await strapiClient.fetchWithCache<{
@@ -173,28 +273,30 @@ const getCategoryPageDataWithSplitQueries = async (
     }
 
     // 2. Fetch dynamic content in parallel
-    const [gamesResponse, casinosResponse] = await Promise.all([
+    const [games, casinos] = await Promise.all([
       // Fetch games for this category
-      strapiClient.fetchWithCache<{ data: GameData[] }>(
-        "games",
-        buildGamesQuery(slug),
-        CACHE_CONFIG.games.ttl
-      ),
+      fetchCategoryGames(slug),
       // Fetch related casinos if needed
-      pageData.relatedCasinos
-        ? strapiClient.fetchWithCache<{ data: CasinoData[] }>(
-            "casinos",
-            buildCasinosQuery(),
-            CACHE_CONFIG.casinos.ttl
-          )
-        : Promise.resolve({ data: [] }),
+      pageData.relatedCasinos ? fetchRelatedCasinos() : Promise.resolve([]),
     ]);
 
-    return {
+    const result = {
       pageData,
-      games: gamesResponse.data || [],
-      casinos: casinosResponse.data || [],
+      games,
+      casinos,
     };
+
+    // Cache the complete result
+    try {
+      await cacheManager.set(pageCacheKey, result, {
+        ttl: Math.min(CACHE_CONFIG.structure.ttl, CACHE_CONFIG.games.ttl),
+        swr: Math.min(CACHE_CONFIG.structure.swr, CACHE_CONFIG.games.swr),
+      });
+    } catch (error) {
+      console.error("Failed to cache complete page data:", error);
+    }
+
+    return result;
   } catch (error) {
     console.error("Failed to fetch category page data:", error);
     return {
@@ -252,6 +354,19 @@ export function mergeCategoryPageData(
  */
 export const getCategoryPageMetadata = unstable_cache(
   async (slug: string): Promise<CategoryPageMetadata | null> => {
+    const cacheKey = `category-metadata:${slug}`;
+
+    try {
+      // Try Redis cache first
+      const cached = await cacheManager.get<CategoryPageMetadata>(cacheKey);
+      if (cached.data) {
+        console.log(`Category metadata cache hit for: ${slug}`);
+        return cached.data;
+      }
+    } catch (error) {
+      console.error("Cache error:", error);
+    }
+
     try {
       const query = {
         fields: ["title", "slug", "publishedAt"],
@@ -270,7 +385,21 @@ export const getCategoryPageMetadata = unstable_cache(
         data: CategoryPageMetadata[];
       }>("slot-categories", query, CACHE_CONFIG.metadata.ttl);
 
-      return response.data?.[0] || null;
+      const metadata = response.data?.[0] || null;
+
+      // Cache the result
+      if (metadata) {
+        try {
+          await cacheManager.set(cacheKey, metadata, {
+            ttl: CACHE_CONFIG.metadata.ttl,
+            swr: CACHE_CONFIG.metadata.swr,
+          });
+        } catch (error) {
+          console.error("Failed to cache metadata:", error);
+        }
+      }
+
+      return metadata;
     } catch (error) {
       console.error("Failed to fetch category page metadata:", error);
       return null;

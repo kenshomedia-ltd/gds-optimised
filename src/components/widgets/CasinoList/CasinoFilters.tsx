@@ -35,7 +35,6 @@ import {
  * - Mobile-responsive design
  */
 export function CasinoFilters({
-  providers,
   selectedFilters,
   onFilterChange,
   onClearFilters,

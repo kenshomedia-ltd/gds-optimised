@@ -86,7 +86,7 @@ export default async function ProviderPage({
         ),
       ]);
 
-    const { pageData, games, casinos } = providerDataResponse;
+    const { pageData, games } = providerDataResponse;
     const { translations } = layoutData;
 
     if (!pageData) {

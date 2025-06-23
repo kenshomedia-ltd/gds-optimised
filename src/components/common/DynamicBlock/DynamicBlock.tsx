@@ -8,12 +8,12 @@ import type {
   HomeCasinoListBlock,
   HomeBlogListBlock,
   IntroductionWithImageBlock,
-  OverviewBlock,
   SingleContentBlock,
   GamesCarouselBlock,
-  NewAndLovedSlotsBlock,
+  GamesNewAndLovedSlotsBlock,
   QuicklinksBlock,
 } from "@/types/dynamic-block.types";
+import type { OverviewBlock } from "@/types/homepage.types";
 import type { CasinoListBlock } from "@/types/casino-filters.types";
 import { Skeleton } from "@/components/ui";
 
@@ -188,7 +188,7 @@ export function DynamicBlock({
     case "games.new-and-loved-slots":
       return (
         <NewAndLovedSlots
-          blockData={blockData as NewAndLovedSlotsBlock}
+          blockData={blockData as GamesNewAndLovedSlotsBlock}
           translations={translations}
           newGames={additionalData.dynamicGamesData?.[blockData.id]?.newGames}
           popularGames={
@@ -201,7 +201,7 @@ export function DynamicBlock({
       return (
         <QuicklinksWidget
           block={blockData as QuicklinksBlock}
-          translations={translations}
+          // translations={translations}
         />
       );
 

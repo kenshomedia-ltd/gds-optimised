@@ -54,7 +54,10 @@ function buildCasinoFilters(
 
   // Add bonus key filters with $and operator for complex conditions
   if (filters.bonusKey) {
-    const andConditions: any[] = [
+    // Create a typed array to avoid 'any' error
+    const andConditions: Array<
+      Record<string, Record<string, Record<string, unknown>>>
+    > = [
       // Bonus amount must not be 0
       {
         [filters.bonusKey]: {
@@ -143,9 +146,6 @@ export async function getCasinos({
 
   try {
     const strapiFilters = buildCasinoFilters(filters);
-    const sort = filters.sort || "ratingAvg:desc";
-
-    console.log("Sort value:", sort);
 
     const query = {
       fields: [
@@ -153,13 +153,25 @@ export async function getCasinos({
         "slug",
         "ratingAvg",
         "ratingCount",
-        "authorRatings",
+        "publishedAt",
+        "Badges",
         "playthrough",
-        "createdAt",
       ],
       populate: {
         images: {
-          fields: ["url", "alternativeText", "width", "height"],
+          fields: ["url", "width", "height"],
+        },
+        casinoBonus: {
+          fields: ["bonusUrl", "bonusLabel", "bonusCode"],
+        },
+        noDepositSection: {
+          fields: ["bonusAmount", "termsConditions", "availability", "speed"],
+        },
+        freeSpinsSection: {
+          fields: ["bonusAmount", "termsConditions", "availability", "speed"],
+        },
+        termsAndConditions: {
+          fields: ["copy", "gambleResponsibly"],
         },
         bonusSection: {
           fields: [
@@ -171,36 +183,19 @@ export async function getCasinos({
             "speed",
           ],
         },
-        noDepositSection: {
-          fields: ["bonusAmount", "termsConditions", "availability", "speed"],
-        },
-        freeSpinsSection: {
-          fields: ["bonusAmount", "termsConditions", "availability", "speed"],
-        },
         providers: {
-          fields: ["title", "slug"],
-          populate: {
-            images: {
-              fields: ["url", "width", "height"],
-            },
-          },
-        },
-        casinoBonus: {
-          fields: ["bonusLabel", "bonusUrl", "bonusCode"],
+          fields: ["slug", "title"],
         },
         casinoGeneralInfo: {
           fields: ["wageringRequirements"],
         },
       },
       filters: strapiFilters,
-      sort: [sort],
-      pagination: {
-        page,
-        pageSize,
-      },
+      sort: [filters.sort || "ratingAvg:desc"],
+      pagination: { pageSize, page },
     };
 
-    console.log("=== Full Strapi Query ===");
+    console.log("=== Strapi Query ===");
     console.log(JSON.stringify(query, null, 2));
 
     const response = await strapiClient.fetchWithCache<{
@@ -218,7 +213,6 @@ export async function getCasinos({
         bonusSection: response.data[0].bonusSection,
         noDepositSection: response.data[0].noDepositSection,
         freeSpinsSection: response.data[0].freeSpinsSection,
-        playthrough: response.data[0].playthrough,
       });
     }
 

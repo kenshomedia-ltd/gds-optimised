@@ -1,7 +1,7 @@
 // src/components/widgets/CasinoList/CasinoList.tsx
 "use client";
 
-import Link from "next/link";
+// import Link from "next/link";
 import { CasinoTable } from "@/components/casino/CasinoTable/CasinoTable";
 import type { HomeCasinoListBlock, CasinoData } from "@/types/casino.types";
 import { cn } from "@/lib/utils/cn";
@@ -55,7 +55,7 @@ export function CasinoList({
         </div>
 
         {/* View All Link */}
-        {block.link && (
+        {/* {block.link && (
           <div className="flex justify-center">
             <Link
               href={block.link.url}
@@ -64,7 +64,7 @@ export function CasinoList({
               {block.link.label}
             </Link>
           </div>
-        )}
+        )} */}
       </div>
     </section>
   );

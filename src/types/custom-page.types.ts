@@ -80,11 +80,20 @@ export interface GamesCarouselBlock extends BaseCustomPageBlock {
 export interface CasinoListBlock extends BaseCustomPageBlock {
   __component: "casinos.casino-list";
   showCasinoTableHeader?: boolean;
+  casinoSort?: string;
+  casinoFilters?: string;
+  showCasinoFilters?: boolean;
+  showLoadMore?: boolean;
+  numberPerLoadMore?: number;
   casinosList?: Array<{
     id: number;
     casinoName: string;
     casino?: CasinoData;
   }>;
+  link?: {
+    url: string;
+    label: string;
+  };
 }
 
 /**
@@ -143,22 +152,14 @@ export interface QuicklinksBlock extends BaseCustomPageBlock {
 }
 
 /**
- * Casino list block
+ * Dynamic games data structure
  */
-export interface CasinoListBlock extends BaseCustomPageBlock {
-  __component: "casinos.casino-list";
-  showCasinoTableHeader?: boolean;
-  casinoSort?: string;
-  casinoFilters?: string;
-  showCasinoFilters?: boolean;
-  showLoadMore?: boolean;
-  numberPerLoadMore?: number;
-  casinosList?: Array<{
-    id: number;
-    casino?: {
-      id: number;
-    };
-  }>;
+export interface DynamicGamesData {
+  [blockId: string]: {
+    newGames?: GameData[];
+    popularGames?: GameData[];
+    games?: GameData[];
+  };
 }
 
 /**
@@ -219,55 +220,25 @@ export interface CustomPageResponse {
   games?: GameData[]; // Deprecated - for backward compatibility
   casinos?: CasinoData[]; // Deprecated - for backward compatibility
   dynamicGamesData?: DynamicGamesData;
-  dynamicCasinosData?: DynamicCasinosData; // Add this
-  relatedPages?: CustomPageMetadata[];
+  dynamicCasinosData?: DynamicCasinosData;
+  relatedPages?: CustomPageData[];
 }
 
 /**
- * Type guards for custom page blocks
+ * Custom page response using split queries
  */
-export function isGamesCarouselBlock(
-  block: CustomPageBlock
-): block is GamesCarouselBlock {
-  return block.__component === "games.games-carousel";
+export interface CustomPageSplitResponse {
+  pageData: CustomPageData | null;
+  dynamicGamesData: DynamicGamesData;
+  dynamicCasinosData: DynamicCasinosData;
 }
 
-export function isCasinoListBlock(
-  block: CustomPageBlock
-): block is CasinoListBlock {
-  return block.__component === "casinos.casino-list";
-}
-
-export function isIntroductionWithImageBlock(
-  block: CustomPageBlock
-): block is IntroductionWithImageBlock {
-  return block.__component === "shared.introduction-with-image";
-}
-
-export function isSingleContentBlock(
-  block: CustomPageBlock
-): block is SingleContentBlock {
-  return block.__component === "shared.single-content";
-}
-
-export function isImageBlock(block: CustomPageBlock): block is ImageBlock {
-  return block.__component === "shared.image";
-}
-
-export function isOverviewBlock(
-  block: CustomPageBlock
-): block is OverviewBlock {
-  return block.__component === "shared.overview-block";
-}
-
-export function isNewAndLovedSlotsBlock(
-  block: CustomPageBlock
-): block is NewAndLovedSlotsBlock {
-  return block.__component === "games.new-and-loved-slots";
-}
-
-export function isQuicklinksBlock(
-  block: CustomPageBlock
-): block is QuicklinksBlock {
-  return block.__component === "shared.quicklinks";
+/**
+ * Helper type for game settings extraction
+ */
+export interface ExtractedGameSettings {
+  providers: string[];
+  categories: string[];
+  totalGamesToDisplay: number;
+  sortBy: string;
 }

@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { Image } from "@/components/common/Image";
 import { SingleContent } from "@/components/common/SingleContent";
-import { AuthorBox } from "@/components/common";
+// import { AuthorBox } from "@/components/common";
 import { FAQWidget } from "@/components/widgets/FAQWidget";
 import { CasinoSidebar } from "@/components/casino/";
 import { GameListWidget } from "@/components/widgets/GameListWidget";

@@ -2,6 +2,7 @@
 import { unstable_cache } from "next/cache";
 import { cache } from "react";
 import { strapiClient, REVALIDATE_TIMES } from "./strapi-client";
+import { cacheManager } from "@/lib/cache/cache-manager";
 import type { SidebarCasinoSections } from "@/types/sidebar.types";
 import type { CasinoData } from "@/types/casino.types";
 
@@ -62,6 +63,24 @@ function buildCasinoSidebarQuery() {
  */
 const getCasinoSidebarDataCached = cache(
   async (): Promise<SidebarCasinoSections> => {
+    const cacheKey = "casino-sidebar-data";
+
+    try {
+      // Try to get from Redis cache first
+      const cached = await cacheManager.get<SidebarCasinoSections>(cacheKey);
+      if (cached.data && !cached.isStale) {
+        console.log("Casino sidebar cache hit");
+        return cached.data;
+      }
+
+      // If stale, we'll fetch fresh data
+      if (cached.isStale) {
+        console.log("Casino sidebar cache stale");
+      }
+    } catch (error) {
+      console.error("Cache error:", error);
+    }
+
     try {
       // Fetch casino sections from layout endpoint
       const query = buildCasinoSidebarQuery();
@@ -76,11 +95,23 @@ const getCasinoSidebarDataCached = cache(
 
       const layoutData = response.data;
 
-      return {
+      const sidebarData = {
         most_loved_casinos: layoutData.most_loved_casinos || [],
         no_deposit_casinos: layoutData.no_deposit_casinos || [],
         free_spin_casinos: layoutData.free_spin_casinos || [],
       };
+
+      // Cache the results
+      try {
+        await cacheManager.set(cacheKey, sidebarData, {
+          ttl: REVALIDATE_TIMES.layout,
+          swr: REVALIDATE_TIMES.layout * 2,
+        });
+      } catch (error) {
+        console.error("Failed to cache casino sidebar data:", error);
+      }
+
+      return sidebarData;
     } catch (error) {
       console.error("Failed to fetch casino sidebar data from layout:", error);
       return {
@@ -133,4 +164,5 @@ export async function revalidateCasinoSidebarCache() {
 
   // Clear Redis cache
   await strapiClient.invalidateCache("layout:*");
+  await cacheManager.delete("casino-sidebar-data");
 }

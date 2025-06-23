@@ -2,21 +2,20 @@
 
 import { strapiClient } from "./strapi-client";
 import { unstable_cache } from "next/cache";
+import { cacheManager } from "@/lib/cache/cache-manager";
 import type {
   ProviderPageData,
   ProviderPageMetadata,
   ProviderPageResponse,
 } from "@/types/provider.types";
 import type { GameData } from "@/types/game.types";
-// import type { CasinoData } from "@/types/casino.types";
-// import { cacheManager } from "@/lib/cache/cache-manager";
 
 // Cache configuration
 const CACHE_CONFIG = {
-  structure: { ttl: 300, tags: ["provider-page-structure"] }, // 5 minutes
-  games: { ttl: 60, tags: ["provider-games"] }, // 1 minute
-  casinos: { ttl: 180, tags: ["provider-casinos"] }, // 3 minutes
-  metadata: { ttl: 600, tags: ["provider-metadata"] }, // 10 minutes
+  structure: { ttl: 300, swr: 600, tags: ["provider-page-structure"] }, // 5min/10min
+  games: { ttl: 60, swr: 180, tags: ["provider-games"] }, // 1min/3min
+  casinos: { ttl: 180, swr: 360, tags: ["provider-casinos"] }, // 3min/6min
+  metadata: { ttl: 600, swr: 1200, tags: ["provider-metadata"] }, // 10min/20min
 };
 
 /**
@@ -137,12 +136,69 @@ function buildGamesQuery(slug: string) {
 }
 
 /**
+ * Fetch provider games with Redis caching
+ */
+async function fetchProviderGames(slug: string): Promise<GameData[]> {
+  const cacheKey = `provider-games:${slug}`;
+
+  try {
+    // Try to get from Redis cache first
+    const cached = await cacheManager.get<GameData[]>(cacheKey);
+    if (cached.data && !cached.isStale) {
+      console.log(`Provider games cache hit for: ${slug}`);
+      return cached.data;
+    }
+
+    // If stale, we'll fetch fresh data
+    if (cached.isStale) {
+      console.log(`Provider games cache stale for: ${slug}`);
+    }
+  } catch (error) {
+    console.error("Cache error:", error);
+  }
+
+  // Fetch fresh data
+  const response = await strapiClient.fetchWithCache<{ data: GameData[] }>(
+    "games",
+    buildGamesQuery(slug),
+    CACHE_CONFIG.games.ttl
+  );
+
+  const games = response.data || [];
+
+  // Cache the results
+  try {
+    await cacheManager.set(cacheKey, games, {
+      ttl: CACHE_CONFIG.games.ttl,
+      swr: CACHE_CONFIG.games.swr,
+    });
+  } catch (error) {
+    console.error("Failed to cache provider games:", error);
+  }
+
+  return games;
+}
+
+/**
  * Fetch provider page data with split queries
  */
 const getProviderPageDataWithSplitQueries = async (
   slug: string
 ): Promise<ProviderPageResponse> => {
   try {
+    // Check if we have the complete page data in cache
+    const pageCacheKey = `provider-page-complete:${slug}`;
+    try {
+      const cached = await cacheManager.get<ProviderPageResponse>(pageCacheKey);
+
+      if (cached.data && !cached.isStale) {
+        console.log(`Complete provider page cache hit for: ${slug}`);
+        return cached.data;
+      }
+    } catch (error) {
+      console.error("Cache error:", error);
+    }
+
     // 1. Fetch page structure
     const structureQuery = buildStructureQuery(slug);
     const pageResponse = await strapiClient.fetchWithCache<{
@@ -160,27 +216,35 @@ const getProviderPageDataWithSplitQueries = async (
     }
 
     // 2. Fetch dynamic content in parallel
-    const [gamesResponse] = await Promise.all([
+    const [games] = await Promise.all([
       // Fetch games for this provider
-      strapiClient.fetchWithCache<{ data: GameData[] }>(
-        "games",
-        buildGamesQuery(slug),
-        CACHE_CONFIG.games.ttl
-      ),
+      fetchProviderGames(slug),
     ]);
 
     // 3. Combine all data
     const completeData: ProviderPageData = {
       ...pageData,
-      games: gamesResponse.data || [],
+      games,
       // relatedCasinos already included in pageData from the initial query
     };
 
-    return {
+    const result = {
       pageData: completeData,
-      games: gamesResponse.data || [],
+      games,
       casinos: pageData.relatedCasinos || [],
     };
+
+    // Cache the complete result
+    try {
+      await cacheManager.set(pageCacheKey, result, {
+        ttl: Math.min(CACHE_CONFIG.structure.ttl, CACHE_CONFIG.games.ttl),
+        swr: Math.min(CACHE_CONFIG.structure.swr, CACHE_CONFIG.games.swr),
+      });
+    } catch (error) {
+      console.error("Failed to cache complete provider page data:", error);
+    }
+
+    return result;
   } catch (error) {
     console.error("Failed to fetch provider page data:", error);
     return {
@@ -196,6 +260,19 @@ const getProviderPageDataWithSplitQueries = async (
  */
 export const getProviderPageMetadata = unstable_cache(
   async (slug: string): Promise<ProviderPageMetadata | null> => {
+    const cacheKey = `provider-metadata:${slug}`;
+
+    try {
+      // Try Redis cache first
+      const cached = await cacheManager.get<ProviderPageMetadata>(cacheKey);
+      if (cached.data) {
+        console.log(`Provider metadata cache hit for: ${slug}`);
+        return cached.data;
+      }
+    } catch (error) {
+      console.error("Cache error:", error);
+    }
+
     try {
       const query = {
         fields: ["id", "title", "slug", "publishedAt"],
@@ -214,7 +291,21 @@ export const getProviderPageMetadata = unstable_cache(
         data: ProviderPageMetadata[];
       }>("slot-providers", query, CACHE_CONFIG.metadata.ttl);
 
-      return response.data?.[0] || null;
+      const metadata = response.data?.[0] || null;
+
+      // Cache the result
+      if (metadata) {
+        try {
+          await cacheManager.set(cacheKey, metadata, {
+            ttl: CACHE_CONFIG.metadata.ttl,
+            swr: CACHE_CONFIG.metadata.swr,
+          });
+        } catch (error) {
+          console.error("Failed to cache metadata:", error);
+        }
+      }
+
+      return metadata;
     } catch (error) {
       console.error("Failed to fetch provider page metadata:", error);
       return null;
