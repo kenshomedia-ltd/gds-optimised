@@ -40,7 +40,7 @@ export function FeaturedProviders({
   }, [data?.homeFeaturedProviders]);
 
   const providerBaseUrl =
-    process.env.NEXT_PUBLIC_PROVIDER_PAGE_PATH || "/providers";
+    process.env.NEXT_PUBLIC_PROVIDER_PAGE_PATH || "/software-slot-machine";
 
   if (!providers.length) {
     return null;

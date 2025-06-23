@@ -102,6 +102,7 @@ export function blockComponentToCustomPageBlock(
     "shared.overview-block",
     "games.new-and-loved-slots",
     "shared.quicklinks",
+    "homepage.home-featured-providers",
   ];
 
   if (validComponents.includes(block.__component)) {
@@ -156,6 +157,7 @@ export function isCustomPageBlock(
     "shared.overview-block",
     "games.new-and-loved-slots",
     "shared.quicklinks",
+    "homepage.home-featured-providers",
   ];
 
   return customPageComponents.includes(block.__component);

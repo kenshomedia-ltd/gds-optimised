@@ -2,21 +2,22 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import type { DynamicBlockProps } from "@/types/dynamic-block.types";
 import type {
   HomeGameListBlock,
   HomeCasinoListBlock,
   HomeBlogListBlock,
+  HomeFeaturedProvidersBlock,
   IntroductionWithImageBlock,
   SingleContentBlock,
   GamesCarouselBlock,
   GamesNewAndLovedSlotsBlock,
   QuicklinksBlock,
+  DynamicBlockProps
 } from "@/types/dynamic-block.types";
 import type { OverviewBlock } from "@/types/homepage.types";
 import type { CasinoListBlock } from "@/types/casino-filters.types";
+import type { FeaturedProvider } from "@/types/featured-providers.types";
 import { Skeleton } from "@/components/ui";
-
 // Lazy load all widget components
 const IntroWithImage = dynamic(
   () =>
@@ -88,6 +89,19 @@ const QuicklinksWidget = dynamic(
       (mod) => mod.QuicklinksWidget
     ),
   { loading: () => <Skeleton className="h-32" /> }
+);
+
+const FeaturedProviders = dynamic(
+  () =>
+    import("@/components/widgets/FeaturedProviders").then(
+      (mod) => mod.FeaturedProviders
+    ),
+  {
+    loading: () =>
+      import("@/components/widgets/FeaturedProviders").then((mod) => (
+        <mod.FeaturedProvidersSkeleton />
+      )),
+  }
 );
 
 /**
@@ -205,6 +219,46 @@ export function DynamicBlock({
         />
       );
 
+    case "homepage.home-featured-providers":
+      const featuredProvidersBlock = blockData as HomeFeaturedProvidersBlock;
+      // Transform to match FeaturedProvidersProps expected structure
+      let homeFeaturedProviders: {
+        id: number;
+        providers?: FeaturedProvider[];
+      } = { id: 0, providers: [] };
+
+      if (featuredProvidersBlock.homeFeaturedProviders) {
+        if (Array.isArray(featuredProvidersBlock.homeFeaturedProviders)) {
+          const firstItem = featuredProvidersBlock.homeFeaturedProviders[0];
+          if (firstItem) {
+            homeFeaturedProviders = {
+              id: firstItem.id,
+              providers: firstItem.providers || [],
+            };
+          }
+        } else {
+          // When it's not an array, it's just { providers?: Provider[] }
+          // So we need to provide a default id
+          homeFeaturedProviders = {
+            id: 0, // Default id since the object doesn't have one
+            providers:
+              featuredProvidersBlock.homeFeaturedProviders.providers || [],
+          };
+        }
+      }
+
+      const featuredProvidersData = {
+        id: featuredProvidersBlock.id,
+        title: featuredProvidersBlock.title,
+        homeFeaturedProviders,
+      };
+
+      return (
+        <FeaturedProviders
+          data={featuredProvidersData}
+          translations={translations}
+        />
+      );
     // Add other custom page block cases as needed...
 
     default:

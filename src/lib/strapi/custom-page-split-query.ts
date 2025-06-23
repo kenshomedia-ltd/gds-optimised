@@ -453,6 +453,22 @@ const getCustomPageDataWithSplitQueries = async (
               },
             },
           },
+          "homepage.home-featured-providers": {
+            populate: {
+              homeFeaturedProviders: {
+                populate: {
+                  providers: {
+                    fields: ["title", "slug"],
+                    populate: {
+                      images: {
+                        fields: ["url", "width", "height"],
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
           "games.games-carousel": {
             fields: [
               "numberOfGames",
