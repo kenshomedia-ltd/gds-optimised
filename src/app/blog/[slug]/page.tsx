@@ -1,10 +1,14 @@
 // src/app/blog/[slug]/page.tsx
 
+import React from "react";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
+
+// Import components for blog post
 import {
   getBlogSingleData,
   getBlogMetadata,
+  getBlogIndexData,
 } from "@/lib/strapi/blog-data-loader";
 import { getLayoutData } from "@/lib/strapi/data-loader";
 import { generateMetadata as generateSEOMetadata } from "@/lib/utils/seo";
@@ -14,6 +18,9 @@ import { TimeDate } from "@/components/common/TimeDate";
 import { SingleContent } from "@/components/common/SingleContent";
 import { BlogList } from "@/components/blog/BlogList/BlogList";
 import { AuthorBox } from "@/components/common/AuthorBox/AuthorBox";
+
+// Import components for pagination
+import { PaginationServer } from "@/components/ui/Pagination/PaginationServer";
 
 // Force static generation with ISR
 export const dynamic = "force-static";
@@ -25,11 +32,33 @@ interface BlogPageProps {
   }>;
 }
 
-// Generate static params for all blog pages
+// Helper function to check if slug is a pagination pattern
+function isPaginationSlug(slug: string): {
+  isPagination: boolean;
+  pageNumber: number;
+} {
+  const match = slug.match(/^p(\d+)$/);
+  if (match) {
+    const pageNumber = parseInt(match[1], 10);
+    return { isPagination: true, pageNumber };
+  }
+  return { isPagination: false, pageNumber: 0 };
+}
+
+// Generate static params for both blog posts and pagination
 export async function generateStaticParams() {
-  // This would fetch all blog slugs from Strapi
-  // For now, return empty array to allow dynamic generation
-  return [];
+  // Generate pagination pages
+  const paginationParams = [
+    { slug: "p2" },
+    { slug: "p3" },
+    { slug: "p4" },
+    { slug: "p5" },
+  ];
+
+  // You could also fetch blog slugs here if needed
+  // const blogSlugs = await fetchAllBlogSlugs();
+
+  return paginationParams;
 }
 
 // Generate metadata for SEO
@@ -37,33 +66,167 @@ export async function generateMetadata({
   params,
 }: BlogPageProps): Promise<Metadata> {
   const { slug } = await params;
+  const { isPagination, pageNumber } = isPaginationSlug(slug);
 
-  try {
-    const blogMetadata = await getBlogMetadata(slug);
-
-    if (!blogMetadata) {
-      return {};
-    }
-
+  if (isPagination) {
+    // Metadata for pagination pages
+    const title = `Blog - Page ${pageNumber}`;
     const canonicalUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/blog/${slug}`;
 
     return generateSEOMetadata({
-      title: blogMetadata.seo?.metaTitle || blogMetadata.title,
-      description:
-        blogMetadata.seo?.metaDescription || blogMetadata.description,
-      keywords: blogMetadata.seo?.keywords,
+      title,
+      description: "Latest articles and insights",
       canonicalUrl,
-      image: blogMetadata.seo?.metaImage?.url,
     });
-  } catch (error) {
-    console.error("Error generating metadata:", error);
-    return {};
+  } else {
+    // Metadata for blog posts
+    try {
+      const blogMetadata = await getBlogMetadata(slug);
+
+      if (!blogMetadata) {
+        return {};
+      }
+
+      const canonicalUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/blog/${slug}`;
+
+      return generateSEOMetadata({
+        title: blogMetadata.seo?.metaTitle || blogMetadata.title,
+        description:
+          blogMetadata.seo?.metaDescription || blogMetadata.description,
+        keywords: blogMetadata.seo?.keywords,
+        canonicalUrl,
+        image: blogMetadata.seo?.metaImage?.url,
+      });
+    } catch (error) {
+      console.error("Error generating metadata:", error);
+      return {};
+    }
   }
 }
 
-export default async function BlogPage({ params }: BlogPageProps) {
+// Main component that handles both pagination and blog posts
+export default async function BlogSlugPage({ params }: BlogPageProps) {
   const { slug } = await params;
+  const { isPagination, pageNumber } = isPaginationSlug(slug);
 
+  if (isPagination) {
+    // Handle pagination pages (p2, p3, etc.)
+    return <BlogPaginationPage pageNumber={pageNumber} />;
+  } else {
+    // Handle individual blog posts
+    return <BlogPostPage slug={slug} />;
+  }
+}
+
+// Pagination page component
+async function BlogPaginationPage({ pageNumber }: { pageNumber: number }) {
+  const pageSize = 12; // Number of blogs per page
+
+  // Validate page number
+  if (pageNumber < 2) {
+    notFound();
+  }
+
+  // Fetch data
+  const [layoutData, blogData] = await Promise.all([
+    getLayoutData({ cached: true }),
+    getBlogIndexData(pageNumber, pageSize),
+  ]);
+
+  const { translations } = layoutData;
+  const { blogs, pagination } = blogData;
+
+  // Check if page exists
+  if (pageNumber > pagination.pageCount && pagination.pageCount > 0) {
+    notFound();
+  }
+
+  // Breadcrumbs
+  const breadcrumbs = [
+    { breadCrumbText: "Home", breadCrumbUrl: "/" },
+    { breadCrumbText: "Blog", breadCrumbUrl: "/blog" },
+    { breadCrumbText: `Page ${pageNumber}`, breadCrumbUrl: "" },
+  ];
+
+  // Schema.org structured data
+  const blogSchema = {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    name: translations?.blogPageTitle || "Blog",
+    description:
+      translations?.blogPageDescription || "Latest articles and insights",
+    url: `${process.env.NEXT_PUBLIC_SITE_URL}/blog/p${pageNumber}`,
+    blogPost: blogs.map((blog) => ({
+      "@type": "BlogPosting",
+      headline: blog.title,
+      url: `${process.env.NEXT_PUBLIC_SITE_URL}/blog/${blog.slug}`,
+      datePublished: blog.publishedAt || blog.createdAt,
+      ...(blog.author && {
+        author: {
+          "@type": "Person",
+          name: `${blog.author.firstName} ${blog.author.lastName}`,
+        },
+      }),
+      ...(blog.images?.url && {
+        image: blog.images.url,
+      }),
+    })),
+  };
+
+  return (
+    <>
+      {/* Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(blogSchema) }}
+      />
+
+      {/* Breadcrumbs */}
+      <Breadcrumbs items={breadcrumbs} />
+
+      {/* Main Content Section */}
+      <section className="main container mx-auto px-4 py-12">
+        {/* Page Title */}
+        <h1 className="text-4xl font-bold mb-8">
+          {translations?.blogPageTitle || "Blog"} - Page {pageNumber}
+        </h1>
+
+        {/* Blog List */}
+        {blogs.length > 0 ? (
+          <BlogList
+            blogs={blogs}
+            translations={translations}
+            className="mb-12"
+          />
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-gray-600">
+              {translations?.noBlogsFound || "No articles found."}
+            </p>
+          </div>
+        )}
+
+        {/* Pagination */}
+        {pagination.pageCount > 1 && (
+          <PaginationServer
+            currentPage={pageNumber}
+            totalPages={pagination.pageCount}
+            baseUrl="/blog"
+            translations={translations}
+            showInfo={true}
+            totalItems={pagination.total}
+            itemsPerPage={pageSize}
+            itemName="articles"
+            className="mt-8"
+          />
+        )}
+      </section>
+    </>
+  );
+}
+
+// Blog post page component (your existing blog post code)
+async function BlogPostPage({ slug }: { slug: string }) {
   // Fetch data
   const [layoutData, blogPageData] = await Promise.all([
     getLayoutData({ cached: true }),
@@ -77,11 +240,11 @@ export default async function BlogPage({ params }: BlogPageProps) {
   const { translations } = layoutData;
   const { blog, relatedBlogs } = blogPageData;
 
-  // Generate breadcrumbs - Updated to use correct property names
+  // Generate breadcrumbs
   const breadcrumbs = [
     { breadCrumbText: "Home", breadCrumbUrl: "/" },
     { breadCrumbText: "Blog", breadCrumbUrl: "/blog" },
-    { breadCrumbText: blog.title, breadCrumbUrl: "" }, // Empty URL for current page
+    { breadCrumbText: blog.title, breadCrumbUrl: "" },
   ];
 
   // Schema.org structured data
@@ -212,7 +375,7 @@ export default async function BlogPage({ params }: BlogPageProps) {
               <AuthorBox
                 author={{
                   ...blog.author,
-                  // Convert null to undefined for twitterLink and facebookLink
+                  // Convert null to undefined for optional fields
                   twitterLink: blog.author.twitterLink || undefined,
                   facebookLink: blog.author.facebookLink || undefined,
                   areaOfWork: blog.author.areaOfWork || undefined,

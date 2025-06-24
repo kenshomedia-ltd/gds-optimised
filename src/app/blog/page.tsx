@@ -2,14 +2,13 @@
 
 import React from "react";
 import { Metadata } from "next";
-import Link from "next/link";
 import { getBlogIndexData } from "@/lib/strapi/blog-data-loader";
 import { getLayoutData } from "@/lib/strapi/data-loader";
 import { generateMetadata as generateSEOMetadata } from "@/lib/utils/seo";
 import { BlogFeatured } from "@/components/blog/BlogFeatured/BlogFeatured";
 import { BlogList } from "@/components/blog/BlogList/BlogList";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
-import { cn } from "@/lib/utils/cn";
+import { PaginationServer } from "@/components/ui/Pagination/PaginationServer";
 
 // Force static generation with ISR
 export const dynamic = "force-static";
@@ -104,7 +103,7 @@ export default async function BlogIndexPage({
       {currentPage === 1 && featuredBlog && (
         <section className="featured-header relative overflow-hidden bg-gradient-to-b from-background-900 from-30% via-background-700 via-80% to-background-500 rounded-b-3xl">
           <div className="container relative mx-auto px-4 z-10 py-12">
-            <BlogFeatured blog={featuredBlog} />
+            <BlogFeatured blog={featuredBlog} translations={translations} />
           </div>
 
           {/* Starry Sky Background Effect */}
@@ -135,88 +134,17 @@ export default async function BlogIndexPage({
 
         {/* Pagination */}
         {pagination.pageCount > 1 && (
-          <nav
-            className="flex justify-center items-center gap-2 mt-12"
-            aria-label="Blog pagination"
-          >
-            {/* Previous Page */}
-            {currentPage > 1 && (
-              <Link
-                href={
-                  currentPage === 2 ? "/blog" : `/blog?page=${currentPage - 1}`
-                }
-                className={cn(
-                  "px-4 py-2 rounded-lg font-medium",
-                  "bg-primary text-white",
-                  "hover:bg-primary-shade transition-colors",
-                  "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                )}
-              >
-                {translations?.previous || "Previous"}
-              </Link>
-            )}
-
-            {/* Page Numbers */}
-            <div className="flex items-center gap-2">
-              {Array.from({ length: pagination.pageCount }, (_, i) => i + 1)
-                .filter((page) => {
-                  // Show first page, last page, current page, and pages adjacent to current
-                  return (
-                    page === 1 ||
-                    page === pagination.pageCount ||
-                    Math.abs(page - currentPage) <= 1
-                  );
-                })
-                .map((page, index, array) => (
-                  <React.Fragment key={page}>
-                    {/* Add ellipsis if there's a gap */}
-                    {index > 0 && array[index - 1] !== page - 1 && (
-                      <span className="px-2 text-gray-500">...</span>
-                    )}
-
-                    {page === currentPage ? (
-                      <span
-                        className={cn(
-                          "px-4 py-2 rounded-lg font-medium",
-                          "bg-primary text-white",
-                          "cursor-default"
-                        )}
-                        aria-current="page"
-                      >
-                        {page}
-                      </span>
-                    ) : (
-                      <Link
-                        href={page === 1 ? "/blog" : `/blog?page=${page}`}
-                        className={cn(
-                          "px-4 py-2 rounded-lg font-medium",
-                          "bg-gray-200 text-gray-700",
-                          "hover:bg-gray-300 transition-colors",
-                          "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                        )}
-                      >
-                        {page}
-                      </Link>
-                    )}
-                  </React.Fragment>
-                ))}
-            </div>
-
-            {/* Next Page */}
-            {currentPage < pagination.pageCount && (
-              <Link
-                href={`/blog?page=${currentPage + 1}`}
-                className={cn(
-                  "px-4 py-2 rounded-lg font-medium",
-                  "bg-primary text-white",
-                  "hover:bg-primary-shade transition-colors",
-                  "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                )}
-              >
-                {translations?.next || "Next"}
-              </Link>
-            )}
-          </nav>
+          <PaginationServer
+            currentPage={currentPage}
+            totalPages={pagination.pageCount}
+            baseUrl="/blog"
+            translations={translations}
+            showInfo={true}
+            totalItems={pagination.total}
+            itemsPerPage={pageSize}
+            itemName="articles"
+            className="mt-8"
+          />
         )}
       </section>
     </>
