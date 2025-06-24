@@ -17,10 +17,7 @@ import { getAllProviderSlugs } from "@/lib/strapi/provider-data-loader";
 import { getLayoutData } from "@/lib/strapi/data-loader";
 import { generateMetadata as generateSEOMetadata } from "@/lib/utils/seo";
 import type { GamesCarouselBlock } from "@/types/dynamic-block.types";
-import type {
-  FilterOption,
-  SelectedFilters,
-} from "@/types/game-list-widget.types";
+import type { SelectedFilters } from "@/types/game-list-widget.types";
 
 // Force static generation with ISR
 export const dynamic = "force-static";
@@ -228,8 +225,6 @@ export default async function ProviderPage({
         ? [{ breadCrumbText: `PAGE ${currentPage}`, breadCrumbUrl: "" }]
         : []),
     ];
-
-    const baseUrl = `/software-slot-machine/${slug}`;
 
     console.log("Provider page - Before GameListWidget:", {
       currentPage,
