@@ -149,7 +149,7 @@ export function GameFilters({
               type="text"
               value={localSearchQuery}
               onChange={handleSearchChange}
-              placeholder={translations?.searchGames || "Search games..."}
+              placeholder={translations?.search || "Search games..."}
               className={cn(
                 "w-full pl-10 pr-8 py-2 rounded-lg border transition-colors",
                 "bg-gray-300 placeholder-gray-500 border-gray-300",
@@ -185,7 +185,7 @@ export function GameFilters({
           <div className="flex items-center gap-2 text-gray-100">
             <FontAwesomeIcon icon={faFilter} className="h-5 w-5" />
             <span className="font-medium">
-              {translations?.filterBy || "Filter by:"}
+              {translations?.filter || "Filter by:"}
             </span>
           </div>
 
@@ -201,9 +201,7 @@ export function GameFilters({
                 showSort && "!rounded-b-none"
               )}
             >
-              <span>
-                {translations?.sortBy || "Sort"}: {currentSortLabel}
-              </span>
+              <span>{translations?.[currentSortLabel]}</span>
               <FontAwesomeIcon
                 icon={faChevronDown}
                 className={cn(
@@ -224,7 +222,7 @@ export function GameFilters({
                       selectedSort === option.value && "bg-gray-100 font-medium"
                     )}
                   >
-                    {option.label}
+                    {translations?.[option.label]}
                   </button>
                 ))}
               </div>

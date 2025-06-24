@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils/cn";
 interface BlogFeaturedProps {
   blog: BlogData;
   className?: string;
+  translations: Record<string, string>;
 }
 
 /**
@@ -22,7 +23,11 @@ interface BlogFeaturedProps {
  * - Optimized image loading
  * - Server-side rendered
  */
-export function BlogFeatured({ blog, className }: BlogFeaturedProps) {
+export function BlogFeatured({
+  blog,
+  translations = {},
+  className,
+}: BlogFeaturedProps) {
   const {
     title,
     slug,
@@ -163,7 +168,7 @@ export function BlogFeatured({ blog, className }: BlogFeaturedProps) {
               )}
               prefetch={false}
             >
-              Read Article
+              {translations.readMore || "Read More"}
               <svg
                 className="w-5 h-5"
                 fill="none"

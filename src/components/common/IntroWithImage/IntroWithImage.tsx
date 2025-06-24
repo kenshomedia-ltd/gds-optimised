@@ -156,13 +156,13 @@ export function IntroWithImage({
                   aria-expanded={isExpanded}
                   aria-label={
                     isExpanded
-                      ? translations.readLess || "Read less"
-                      : translations.readMore || "Read more"
+                      ? translations.showLess || "Show less"
+                      : translations.showMore || "Show more"
                   }
                 >
                   {isExpanded
-                    ? translations.readLess || "Read less"
-                    : translations.readMore || "Read more"}
+                    ? translations.showLess || "Show less"
+                    : translations.showMore || "Show more"}
                   <svg
                     className={cn(
                       "w-4 h-4 transition-transform duration-200",

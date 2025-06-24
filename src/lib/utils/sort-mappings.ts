@@ -39,11 +39,10 @@ export type SortKey = keyof typeof SORT_MAPPINGS;
  * Each option has a value (key) and a label for display
  */
 export const GAME_SORT_OPTIONS = [
-  { value: "Newest", label: "Newest" },
-  { value: "Most Popular", label: "Most Popular" },
-  { value: "Top Rated", label: "Top Rated" },
-  { value: "Alphabetical", label: "A-Z" },
-  { value: "Reverse Alphabetical", label: "Z-A" },
+  { value: "Newest", label: "filtersNew" },
+  { value: "Most Popular", label: "filtersPopular" },
+  { value: "Top Rated", label: "filtersRating" },
+  { value: "Alphabetical", label: "filtersAZ" },
 ] as const;
 
 /**
