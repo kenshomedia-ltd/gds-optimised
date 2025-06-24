@@ -109,11 +109,11 @@ export function CasinoRow({
           />
 
           {/* Rating value and vote count */}
-          <div className="flex items-center gap-2 text-xs text-gray-500">
+          <div className="flex items-center gap-2 text-xs text-gray-900">
             <span className="font-medium tabular-nums">
               {casino.ratingAvg.toFixed(1)}/5
             </span>
-            <span className="text-gray-400">•</span>
+            <span className="text-gray-900">•</span>
             <span>
               ({casino.ratingCount} {translations.votes || "votes"})
             </span>
@@ -125,7 +125,7 @@ export function CasinoRow({
               href={`${siteId === "gds" ? "/it" : ""}${casinoPagePath}/${
                 casino.slug
               }/`}
-              className="casino-name text-[14px] text-grey-500 mr-[11px] hover:text-primary transition-colors group"
+              className="casino-name text-[14px] text-grey-900 mr-[11px] hover:text-primary transition-colors group"
             >
               <span className="hidden sm:inline-flex sm:pr-1">
                 {casino.title}

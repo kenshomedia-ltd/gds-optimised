@@ -87,7 +87,7 @@ export function IntroWithImage({
     <section className="relative z-20" aria-label={heading}>
       <div
         className={cn(
-          "relative grid grid-cols-12 gap-4 px-4 lg:px-0 lg:gap-8",
+          "relative grid grid-cols-12 gap-4 px-2 lg:px-0 lg:gap-8",
           hasValidImage ? "pt-0 lg:pt-10" : "pt-5",
           "xl:container xl:mx-auto"
         )}
@@ -97,7 +97,7 @@ export function IntroWithImage({
           className={cn(
             "col-span-12 lg:z-20",
             hasValidImage
-              ? "order-2 lg:order-1 lg:col-span-6 lg:max-w-xl"
+              ? "order-2 lg:order-1 lg:col-span-7"
               : "lg:col-span-10 lg:col-start-2 text-center mx-auto max-w-4xl"
           )}
         >
@@ -116,8 +116,8 @@ export function IntroWithImage({
           {/* Heading */}
           <h1
             className={cn(
-              "text-3xl font-bold leading-tight tracking-tight lg:text-5xl",
-              "text-gray-900 dark:text-white",
+              "font-bold leading-tight tracking-tight",
+              "text-white capitalize",
               "mb-4 lg:mb-6"
             )}
           >
@@ -126,10 +126,10 @@ export function IntroWithImage({
 
           {/* Introduction Text - Only render if there's actual content */}
           {sanitizedIntroduction && (
-            <div className="space-y-4">
+            <div>
               <div
                 className={cn(
-                  "text-base lg:text-lg text-gray-700 dark:text-gray-300",
+                  "text-base lg:text-md text-white",
                   "leading-relaxed",
                   shouldTruncate &&
                     !isExpanded &&
@@ -148,9 +148,8 @@ export function IntroWithImage({
                 <button
                   onClick={() => setIsExpanded(!isExpanded)}
                   className={cn(
-                    "inline-flex items-center gap-2 text-sm font-medium",
-                    "text-primary-600 hover:text-primary-700",
-                    "dark:text-primary-400 dark:hover:text-primary-300",
+                    "pt-2 flex items-center gap-2 text-sm font-medium",
+                    "text-gray-100 hover:text-white underline justify-self-end",
                     "transition-colors duration-200",
                     "lg:hidden" // Hide on desktop
                   )}
@@ -190,18 +189,18 @@ export function IntroWithImage({
         {hasValidImage && imageUrl && (
           <div
             className={cn(
-              "col-span-12 lg:col-span-6",
+              "col-span-12 lg:col-span-5",
               "order-1 lg:order-2",
               "relative aspect-[16/9] lg:aspect-auto lg:h-full",
               "overflow-hidden rounded-xl lg:rounded-2xl",
-              "shadow-lg"
+              "mix-blend-lighten shadow-lg"
             )}
           >
             <Image
               src={imageUrl}
               alt={imageAlt}
-              width={imageData?.width || 800}
-              height={imageData?.height || 450}
+              width={525}
+              height={200}
               priority={true}
               className="w-full h-full object-cover"
               sizes="(max-width: 1024px) 100vw, 50vw"

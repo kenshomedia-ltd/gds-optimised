@@ -162,7 +162,7 @@ export default async function CategoryPage({
           <div className="container relative mx-auto px-4 z-10 py-12">
             {/* Introduction (if exists) */}
             {pageData.IntroductionWithImage && (
-              <div className="mb-8">
+              <div className="mb-2">
                 <IntroWithImage
                   heading={
                     pageData.IntroductionWithImage.heading ||

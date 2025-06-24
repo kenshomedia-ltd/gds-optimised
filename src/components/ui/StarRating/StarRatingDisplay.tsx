@@ -53,12 +53,13 @@ export function StarRatingDisplay({
         <FontAwesomeIcon
           icon={faStar}
           className={cn(sizeClass, "text-accent-100")}
+          swapOpacity
         />
         <span
           className={cn(
             "font-medium tabular-nums",
             size === "xs" ? "text-xs" : "text-sm",
-            "text-gray-600"
+            "text-gray-900"
           )}
         >
           {rating.toFixed(1)}
@@ -66,7 +67,7 @@ export function StarRatingDisplay({
         {showCount && count !== undefined && (
           <span
             className={cn(
-              "text-gray-500",
+              "text-gray-900",
               size === "xs" ? "text-xs" : "text-sm"
             )}
           >
@@ -98,26 +99,29 @@ export function StarRatingDisplay({
             key={`full-${i}`}
             icon={faStar}
             className={cn(sizeClass, "text-accent-100")}
+            swapOpacity
           />
         ))}
 
-        {/* Partial star using CSS gradient */}
+        {/* Partial star using CSS gradient - fixed alignment */}
         {partialStar > 0 && (
-          <div className="relative inline-block">
+          <span className="relative inline-flex items-center">
             <FontAwesomeIcon
               icon={faStar}
               className={cn(sizeClass, "text-gray-300")}
+              swapOpacity
             />
-            <div
-              className="absolute inset-0 overflow-hidden"
+            <span
+              className="absolute inset-0 overflow-hidden inline-flex items-center"
               style={{ width: `${partialStar * 100}%` }}
             >
               <FontAwesomeIcon
                 icon={faStar}
                 className={cn(sizeClass, "text-accent-100")}
+                swapOpacity
               />
-            </div>
-          </div>
+            </span>
+          </span>
         )}
 
         {/* Empty stars */}
@@ -126,6 +130,7 @@ export function StarRatingDisplay({
             key={`empty-${i}`}
             icon={faStar}
             className={cn(sizeClass, "text-gray-300")}
+            swapOpacity
           />
         ))}
       </div>
@@ -139,15 +144,15 @@ export function StarRatingDisplay({
           )}
         >
           {showValue && (
-            <span className="font-medium text-gray-600 tabular-nums">
+            <span className="font-medium text-gray-900 tabular-nums">
               {rating.toFixed(1)}/{maxRating}
             </span>
           )}
           {showValue && showCount && count !== undefined && (
-            <span className="text-gray-400">•</span>
+            <span className="text-gray-900">•</span>
           )}
           {showCount && count !== undefined && (
-            <span className="text-gray-500">({count})</span>
+            <span className="text-gray-900">({count})</span>
           )}
         </div>
       )}

@@ -23,11 +23,11 @@ export function HomeGameList({
   block,
   games,
   translations,
-}: HomeGameListProps) {
+}: HomeGameListProps) { 
   return (
     <Suspense
       fallback={
-        <div className="py-8 lg:py-12">
+        <div className="py-6">
           <div className="xl:container mx-auto px-4">
             <div className="h-10 bg-gray-200 rounded w-64 mx-auto mb-6 animate-pulse" />
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">

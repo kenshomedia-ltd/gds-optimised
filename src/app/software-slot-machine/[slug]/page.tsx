@@ -164,10 +164,10 @@ export default async function ProviderPage({
 
         {/* Hero Section with Introduction and Games */}
         <section className="featured-header relative overflow-hidden bg-gradient-to-b from-background-900 from-30% via-background-700 via-80% to-background-500 rounded-b-3xl">
-          <div className="container relative mx-auto px-4 z-10 py-12">
+          <div className="container relative mx-auto px-4 z-10 pb-12">
             {/* Introduction */}
             {(pageData.IntroductionWithImage || pageData.content1) && (
-              <div className="mb-8">
+              <div>
                 <IntroWithImage
                   heading={
                     pageData.IntroductionWithImage?.heading ||
@@ -188,7 +188,11 @@ export default async function ProviderPage({
             {/* Games Section - In Hero */}
             {games && games.length > 0 && (
               <div className="relative z-10">
-                <GameListWidget block={gamesBlock} games={games} />
+                <GameListWidget
+                  block={gamesBlock}
+                  games={games}
+                  usePagination={true}
+                />
               </div>
             )}
           </div>

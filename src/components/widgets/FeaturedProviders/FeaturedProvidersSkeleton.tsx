@@ -7,7 +7,7 @@
  */
 export function FeaturedProvidersSkeleton() {
   return (
-    <div className="relative flex flex-col justify-center items-center gap-10 xl:container z-10 px-4 py-8">
+    <div className="relative flex flex-col justify-center items-center gap-10 xl:container z-10 px-2 py-8">
       <div className="h-8 w-64 bg-gray-700 rounded animate-pulse mt-10" />
 
       <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-8 xl:grid-cols-10 gap-3 w-full max-w-7xl">

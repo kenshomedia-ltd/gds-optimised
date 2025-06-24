@@ -15,7 +15,7 @@ function buildCasinoSidebarQuery() {
       most_loved_casinos: {
         fields: ["slug", "title"],
         populate: {
-          images: {
+          logoIcon: {
             fields: ["url", "width", "height"],
           },
           casinoBonus: {
@@ -29,7 +29,7 @@ function buildCasinoSidebarQuery() {
       no_deposit_casinos: {
         fields: ["slug", "title"],
         populate: {
-          images: {
+          logoIcon: {
             fields: ["url", "width", "height"],
           },
           casinoBonus: {
@@ -43,7 +43,7 @@ function buildCasinoSidebarQuery() {
       free_spin_casinos: {
         fields: ["slug", "title"],
         populate: {
-          images: {
+          logoIcon: {
             fields: ["url", "width", "height"],
           },
           casinoBonus: {

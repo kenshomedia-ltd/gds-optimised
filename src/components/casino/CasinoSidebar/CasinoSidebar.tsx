@@ -28,6 +28,8 @@ export function CasinoSidebar({
     return null;
   }
 
+  console.log("casino2s", casinos);
+
   return (
     <aside
       className={cn(

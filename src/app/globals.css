@@ -122,6 +122,11 @@
   --color-btn-danger: var(--site-button-danger);
   --color-btn-danger-hover: var(--site-button-danger-hover);
   --color-btn-danger-text: var(--site-button-danger-text);
+  
+  /* filters colors */
+  --color-filter-bkg: var(--site-blue-100);
+  --color-filter-text: var(--site-gray-700);
+  --color-filter-border: var(--site-gray-700);
 
   /* Semantic colors */
   --color-secondary-tint: var(--site-secondary-tint);
@@ -163,7 +168,7 @@
 
   /* Heading size scale with responsive sizing */
   h1, .h1 {
-    font-size: clamp(2rem, 5vw, 3.75rem);
+    font-size: clamp(1.5rem, 5vw, 2.5rem);
     color: var(--color-white);
     text-shadow: 0px 0px 12px rgba(63, 230, 252, 0.6);
     backdrop-filter: blur(6px);

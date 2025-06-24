@@ -31,6 +31,8 @@ export function CasinoSidebarItem({
     }
   };
 
+  console.log("casino", casino);
+
   const bonusText = getBonusText();
 
   return (
@@ -43,10 +45,10 @@ export function CasinoSidebarItem({
         target="_blank"
       >
         <Image
-          src={casino.images.url}
+          src={casino.logoIcon.url}
           alt={`${casino.title} logo`}
-          width={90}
-          height={60}
+          width={50}
+          height={50}
           className="rounded border border-border object-contain"
           loading="lazy"
         />
@@ -55,7 +57,7 @@ export function CasinoSidebarItem({
       {/* Casino Info */}
       <div className="flex-1 min-w-0">
         <h4 className="font-semibold text-sm mb-1 truncate">{casino.title}</h4>
-        <div className="text-xs text-muted-foreground">{bonusText}</div>
+        <div className="text-sm text-muted-foreground">{bonusText}</div>
       </div>
 
       {/* CTA Button */}

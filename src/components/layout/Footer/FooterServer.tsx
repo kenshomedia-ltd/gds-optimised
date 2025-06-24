@@ -75,11 +75,15 @@ export function FooterServer({
         {footerImages.length > 0 && (
           <div className="mt-10 mb-4 flex flex-wrap gap-y-5 justify-center space-x-10 md:justify-end">
             {footerImages.map((img) => {
+              // Calculate proportional width based on the 40px height
+              const aspectRatio = img.image.width / img.image.height;
+              const calculatedWidth = Math.round(40 * aspectRatio);
+
               const imageElement = (
                 <Image
                   src={img.image.url}
                   alt={`${img.imageName} logo`}
-                  width={img.image.width}
+                  width={calculatedWidth}
                   height={40}
                   className="gambling-logos h-10 w-auto object-contain"
                   quality={90}

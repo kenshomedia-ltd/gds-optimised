@@ -6,6 +6,7 @@ import { GameCard } from "@/components/games/GameCard/GameCard";
 import { GameCardSkeleton } from "@/components/games/GameCard/GameCardSkeleton";
 import { GameFilters } from "./GameFilters";
 import { GameFiltersSkeleton } from "./GameFiltersSkeleton";
+import { Pagination } from "@/components/ui/Pagination/Pagination";
 import type {
   GameListWidgetProps,
   FilterOption,
@@ -21,12 +22,12 @@ import {
 /**
  * GameListWidget Component
  *
- * A comprehensive game listing widget with filtering and pagination
+ * A comprehensive game listing widget with filtering and pagination/load more
  * Used on non-homepage pages like the slot-machine page
  *
  * Features:
  * - Filter by providers and categories
- * - Load more functionality
+ * - Load more functionality OR Pagination (configurable)
  * - Responsive grid layout
  * - Loading states
  * - Progressive enhancement
@@ -39,7 +40,8 @@ export function GameListWidget({
   className,
   providers: initialProviders,
   categories: initialCategories,
-}: GameListWidgetProps) {
+  usePagination = false, // New prop to enable pagination
+}: GameListWidgetProps & { usePagination?: boolean }) {
   const [games, setGames] = useState<GameData[]>(initialGames);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
@@ -160,16 +162,18 @@ export function GameListWidget({
         });
 
         if (result.games && result.games.length > 0) {
-          if (append) {
+          if (append && !usePagination) {
+            // Load more mode: append to existing
             setGames((prev) => [...prev, ...result.games]);
           } else {
+            // Pagination mode or initial load: replace
             setGames(result.games);
           }
           setTotalGames(result.total);
           setHasMore(result.games.length === numberOfGames);
         } else {
           setHasMore(false);
-          if (!append) {
+          if (!append || usePagination) {
             setGames([]);
             setTotalGames(0);
           }
@@ -190,6 +194,7 @@ export function GameListWidget({
       numberOfGames,
       selectedSort,
       searchQuery,
+      usePagination,
     ]
   );
 
@@ -218,6 +223,20 @@ export function GameListWidget({
     setHasMore(true);
   }, []);
 
+  // Handle page change (pagination mode)
+  const handlePageChange = useCallback(
+    (newPage: number) => {
+      if (newPage === page || newPage < 1 || newPage > totalPages) return;
+      setPage(newPage);
+      // Scroll to top of the game list
+      const element = document.querySelector("[data-game-list-top]");
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    },
+    [page, totalPages]
+  );
+
   // Load more games
   const loadMoreGames = useCallback(async () => {
     if (!hasMore || loading) return;
@@ -228,12 +247,26 @@ export function GameListWidget({
 
   // Reload games when filters change
   useEffect(() => {
-    loadGames(1, false);
+    if (usePagination) {
+      // In pagination mode, reload for current page
+      loadGames(page, false);
+    } else {
+      // In load more mode, reset to page 1
+      setPage(1);
+      loadGames(1, false);
+    }
   }, [selectedProviders, selectedCategories, selectedSort, searchQuery]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Load games when page changes in pagination mode
+  useEffect(() => {
+    if (usePagination && page > 1) {
+      loadGames(page, false);
+    }
+  }, [page, usePagination]); // eslint-disable-line react-hooks/exhaustive-deps
+
   return (
-    <section className={cn("py-8 lg:py-12", className)}>
-      <div className="xl:container mx-auto px-4">
+    <section className={cn("pb-8", className)} data-game-list-top>
+      <div className="xl:container mx-auto">
         {/* Filter Panel */}
         {showFilters &&
           (filtersLoading ? (
@@ -278,9 +311,17 @@ export function GameListWidget({
 
           {/* Loading skeletons */}
           {loading &&
-            !games.length &&
+            games.length === 0 &&
             Array.from({ length: numberOfGames }).map((_, index) => (
               <GameCardSkeleton key={`skeleton-${index}`} />
+            ))}
+
+          {/* Loading skeletons for load more mode */}
+          {loading &&
+            games.length > 0 &&
+            !usePagination &&
+            Array.from({ length: 6 }).map((_, index) => (
+              <GameCardSkeleton key={`skeleton-append-${index}`} />
             ))}
         </div>
 
@@ -294,8 +335,8 @@ export function GameListWidget({
           </div>
         )}
 
-        {/* Load More Button */}
-        {showLoadMore && hasMore && games.length > 0 && (
+        {/* Load More Section (only in load more mode) */}
+        {showLoadMore && !usePagination && hasMore && games.length > 0 && (
           <div className="text-center mt-8 space-y-3">
             {/* Load More Button */}
             <button
@@ -326,11 +367,34 @@ export function GameListWidget({
                 {totalGames > 0 && (
                   <span className="ml-2">
                     ({games.length} {translations?.of || "of"} {totalGames})
-                    {/* {translations?.games || "games"}) */}
                   </span>
                 )}
               </p>
             )}
+          </div>
+        )}
+
+        {/* Pagination (only in pagination mode) */}
+        {showLoadMore && usePagination && totalPages > 1 && (
+          <div className="mt-12 flex justify-center">
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+              disabled={loading}
+              showInfo={true}
+              variant="compact"
+              totalItems={totalGames}
+              itemsPerPage={numberOfGames}
+              itemName={translations?.games || "games"}
+              translations={{
+                previous: translations?.previous || "Back",
+                next: translations?.next || "Next",
+                page: translations?.page,
+                of: translations?.of,
+                showing: translations?.showing,
+              }}
+            />
           </div>
         )}
       </div>

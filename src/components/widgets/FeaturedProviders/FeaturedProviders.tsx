@@ -50,7 +50,7 @@ export function FeaturedProviders({
     <section
       className={cn(
         "relative flex flex-col justify-center items-center gap-10",
-        "xl:container z-10 px-4 py-8",
+        "xl:container z-10 px-2 py-8",
         className
       )}
       aria-label={data.title || "Featured Providers"}

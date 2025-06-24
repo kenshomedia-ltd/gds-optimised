@@ -64,6 +64,7 @@ export interface CasinoData {
   createdAt?: string;
   Badges?: string | null;
   images: StrapiImage;
+  logoIcon: StrapiImage;
   casinoBonus: CasinoBonus;
   noDepositSection?: NoDepositSection | null;
   freeSpinsSection?: FreeSpinsSection | null;

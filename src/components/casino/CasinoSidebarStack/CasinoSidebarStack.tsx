@@ -21,7 +21,7 @@ export function CasinoSidebarStack({
     <div className="bg-white rounded-lg shadow-sm border border-border">
       {/* Stack Header */}
       <div className="bg-table-header-bkg text-white p-4 rounded-t-lg">
-        <h3 className="text-lg font-bold text-center">{title}</h3>
+        <h3 className="text-lg font-bold capitalize">{title}</h3>
       </div>
 
       {/* Casino Items */}

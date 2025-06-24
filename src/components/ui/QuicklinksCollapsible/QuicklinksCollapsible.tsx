@@ -119,7 +119,7 @@ export function QuicklinksCollapsible({
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
           "flex items-center justify-between w-full text-left p-4",
-          "text-white bg-table-header-bkg transition-colors",
+          "text-white bg-table-header-bkg transition-colors mb-2",
           "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary",
           isOpen ? "rounded-t-lg" : "rounded-lg",
           labelClass
@@ -145,7 +145,7 @@ export function QuicklinksCollapsible({
           className={cn("px-4 pb-4", contentClass)}
           aria-label="Quick navigation links"
         >
-          <ul className="grid grid-cols-2 gap-x-6 gap-y-2">
+          <ul className="flex flex-col md:grid md:grid-cols-2 md:gap-x-6 gap-y-2">
             {headings.map((heading, index) => {
               // Calculate which column the item should be in
               const midpoint = Math.ceil(headings.length / 2);
@@ -164,8 +164,8 @@ export function QuicklinksCollapsible({
                   <button
                     onClick={() => handleScrollToSection(heading.id)}
                     className={cn(
-                      "w-full text-left text-md text-body-text hover:text-grey-500",
-                      "hover:underline transition-colors py-1.5 px-2 rounded",
+                      "w-full text-left underline text-md text-body-text hover:text-grey-500",
+                      "hover:text-primary transition-colors px-2 rounded",
                       "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                     )}
                     aria-label={`Navigate to ${heading.text}`}

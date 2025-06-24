@@ -84,7 +84,7 @@ export function GameList({
 
   return (
     <section className={cn("py-8 lg:py-12", className)}>
-      <div className="xl:container mx-auto px-4">
+      <div className="xl:container mx-auto px-2">
         {/* Title */}
         {block.gameListTitle && (
           <h2 className="text-2xl md:text-3xl font-bold text-heading-text mb-6 text-center">

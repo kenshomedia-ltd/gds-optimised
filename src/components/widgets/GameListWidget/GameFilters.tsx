@@ -140,10 +140,10 @@ export function GameFilters({
       <div className="flex flex-wrap items-center gap-4">
         {/* Search Bar - Left Side */}
         <div className="flex-1 min-w-[200px] max-w-md">
-          <div className="relative">
+          <div className="relative text-gray-700">
             <FontAwesomeIcon
               icon={faSearch}
-              className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400"
+              className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-700"
             />
             <input
               type="text"
@@ -160,9 +160,12 @@ export function GameFilters({
             {localSearchQuery && (
               <button
                 onClick={clearSearch}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-700"
               >
-                <FontAwesomeIcon icon={faTimes} className="h-4 w-4" />
+                <FontAwesomeIcon
+                  icon={faTimes}
+                  className="h-4 w-4 text-gray-700"
+                />
               </button>
             )}
             {isSearching && (
@@ -179,7 +182,7 @@ export function GameFilters({
         {/* Right Side - Filters and Sort */}
         <div className="flex flex-wrap items-center gap-4">
           {/* Filter Icon and Label */}
-          <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+          <div className="flex items-center gap-2 text-gray-100">
             <FontAwesomeIcon icon={faFilter} className="h-5 w-5" />
             <span className="font-medium">
               {translations?.filterBy || "Filter by:"}
@@ -193,8 +196,9 @@ export function GameFilters({
               onBlur={() => setTimeout(() => setShowSort(false), 200)}
               className={cn(
                 "flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors",
-                "bg-gray-300 hover:bg-gray-200",
-                "border-gray-300"
+                "bg-filter-bkg",
+                "border-filter-border",
+                showSort && "!rounded-b-none"
               )}
             >
               <span>
@@ -210,15 +214,14 @@ export function GameFilters({
             </button>
 
             {showSort && (
-              <div className="absolute z-50 mt-2 w-48 bg-gray-300 hover:bg-gray-200 rounded-lg shadow-lg border border-gray-300">
+              <div className="absolute z-50 w-48 bg-gray-300 hover:bg-gray-200 rounded-b-lg shadow-lg border border-gray-300">
                 {sortOptions.map((option) => (
                   <button
                     key={option.value}
                     onClick={() => handleSortSelect(option.value)}
                     className={cn(
                       "w-full text-left px-4 py-2 bg-gray-300 hover:bg-gray-200 transition-colors",
-                      selectedSort === option.value &&
-                        "bg-gray-100 font-medium"
+                      selectedSort === option.value && "bg-gray-100 font-medium"
                     )}
                   >
                     {option.label}
@@ -238,7 +241,7 @@ export function GameFilters({
                   "flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors",
                   "bg-gray-300 hover:bg-gray-200",
                   selectedProviders.length > 0
-                    ? "border-primary bg-primary/5 text-primary"
+                    ? "!bg-filter-bkg border-filter-border"
                     : "border-gray-300"
                 )}
               >
@@ -330,7 +333,7 @@ export function GameFilters({
           {hasActiveFilters && (
             <button
               onClick={clearAllFilters}
-              className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition-colors"
+              className="text-sm text-white transition-colors"
             >
               {translations?.clearFilters || "Clear all filters"}
             </button>

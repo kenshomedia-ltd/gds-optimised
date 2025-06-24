@@ -163,6 +163,7 @@ export function StarRating({
               sizeClass,
               "text-gray-400 transition-colors duration-150"
             )}
+            swapOpacity
           />
 
           {/* Foreground star (filled) with clipping */}
@@ -176,6 +177,7 @@ export function StarRating({
                 sizeClass,
                 "text-accent-100 transition-colors duration-150"
               )}
+              swapOpacity
             />
           </div>
         </div>

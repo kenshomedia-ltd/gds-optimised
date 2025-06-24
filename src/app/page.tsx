@@ -139,7 +139,7 @@ export default async function HomePage() {
       )}
 
       {/* Main Content Section with Progressive Loading */}
-      <section className="main container mx-auto px-4 py-8">
+      <section className="main container mx-auto px-2 py-8">
         <div className="space-y-12">
           {mainBlocks.map((block, index) => (
             <section

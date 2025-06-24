@@ -137,7 +137,7 @@ export function SingleContent({
           "[&_figure.table_table]:w-auto",
 
           // Headings
-          "prose-headings:font-bold prose-headings:text-heading-text prose-headings:text-center",
+          "prose-headings:font-bold prose-headings:text-heading-text prose-headings:text-left prose-headings:capitalize",
           "prose-h2:text-3xl prose-h2:mt-8 prose-h2:mb-4",
           "prose-h3:text-2xl prose-h3:mt-6 prose-h3:mb-3",
           "prose-h4:text-xl prose-h4:mt-4 prose-h4:mb-2",

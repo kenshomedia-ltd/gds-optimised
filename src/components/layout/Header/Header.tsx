@@ -81,7 +81,7 @@ export function Header({
         `}
       >
         <nav
-          className="mx-auto flex h-16 items-center justify-between p-2 xl:container"
+          className="mx-auto flex h-16 items-center justify-between px-4 py-2 xl:container"
           aria-label="Main navigation"
         >
           {/* Mobile Menu Button */}
@@ -178,7 +178,7 @@ export function Header({
                 <Link
                   key={item.id}
                   href={item.url || "#"}
-                  className="flex items-center gap-2 px-3 py-1.5 bg-gray-900 text-navbar-text text-xs font-medium uppercase rounded whitespace-nowrap"
+                  className="flex items-center gap-2 px-3 py-1.5 text-navbar-text text-xs font-medium uppercase rounded whitespace-nowrap"
                 >
                   {item.images && (
                     <Image

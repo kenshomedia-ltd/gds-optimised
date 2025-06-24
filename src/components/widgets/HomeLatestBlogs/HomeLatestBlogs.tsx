@@ -29,7 +29,7 @@ export function HomeLatestBlogs({
 
   return (
     <section className={cn("py-8 lg:py-12", className)}>
-      <div className="xl:container mx-auto px-4">
+      <div className="xl:container mx-auto">
         <Suspense
           fallback={
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

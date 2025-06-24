@@ -46,11 +46,11 @@ export function LegalServer({ legalText, className }: LegalProps) {
       >
         <div className="xl:container mx-auto flex items-center justify-end text-legal-text h-[35px] py-[5px] text-[10px] px-2">
           {/* Legal text with proper spacing */}
-          <span className="mr-2 leading-tight">{legalText}</span>
+          <span className="flex leading-tight justify-end">{legalText}</span>
 
           {/* Compliance icons using Next.js Image */}
           <div
-            className="flex items-center gap-[2px]"
+            className="flex items-center justify-end gap-[2px] min-w-[120px]"
             aria-label="Compliance certifications"
           >
             <Image
@@ -58,7 +58,7 @@ export function LegalServer({ legalText, className }: LegalProps) {
               alt="Logo Timone - Regulatory compliance"
               width={40}
               height={25}
-              className="inline-block"
+              className="inline-block w-5 h-5 md:w-10 md:h-[25px] object-contain"
               priority
               unoptimized // SVGs don't need optimization
             />
@@ -68,7 +68,7 @@ export function LegalServer({ legalText, className }: LegalProps) {
               alt="ADM - Agenzia delle Dogane e dei Monopoli certification"
               width={60}
               height={25}
-              className="inline-block"
+              className="inline-block w-5 h-5 md:w-10 md:h-[25px] object-contain"
               priority
               unoptimized // SVGs don't need optimization
             />
@@ -76,9 +76,9 @@ export function LegalServer({ legalText, className }: LegalProps) {
             <Image
               src="/icons/plus-18.svg"
               alt="18+ Age restriction - Gambling is prohibited for minors"
-              width={40}
-              height={22}
-              className="inline-block"
+              width={25}
+              height={25}
+              className="inline-block w-5 h-5 md:w-10 md:h-[25px] object-contain"
               priority
               unoptimized // SVGs don't need optimization
             />

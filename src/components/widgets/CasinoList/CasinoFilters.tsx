@@ -126,11 +126,11 @@ export function CasinoFilters({
             <button
               type="button"
               className={cn(
-                "w-full p-2 md:p-2.5 h-11 flex items-center justify-between text-xs md:text-sm font-medium rounded border transition-colors",
+                "w-full p-2 md:p-2.5 h-11 flex items-center justify-between text-xs md:text-sm font-medium rounded-lg border transition-colors",
                 selectedFilters.bonusKey
-                  ? "bg-purple-100 border-purple-300"
+                  ? "bg-filter-bkg border-filter-border"
                   : "bg-gray-100 border-gray-300",
-                "hover:bg-gray-200"
+                openDropdown === "bonusType" && "!rounded-b-none"
               )}
               onClick={() => toggleDropdown("bonusType")}
               disabled={loading}
@@ -161,13 +161,13 @@ export function CasinoFilters({
             </button>
 
             {openDropdown === "bonusType" && (
-              <div className="absolute top-full mt-1 w-full bg-white rounded-md shadow-lg z-[100] border border-gray-200 max-h-64 overflow-y-auto">
+              <div className="absolute top-full w-full bg-white rounded-b-lg shadow-lg z-[100] border border-gray-200 max-h-64 overflow-y-auto">
                 <div className="p-2 flex flex-col gap-1">
                   {BONUS_TYPE_OPTIONS.map((option) => (
                     <button
                       key={option.value}
                       className={cn(
-                        "w-full p-2 text-xs md:text-sm text-left rounded transition-colors",
+                        "w-full p-2 text-xs md:text-sm text-left rounded-lg transition-colors",
                         selectedFilters.bonusKey === option.value
                           ? "bg-purple-100 text-purple-900"
                           : "hover:bg-gray-100"
@@ -194,12 +194,12 @@ export function CasinoFilters({
             <button
               type="button"
               className={cn(
-                "w-full p-2 md:p-2.5 h-11 flex items-center justify-between text-xs md:text-sm font-medium rounded border transition-colors",
+                "w-full p-2 md:p-2.5 h-11 flex items-center justify-between text-xs md:text-sm font-medium rounded-lg border transition-colors",
                 selectedFilters.condition
-                  ? "bg-purple-100 border-purple-300"
+                  ? "bg-filter-bkg border-filter-border"
                   : "bg-gray-100 border-gray-300",
                 !canApplyFilters && "opacity-50 cursor-not-allowed",
-                "hover:bg-gray-200"
+                openDropdown === "condition" && "!rounded-b-none"
               )}
               onClick={() => canApplyFilters && toggleDropdown("condition")}
               disabled={loading || !canApplyFilters}
@@ -230,13 +230,13 @@ export function CasinoFilters({
             </button>
 
             {openDropdown === "condition" && canApplyFilters && (
-              <div className="absolute top-full mt-1 w-full bg-white rounded-md shadow-lg z-[100] border border-gray-200 max-h-64 overflow-y-auto">
+              <div className="absolute top-full w-full bg-white rounded-b-lg shadow-lg z-[100] border border-gray-200 max-h-64 overflow-y-auto">
                 <div className="p-2 flex flex-col gap-1">
                   {CONDITION_OPTIONS.map((option) => (
                     <button
                       key={option.value}
                       className={cn(
-                        "w-full p-2 text-xs md:text-sm text-left rounded transition-colors",
+                        "w-full p-2 text-xs md:text-sm text-left rounded-lg transition-colors",
                         selectedFilters.condition === option.value
                           ? "bg-purple-100 text-purple-900"
                           : "hover:bg-gray-100"
@@ -263,12 +263,12 @@ export function CasinoFilters({
             <button
               type="button"
               className={cn(
-                "w-full p-2 md:p-2.5 h-11 flex items-center justify-between text-xs md:text-sm font-medium rounded border transition-colors",
+                "w-full p-2 md:p-2.5 h-11 flex items-center justify-between text-xs md:text-sm font-medium rounded-lg border transition-colors",
                 selectedFilters.amount
-                  ? "bg-purple-100 border-purple-300"
+                  ? "bg-filter-bkg border-filter-border"
                   : "bg-gray-100 border-gray-300",
                 !canApplyFilters && "opacity-50 cursor-not-allowed",
-                "hover:bg-gray-200"
+                openDropdown === "amount" && "!rounded-b-none"
               )}
               onClick={() => canApplyFilters && toggleDropdown("amount")}
               disabled={loading || !canApplyFilters}
@@ -296,13 +296,13 @@ export function CasinoFilters({
             </button>
 
             {openDropdown === "amount" && canApplyFilters && (
-              <div className="absolute top-full mt-1 w-full bg-white rounded-md shadow-lg z-[100] border border-gray-200 max-h-64 overflow-y-auto">
+              <div className="absolute top-full w-full bg-white rounded-b-lg shadow-lg z-[100] border border-gray-200 max-h-64 overflow-y-auto">
                 <div className="p-2 flex flex-col gap-1">
                   {BONUS_AMOUNT_OPTIONS.map((amount) => (
                     <button
                       key={amount}
                       className={cn(
-                        "w-full p-2 text-xs md:text-sm text-left rounded transition-colors",
+                        "w-full p-2 text-xs md:text-sm text-left rounded-lg transition-colors",
                         selectedFilters.amount === amount.toString()
                           ? "bg-purple-100 text-purple-900"
                           : "hover:bg-gray-100"
@@ -329,12 +329,12 @@ export function CasinoFilters({
             <button
               type="button"
               className={cn(
-                "w-full p-2 md:p-2.5 h-11 flex items-center justify-between text-xs md:text-sm font-medium rounded border transition-colors",
+                "w-full p-2 md:p-2.5 h-11 flex items-center justify-between text-xs md:text-sm font-medium rounded-lg border transition-colors",
                 selectedFilters.wagering
-                  ? "bg-purple-100 border-purple-300"
+                  ? "bg-filter-bkg border-filter-border"
                   : "bg-gray-100 border-gray-300",
                 !canApplyFilters && "opacity-50 cursor-not-allowed",
-                "hover:bg-gray-200"
+                openDropdown === "wagering" && "!rounded-b-none"
               )}
               onClick={() => canApplyFilters && toggleDropdown("wagering")}
               disabled={loading || !canApplyFilters}
@@ -362,13 +362,13 @@ export function CasinoFilters({
             </button>
 
             {openDropdown === "wagering" && canApplyFilters && (
-              <div className="absolute top-full mt-1 w-full bg-white rounded-md shadow-lg z-[100] border border-gray-200 max-h-64 overflow-y-auto">
+              <div className="absolute top-full w-full bg-white rounded-b-lg shadow-lg z-[100] border border-gray-200 max-h-64 overflow-y-auto">
                 <div className="p-2 flex flex-col gap-1">
                   {WAGERING_OPTIONS.map((wagering) => (
                     <button
                       key={wagering}
                       className={cn(
-                        "w-full p-2 text-xs md:text-sm text-left rounded transition-colors",
+                        "w-full p-2 text-xs md:text-sm text-left rounded-lg transition-colors",
                         selectedFilters.wagering === wagering
                           ? "bg-purple-100 text-purple-900"
                           : "hover:bg-gray-100"
@@ -388,7 +388,7 @@ export function CasinoFilters({
             <label
               htmlFor="immediate"
               className={cn(
-                "text-xs md:text-sm font-medium cursor-pointer",
+                "text-xs md:text-sm text-white font-medium cursor-pointer",
                 !canApplyFilters && "opacity-50 cursor-not-allowed"
               )}
             >
@@ -417,9 +417,9 @@ export function CasinoFilters({
               <button
                 type="button"
                 className={cn(
-                  "w-full p-2 md:p-2.5 h-11 flex items-center justify-between text-xs md:text-sm font-medium rounded-l border transition-colors",
-                  "bg-gray-100 border-gray-300",
-                  "hover:bg-gray-200"
+                  "w-full p-2 md:p-2.5 h-11 flex items-center justify-between text-xs md:text-sm font-medium rounded-l-lg border transition-colors",
+                  "bg-filter-bkg border-filter-border",
+                  openDropdown === "sort" && "!rounded-b-none"
                 )}
                 onClick={() => toggleDropdown("sort")}
                 disabled={loading}
@@ -433,13 +433,13 @@ export function CasinoFilters({
               </button>
 
               {openDropdown === "sort" && (
-                <div className="absolute top-full mt-1 w-full bg-white rounded-md shadow-lg z-[100] border border-gray-200 max-h-64 overflow-y-auto">
+                <div className="absolute top-full mt-1 w-full bg-filter-bkg rounded-b-lg shadow-lg z-[100] border border-filter-border max-h-64 overflow-y-auto">
                   <div className="p-2 flex flex-col gap-1">
                     {CASINO_SORT_OPTIONS.map((option) => (
                       <button
                         key={option.value}
                         className={cn(
-                          "w-full p-2 text-xs md:text-sm text-left rounded transition-colors",
+                          "w-full p-2 text-xs md:text-sm text-left rounded-lg transition-colors",
                           selectedFilters.sort === option.value
                             ? "bg-purple-100 text-purple-900"
                             : "hover:bg-gray-100"
@@ -457,9 +457,8 @@ export function CasinoFilters({
             <button
               type="button"
               className={cn(
-                "p-2 md:p-2.5 h-11 flex items-center justify-center rounded-r border transition-colors",
-                "bg-gray-100 border-gray-300 border-l-0",
-                "hover:bg-gray-200"
+                "p-2 md:p-2.5 h-11 flex items-center justify-center rounded-r-lg border transition-colors",
+                "bg-filter-bkg border-filter-border border-l-0",
               )}
               onClick={toggleSortOrder}
               disabled={loading}

@@ -15,7 +15,7 @@ import {
 import { Image } from "@/components/common/Image";
 import { Button } from "@/components/ui/Button";
 import { FavoriteButton } from "@/components/features/Favorites/FavoriteButton";
-import { StarRating } from "@/components/ui/StarRating/StarRating";
+import { StarRatingInteractive } from "@/components/ui/StarRating/StarRatingInteractive";
 import type { GamePlayerProps } from "@/types/game-page.types";
 import { cn } from "@/lib/utils/cn";
 
@@ -114,10 +114,12 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
     // You can emit an event or call a parent handler here
   };
 
-  const handleRatingChange = (rating: number) => {
-    // This would typically send the rating to an API
-    console.log("Rating changed:", rating);
-  };
+  // const handleRatingChange = (rating: number) => {
+  //   // This would typically send the rating to an API
+  //   console.log("Rating changed:", rating);
+  // };
+
+  console.log("Game:", game);
 
   // Get embed code based on device
   const embedCode = isMobile
@@ -355,14 +357,18 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
         <div className="px-2.5 shrink-0 justify-between basis-full flex items-center order-3 grow-0 md:basis-[300px] md:grow mt-4 md:mt-0 md:order-2">
           <div className="p-2.5 md:p-0 shrink-0 justify-between basis-full flex items-center order-3 grow-0 md:basis-[300px] md:grow rounded-lg md:rounded-none md:border-0 md:order-2">
             <div className="ml-0 md:ml-4">
-              <StarRating
-                initialRating={game.ratingAvg}
-                onRatingChange={handleRatingChange}
-                size="md"
-                showValue
-                valuePosition="bottom"
-                className="flex-col"
-              />
+              {game.documentId && (
+                <StarRatingInteractive
+                  documentId={game.documentId}
+                  slug={game.slug}
+                  initialRating={game.ratingAvg}
+                  initialCount={game.ratingCount}
+                  size="md"
+                  ratingType="games"
+                  itemTitle={game.title}
+                  showCount={true}
+                />
+              )}
             </div>
 
             <div className="md:absolute md:left-1/2 md:-translate-x-1/2 flex items-center md:m-auto">
