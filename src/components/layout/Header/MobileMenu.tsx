@@ -92,43 +92,16 @@ export function MobileMenu({
             className="rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             aria-label={translations.closeMenu || "Close menu"}
           >
-            <FontAwesomeIcon icon={faXmark} className="h-6 w-6" aria-hidden="true" />
+            <FontAwesomeIcon
+              icon={faXmark}
+              className="h-6 w-6"
+              aria-hidden="true"
+            />
           </button>
         </div>
 
         {/* Menu Content */}
         <div className="flex h-full flex-col overflow-y-auto pb-20">
-          {/* Sub Navigation (Featured Items) */}
-          {subNavigation.length > 0 && (
-            <div className="border-b border-gray-200 px-4 py-4">
-              <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
-                {translations.quickLinks || "Quick Links"}
-              </h3>
-              <div className="space-y-2">
-                {subNavigation.map((item) => (
-                  <Link
-                    key={item.id}
-                    href={item.url || "#"}
-                    onClick={onClose}
-                    className="flex items-center gap-3 rounded-lg bg-gray-50 px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100"
-                  >
-                    {item.images && (
-                      <Image
-                        src={item.images.url}
-                        alt={`${item.title} icon`}
-                        width={20}
-                        height={20}
-                        className="h-5 w-5"
-                        unoptimized={item.images.url.endsWith(".svg")}
-                      />
-                    )}
-                    <span>{item.title}</span>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
-
           {/* Main Navigation */}
           <nav className="flex-1 px-4 py-4">
             <ul className="space-y-1">
@@ -196,6 +169,37 @@ export function MobileMenu({
               })}
             </ul>
           </nav>
+
+          {/* Sub Navigation (Featured Items) */}
+          {subNavigation.length > 0 && (
+            <div className="border-b border-gray-200 px-4 py-4">
+              <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                {translations.quickLinks || "Quick Links"}
+              </h3>
+              <div className="space-y-2">
+                {subNavigation.map((item) => (
+                  <Link
+                    key={item.id}
+                    href={item.url || "#"}
+                    onClick={onClose}
+                    className="flex items-center gap-3 rounded-lg bg-gray-50 px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100"
+                  >
+                    {item.images && (
+                      <Image
+                        src={item.images.url}
+                        alt={`${item.title} icon`}
+                        width={20}
+                        height={20}
+                        className="h-5 w-5"
+                        unoptimized={item.images.url.endsWith(".svg")}
+                      />
+                    )}
+                    <span>{item.title}</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </>
