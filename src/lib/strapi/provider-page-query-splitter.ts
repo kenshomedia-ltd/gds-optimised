@@ -370,7 +370,7 @@ export async function getProviderPageDataSplitWithPagination(
     }
 
     // Build filters for games query
-    const gameFilters: any = {
+    const gameFilters: Record<string, unknown> = {
       provider: {
         slug: { $eq: slug },
       },

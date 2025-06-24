@@ -180,6 +180,7 @@ export interface CasinoPageSplitData {
     authorRatings?: number;
     playthrough?: string;
     images: StrapiImage;
+    logoIcon: StrapiImage;
     bonusSection: CasinoPageData["bonusSection"];
     noDepositSection?: CasinoPageData["noDepositSection"];
     freeSpinsSection?: CasinoPageData["freeSpinsSection"];

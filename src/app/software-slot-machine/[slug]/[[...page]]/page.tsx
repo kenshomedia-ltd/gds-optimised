@@ -306,86 +306,96 @@ export default async function ProviderPage({
 
         {/* Main Content Section - Only show on first page */}
         {currentPage === 1 && (
-          <section className="main">
-            <div
-              className={
-                (!pageData.sideBarToShow ||
-                  pageData.sideBarToShow === "casinos" ||
-                  pageData.sideBarToShow === "casino") &&
-                sidebarCasinos
-                  ? "lg:flex lg:gap-8"
-                  : ""
-              }
-            >
-              {/* Main Content */}
-              <div
-                className={
-                  (!pageData.sideBarToShow ||
-                    pageData.sideBarToShow === "casinos" ||
-                    pageData.sideBarToShow === "casino") &&
-                  sidebarCasinos
-                    ? "flex-1"
-                    : ""
-                }
-              >
-                {/* Content Section 2 */}
-                {pageData.content2 && (
-                  <section>
-                    <SingleContent
-                      block={{
-                        content: pageData.content2,
+          <section className="main container mx-auto px-4 py-8">
+            <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
+              {/* Main Content Column */}
+              <div className="flex-1 min-w-0">
+                {/* Content sections with staggered animations */}
+                <div className="space-y-8">
+                  {/* Content Section 2 */}
+                  {pageData.content2 && (
+                    <section
+                      className="opacity-0 animate-fadeIn"
+                      style={{
+                        animationDelay: "100ms",
+                        animationFillMode: "forwards",
                       }}
-                    />
-                  </section>
-                )}
-
-                {/* Casino Comparison */}
-                {pageData.casinosToShow &&
-                  pageData.casinosToShow.length > 0 && (
-                    <section className="mt-12">
-                      <CasinoComparison
-                        casinos={pageData.casinosToShow}
-                        title={`Best Casinos with ${pageData.title} Games`}
+                    >
+                      <SingleContent
+                        block={{
+                          content: pageData.content2,
+                        }}
                       />
                     </section>
                   )}
 
-                {/* Content Section 3 */}
-                {pageData.content3 && (
-                  <section className="mt-12">
-                    <SingleContent
-                      block={{
-                        content: pageData.content3,
-                      }}
-                    />
-                  </section>
-                )}
+                  {/* Related Casinos - Using CasinoComparison */}
+                  {pageData.relatedCasinos &&
+                    pageData.relatedCasinos.length > 0 && (
+                      <section
+                        className="opacity-0 animate-fadeIn my-12"
+                        style={{
+                          animationDelay: "200ms",
+                          animationFillMode: "forwards",
+                        }}
+                      >
+                        <h2 className="text-2xl font-bold mb-6 text-center">
+                          {translations.bestCasinosWithProvider ||
+                            `Best Casinos with ${pageData.title}`}
+                        </h2>
+                        <CasinoComparison
+                          casinos={pageData.relatedCasinos}
+                          translations={translations}
+                        />
+                      </section>
+                    )}
 
-                {/* FAQs */}
-                {pageData.faqs && pageData.faqs.length > 0 && (
-                  <section className="mt-12">
-                    <FAQWidget
-                      faqs={pageData.faqs}
-                      title={`${pageData.title} FAQs`}
-                      className="mt-12"
-                      defaultOpen={true}
-                    />
-                  </section>
-                )}
+                  {/* Content Section 3 */}
+                  {pageData.content3 && (
+                    <section
+                      className="opacity-0 animate-fadeIn"
+                      style={{
+                        animationDelay: "300ms",
+                        animationFillMode: "forwards",
+                      }}
+                    >
+                      <SingleContent
+                        block={{
+                          content: pageData.content3,
+                        }}
+                      />
+                    </section>
+                  )}
+
+                  {/* FAQs */}
+                  {pageData.faqs && pageData.faqs.length > 0 && (
+                    <section
+                      className="opacity-0 animate-fadeIn"
+                      style={{
+                        animationDelay: "400ms",
+                        animationFillMode: "forwards",
+                      }}
+                    >
+                      <FAQWidget
+                        faqs={pageData.faqs}
+                        title={`${pageData.title} FAQs`}
+                        className="mt-12"
+                        defaultOpen={true}
+                      />
+                    </section>
+                  )}
+                </div>
               </div>
 
               {/* Casino Sidebar */}
-              {(!pageData.sideBarToShow ||
-                pageData.sideBarToShow === "casinos" ||
-                pageData.sideBarToShow === "casino") &&
-                sidebarCasinos && (
-                  <aside className="mt-8 lg:mt-0 lg:w-80 xl:w-96">
-                    <CasinoSidebar
-                      casinos={sidebarCasinos}
-                      translations={translations}
-                    />
-                  </aside>
-                )}
+              {sidebarCasinos && (
+                <aside className="mt-8 lg:mt-0 lg:w-80 xl:w-96">
+                  <CasinoSidebar
+                    casinos={sidebarCasinos}
+                    translations={translations}
+                  />
+                </aside>
+              )}
             </div>
           </section>
         )}

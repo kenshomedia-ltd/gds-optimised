@@ -40,6 +40,9 @@ export function buildCasinoPageQuery(slug: string) {
       images: {
         fields: ["url", "width", "height", "alternativeText"],
       },
+      logoIcon: {
+        fields: ["url", "width", "height", "alternativeText"],
+      },
       casinoFeatures: {
         fields: ["feature"],
       },
@@ -78,13 +81,35 @@ export function buildCasinoPageQuery(slug: string) {
         },
       },
       noDepositSection: {
-        fields: ["bonusAmount", "availability", "speed"],
+        fields: ["bonusAmount", "termsConditions"],
       },
       freeSpinsSection: {
-        fields: ["bonusAmount", "availability", "speed"],
+        fields: ["bonusAmount", "termsConditions"],
       },
       termsAndConditions: {
-        fields: ["heading", "copy", "gambleResponsibly"],
+        fields: ["copy", "gambleResponsibly"],
+      },
+      casinoBonus: {
+        fields: ["bonusUrl", "bonusLabel", "bonusCode"],
+      },
+      author: {
+        fields: ["firstName", "lastName", "jobTitle"],
+        populate: {
+          photo: {
+            fields: ["url", "width", "height"],
+          },
+        },
+      },
+      providers: {
+        fields: ["title", "slug"],
+        populate: {
+          images: {
+            fields: ["url", "width", "height"],
+          },
+        },
+      },
+      faqs: {
+        fields: ["question", "answer"],
       },
       paymentOptions: {
         fields: [
@@ -111,9 +136,6 @@ export function buildCasinoPageQuery(slug: string) {
           "vip",
         ],
       },
-      casinoBonus: {
-        fields: ["bonusLabel", "bonusUrl", "bonusCode"],
-      },
       testimonial: {
         fields: ["testimonial"],
         populate: {
@@ -127,38 +149,13 @@ export function buildCasinoPageQuery(slug: string) {
           },
         },
       },
-      faqs: {
-        fields: ["question", "answer"],
-      },
-      author: {
-        fields: [
-          "firstName",
-          "lastName",
-          "linkedInLink",
-          "facebookLink",
-          "twitterLink",
-          "jobTitle",
-          "content1",
-          "experience",
-          "areaOfWork",
-          "specialization",
-        ],
-        populate: {
-          photo: {
-            fields: ["url", "width", "height"],
-          },
-        },
-      },
-      providers: {
-        fields: ["title", "slug"],
-        populate: {
-          images: {
-            fields: ["url", "width", "height"],
-          },
-        },
-      },
       seo: {
         fields: ["metaTitle", "metaDescription", "keywords"],
+        populate: {
+          shareImage: {
+            fields: ["url", "width", "height"],
+          },
+        },
       },
       casinoComparison: {
         fields: [
@@ -268,6 +265,7 @@ export function splitCasinoPageData(data: CasinoPageData): CasinoPageSplitData {
       authorRatings: data.authorRatings,
       playthrough: data.playthrough,
       images: data.images,
+      logoIcon: data.logoIcon,
       bonusSection: data.bonusSection,
       noDepositSection: data.noDepositSection,
       freeSpinsSection: data.freeSpinsSection,

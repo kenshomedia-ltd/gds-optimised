@@ -2,6 +2,7 @@
 
 import { GameListWidget } from "./GameListWidget";
 import { GameCardSkeleton } from "@/components/games/GameCard/GameCardSkeleton";
+import { GameFiltersSkeleton } from "./GameFiltersSkeleton";
 import type { GamesCarouselBlock } from "@/types/dynamic-block.types";
 import type { GameData } from "@/types/game.types";
 import { cn } from "@/lib/utils/cn";
@@ -32,6 +33,9 @@ export async function GameListWidgetServer({
     return (
       <section className="py-8 lg:py-12">
         <div className="xl:container mx-auto px-4">
+          {/* Show filter skeleton if filters are enabled */}
+          {showFilters && <GameFiltersSkeleton className="mb-8" />}
+
           <div
             className={cn(
               "grid gap-3",
@@ -52,10 +56,17 @@ export async function GameListWidgetServer({
   // Pre-fetch filter data if filters are enabled
   let providers, categories;
   if (showFilters) {
-    [providers, categories] = await Promise.all([
-      getFilterProviders(),
-      getGameCategories(),
-    ]);
+    try {
+      [providers, categories] = await Promise.all([
+        getFilterProviders(),
+        getGameCategories(),
+      ]);
+    } catch (error) {
+      console.error("Failed to fetch filter data:", error);
+      // Continue without filters rather than failing the entire component
+      providers = undefined;
+      categories = undefined;
+    }
   }
 
   return (

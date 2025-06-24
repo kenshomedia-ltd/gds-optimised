@@ -26,6 +26,14 @@ export interface FilterOption {
 }
 
 /**
+ * Selected filters structure
+ */
+export interface SelectedFilters {
+  providers: string[];
+  categories: string[];
+}
+
+/**
  * Props for the GameFilters component
  */
 export interface GameFiltersProps {

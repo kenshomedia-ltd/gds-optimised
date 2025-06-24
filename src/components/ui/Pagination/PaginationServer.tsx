@@ -249,12 +249,16 @@ export function PaginationServer({
       </nav>
 
       {/* Info text */}
-      {showInfo && totalItems > 0 && itemsPerPage > 0 && (
-        <p className="text-sm text-gray-600">
-          {translations.showing || "Showing"} {startItem}–{endItem}{" "}
-          {translations.of || "of"} {totalItems} {itemName}
-        </p>
-      )}
+      {showInfo &&
+        totalItems &&
+        totalItems > 0 &&
+        itemsPerPage &&
+        itemsPerPage > 0 && (
+          <p className="text-sm text-gray-600">
+            {translations.showing || "Showing"} {startItem}–{endItem}{" "}
+            {translations.of || "of"} {totalItems} {itemName}
+          </p>
+        )}
     </div>
   );
 }

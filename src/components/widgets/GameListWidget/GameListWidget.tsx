@@ -52,14 +52,22 @@ export function GameListWidget({
   totalGames?: number;
   baseUrl?: string;
 }) {
+  // Constants
+  const numberOfGames = block.numberOfGames || 24;
+  const showFilters = block.showGameFilterPanel || false;
+  const showLoadMore = block.showGameMoreButton || false;
+
   // State
   const [games, setGames] = useState<GameData[]>(initialGames);
   const [loading, setLoading] = useState(false);
-  const [filtersLoading, setFiltersLoading] = useState(false);
   const [page, setPage] = useState(currentPage);
   const [hasMore, setHasMore] = useState(true);
   const [localTotalGames, setLocalTotalGames] = useState(totalGames);
   const [isClientLoaded, setIsClientLoaded] = useState(false);
+  // Initialize skeleton state based on whether we need to load filters
+  const [showFiltersSkeleton, setShowFiltersSkeleton] = useState(
+    showFilters && (!initialProviders || !initialCategories)
+  );
 
   // Filter states
   const [availableProviders, setAvailableProviders] = useState<FilterOption[]>(
@@ -73,11 +81,6 @@ export function GameListWidget({
   const [selectedSort, setSelectedSort] = useState<string>(block.sortBy || "");
   const [searchQuery, setSearchQuery] = useState<string>("");
 
-  // Constants
-  const numberOfGames = block.numberOfGames || 24;
-  const showFilters = block.showGameFilterPanel || false;
-  const showLoadMore = block.showGameMoreButton || false;
-
   // Calculate total pages (for client-side pagination)
   const calculatedTotalPages = useMemo(() => {
     // Use passed totalPages if no client-side data yet
@@ -87,7 +90,7 @@ export function GameListWidget({
     return Math.ceil(localTotalGames / numberOfGames);
   }, [localTotalGames, numberOfGames, isClientLoaded, totalPages]);
 
-  // Mark component as client-loaded
+  // Mark component as client-loaded and handle initial skeleton state
   useEffect(() => {
     setIsClientLoaded(true);
   }, []);
@@ -138,12 +141,24 @@ export function GameListWidget({
 
   // Load filter options
   useEffect(() => {
-    if (!showFilters || (initialProviders && initialCategories)) return;
+    // If filters are not needed, don't show skeleton
+    if (!showFilters) {
+      setShowFiltersSkeleton(false);
+      return;
+    }
+
+    // If we already have the data, don't show skeleton
+    if (initialProviders && initialCategories) {
+      setShowFiltersSkeleton(false);
+      return;
+    }
+
+    // Show skeleton while loading
+    setShowFiltersSkeleton(true);
 
     let cancelled = false;
 
     const loadFilterOptions = async () => {
-      setFiltersLoading(true);
       try {
         const [providersData, categoriesData] = await Promise.all([
           initialProviders
@@ -157,13 +172,11 @@ export function GameListWidget({
         if (!cancelled) {
           setAvailableProviders(providersData || []);
           setAvailableCategories(categoriesData || []);
+          setShowFiltersSkeleton(false);
         }
       } catch (error) {
         console.error("Failed to load filter options:", error);
-      } finally {
-        if (!cancelled) {
-          setFiltersLoading(false);
-        }
+        setShowFiltersSkeleton(false);
       }
     };
 
@@ -183,7 +196,7 @@ export function GameListWidget({
         setLoading(true);
 
         // Build filters
-        const filters: any = {};
+        const filters: Record<string, unknown> = {};
 
         // Add provider filters
         const providerFilters =
@@ -356,13 +369,15 @@ export function GameListWidget({
     );
   };
 
+  // Determine whether to show filters, skeleton, or nothing
+  const shouldShowFilterArea = showFilters;
+
   return (
     <section className={cn("pb-8", className)} data-game-list-top>
       <div className="xl:container mx-auto">
-        {/* Filter Panel - Client-side only */}
-        {showFilters &&
-          isClientLoaded &&
-          (filtersLoading ? (
+        {/* Filter Panel - Show skeleton during loading */}
+        {shouldShowFilterArea &&
+          (showFiltersSkeleton ? (
             <GameFiltersSkeleton className="mb-8" />
           ) : (
             (availableProviders.length > 0 ||
