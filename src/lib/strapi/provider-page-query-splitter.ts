@@ -9,6 +9,10 @@ import type {
   ProviderPageResponse,
 } from "@/types/provider.types";
 import type { GameData } from "@/types/game.types";
+import type {
+  SelectedFilters,
+  FilterOption,
+} from "@/types/game-list-widget.types";
 
 // Cache configuration
 const CACHE_CONFIG = {
@@ -329,3 +333,142 @@ export const getProviderPageDataSplit = unstable_cache(
     tags: ["provider-page"],
   }
 );
+
+/**
+ * Fetch provider page data with pagination support
+ */
+export async function getProviderPageDataSplitWithPagination(
+  slug: string,
+  page: number = 1,
+  pageSize: number = 24,
+  filters?: SelectedFilters
+) {
+  try {
+    // Fetch the provider page structure (without games)
+    const structureQuery = buildStructureQuery(slug);
+    const pageResponse = await strapiClient.fetchWithCache<{
+      data: ProviderPageData[];
+    }>("slot-providers", structureQuery, CACHE_CONFIG.structure.ttl);
+
+    const pageData = pageResponse.data?.[0];
+
+    if (!pageData) {
+      return {
+        pageData: null,
+        games: [],
+        pagination: {
+          page: 1,
+          pageSize,
+          pageCount: 0,
+          total: 0,
+        },
+        filterOptions: {
+          providers: [],
+          categories: [],
+        },
+      };
+    }
+
+    // Build filters for games query
+    const gameFilters: any = {
+      provider: {
+        slug: { $eq: slug },
+      },
+    };
+
+    // Add category filters if provided
+    if (filters?.categories && filters.categories.length > 0) {
+      gameFilters.categories = {
+        slug: { $in: filters.categories },
+      };
+    }
+
+    // Fetch games with pagination
+    const gamesPromise = strapiClient.fetchWithCache<{
+      data: GameData[];
+      meta: { 
+        pagination: { 
+          page: number;
+          pageSize: number;
+          pageCount: number;
+          total: number;
+        } 
+      };
+    }>(
+      "games",
+      {
+        fields: [
+          "title",
+          "slug",
+          "ratingAvg",
+          "ratingCount",
+          "createdAt",
+          "views",
+          "publishedAt",
+        ],
+        populate: {
+          images: {
+            fields: ["url", "alternativeText", "width", "height"],
+          },
+          provider: {
+            fields: ["title", "slug"],
+          },
+          categories: {
+            fields: ["title", "slug"],
+          },
+        },
+        filters: gameFilters,
+        sort: ["ratingAvg:desc"],
+        pagination: {
+          page,
+          pageSize,
+        },
+      },
+      CACHE_CONFIG.games.ttl
+    );
+
+    // Fetch filter options (all categories - simpler approach)
+    const categoriesPromise = strapiClient.fetchWithCache<{
+      data: Array<{
+        id: number;
+        slug: string;
+        title: string;
+      }>;
+    }>(
+      "slot-categories",
+      {
+        fields: ["title", "slug"],
+        sort: ["title:asc"],
+      },
+      CACHE_CONFIG.metadata.ttl
+    );
+
+    // Execute all queries in parallel
+    const [gamesResponse, categoriesResponse] = await Promise.all([
+      gamesPromise,
+      categoriesPromise,
+    ]);
+
+    // Transform categories to filter options (matching the expected type)
+    const categoryOptions: FilterOption[] = categoriesResponse.data
+      .map(cat => ({
+        id: cat.id,
+        title: cat.title,
+        slug: cat.slug,
+      }))
+      .sort((a, b) => a.title.localeCompare(b.title));
+
+    return {
+      pageData,
+      games: gamesResponse.data || [],
+      pagination: gamesResponse.meta.pagination,
+      filterOptions: {
+        providers: [], // Single provider page doesn't need provider filters
+        categories: categoryOptions,
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching provider page data with pagination:", error);
+    throw error;
+  }
+}

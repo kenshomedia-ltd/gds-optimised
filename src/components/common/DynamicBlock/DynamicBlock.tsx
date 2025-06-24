@@ -177,12 +177,17 @@ export function DynamicBlock({
     case "shared.single-content":
       return <SingleContent block={blockData as SingleContentBlock} />;
 
-    // Custom page blocks
     case "games.games-carousel":
+      // For custom pages, games are stored in dynamicGamesData[blockId]
+      const blockGames =
+        additionalData.dynamicGamesData?.[`block-${blockData.id}`]?.games ||
+        games ||
+        [];
+
       return (
         <GameListWidget
           block={blockData as GamesCarouselBlock}
-          games={games}
+          games={blockGames}
           translations={translations}
         />
       );

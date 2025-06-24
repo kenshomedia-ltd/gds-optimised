@@ -7,6 +7,7 @@ import { GameCardSkeleton } from "@/components/games/GameCard/GameCardSkeleton";
 import { GameFilters } from "./GameFilters";
 import { GameFiltersSkeleton } from "./GameFiltersSkeleton";
 import { Pagination } from "@/components/ui/Pagination/Pagination";
+import { PaginationServer } from "@/components/ui/Pagination/PaginationServer";
 import type {
   GameListWidgetProps,
   FilterOption,
@@ -26,12 +27,11 @@ import {
  * Used on non-homepage pages like the slot-machine page
  *
  * Features:
- * - Filter by providers and categories
+ * - Server-side rendered initial games (works without JS)
+ * - Progressive enhancement with client-side filtering
  * - Load more functionality OR Pagination (configurable)
  * - Responsive grid layout
  * - Loading states
- * - Progressive enhancement
- * - Can receive pre-fetched filter data or fetch it client-side
  */
 export function GameListWidget({
   block,
@@ -40,89 +40,152 @@ export function GameListWidget({
   className,
   providers: initialProviders,
   categories: initialCategories,
-  usePagination = false, // New prop to enable pagination
-}: GameListWidgetProps & { usePagination?: boolean }) {
+  usePagination = false,
+  currentPage = 1,
+  totalPages = 1,
+  totalGames = 0,
+  baseUrl = "",
+}: GameListWidgetProps & {
+  usePagination?: boolean;
+  currentPage?: number;
+  totalPages?: number;
+  totalGames?: number;
+  baseUrl?: string;
+}) {
+  // State
   const [games, setGames] = useState<GameData[]>(initialGames);
   const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(1);
-  const [totalGames, setTotalGames] = useState(0);
+  const [filtersLoading, setFiltersLoading] = useState(false);
+  const [page, setPage] = useState(currentPage);
   const [hasMore, setHasMore] = useState(true);
-  const [selectedProviders, setSelectedProviders] = useState<string[]>([]);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedSort, setSelectedSort] = useState<string>(
-    block.sortBy || "Newest"
-  );
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [localTotalGames, setLocalTotalGames] = useState(totalGames);
+  const [isClientLoaded, setIsClientLoaded] = useState(false);
+
+  // Filter states
   const [availableProviders, setAvailableProviders] = useState<FilterOption[]>(
     initialProviders || []
   );
   const [availableCategories, setAvailableCategories] = useState<
     FilterOption[]
   >(initialCategories || []);
-  const [filtersLoading, setFiltersLoading] = useState(
-    !initialProviders || !initialCategories
-  );
+  const [selectedProviders, setSelectedProviders] = useState<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedSort, setSelectedSort] = useState<string>(block.sortBy || "");
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
+  // Constants
   const numberOfGames = block.numberOfGames || 24;
   const showFilters = block.showGameFilterPanel || false;
   const showLoadMore = block.showGameMoreButton || false;
 
-  // Calculate total pages
-  const totalPages = Math.ceil(totalGames / numberOfGames) || 0;
+  // Calculate total pages (for client-side pagination)
+  const calculatedTotalPages = useMemo(() => {
+    // Use passed totalPages if no client-side data yet
+    if (!isClientLoaded && totalPages > 0) {
+      return totalPages;
+    }
+    return Math.ceil(localTotalGames / numberOfGames);
+  }, [localTotalGames, numberOfGames, isClientLoaded, totalPages]);
 
-  // Extract initial filter values from block configuration
-  const initialProviderFilters = useMemo(
-    () =>
-      (block.gameProviders
-        ?.map((p) => p.slotProvider?.slug)
-        .filter(Boolean) as string[]) || [],
-    [block.gameProviders]
-  );
-
-  const initialCategoryFilters = useMemo(
-    () =>
-      (block.gameCategories
-        ?.map((c) => c.slotCategory?.slug)
-        .filter(Boolean) as string[]) || [],
-    [block.gameCategories]
-  );
-
-  // Fetch available filters on mount if not provided
+  // Mark component as client-loaded
   useEffect(() => {
-    const fetchFilters = async () => {
+    setIsClientLoaded(true);
+  }, []);
+
+  // Debug logging in development
+  useEffect(() => {
+    if (process.env.NODE_ENV === "development" && usePagination) {
+      console.log("GameListWidget Pagination Debug:", {
+        usePagination,
+        isClientLoaded,
+        totalPages: calculatedTotalPages,
+        passedTotalPages: totalPages,
+        totalGames: localTotalGames,
+        passedTotalGames: totalGames,
+        numberOfGames,
+        baseUrl,
+        currentPage: page,
+        passedCurrentPage: currentPage,
+      });
+    }
+  }, [
+    usePagination,
+    isClientLoaded,
+    calculatedTotalPages,
+    totalPages,
+    localTotalGames,
+    totalGames,
+    numberOfGames,
+    baseUrl,
+    page,
+    currentPage,
+  ]);
+
+  // Extract initial filters from block
+  const initialProviderFilters = useMemo(() => {
+    return (
+      block.gameProviders?.map((p) => p.slotProvider?.slug).filter(Boolean) ||
+      []
+    );
+  }, [block.gameProviders]);
+
+  const initialCategoryFilters = useMemo(() => {
+    return (
+      block.gameCategories?.map((c) => c.slotCategory?.slug).filter(Boolean) ||
+      []
+    );
+  }, [block.gameCategories]);
+
+  // Load filter options
+  useEffect(() => {
+    if (!showFilters || (initialProviders && initialCategories)) return;
+
+    let cancelled = false;
+
+    const loadFilterOptions = async () => {
+      setFiltersLoading(true);
       try {
-        const [providers, categories] = await Promise.all([
-          getFilterProviders(),
-          getGameCategories(),
+        const [providersData, categoriesData] = await Promise.all([
+          initialProviders
+            ? Promise.resolve(initialProviders)
+            : getFilterProviders(),
+          initialCategories
+            ? Promise.resolve(initialCategories)
+            : getGameCategories(),
         ]);
-        setAvailableProviders(providers);
-        setAvailableCategories(categories);
+
+        if (!cancelled) {
+          setAvailableProviders(providersData || []);
+          setAvailableCategories(categoriesData || []);
+        }
       } catch (error) {
-        console.error("Failed to fetch filters:", error);
+        console.error("Failed to load filter options:", error);
       } finally {
-        setFiltersLoading(false);
+        if (!cancelled) {
+          setFiltersLoading(false);
+        }
       }
     };
 
-    // Only fetch if filters are needed and not pre-provided
-    if (showFilters && (!initialProviders || !initialCategories)) {
-      fetchFilters();
-    } else {
-      setFiltersLoading(false);
-    }
+    loadFilterOptions();
+
+    return () => {
+      cancelled = true;
+    };
   }, [showFilters, initialProviders, initialCategories]);
 
   // Load games function
   const loadGames = useCallback(
-    async (pageNum: number, append = false) => {
+    async (pageNum: number, append: boolean = false) => {
       if (loading) return;
 
-      setLoading(true);
       try {
-        const filters: Record<string, unknown> = {};
+        setLoading(true);
+
+        // Build filters
+        const filters: any = {};
 
         // Add provider filters
-        // Use selected providers if any, otherwise use initial filters from block
         const providerFilters =
           selectedProviders.length > 0
             ? selectedProviders
@@ -135,7 +198,6 @@ export function GameListWidget({
         }
 
         // Add category filters
-        // Use selected categories if any, otherwise use initial filters from block
         const categoryFilters =
           selectedCategories.length > 0
             ? selectedCategories
@@ -169,13 +231,13 @@ export function GameListWidget({
             // Pagination mode or initial load: replace
             setGames(result.games);
           }
-          setTotalGames(result.total);
+          setLocalTotalGames(result.total);
           setHasMore(result.games.length === numberOfGames);
         } else {
           setHasMore(false);
           if (!append || usePagination) {
             setGames([]);
-            setTotalGames(0);
+            setLocalTotalGames(0);
           }
         }
       } catch (error) {
@@ -226,7 +288,8 @@ export function GameListWidget({
   // Handle page change (pagination mode)
   const handlePageChange = useCallback(
     (newPage: number) => {
-      if (newPage === page || newPage < 1 || newPage > totalPages) return;
+      if (newPage === page || newPage < 1 || newPage > calculatedTotalPages)
+        return;
       setPage(newPage);
       // Scroll to top of the game list
       const element = document.querySelector("[data-game-list-top]");
@@ -234,7 +297,7 @@ export function GameListWidget({
         element.scrollIntoView({ behavior: "smooth", block: "start" });
       }
     },
-    [page, totalPages]
+    [page, calculatedTotalPages]
   );
 
   // Load more games
@@ -245,8 +308,10 @@ export function GameListWidget({
     await loadGames(nextPage, true);
   }, [hasMore, loading, page, loadGames]);
 
-  // Reload games when filters change
+  // Reload games when filters change (only on client)
   useEffect(() => {
+    if (!isClientLoaded) return; // Don't reload on initial mount
+
     if (usePagination) {
       // In pagination mode, reload for current page
       loadGames(page, false);
@@ -257,18 +322,46 @@ export function GameListWidget({
     }
   }, [selectedProviders, selectedCategories, selectedSort, searchQuery]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Load games when page changes in pagination mode
+  // Load games when page changes in pagination mode (only on client)
   useEffect(() => {
+    if (!isClientLoaded) return; // Don't reload on initial mount
+
     if (usePagination && page > 1) {
       loadGames(page, false);
     }
   }, [page, usePagination]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Render server-side pagination as fallback
+  const renderServerPagination = () => {
+    if (!usePagination || !baseUrl) return null;
+
+    // Use initial values for server-side render
+    const serverTotalPages =
+      totalPages || Math.ceil(totalGames / numberOfGames);
+
+    if (serverTotalPages <= 1) return null;
+
+    return (
+      <PaginationServer
+        currentPage={currentPage}
+        totalPages={serverTotalPages}
+        baseUrl={baseUrl}
+        translations={translations}
+        showInfo={true}
+        totalItems={totalGames}
+        itemsPerPage={numberOfGames}
+        itemName="games"
+        className="mt-8"
+      />
+    );
+  };
+
   return (
     <section className={cn("pb-8", className)} data-game-list-top>
       <div className="xl:container mx-auto">
-        {/* Filter Panel */}
+        {/* Filter Panel - Client-side only */}
         {showFilters &&
+          isClientLoaded &&
           (filtersLoading ? (
             <GameFiltersSkeleton className="mb-8" />
           ) : (
@@ -291,13 +384,14 @@ export function GameListWidget({
             )
           ))}
 
-        {/* Games Grid */}
+        {/* Games Grid - Always rendered with initial games */}
         <div
           className={cn(
             "grid gap-3",
             "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
           )}
         >
+          {/* Show games (initial or filtered) */}
           {games.map((game, index) => (
             <GameCard
               key={game.id}
@@ -309,94 +403,62 @@ export function GameListWidget({
             />
           ))}
 
-          {/* Loading skeletons */}
+          {/* Show loading skeletons when loading more games */}
           {loading &&
+            usePagination &&
             games.length === 0 &&
-            Array.from({ length: numberOfGames }).map((_, index) => (
+            Array.from({ length: 12 }).map((_, index) => (
               <GameCardSkeleton key={`skeleton-${index}`} />
-            ))}
-
-          {/* Loading skeletons for load more mode */}
-          {loading &&
-            games.length > 0 &&
-            !usePagination &&
-            Array.from({ length: 6 }).map((_, index) => (
-              <GameCardSkeleton key={`skeleton-append-${index}`} />
             ))}
         </div>
 
-        {/* No results message */}
         {!loading && games.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-lg text-muted-foreground">
-              {translations?.noGamesFound ||
-                "No games found matching your filters."}
+            <p className="text-gray-600">
+              {translations.noGamesFound ||
+                "No games found matching your criteria."}
             </p>
           </div>
         )}
 
-        {/* Load More Section (only in load more mode) */}
-        {showLoadMore && !usePagination && hasMore && games.length > 0 && (
-          <div className="text-center mt-8 space-y-3">
-            {/* Load More Button */}
+        {/* Load More Button (for load more mode) */}
+        {!usePagination && showLoadMore && hasMore && games.length > 0 && (
+          <div className="flex justify-center mt-8">
             <button
               onClick={loadMoreGames}
               disabled={loading}
               className={cn(
-                "inline-flex items-center px-8 py-3",
-                "bg-primary text-white font-medium rounded-lg",
-                "hover:bg-primary/90 transition-colors",
-                "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
-                "disabled:opacity-50 disabled:cursor-not-allowed"
+                "px-6 py-3 rounded-lg font-medium transition-all",
+                "bg-primary text-white hover:bg-primary-shade",
+                "disabled:opacity-50 disabled:cursor-not-allowed",
+                loading && "animate-pulse"
               )}
             >
-              {loading ? (
-                <>
-                  <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                  {translations?.loading || "Loading..."}
-                </>
-              ) : (
-                translations?.loadMore || "Load More Games"
-              )}
+              {loading
+                ? translations.loading || "Loading..."
+                : translations.loadMore || "Load More Games"}
             </button>
-            {/* Pagination Info */}
-            {totalPages > 0 && (
-              <p className="text-xs text-white">
-                {translations?.page || "Page"} {page} {translations?.of || "of"}{" "}
-                {totalPages}
-                {totalGames > 0 && (
-                  <span className="ml-2">
-                    ({games.length} {translations?.of || "of"} {totalGames})
-                  </span>
-                )}
-              </p>
-            )}
           </div>
         )}
 
-        {/* Pagination (only in pagination mode) */}
-        {showLoadMore && usePagination && totalPages > 1 && (
-          <div className="mt-12 flex justify-center">
-            <Pagination
-              currentPage={page}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-              disabled={loading}
-              showInfo={true}
-              variant="compact"
-              totalItems={totalGames}
-              itemsPerPage={numberOfGames}
-              itemName={translations?.games || "games"}
-              translations={{
-                previous: translations?.previous || "Back",
-                next: translations?.next || "Next",
-                page: translations?.page,
-                of: translations?.of,
-                showing: translations?.showing,
-              }}
-            />
-          </div>
+        {/* Client-side Pagination */}
+        {usePagination && isClientLoaded && calculatedTotalPages > 1 && (
+          <Pagination
+            currentPage={page}
+            totalPages={calculatedTotalPages}
+            onPageChange={handlePageChange}
+            disabled={loading}
+            showInfo={true}
+            totalItems={localTotalGames}
+            itemsPerPage={numberOfGames}
+            itemName="games"
+            translations={translations}
+            className="mt-8"
+          />
         )}
+
+        {/* Server-side Pagination (shown when JS is disabled) */}
+        {!isClientLoaded && renderServerPagination()}
       </div>
     </section>
   );
