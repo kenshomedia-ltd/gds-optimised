@@ -378,7 +378,7 @@ export default async function ProviderPage({
                     >
                       <FAQWidget
                         faqs={pageData.faqs}
-                        title={`${pageData.title} FAQs`}
+                        title={translations.faq}
                         className="mt-12"
                         defaultOpen={true}
                       />

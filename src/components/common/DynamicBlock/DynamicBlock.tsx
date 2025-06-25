@@ -168,6 +168,8 @@ export function DynamicBlock({
           introduction={introBlock.introduction}
           image={introBlock.image}
           translations={translations}
+          showContentDate={additionalData.showContentDate}
+          authorData={additionalData.authorData}
         />
       );
 

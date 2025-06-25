@@ -1,7 +1,6 @@
 // src/app/[...slug]/page.tsx
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
-import { Image } from "@/components/common/Image";
 import { AuthorBox } from "@/components/common";
 import {
   getCustomPageMetadata,
@@ -45,8 +44,6 @@ export async function generateMetadata({
   // Await params as required in Next.js 15
   const { slug } = await params;
   const path = slug.join("/");
-
-  console.log("path", path);
 
   try {
     const metadata = await getCustomPageMetadata(path);
@@ -110,7 +107,7 @@ export default async function CustomPage({
 
     const { translations } = layoutData;
 
-    console.log("pageData", casinos);
+    console.log("pageData", pageData);
 
     // Additional data for blocks
     const additionalData = {
@@ -119,9 +116,9 @@ export default async function CustomPage({
       translations,
       dynamicGamesData,
       dynamicCasinosData,
+      showContentDate: pageData.showContentDate,
+      authorData: pageData.author,
     };
-
-    console.log("additionalData", additionalData);
 
     // Separate blocks by section with proper typing
     const blocks = (pageData?.blocks || []) as CustomPageBlock[];
@@ -226,35 +223,6 @@ export default async function CustomPage({
                   : ""
               }
             >
-              {/* Show author and date if enabled */}
-              {pageData.showContentDate && (
-                <div className="mb-8 flex items-center gap-4 text-sm text-muted-foreground">
-                  {pageData.author && (
-                    <div className="flex items-center gap-2">
-                      {pageData.author.photo && (
-                        <Image
-                          src={pageData.author.photo.url}
-                          alt={`${pageData.author.firstName} ${pageData.author.lastName}`}
-                          width={32}
-                          height={32}
-                          className="rounded-full"
-                          quality={90}
-                          loading="eager"
-                        />
-                      )}
-                      <span>
-                        {pageData.author.firstName} {pageData.author.lastName}
-                      </span>
-                    </div>
-                  )}
-                  {pageData.updatedAt && (
-                    <time dateTime={pageData.updatedAt}>
-                      {new Date(pageData.updatedAt).toLocaleDateString()}
-                    </time>
-                  )}
-                </div>
-              )}
-
               <div className="space-y-12">
                 {mainBlocks.map((block: CustomPageBlock, index: number) => (
                   <section

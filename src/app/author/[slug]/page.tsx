@@ -6,7 +6,7 @@ import { getLayoutData } from "@/lib/strapi/data-loader";
 import { generateMetadata as generateSEOMetadata } from "@/lib/utils/seo";
 import { AuthorBio } from "@/components/author/AuthorBio/AuthorBio";
 import { AuthorGameList } from "@/components/author/AuthorGameList/AuthorGameList";
-import { AuthorBlogList } from "@/components/author/AuthorBlogList/AuthorBlogList";
+import { AuthorBlogList } from "@/components/AuthorBlogList/AuthorBlogList";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import type { Metadata } from "next";
 import type { AuthorPageProps } from "@/types/author.types";

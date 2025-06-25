@@ -36,7 +36,7 @@ export function CasinoSidebarItem({
   const bonusText = getBonusText();
 
   return (
-    <div className="flex items-center gap-4 border-b border-border pb-4 last:border-0 last:pb-0">
+    <div className="flex items-center gap-4 border-b border-gray-300 pb-4 last:border-0 last:pb-0">
       {/* Casino Logo */}
       <Link
         href={casino.casinoBonus.bonusUrl}

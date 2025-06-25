@@ -66,8 +66,11 @@ export function IntroWithImage({
   authorData,
   isHomePage = false,
   isDateEnabled = true,
+  showContentDate = false,
 }: IntroWithImageProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+
+  console.log("authorData", authorData);
 
   // Process image data - handle both nested and direct structures
   const imageData = extractImageData(image);
@@ -97,22 +100,10 @@ export function IntroWithImage({
           className={cn(
             "col-span-12 lg:z-20",
             hasValidImage
-              ? "order-2 lg:order-1 lg:col-span-7"
-              : "lg:col-span-10 lg:col-start-2 text-center mx-auto max-w-4xl"
+              ? "lg:col-span-7 order-2 lg:order-1"
+              : "lg:col-span-12"
           )}
         >
-          {/* Time and Author Info */}
-          {(timeDate || authorData) && (
-            <div className="flex flex-wrap items-center gap-4 mb-4">
-              {timeDate && isDateEnabled && (
-                <TimeDate timeDate={timeDate} translations={translations} />
-              )}
-              {authorData && (
-                <HeaderAuthor author={authorData} translations={translations} />
-              )}
-            </div>
-          )}
-
           {/* Heading */}
           <h1
             className={cn(
@@ -123,6 +114,18 @@ export function IntroWithImage({
           >
             {heading}
           </h1>
+
+          {/* Time and Author Info */}
+          {showContentDate && (
+            <div className="flex flex-wrap items-center gap-4 mb-4">
+              {timeDate && isDateEnabled && (
+                <TimeDate timeDate={timeDate} translations={translations} />
+              )}
+              {authorData && (
+                <HeaderAuthor author={authorData} translations={translations} />
+              )}
+            </div>
+          )}
 
           {/* Introduction Text - Only render if there's actual content */}
           {sanitizedIntroduction && (

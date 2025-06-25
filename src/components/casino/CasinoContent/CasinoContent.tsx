@@ -146,10 +146,7 @@ export function CasinoContent({
             {/* FAQs */}
             {casino.faqs && casino.faqs.length > 0 && (
               <div className="mb-8" id="faqs">
-                <FAQWidget
-                  faqs={casino.faqs}
-                  title={translations.faq || "Domande Frequenti"}
-                />
+                <FAQWidget faqs={casino.faqs} title={translations.faq} />
               </div>
             )}
 

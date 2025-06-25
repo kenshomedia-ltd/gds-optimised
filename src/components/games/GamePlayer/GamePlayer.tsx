@@ -20,6 +20,54 @@ import type { GamePlayerProps } from "@/types/game-page.types";
 import { cn } from "@/lib/utils/cn";
 
 /**
+ * Utility function to check if a string contains an iframe tag
+ */
+function containsIframe(html: string): boolean {
+  return /<iframe[^>]*>/i.test(html);
+}
+
+/**
+ * Utility function to extract iframe attributes from an iframe HTML string
+ */
+function extractIframeAttributes(iframeHtml: string): Record<string, string> {
+  const match = iframeHtml.match(/<iframe([^>]*)>/i);
+  if (!match) return {};
+
+  const attributesString = match[1];
+  const attributes: Record<string, string> = {};
+
+  // Extract src
+  const srcMatch = attributesString.match(/src=["']([^"']+)["']/i);
+  if (srcMatch) attributes.src = srcMatch[1];
+
+  // Extract other common attributes
+  const widthMatch = attributesString.match(/width=["']([^"']+)["']/i);
+  if (widthMatch) attributes.width = widthMatch[1];
+
+  const heightMatch = attributesString.match(/height=["']([^"']+)["']/i);
+  if (heightMatch) attributes.height = heightMatch[1];
+
+  const titleMatch = attributesString.match(/title=["']([^"']+)["']/i);
+  if (titleMatch) attributes.title = titleMatch[1];
+
+  const allowMatch = attributesString.match(/allow=["']([^"']+)["']/i);
+  if (allowMatch) attributes.allow = allowMatch[1];
+
+  // Check for allowFullScreen
+  if (/allowfullscreen/i.test(attributesString)) {
+    attributes.allowFullScreen = "true";
+  }
+
+  // Check for frameBorder
+  const frameBorderMatch = attributesString.match(
+    /frameborder=["']([^"']+)["']/i
+  );
+  if (frameBorderMatch) attributes.frameBorder = frameBorderMatch[1];
+
+  return attributes;
+}
+
+/**
  * GamePlayer Component
  *
  * Features:
@@ -30,6 +78,7 @@ import { cn } from "@/lib/utils/cn";
  * - Favorite functionality
  * - Info tooltip
  * - Mobile responsive
+ * - Smart iframe handling to prevent nesting
  */
 export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -114,20 +163,23 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
     // You can emit an event or call a parent handler here
   };
 
-  // const handleRatingChange = (rating: number) => {
-  //   // This would typically send the rating to an API
-  //   console.log("Rating changed:", rating);
-  // };
-
   // Get embed code based on device
   const embedCode = isMobile
     ? game.embedCode?.mobileEmbedCode
     : game.embedCode?.desktopEmbedCode;
 
-  // Check if it's an iframe URL or embed code
-  const isIframeUrl =
+  // Check if it's a direct URL or HTML embed code
+  const isDirectUrl =
     embedCode &&
     (embedCode.startsWith("http://") || embedCode.startsWith("https://"));
+
+  // Check if embed code already contains an iframe
+  const hasExistingIframe = embedCode && containsIframe(embedCode);
+
+  // Extract iframe attributes if embed code contains an iframe
+  const iframeAttributes = hasExistingIframe
+    ? extractIframeAttributes(embedCode)
+    : {};
 
   // Debug log embed code
   if (process.env.NODE_ENV === "development") {
@@ -137,7 +189,9 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
       mobileCode: game.embedCode?.mobileEmbedCode?.substring(0, 100) + "...",
       desktopCode: game.embedCode?.desktopEmbedCode?.substring(0, 100) + "...",
       selectedCode: embedCode?.substring(0, 100) + "...",
-      isIframeUrl,
+      isDirectUrl,
+      hasExistingIframe,
+      extractedAttributes: iframeAttributes,
       isMobile,
     });
   }
@@ -164,9 +218,79 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
   };
 
   // Generate provider URLs
-  //   const siteId = process.env.NEXT_PUBLIC_SITE_ID;
-  const providerPagePath = `/provider-pages/${game.provider?.slug}`;
-  const casinoProviderPagePath = `/casino-providers-page/${game.provider?.slug}`;
+  const providerPagePath = `/software-slot-machine/${game.provider?.slug}`;
+  // const casinoProviderPagePath = `/casino-providers-page/${game.provider?.slug}`;
+
+  /**
+   * Render the game iframe based on the embed code type
+   */
+  const renderGameIframe = () => {
+    if (!embedCode) {
+      return (
+        <div className="flex flex-col items-center justify-center h-full p-4 text-white">
+          <FontAwesomeIcon
+            icon={faExclamationTriangle}
+            className="w-16 h-16 mb-4 text-yellow-500"
+          />
+          <h3 className="text-xl font-bold mb-2">
+            {translations.noGameAvailable || "Game not available"}
+          </h3>
+          <p className="text-center text-sm opacity-80 max-w-md">
+            {translations.noEmbedCode ||
+              "The game embed code is not available. Please try again later or contact support."}
+          </p>
+          {process.env.NODE_ENV === "development" && (
+            <div className="mt-4 p-4 bg-black/50 rounded text-xs font-mono">
+              <p>Debug Info:</p>
+              <p>embedCode: {JSON.stringify(game.embedCode)}</p>
+              <p>gamesApiOverride: {String(game.gamesApiOverride)}</p>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // Case 1: Direct URL - create an iframe with the URL
+    if (isDirectUrl) {
+      return (
+        <iframe
+          ref={iframeRef}
+          src={embedCode}
+          className="w-full h-full"
+          allowFullScreen
+          frameBorder="0"
+          title={`${game.title} game`}
+        />
+      );
+    }
+
+    // Case 2: Embed code already contains an iframe - extract src and create new iframe
+    if (hasExistingIframe && iframeAttributes.src) {
+      return (
+        <iframe
+          ref={iframeRef}
+          src={iframeAttributes.src}
+          className="w-full h-full"
+          allowFullScreen={iframeAttributes.allowFullScreen === "true"}
+          frameBorder={iframeAttributes.frameBorder || "0"}
+          title={iframeAttributes.title || `${game.title} game`}
+          allow={iframeAttributes.allow}
+        />
+      );
+    }
+
+    // Case 3: HTML embed code without iframe - use srcDoc
+    return (
+      <iframe
+        ref={iframeRef}
+        srcDoc={embedCode}
+        className="w-full h-full"
+        allowFullScreen
+        frameBorder="0"
+        title={`${game.title} game`}
+      />
+    );
+  };
 
   return (
     <div className="flex flex-col justify-center rounded-t-lg -mx-3 md:mx-0">
@@ -201,34 +325,21 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
                   style={{ "--fa-secondary-opacity": 0 }}
                 />
               </button>
-              <FavoriteButton
-                gameId={game.id}
-                gameTitle={game.title}
-                game={normalizedGame}
-                translations={translations}
-                size="sm"
-                className="!w-[30px] !h-[30px] mb-[5px]"
-              />
               <button
-                className="w-[30px] h-[30px] rounded-full flex items-center justify-center"
-                onClick={handleReportGame}
-              >
-                <FontAwesomeIcon
-                  icon={faExclamationTriangle}
-                  className="w-4 h-4 text-gameplayer-report-issue-fill"
-                  style={{ "--fa-secondary-opacity": 0 }}
-                />
-              </button>
-              <button
-                className="w-[30px] h-[30px] rounded-full flex items-center justify-center"
+                className="w-[30px] h-[30px] rounded-full border border-gameplayer-meta-btn-border flex items-center justify-center"
                 onClick={handleFullscreen}
               >
-                <FontAwesomeIcon icon={faXmark} className="w-4 h-4" />
+                <FontAwesomeIcon
+                  icon={faExpand}
+                  className="w-4 h-4"
+                  style={{ "--fa-secondary-opacity": 0 }}
+                />
               </button>
             </div>
           </div>
         )}
 
+        {/* Game content or play button */}
         {!isPlaying ? (
           // Start game overlay
           <div className="flex flex-col items-center justify-center p-2.5">
@@ -294,51 +405,9 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
               </>
             )}
           </div>
-        ) : // Game iframe
-        embedCode ? (
-          isIframeUrl ? (
-            // Direct iframe URL from games API
-            <iframe
-              ref={iframeRef}
-              src={embedCode}
-              className="w-full h-full"
-              allowFullScreen
-              frameBorder="0"
-              title={`${game.title} game`}
-            />
-          ) : (
-            // HTML embed code from Strapi
-            <iframe
-              ref={iframeRef}
-              srcDoc={embedCode}
-              className="w-full h-full"
-              allowFullScreen
-              frameBorder="0"
-              title={`${game.title} game`}
-            />
-          )
         ) : (
-          // No embed code available
-          <div className="flex flex-col items-center justify-center h-full p-4 text-white">
-            <FontAwesomeIcon
-              icon={faExclamationTriangle}
-              className="w-16 h-16 mb-4 text-yellow-500"
-            />
-            <h3 className="text-xl font-bold mb-2">
-              {translations.noGameAvailable || "Game not available"}
-            </h3>
-            <p className="text-center text-sm opacity-80 max-w-md">
-              {translations.noEmbedCode ||
-                "The game embed code is not available. Please try again later or contact support."}
-            </p>
-            {process.env.NODE_ENV === "development" && (
-              <div className="mt-4 p-4 bg-black/50 rounded text-xs font-mono">
-                <p>Debug Info:</p>
-                <p>embedCode: {JSON.stringify(game.embedCode)}</p>
-                <p>gamesApiOverride: {String(game.gamesApiOverride)}</p>
-              </div>
-            )}
-          </div>
+          // Render the game iframe using our smart logic
+          renderGameIframe()
         )}
       </div>
 
@@ -364,184 +433,162 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
                   size="md"
                   ratingType="games"
                   itemTitle={game.title}
-                  showCount={true}
                 />
               )}
             </div>
 
-            <div className="md:absolute md:left-1/2 md:-translate-x-1/2 flex items-center md:m-auto">
+            {/* Play Again Button - Only show when playing */}
+            {isPlaying && (
               <Button
-                href={casinoProviderPagePath}
-                className="w-32 md:w-[200px] mr-3 uppercase bg-misc hover:bg-misc-600"
-                size="md"
+                onClick={handleReload}
+                variant="default"
+                size="sm"
+                className="ml-4"
               >
-                {translations.playRealBtn || "GIOCA CON SOLDI VERI"}
+                {translations.playAgain || "Play Again"}
               </Button>
-
-              {/* Info Button */}
-              <div className="relative">
-                <button
-                  className="w-[30px] h-[30px] rounded bg-grey-300 border border-grey-500 flex items-center justify-center"
-                  onMouseEnter={() => setShowInfo(true)}
-                  onMouseLeave={() => setShowInfo(false)}
-                  onFocus={() => setShowInfo(true)}
-                  onBlur={() => setShowInfo(false)}
-                >
-                  <FontAwesomeIcon icon={faInfo} className="w-4 h-4" />
-                </button>
-
-                {showInfo && game.gameInfoTable && (
-                  <div className="absolute bottom-full left-0 mb-2 px-5 py-2 bg-grey-100 text-black text-sm rounded shadow-lg z-20 w-[220px] -ml-[180px] md:ml-0">
-                    <div className="space-y-1">
-                      {game.gameInfoTable.rtp && (
-                        <p>
-                          <span className="font-semibold">RTP:</span>{" "}
-                          {game.gameInfoTable.rtp}
-                        </p>
-                      )}
-                      {game.gameInfoTable.volatilita && (
-                        <p>
-                          <span className="font-semibold">
-                            {translations.volatility || "Volatility"}:
-                          </span>{" "}
-                          {game.gameInfoTable.volatilita}
-                        </p>
-                      )}
-                      {game.gameInfoTable.layout && (
-                        <p>
-                          <span className="font-semibold">
-                            {translations.layout || "Layout"}:
-                          </span>{" "}
-                          {game.gameInfoTable.layout}
-                        </p>
-                      )}
-                      {game.gameInfoTable.puntataMinima && (
-                        <p>
-                          <span className="font-semibold">
-                            {translations.minBet || "Min Bet"}:
-                          </span>{" "}
-                          {game.gameInfoTable.puntataMinima}
-                        </p>
-                      )}
-                      {game.gameInfoTable.puntataMassima && (
-                        <p>
-                          <span className="font-semibold">
-                            {translations.maxBet || "Max Bet"}:
-                          </span>{" "}
-                          {game.gameInfoTable.puntataMassima}
-                        </p>
-                      )}
-                    </div>
-                    <p className="mt-2 text-xs italic">
-                      {translations.gameInfoText ||
-                        "Check the list of online casinos that offer this game and their welcome offers."}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
+            )}
           </div>
         </div>
 
-        {/* Right Section - Action Buttons */}
-        {!game.isGameDisabled && (
-          <div className="order-2 md:order-3 p-2.5 md:pr-0 flex items-center grow md:grow-0 justify-end">
-            <div className="flex gap-x-1">
-              {/* Fullscreen Button */}
-              <div className="relative">
-                <button
-                  className="w-[30px] h-[30px] rounded-[5px] bg-grey-300 border border-grey-500 flex items-center justify-center text-primary hover:text-primary-600"
-                  onClick={handleFullscreen}
-                  onMouseEnter={() => setShowFullscreenTooltip(true)}
-                  onMouseLeave={() => setShowFullscreenTooltip(false)}
-                  onFocus={() => setShowFullscreenTooltip(true)}
-                  onBlur={() => setShowFullscreenTooltip(false)}
-                >
-                  <FontAwesomeIcon
-                    icon={faExpand}
-                    className="w-4 h-4"
-                    style={{ "--fa-secondary-opacity": 0 }}
-                  />
-                </button>
-                {showFullscreenTooltip && (
-                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-5 py-2 bg-grey-100 text-black text-sm rounded shadow-lg z-20 w-[150px]">
-                    {translations.fullscreen || "Fullscreen"}
-                  </div>
-                )}
-              </div>
-
-              {/* Reload Button */}
-              <div className="relative">
-                <button
-                  className="w-[30px] h-[30px] rounded-[5px] bg-grey-300 border border-grey-500 flex items-center justify-center text-primary hover:text-primary-600"
-                  onClick={handleReload}
-                  onMouseEnter={() => setShowReloadTooltip(true)}
-                  onMouseLeave={() => setShowReloadTooltip(false)}
-                  onFocus={() => setShowReloadTooltip(true)}
-                  onBlur={() => setShowReloadTooltip(false)}
-                >
-                  <FontAwesomeIcon
-                    icon={faRotateRight}
-                    className="w-4 h-4"
-                    style={{ "--fa-secondary-opacity": 0 }}
-                  />
-                </button>
-                {showReloadTooltip && (
-                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-5 py-2 bg-grey-100 text-black text-sm rounded shadow-lg z-20 w-[150px]">
-                    {translations.reloadGame || "Reload Game"}
-                  </div>
-                )}
-              </div>
-
-              {/* Favorite Button */}
-              <div
-                className="relative"
-                onMouseEnter={() => setShowFavoriteTooltip(true)}
-                onMouseLeave={() => setShowFavoriteTooltip(false)}
-                onFocus={() => setShowFavoriteTooltip(true)}
-                onBlur={() => setShowFavoriteTooltip(false)}
+        {/* Control Icons */}
+        <div className="p-2.5 md:p-0 flex order-2 md:order-3 grow md:grow-0">
+          <div className="flex items-center gap-2 ml-auto">
+            {/* Reload button */}
+            <div className="relative">
+              <button
+                onClick={handleReload}
+                onMouseEnter={() => setShowReloadTooltip(true)}
+                onMouseLeave={() => setShowReloadTooltip(false)}
+                className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 transition-colors"
+                aria-label={translations.reload || "Reload"}
               >
-                <FavoriteButton
-                  gameId={game.id}
-                  gameTitle={game.title}
-                  game={normalizedGame}
-                  translations={translations}
-                  size="sm"
-                  className="!w-[30px] !h-[30px] bg-grey-300 !rounded-[5px] border border-grey-500"
+                <FontAwesomeIcon
+                  icon={faRotateRight}
+                  className="w-4 h-4 text-gray-600"
                 />
-                {showFavoriteTooltip && (
-                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-5 py-2 bg-grey-100 text-black text-sm rounded shadow-lg z-20 w-fit whitespace-nowrap -ml-[180px]">
-                    {translations.favouriteAGame || "Favorite a game"}
-                  </div>
-                )}
-              </div>
+              </button>
+              {showReloadTooltip && (
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded whitespace-nowrap z-10">
+                  {translations.reload || "Reload"}
+                </div>
+              )}
+            </div>
 
-              {/* Report Button */}
-              <div className="relative">
-                <button
-                  className="w-[30px] h-[30px] rounded-[5px] bg-danger border flex items-center justify-center"
-                  onClick={handleReportGame}
-                  onMouseEnter={() => setShowReportTooltip(true)}
-                  onMouseLeave={() => setShowReportTooltip(false)}
-                  onFocus={() => setShowReportTooltip(true)}
-                  onBlur={() => setShowReportTooltip(false)}
-                >
-                  <FontAwesomeIcon
-                    icon={faExclamationTriangle}
-                    className="w-4 h-4 text-white"
-                    style={{ "--fa-secondary-opacity": 0 }}
-                  />
-                </button>
-                {showReportTooltip && (
-                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-5 py-2 bg-grey-100 text-black text-sm rounded shadow-lg z-20 w-fit whitespace-nowrap -ml-[180px]">
-                    {translations.reportAGame || "Report a game"}
-                  </div>
-                )}
-              </div>
+            {/* Fullscreen button */}
+            <div className="relative">
+              <button
+                onClick={handleFullscreen}
+                onMouseEnter={() => setShowFullscreenTooltip(true)}
+                onMouseLeave={() => setShowFullscreenTooltip(false)}
+                className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 transition-colors"
+                aria-label={translations.fullscreen || "Fullscreen"}
+              >
+                <FontAwesomeIcon
+                  icon={faExpand}
+                  className="w-4 h-4 text-gray-600"
+                />
+              </button>
+              {showFullscreenTooltip && (
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded whitespace-nowrap z-10">
+                  {translations.fullscreen || "Fullscreen"}
+                </div>
+              )}
+            </div>
+
+            {/* Favorite button */}
+            <div
+              className="relative"
+              onMouseEnter={() => setShowFavoriteTooltip(true)}
+              onMouseLeave={() => setShowFavoriteTooltip(false)}
+            >
+              <FavoriteButton
+                gameId={game.id}
+                gameTitle={game.title}
+                game={normalizedGame}
+                translations={translations}
+                size="sm"
+                className="!w-[30px] !h-[30px] bg-grey-300 !rounded-[5px] border border-grey-500"
+              />
+              {showFavoriteTooltip && (
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-5 py-2 bg-grey-100 text-black text-sm rounded shadow-lg z-20 w-fit whitespace-nowrap -ml-[180px]">
+                  {translations.favouriteAGame || "Favorite a game"}
+                </div>
+              )}
+            </div>
+
+            {/* Info button */}
+            <div className="relative">
+              <button
+                onClick={() => setShowInfo(!showInfo)}
+                className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 transition-colors"
+                aria-label={translations.info || "Info"}
+              >
+                <FontAwesomeIcon
+                  icon={showInfo ? faXmark : faInfo}
+                  className="w-4 h-4 text-gray-600"
+                />
+              </button>
+            </div>
+
+            {/* Report button */}
+            <div className="relative">
+              <button
+                onClick={handleReportGame}
+                onMouseEnter={() => setShowReportTooltip(true)}
+                onMouseLeave={() => setShowReportTooltip(false)}
+                className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 transition-colors"
+                aria-label={translations.report || "Report"}
+              >
+                <FontAwesomeIcon
+                  icon={faExclamationTriangle}
+                  className="w-4 h-4 text-gray-600"
+                />
+              </button>
+              {showReportTooltip && (
+                <div className="absolute bottom-full right-0 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded whitespace-nowrap z-10">
+                  {translations.report || "Report game"}
+                </div>
+              )}
             </div>
           </div>
-        )}
+        </div>
       </div>
+
+      {/* Info Panel */}
+      {showInfo && (
+        <div className="mt-4 p-4 bg-gray-100 rounded-lg">
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span className="font-semibold">
+                {translations.provider || "Provider"}:
+              </span>
+              <Link
+                href={providerPagePath}
+                className="text-primary hover:underline"
+              >
+                {game.provider?.title}
+              </Link>
+            </div>
+            {game.categories && game.categories.length > 0 && (
+              <div className="flex justify-between">
+                <span className="font-semibold">
+                  {translations.categories || "Categories"}:
+                </span>
+                <span>
+                  {game.categories.map((cat) => cat.title).join(", ")}
+                </span>
+              </div>
+            )}
+            <div className="flex justify-between">
+              <span className="font-semibold">
+                {translations.rating || "Rating"}:
+              </span>
+              <span>{game.ratingAvg.toFixed(1)} / 5.0</span>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

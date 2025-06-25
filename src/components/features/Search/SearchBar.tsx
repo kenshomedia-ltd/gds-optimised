@@ -34,7 +34,7 @@ export function SearchBar({
   const containerRef = useRef<HTMLDivElement>(null);
 
   const siteURL = process.env.NEXT_PUBLIC_SITE_URL || "";
-  const gamePagePath = process.env.NEXT_PUBLIC_GAME_PAGE_PATH || "/games";
+  const gamePagePath = process.env.NEXT_PUBLIC_GAME_PAGE_PATH || "/slot-machines";
 
   // Debounced search logic
   useEffect(() => {

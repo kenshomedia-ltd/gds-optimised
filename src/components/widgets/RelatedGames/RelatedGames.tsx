@@ -43,7 +43,7 @@ export function RelatedGames({
                   } ${providerName}`
                 : translations?.relatedGames || "Related Games"}
             </h2>
-            <div className="bg-white/[0.36] border border-white/30 shadow-[0px_0px_12px_rgba(63,230,252,0.6)] backdrop-blur-[6px] rounded-xl flex md:grid grid-cols-3 lg:grid-cols-6 gap-x-2 p-2">
+            <div className="bg-white/[0.36] border border-white/30 shadow-[0px_0px_12px_rgba(63,230,252,0.6)] backdrop-blur-[6px] rounded-xl grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 p-2">
               {games.map((game) => (
                 <GameCard
                   key={game.id}

@@ -33,7 +33,7 @@ export async function RelatedCasinosServer({
   return (
     <section className={className}>
       {showTitle && (
-        <h2 className="text-2xl md:text-3xl font-bold text-heading-text text-center mb-6">
+        <h2 className="text-2xl md:text-3xl font-bold text-heading-text text-left mb-6">
           {translations.relatedCasinosTitle ||
             `Best Casinos with ${provider.title} Games`}
         </h2>

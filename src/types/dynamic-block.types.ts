@@ -7,6 +7,7 @@ import type {
 } from "./strapi.types";
 import type { GameData } from "./game.types";
 import type { CasinoData } from "./casino.types";
+import { AuthorData } from "./author.types";
 
 // Define Provider and Category interfaces locally since they're not exported from strapi.types
 interface Provider {
@@ -335,6 +336,8 @@ export interface DynamicBlockProps {
       // Add this
       [blockId: string]: CasinoData[];
     };
+    showContentDate?: boolean;
+    authorData?: AuthorData;
   };
 }
 

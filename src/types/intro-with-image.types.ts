@@ -20,4 +20,5 @@ export interface IntroWithImageProps {
   };
   isHomePage?: boolean;
   isDateEnabled?: boolean;
+  showContentDate?: boolean;
 }

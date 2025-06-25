@@ -311,6 +311,126 @@
   .btn-danger:hover {
     background-color: var(--color-btn-danger-hover);
   }
+
+  /* custom bullet points using font awesome fonts */
+  .prose ul {
+    list-style: none !important;
+    padding-left: 0 !important;
+  }
+
+  .prose ul > li {
+    position: relative !important;
+    padding-left: 1.75rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .prose ul > li::before {
+    content: "" !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0.50rem !important;
+    width: 1rem !important;
+    height: 1rem !important;
+    /* Your coin SVG as a data URI - using your theme's warning color */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath class='fa-secondary' opacity='.4' fill='%23f59e0b' d='M0 256a256 256 0 1 0 512 0A256 256 0 1 0 0 256zm448 0A192 192 0 1 1 64 256a192 192 0 1 1 384 0zM96 256a160 160 0 1 0 320 0A160 160 0 1 0 96 256zm136-72c0-13.3 10.7-24 24-24s24 10.7 24 24l0 144c0 13.3-10.7 24-24 24s-24-10.7-24-24l0-144z'/%3E%3Cpath class='fa-primary' fill='%23d97706' d='M256 96a160 160 0 1 1 0 320 160 160 0 1 1 0-320zm0 352a192 192 0 1 0 0-384 192 192 0 1 0 0 384z'/%3E%3C/svg%3E") !important;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+  }
+
+  /* CSS custom properties for flexibility */
+  :root {
+    /* You can change these colors to match your theme */
+    --coin-primary-color: #d97706; /* amber-600 */
+    --coin-secondary-color: #f59e0b; /* amber-500 */
+  }
+
+  /* Apply to specific sections using data attributes */
+  [data-coin-bullets] ul {
+    list-style: none;
+    padding-left: 0;
+  }
+
+  [data-coin-bullets] ul > li {
+    position: relative;
+    padding-left: 1.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  [data-coin-bullets] ul > li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.25rem;
+    width: 1rem;
+    height: 1rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath class='fa-secondary' opacity='.4' fill='%23f59e0b' d='M0 256a256 256 0 1 0 512 0A256 256 0 1 0 0 256zm448 0A192 192 0 1 1 64 256a192 192 0 1 1 384 0zM96 256a160 160 0 1 0 320 0A160 160 0 1 0 96 256zm136-72c0-13.3 10.7-24 24-24s24 10.7 24 24l0 144c0 13.3-10.7 24-24 24s-24-10.7-24-24l0-144z'/%3E%3Cpath class='fa-primary' fill='%23d97706' d='M256 96a160 160 0 1 1 0 320 160 160 0 1 1 0-320zm0 352a192 192 0 1 0 0-384 192 192 0 1 0 0 384z'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+
+  /* Exclude certain areas where you don't want coin bullets */
+  .navigation ul > li::before,
+  .header ul > li::before,
+  .footer ul > li::before,
+  .menu ul > li::before {
+    content: none !important;
+  }
+
+  /* Reset for ordered lists - keep numbers */
+  ol {
+    list-style-type: decimal;
+  }
+
+  /* Utility class to opt-out of coin bullets */
+  .no-coin-bullets ul,
+  ul.no-coin-bullets {
+    list-style: disc !important;
+    padding-left: 1.5rem !important;
+  }
+
+  .no-coin-bullets ul > li::before,
+  ul.no-coin-bullets > li::before {
+    content: none !important;
+  }
+
+  .no-coin-bullets ul > li,
+  ul.no-coin-bullets > li {
+    padding-left: 0 !important;
+  }
+
+  /* Size variations */
+  .prose ul.list-coin-sm > li {
+    padding-left: 1.5rem !important;
+  }
+
+  .prose ul.list-coin-sm > li::before {
+    width: 0.875rem !important;
+    height: 0.875rem !important;
+  }
+
+  .prose ul.list-coin-lg > li {
+    padding-left: 2rem !important;
+  }
+
+  .prose ul.list-coin-lg > li::before {
+    width: 1.25rem !important;
+    height: 1.25rem !important;
+    top: 0.125rem !important;
+  }
+
+  /* Alternative: Use CSS variables to dynamically set colors */
+  [data-coin-color="primary"] ul > li::before {
+    filter: hue-rotate(180deg); /* Changes the color */
+  }
+
+  [data-coin-color="success"] ul > li::before {
+    filter: hue-rotate(90deg) saturate(0.8);
+  }
+
+  /* Simple version without the duotone effect */
+  .prose ul.list-coin-simple > li::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='10' fill='%23f59e0b' stroke='%23d97706' stroke-width='2'/%3E%3Ccircle cx='12' cy='12' r='7' fill='none' stroke='%23d97706' stroke-width='1'/%3E%3C/svg%3E");
+  }
   
   /* Border utilities */
   .border-primary { border-color: var(--site-primary); }

@@ -193,7 +193,7 @@ export function FavoritesDrawer({
                     {/* Game Info */}
                     <div className="flex-1 min-w-0">
                       <Link
-                        href={`/slots/${game.slug}`}
+                        href={`/slot-machines/${game.slug}`}
                         className="block"
                         onClick={onClose}
                       >

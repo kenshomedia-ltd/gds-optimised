@@ -154,13 +154,19 @@ async function GameContent({ game }: { game: GamePageData }) {
         <div className="space-y-12">
           {/* Related Casinos Widget - Full width */}
           {game.provider && (
-            <RelatedCasinosServer
-              provider={game.provider}
-              maxCasinos={5}
-              showTitle={true}
-              className="w-full"
-              translations={translations}
-            />
+            <>
+              <h2 className="text-2xl md:text-3xl font-bold text-heading-text text-left mb-6">
+                {`${game.title} ${translations.gamePageRelatedCasinoH2}` ||
+                  `Best Casinos with ${game.title} Games`}
+              </h2>
+              <RelatedCasinosServer
+                provider={game.provider}
+                maxCasinos={5}
+                showTitle={false}
+                className="w-full"
+                translations={translations}
+              />
+            </>
           )}
 
           {/* Two column layout for content and sidebar */}
@@ -199,7 +205,7 @@ async function GameContent({ game }: { game: GamePageData }) {
                 >
                   <div className="bg-gray-50 rounded-lg p-8">
                     <h2 className="text-2xl font-bold mb-6">
-                      Game Information
+                      {`${translations.gameInfoTableH2} ${game.title}`}
                     </h2>
                     <dl className="grid md:grid-cols-2 gap-y-4 gap-x-8">
                       {game.gameInfoTable!.rtp && (
@@ -365,7 +371,7 @@ async function GameContent({ game }: { game: GamePageData }) {
               {hasProscons && <ProsConsWidget proscons={game.proscons!} />}
 
               {/* FAQ Widget */}
-              {hasFaqs && <FAQWidget faqs={game.faqs!} />}
+              {hasFaqs && <FAQWidget faqs={game.faqs!} title={translations.faq}/>}
 
               {/* Author Box - At the bottom of left column */}
               {game.author && (
