@@ -4,22 +4,59 @@ import { Redis } from "ioredis";
 import { unstable_cache } from "next/cache";
 import { cache } from "react";
 
-// Initialize Redis with connection pooling
-const redis = new Redis({
-  host: process.env.REDIS_HOST || "localhost",
-  port: parseInt(process.env.REDIS_PORT || "6379"),
-  password: process.env.REDIS_PASSWORD,
-  maxRetriesPerRequest: 3,
-  enableReadyCheck: true,
-  enableOfflineQueue: true,
-  // Connection pool settings for better performance
-  lazyConnect: true,
-  connectTimeout: 10000,
-  disconnectTimeout: 2000,
-  commandTimeout: 5000,
-  // Enable pipelining for better performance
-  enableAutoPipelining: true,
-});
+// Lazy-initialized Redis instance
+let redis: Redis | null = null;
+
+/**
+ * Get or create Redis connection
+ * This ensures the connection is created after environment variables are available
+ */
+function getRedisClient(): Redis {
+  if (!redis) {
+    const redisHost = process.env.REDIS_HOST || "localhost";
+    const redisPort = parseInt(process.env.REDIS_PORT || "6379");
+    const redisPassword = process.env.REDIS_PASSWORD;
+
+    console.log(`[Redis] Initializing connection to ${redisHost}:${redisPort}`);
+
+    redis = new Redis({
+      host: redisHost,
+      port: redisPort,
+      password: redisPassword,
+      maxRetriesPerRequest: 3,
+      enableReadyCheck: true,
+      enableOfflineQueue: true,
+      // Connection pool settings for better performance
+      lazyConnect: true,
+      connectTimeout: 10000,
+      disconnectTimeout: 2000,
+      commandTimeout: 5000,
+      // Enable pipelining for better performance
+      enableAutoPipelining: true,
+      // Retry strategy
+      retryStrategy: (times) => {
+        const delay = Math.min(times * 50, 2000);
+        console.log(`[Redis] Retry attempt ${times}, waiting ${delay}ms`);
+        return delay;
+      },
+    });
+
+    // Add event handlers for debugging
+    redis.on("connect", () => {
+      console.log(`[Redis] Connected to ${redisHost}:${redisPort}`);
+    });
+
+    redis.on("error", (err) => {
+      console.error("[Redis] Connection error:", err);
+    });
+
+    redis.on("ready", () => {
+      console.log("[Redis] Ready to accept commands");
+    });
+  }
+
+  return redis;
+}
 
 // Cache configuration with stale-while-revalidate pattern
 export const CACHE_CONFIG = {
@@ -80,7 +117,8 @@ export class CacheManager {
    */
   async get<T>(key: string): Promise<{ data: T | null; isStale: boolean }> {
     try {
-      const cached = await redis.get(key);
+      const client = getRedisClient();
+      const cached = await client.get(key);
       if (!cached) {
         return { data: null, isStale: false };
       }
@@ -92,7 +130,7 @@ export class CacheManager {
 
       if (isStale) {
         // Data is too old, return null
-        await redis.del(key);
+        await client.del(key);
         return { data: null, isStale: true };
       }
 
@@ -112,6 +150,7 @@ export class CacheManager {
     options: Pick<CacheOptions, "ttl" | "swr">
   ): Promise<void> {
     try {
+      const client = getRedisClient();
       const { ttl = 300, swr = 600 } = options;
       const cacheData = {
         data,
@@ -121,7 +160,7 @@ export class CacheManager {
       };
 
       // Set with SWR ttl
-      await redis.setex(key, swr, JSON.stringify(cacheData));
+      await client.setex(key, swr, JSON.stringify(cacheData));
     } catch (error) {
       console.error(`Cache set error for ${key}:`, error);
     }
@@ -132,9 +171,10 @@ export class CacheManager {
    */
   async delete(pattern: string): Promise<void> {
     try {
-      const keys = await redis.keys(pattern);
+      const client = getRedisClient();
+      const keys = await client.keys(pattern);
       if (keys.length > 0) {
-        await redis.del(...keys);
+        await client.del(...keys);
       }
     } catch (error) {
       console.error(`Cache delete error for ${pattern}:`, error);
@@ -146,7 +186,8 @@ export class CacheManager {
    */
   async mget<T>(keys: string[]): Promise<Map<string, T>> {
     try {
-      const values = await redis.mget(keys);
+      const client = getRedisClient();
+      const values = await client.mget(keys);
       const result = new Map<string, T>();
 
       values.forEach((value, index) => {
@@ -171,7 +212,8 @@ export class CacheManager {
    * Warm cache with multiple entries
    */
   async warmCache(entries: CacheEntry[]): Promise<void> {
-    const pipeline = redis.pipeline();
+    const client = getRedisClient();
+    const pipeline = client.pipeline();
 
     for (const { key, data, options } of entries) {
       const { ttl = 300, swr = 600 } = options;
@@ -302,5 +344,20 @@ export async function prefetchCriticalData(paths: string[]): Promise<void> {
 
   if (entries.length > 0) {
     await cacheManager.warmCache(entries);
+  }
+}
+
+/**
+ * Gracefully close Redis connection
+ * Call this on application shutdown
+ */
+export async function closeRedisConnection(): Promise<void> {
+  if (redis) {
+    try {
+      await redis.quit();
+      console.log("[Redis] Connection closed gracefully");
+    } catch (error) {
+      console.error("[Redis] Error closing connection:", error);
+    }
   }
 }
