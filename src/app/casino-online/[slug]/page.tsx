@@ -2,20 +2,18 @@
 
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { unstable_cache } from "next/cache";
 import { SingleContent } from "@/components/common";
 import { Breadcrumbs } from "@/components/layout";
 import { CasinoSidebar, CasinoTable } from "@/components/casino";
 import { CasinoComparison } from "@/components/widgets";
 import { IntroWithImage } from "@/components/common";
 import { FAQWidget } from "@/components/widgets";
-import { generateSEOMetadata } from "@/lib/utils/seo";
+import { generateMetadata as generateSEOMetadata } from "@/lib/utils/seo";
 import { getLayoutData } from "@/lib/strapi/data-loader";
 import {
   getCasinoProviderPageDataSplit,
   getCasinoProviderPageMetadata,
 } from "@/lib/strapi/casino-provider-query-splitter";
-import type { CasinoProviderPageData } from "@/types/casino-provider.types";
 
 interface CasinoProviderPageProps {
   params: Promise<{
@@ -47,7 +45,8 @@ export async function generateMetadata({
       title:
         pageData.seo?.metaTitle || `${pageData.title} - Best Online Casinos`,
       description,
-      path: `/casino-online/${slug}`,
+      keywords: pageData.seo?.keywords,
+      canonicalUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/casino-online/${slug}`,
       modifiedTime: pageData.updatedAt,
     });
   } catch (error) {
@@ -142,7 +141,6 @@ export default async function CasinoProviderPage({
               <IntroWithImage
                 heading={
                   pageData.IntroductionWithImage.heading ||
-                  pageData.heading ||
                   pageData.title
                 }
                 introduction={pageData.IntroductionWithImage.introduction}
