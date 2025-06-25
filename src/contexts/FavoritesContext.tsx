@@ -8,10 +8,8 @@ import React, {
   useEffect,
   useCallback,
 } from "react";
-import { useRouter } from "next/navigation";
 import type {
   FavoriteGame,
-  UserFavoriteGame,
   FavoritesContextValue,
 } from "@/types/favorite.types";
 import type { GameData } from "@/types/game.types";
@@ -22,50 +20,46 @@ const FavoritesContext = createContext<FavoritesContextValue | undefined>(
 
 interface FavoritesProviderProps {
   children: React.ReactNode;
-  initialUserFavorites?: UserFavoriteGame[];
-  isAuthenticated?: boolean;
 }
+
+// localStorage key as specified
+const FAVORITES_STORAGE_KEY = "_favourites";
 
 /**
  * FavoritesProvider - Manages favorite games state
  *
  * Features:
- * - Local storage persistence for anonymous users
- * - API sync for authenticated users
+ * - Local storage persistence with "_favourites" key
  * - Optimistic updates
- * - Error handling with rollback
+ * - Simple add/remove functionality
  */
-export function FavoritesProvider({
-  children,
-  initialUserFavorites = [],
-  isAuthenticated = false,
-}: FavoritesProviderProps) {
+export function FavoritesProvider({ children }: FavoritesProviderProps) {
   const [favorites, setFavorites] = useState<FavoriteGame[]>([]);
-  const [userFavorites, setUserFavorites] =
-    useState<UserFavoriteGame[]>(initialUserFavorites);
   const [isLoading] = useState(false);
-  const router = useRouter();
 
   // Load favorites from localStorage on mount
   useEffect(() => {
-    if (!isAuthenticated) {
-      const stored = localStorage.getItem("favorites");
-      if (stored) {
-        try {
-          setFavorites(JSON.parse(stored));
-        } catch (error) {
-          console.error("Failed to parse favorites from localStorage:", error);
-        }
+    const stored = localStorage.getItem(FAVORITES_STORAGE_KEY);
+    if (stored) {
+      try {
+        setFavorites(JSON.parse(stored));
+      } catch (error) {
+        console.error("Failed to parse favorites from localStorage:", error);
+        // Clear corrupted data
+        localStorage.removeItem(FAVORITES_STORAGE_KEY);
       }
     }
-  }, [isAuthenticated]);
+  }, []);
 
-  // Save to localStorage when favorites change (for anonymous users)
+  // Save to localStorage when favorites change
   useEffect(() => {
-    if (!isAuthenticated && favorites.length > 0) {
-      localStorage.setItem("favorites", JSON.stringify(favorites));
+    if (favorites.length > 0) {
+      localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(favorites));
+    } else {
+      // Remove key if no favorites
+      localStorage.removeItem(FAVORITES_STORAGE_KEY);
     }
-  }, [favorites, isAuthenticated]);
+  }, [favorites]);
 
   // Convert GameData to FavoriteGame format
   const gameToFavorite = useCallback((game: GameData): FavoriteGame => {
@@ -76,12 +70,12 @@ export function FavoritesProvider({
       id: game.id,
       title: game.title,
       slug: game.slug,
-      ratingAvg: game.ratingAvg,
+      ratingAvg: game.ratingAvg || 0,
       publishedAt: game.publishedAt,
       provider: game.provider
         ? {
             slug: game.provider.slug,
-            title: game.provider.title,
+            title: game.provider.title || game.provider.slug,
           }
         : undefined,
       images: gameImage
@@ -96,118 +90,42 @@ export function FavoritesProvider({
   // Add favorite
   const addFavorite = useCallback(
     async (game: GameData) => {
-      const favoriteGame = gameToFavorite(game);
+      const newFavorite = gameToFavorite(game);
 
-      // Optimistic update
-      if (isAuthenticated) {
-        setUserFavorites((prev) => [...prev, { id: Date.now(), game }]);
-      } else {
-        setFavorites((prev) => [...prev, favoriteGame]);
-      }
-
-      // API call for authenticated users
-      if (isAuthenticated) {
-        try {
-          const response = await fetch("/api/user/favorites", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ gameId: game.id }),
-          });
-
-          if (!response.ok) {
-            throw new Error("Failed to add favorite");
-          }
-
-          const newFavorite = await response.json();
-
-          // Update with actual server response
-          setUserFavorites((prev) =>
-            prev.map((fav) => (fav.id === Date.now() ? newFavorite : fav))
-          );
-
-          // Refresh router to update any server components
-          router.refresh();
-        } catch (error) {
-          // Rollback on error
-          console.error("Failed to add favorite:", error);
-          setUserFavorites((prev) =>
-            prev.filter((fav) => fav.game.id !== game.id)
-          );
+      setFavorites((prev) => {
+        // Check if already exists
+        if (prev.some((fav) => fav.id === newFavorite.id)) {
+          return prev;
         }
-      }
+        return [...prev, newFavorite];
+      });
     },
-    [isAuthenticated, gameToFavorite, router]
+    [gameToFavorite]
   );
 
   // Remove favorite
-  const removeFavorite = useCallback(
-    async (gameId: number) => {
-      // Store current state for rollback
-      // const prevFavorites = favorites;
-      const prevUserFavorites = userFavorites;
-
-      // Optimistic update
-      if (isAuthenticated) {
-        setUserFavorites((prev) =>
-          prev.filter((fav) => fav.game.id !== gameId)
-        );
-      } else {
-        setFavorites((prev) => prev.filter((fav) => fav.id !== gameId));
-        localStorage.setItem(
-          "favorites",
-          JSON.stringify(favorites.filter((fav) => fav.id !== gameId))
-        );
-      }
-
-      // API call for authenticated users
-      if (isAuthenticated) {
-        try {
-          const userFavorite = userFavorites.find(
-            (fav) => fav.game.id === gameId
-          );
-          if (!userFavorite) return;
-
-          const response = await fetch(
-            `/api/user/favorites/${userFavorite.id}`,
-            {
-              method: "DELETE",
-            }
-          );
-
-          if (!response.ok) {
-            throw new Error("Failed to remove favorite");
-          }
-
-          // Refresh router to update any server components
-          router.refresh();
-        } catch (error) {
-          // Rollback on error
-          console.error("Failed to remove favorite:", error);
-          setUserFavorites(prevUserFavorites);
-        }
-      }
-    },
-    [favorites, userFavorites, isAuthenticated, router]
-  );
+  const removeFavorite = useCallback(async (gameId: number) => {
+    setFavorites((prev) => prev.filter((fav) => fav.id !== gameId));
+  }, []);
 
   // Check if game is favorited
   const isFavorited = useCallback(
     (gameId: number): boolean => {
-      if (isAuthenticated) {
-        return userFavorites.some((fav) => fav.game.id === gameId);
-      }
       return favorites.some((fav) => fav.id === gameId);
     },
-    [favorites, userFavorites, isAuthenticated]
+    [favorites]
   );
+
+  // Get total favorites count
+  const favoritesCount = favorites.length;
 
   const value: FavoritesContextValue = {
     favorites,
-    userFavorites,
     isLoading,
     addFavorite,
     removeFavorite,
     isFavorited,
+    favoritesCount,
   };
 
   return (

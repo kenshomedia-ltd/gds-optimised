@@ -22,15 +22,6 @@ export interface FavoriteGame {
 }
 
 /**
- * User favorite game from API
- */
-export interface UserFavoriteGame {
-  id: number;
-  game: GameData;
-  createdAt?: string;
-}
-
-/**
  * Favorite button props
  */
 export interface FavoriteButtonProps {
@@ -43,13 +34,22 @@ export interface FavoriteButtonProps {
 }
 
 /**
+ * Favorites drawer props
+ */
+export interface FavoritesDrawerProps {
+  isOpen: boolean;
+  onClose: () => void;
+  translations?: Record<string, string>;
+}
+
+/**
  * Favorites context value
  */
 export interface FavoritesContextValue {
   favorites: FavoriteGame[];
-  userFavorites: UserFavoriteGame[];
   isLoading: boolean;
   addFavorite: (game: GameData) => Promise<void>;
   removeFavorite: (gameId: number) => Promise<void>;
   isFavorited: (gameId: number) => boolean;
+  favoritesCount: number;
 }

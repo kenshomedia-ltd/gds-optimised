@@ -47,12 +47,10 @@ export function FavoriteButton({
       try {
         if (favorited) {
           await removeFavorite(gameId);
-          toast.success(
-            translations.removeFromFavorites || "Removed from favorites"
-          );
+          toast.success(`${gameTitle} ${translations.removeToFav}`);
         } else {
           await addFavorite(game);
-          toast.success(translations.addToFavorites || "Added to favorites");
+          toast.success(`${gameTitle} ${translations.addToFav}`);
         }
       } catch {
         toast.error(translations.favoriteError || "Failed to update favorites");
@@ -91,8 +89,8 @@ export function FavoriteButton({
       )}
       aria-label={
         favorited
-          ? `Remove ${gameTitle} from favorites`
-          : `Add ${gameTitle} to favorites`
+          ? `${gameTitle} ${translations.removeToFav}`
+          : `${gameTitle} ${translations.addToFav}`
       }
       aria-pressed={favorited}
     >
@@ -109,6 +107,7 @@ export function FavoriteButton({
           isAnimating && "animate-ping",
           "group-hover:scale-110"
         )}
+        swapOpacity
       />
 
       {/* Loading spinner overlay */}

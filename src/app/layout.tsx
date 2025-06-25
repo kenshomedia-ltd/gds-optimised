@@ -10,14 +10,6 @@ import { ClientProviders } from "@/components/providers/ClientProviders";
 import { BackToTop } from "@/components/common/BackToTop/BackToTop";
 import { Toaster } from "sonner";
 
-// Font Awesome
-// import { config } from '@fortawesome/fontawesome-svg-core'
-// import '@fortawesome/fontawesome-svg-core/styles.css'
-
-// // Font Awesome Kit package
-// import '@awesome.me/kit-0e07a43543'
-// config.autoAddCss = false;
-
 import "./globals.css";
 import { cn } from "@/lib/utils/cn";
 
@@ -28,7 +20,7 @@ const lato = Lato({
   display: "swap",
   variable: "--font-lato",
   preload: true,
-  adjustFontFallback: true, // This line reduces CLS
+  adjustFontFallback: true,
 });
 
 // Configure Roboto for body text with font metrics for reduced CLS
@@ -38,7 +30,7 @@ const roboto = Roboto({
   display: "swap",
   variable: "--font-roboto",
   preload: true,
-  adjustFontFallback: true, // This line reduces CLS
+  adjustFontFallback: true,
 });
 
 // Viewport configuration for mobile optimization
@@ -88,7 +80,7 @@ export default async function RootLayout({
   return (
     <html lang="en" className={`${lato.variable} ${roboto.variable}`}>
       <head>
-        {/* 3. RENDER THE THEME COMPONENT */}
+        {/* RENDER THE THEME COMPONENT */}
         {/* This component imports the CSS but renders no HTML */}
         <DynamicTheme siteId={siteId} />
 
@@ -125,35 +117,39 @@ export default async function RootLayout({
           "min-h-screen bg-body-bg text-body-text antialiased font-body",
           roboto.className
         )}
-        // Add suppressHydrationWarning to prevent browser extension warnings
         suppressHydrationWarning={true}
       >
         {/* Legal bar at the very top */}
         <LegalServer legalText={layoutData.layout.legalText} />
 
-        {/* Main layout structure */}
-        <div className="flex flex-col min-h-[calc(100vh-35px)]">
-          {/* Header Component */}
-          <Header
-            logo={layoutData.layout.Logo}
-            mainNavigation={layoutData.navigation.mainNavigation}
-            subNavigation={layoutData.navigation.subNavigation}
-            translations={layoutData.translations}
-          />
+        {/* Wrap everything that needs client providers */}
+        <ClientProviders>
+          {/* Main layout structure */}
+          <div className="flex flex-col min-h-[calc(100vh-35px)]">
+            {/* Header Component - Now inside ClientProviders */}
+            <Header
+              logo={layoutData.layout.Logo}
+              mainNavigation={layoutData.navigation.mainNavigation}
+              subNavigation={layoutData.navigation.subNavigation}
+              translations={layoutData.translations}
+            />
 
-          {/* Main content */}
-          <ClientProviders>
+            {/* Main content */}
             <main className="flex-1">{children}</main>
-          </ClientProviders>
 
-          <FooterServer
-            footerContent={layoutData.layout.footerContent}
-            footerImages={layoutData.layout.footerImages}
-            footerNavigation={layoutData.navigation.footerNavigation}
-            footerNavigations={layoutData.navigation.footerNavigations}
-            translations={layoutData.translations}
-          />
-        </div>
+            <FooterServer
+              footerContent={layoutData.layout.footerContent}
+              footerImages={layoutData.layout.footerImages}
+              footerNavigation={layoutData.navigation.footerNavigation}
+              footerNavigations={layoutData.navigation.footerNavigations}
+              translations={layoutData.translations}
+            />
+          </div>
+
+          {/* Back to Top Button - Also needs to be inside providers if it uses any context */}
+          <BackToTop />
+        </ClientProviders>
+
         <Toaster
           position="top-right"
           toastOptions={{
@@ -164,8 +160,6 @@ export default async function RootLayout({
             },
           }}
         />
-        {/* Back to Top Button */}
-        <BackToTop />
       </body>
     </html>
   );

@@ -4,13 +4,20 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHeart, faUser, faBars } from "@awesome.me/kit-0e07a43543/icons/duotone/light";
+import {
+  faHeart,
+  faUser,
+  faBars,
+} from "@awesome.me/kit-0e07a43543/icons/duotone/light";
+import { faHeart as faHeartSolid } from "@awesome.me/kit-0e07a43543/icons/duotone/solid";
 import { Image } from "@/components/common/Image";
 import { SearchBar } from "@/components/features/Search/SearchBar";
+import { FavoritesDrawer } from "@/components/features/Favorites/FavoritesDrawer";
+import { useFavorites } from "@/contexts/FavoritesContext";
 import { MainNav } from "./MainNav";
-// import { SubNav } from "./SubNav";
 import { MobileMenu } from "./MobileMenu";
 import type { HeaderProps } from "@/types/header.types";
+import { cn } from "@/lib/utils/cn";
 
 /**
  * Main Header Component
@@ -18,7 +25,7 @@ import type { HeaderProps } from "@/types/header.types";
  * Features:
  * - Sticky header with scroll detection
  * - Responsive navigation with search, favorites, and user account
- * - Optimized image loading for logo
+ * - Favorites drawer with red heart indicator when items are favorited
  * - Mobile-first approach
  * - Accessibility compliant
  * - Performance optimized with React hooks
@@ -32,6 +39,8 @@ export function Header({
 }: HeaderProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
+  const { favoritesCount } = useFavorites();
 
   const siteName = process.env.NEXT_PUBLIC_SITE_NAME || "GiochiDiSlots";
   const siteId = process.env.NEXT_PUBLIC_SITE_ID || "gds";
@@ -70,15 +79,19 @@ export function Header({
     setIsMobileMenuOpen(false);
   };
 
+  const toggleFavorites = () => {
+    setIsFavoritesOpen(!isFavoritesOpen);
+  };
+
   return (
     <>
       {/* Main Header */}
       <header
-        className={`
-          top-0 z-50 w-full bg-navbar-bkg
-          transition-shadow duration-300
-          ${isScrolled ? "shadow-lg" : ""}
-        `}
+        className={cn(
+          "top-0 z-50 w-full bg-navbar-bkg",
+          "transition-shadow duration-300",
+          isScrolled && "shadow-lg"
+        )}
       >
         <nav
           className="mx-auto flex h-16 items-center justify-between px-4 py-2 xl:container"
@@ -143,60 +156,45 @@ export function Header({
             {/* Favorites Button */}
             <button
               type="button"
-              className="p-2 rounded-md text-navbar-text hover:bg-white/10 transition-colors"
+              className={cn(
+                "relative p-2 rounded-md transition-colors",
+                "hover:bg-white/10",
+                "focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
+              )}
+              onClick={toggleFavorites}
               aria-label={translations.favorite || "Favorites"}
               data-favorites-trigger
             >
-              <FontAwesomeIcon icon={faHeart} className="h-5 w-5" />
+              <FontAwesomeIcon
+                icon={favoritesCount > 0 ? faHeartSolid : faHeart}
+                className={cn(
+                  "h-5 w-5 transition-colors",
+                  favoritesCount > 0 ? "text-danger" : "text-navbar-text"
+                )}
+                swapOpacity
+              />
+              {/* Optional badge for favorites count */}
+              {favoritesCount > 0 && (
+                <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-danger text-white text-[10px] font-bold flex items-center justify-center">
+                  {favoritesCount > 9 ? "9+" : favoritesCount}
+                </span>
+              )}
             </button>
 
             {/* User Account */}
             <Link
-              href={
-                user?.isAuthenticated ? "/account" : "/authentication/login/"
-              }
+              href={user?.isAuthenticated ? "/account" : "/login"}
               className="p-2 rounded-md text-navbar-text hover:bg-white/10 transition-colors"
               aria-label={
                 user?.isAuthenticated
-                  ? translations.myAccount || "My Account"
-                  : translations.logIn || "Login"
+                  ? translations.account || "My Account"
+                  : translations.login || "Login"
               }
             >
               <FontAwesomeIcon icon={faUser} className="h-5 w-5" />
             </Link>
           </div>
         </nav>
-
-        {/* Sub Navigation - Mobile only */}
-        {subNavigation.length > 0 && (
-          <nav
-            className="lg:hidden flex overflow-x-auto bg-subnavbar-bkg"
-            aria-label="Quick links"
-          >
-            <div className="flex gap-2 px-2 py-2 min-w-full">
-              {subNavigation.map((item) => (
-                <Link
-                  key={item.id}
-                  href={item.url || "#"}
-                  className="flex items-center gap-2 px-3 py-1.5 text-navbar-text text-xs font-medium uppercase rounded whitespace-nowrap"
-                >
-                  {item.images && (
-                    <Image
-                      src={item.images.url}
-                      alt=""
-                      width={15}
-                      height={15}
-                      className="w-[15px] h-[15px] object-contain"
-                      quality={85}
-                      unoptimized={item.images.url.endsWith(".svg")}
-                    />
-                  )}
-                  {item.title}
-                </Link>
-              ))}
-            </div>
-          </nav>
-        )}
       </header>
 
       {/* Mobile Menu */}
@@ -206,6 +204,20 @@ export function Header({
         mainNavigation={mainNavigation}
         subNavigation={subNavigation}
         translations={translations}
+      />
+
+      {/* Favorites Drawer */}
+      <FavoritesDrawer
+        isOpen={isFavoritesOpen}
+        onClose={() => setIsFavoritesOpen(false)}
+        translations={{
+          favoritesTitle: translations.favoritesTitle || "My Favorite Games",
+          noFavorites: translations.noFavorites || "No favorite games yet",
+          noFavoritesDesc:
+            translations.noFavoritesDesc ||
+            "Start adding games to your favorites!",
+          viewAll: translations.viewAll || "View All",
+        }}
       />
     </>
   );

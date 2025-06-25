@@ -119,8 +119,6 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
   //   console.log("Rating changed:", rating);
   // };
 
-  console.log("Game:", game);
-
   // Get embed code based on device
   const embedCode = isMobile
     ? game.embedCode?.mobileEmbedCode
@@ -509,7 +507,7 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
                   game={normalizedGame}
                   translations={translations}
                   size="sm"
-                  className="!w-[30px] !h-[30px] bg-grey-300 rounded-[5px] border border-grey-500"
+                  className="!w-[30px] !h-[30px] bg-grey-300 !rounded-[5px] border border-grey-500"
                 />
                 {showFavoriteTooltip && (
                   <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-5 py-2 bg-grey-100 text-black text-sm rounded shadow-lg z-20 w-fit whitespace-nowrap -ml-[180px]">

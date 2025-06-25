@@ -146,7 +146,7 @@ export function StarRatingInteractive({
   );
 
   return (
-    <div className={cn("space-y-2", className)}>
+    <div className={className}>
       <div className="flex items-center gap-3">
         <StarRating
           initialRating={userRating !== null ? userRating : currentRating}
