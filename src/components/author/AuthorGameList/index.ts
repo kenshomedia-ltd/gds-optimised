@@ -1,0 +1,1 @@
+export { AuthorGameList } from "./AuthorGameList";
