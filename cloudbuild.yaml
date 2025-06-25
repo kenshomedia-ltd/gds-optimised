@@ -44,7 +44,11 @@ steps:
       - 'REDIS_PORT=${_REDIS_PORT}'
       - '--build-arg'
       - 'REDIS_PASSWORD=${_REDIS_PASSWORD}'
-
+      - '--build-arg'
+      - 'NEXT_PUBLIC_GAMES_API_URL=${_NEXT_PUBLIC_GAMES_API_URL}'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_GAMES_API_TOKEN=${_NEXT_PUBLIC_GAMES_API_TOKEN}'
+  
   # Step 2: Push the Docker image to Google Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
     id: 'Push Docker Image'
@@ -89,6 +93,8 @@ steps:
         NEXT_PUBLIC_MEILISEARCH_INDEX_NAME=${_NEXT_PUBLIC_MEILISEARCH_INDEX_NAME},
         NEXT_PUBLIC_IMAGE_URL=${_NEXT_PUBLIC_IMAGE_URL},
         NEXT_PUBLIC_IMAGE_BUCKET=${_NEXT_PUBLIC_IMAGE_BUCKET},
+        NEXT_PUBLIC_GAMES_API_URL=${_NEXT_PUBLIC_GAMES_API_URL},
+        NEXT_PUBLIC_GAMES_API_TOKEN=${_NEXT_PUBLIC_GAMES_API_TOKEN},
         REDIS_HOST=${_REDIS_HOST},
         REDIS_PORT=${_REDIS_PORT},
         REDIS_PASSWORD=${_REDIS_PASSWORD}
@@ -117,6 +123,8 @@ substitutions:
   _NEXT_PUBLIC_MEILISEARCH_INDEX_NAME: 'your_meili_index'
   _NEXT_PUBLIC_IMAGE_URL: 'http://images.example.com'
   _NEXT_PUBLIC_IMAGE_BUCKET: 'your-image-bucket-name'
+  _NEXT_PUBLIC_GAMES_API_URL: 'https://games.example.com'
+  _NEXT_PUBLIC_GAMES_API_TOKEN: 'your_games_api_token'
   
   # --- Secret/VPC substitutions (Best to configure in trigger) ---
   _REDIS_HOST: '10.0.0.3'
