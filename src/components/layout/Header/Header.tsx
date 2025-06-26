@@ -211,12 +211,11 @@ export function Header({
         isOpen={isFavoritesOpen}
         onClose={() => setIsFavoritesOpen(false)}
         translations={{
-          favoritesTitle: translations.favoritesTitle || "My Favorite Games",
-          noFavorites: translations.noFavorites || "No favorite games yet",
-          noFavoritesDesc:
-            translations.noFavoritesDesc ||
-            "Start adding games to your favorites!",
-          viewAll: translations.viewAll || "View All",
+          favouritesTitle: translations.favouritesTitle,
+          noFavourites: translations.noFavourites,
+          noFavouritesDesc: translations.noFavouritesDesc,
+          viewAll: translations.viewAll,
+          numberInFavs: translations.numberInFavs,
         }}
       />
     </>
