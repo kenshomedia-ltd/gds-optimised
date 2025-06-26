@@ -137,10 +137,16 @@ export function CasinoListWidget({
     }
   }, [filters, shouldShowFilters, showLoadMore, itemsPerPage]);
 
-  // Handle filter changes
-  const handleFilterChange = useCallback((newFilters: CasinoFiltersState) => {
-    setFilters(newFilters);
-  }, []);
+  // Handle filter changes - FIXED: Now accepts Partial<CasinoFiltersState>
+  const handleFilterChange = useCallback(
+    (newFilters: Partial<CasinoFiltersState>) => {
+      setFilters((prevFilters) => ({
+        ...prevFilters,
+        ...newFilters,
+      }));
+    },
+    []
+  );
 
   // Handle clear filters
   const handleClearFilters = useCallback(() => {
@@ -324,7 +330,7 @@ export function CasinoListWidget({
         </div>
 
         {/* Pagination or Load More */}
-        {showLoadMore && !loading && allCasinos.length > itemsPerPage && (
+        {showLoadMore && totalPages > 1 && !loading && (
           <div className="flex justify-center mt-8">
             {block.usePagination ? (
               <Pagination
@@ -342,14 +348,9 @@ export function CasinoListWidget({
                 <button
                   onClick={handleLoadMore}
                   disabled={loading}
-                  className={cn(
-                    "btn btn-secondary min-w-[200px] inline-flex items-center justify-center",
-                    loading && "opacity-50 cursor-not-allowed"
-                  )}
+                  className="btn btn-secondary min-w-[200px] inline-flex items-center justify-center"
                 >
-                  {loading
-                    ? translations.loading || "Loading..."
-                    : translations.loadMore || "Load More"}
+                  {translations.loadMore || "Load More"}
                 </button>
               )
             )}

@@ -56,7 +56,7 @@ export interface CasinoListWidgetProps {
   casinos: CasinoData[];
   translations?: Record<string, string>;
   className?: string;
-  providers?: FilterOption[];
+  providers?: CasinoFilterOption[]; // Changed from FilterOption[] to CasinoFilterOption[]
   showCasinoFilters?: boolean;
   currentPage?: number;
 }
@@ -85,7 +85,7 @@ export interface CasinoListBlock {
   };
 }
 
-// Props for filter option
+// Props for filter option (deprecated - use CasinoFilterOption instead)
 export interface FilterOption {
   id: string | number;
   label: string;
