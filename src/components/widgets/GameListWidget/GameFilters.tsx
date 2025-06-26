@@ -5,7 +5,6 @@ import { useState, useMemo, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChevronDown,
-  faFilter,
   faSearch,
   faTimes,
 } from "@awesome.me/kit-0e07a43543/icons/duotone/light";
@@ -181,13 +180,6 @@ export function GameFilters({
 
         {/* Right Side - Filters and Sort */}
         <div className="flex flex-wrap items-center gap-4">
-          {/* Filter Icon and Label */}
-          <div className="flex items-center gap-2 text-gray-100">
-            <FontAwesomeIcon icon={faFilter} className="h-5 w-5" />
-            <span className="font-medium">
-              {translations?.filter || "Filter by:"}
-            </span>
-          </div>
 
           {/* Sort Dropdown */}
           <div className="relative">

@@ -109,7 +109,6 @@ export function IntroWithImage({
             className={cn(
               "font-bold leading-tight tracking-tight",
               "text-white capitalize",
-              "mb-4 lg:mb-6"
             )}
           >
             {heading}
@@ -117,12 +116,12 @@ export function IntroWithImage({
 
           {/* Time and Author Info */}
           {showContentDate && (
-            <div className="flex flex-wrap items-center gap-4 mb-4">
-              {timeDate && isDateEnabled && (
-                <TimeDate timeDate={timeDate} translations={translations} />
-              )}
-              {authorData && (
-                <HeaderAuthor author={authorData} translations={translations} />
+            <div className="flex flex-wrap items-center gap-4 mt-3">
+              {timeDate && authorData && isDateEnabled && (
+                <>
+                  <TimeDate timeDate={timeDate} translations={translations} />
+                  <HeaderAuthor author={authorData} translations={translations} />
+                </>
               )}
             </div>
           )}
@@ -132,7 +131,7 @@ export function IntroWithImage({
             <div>
               <div
                 className={cn(
-                  "text-base lg:text-md text-white",
+                  "text-base lg:text-md text-white mt-4 lg:mt-6",
                   "leading-relaxed",
                   shouldTruncate &&
                     !isExpanded &&

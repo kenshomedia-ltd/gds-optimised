@@ -207,14 +207,15 @@ export function DynamicBlock({
       );
 
     case "games.new-and-loved-slots":
+      const newAndLovedData =
+        additionalData.dynamicGamesData?.[`block-${blockData.id}`];
+
       return (
         <NewAndLovedSlots
           blockData={blockData as GamesNewAndLovedSlotsBlock}
           translations={translations}
-          newGames={additionalData.dynamicGamesData?.[blockData.id]?.newGames}
-          popularGames={
-            additionalData.dynamicGamesData?.[blockData.id]?.popularGames
-          }
+          newGames={newAndLovedData?.newGames}
+          popularGames={newAndLovedData?.popularGames}
         />
       );
 

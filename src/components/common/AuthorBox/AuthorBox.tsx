@@ -108,7 +108,11 @@ export function AuthorBox({ author, className }: AuthorBoxProps) {
 
           {/* Author Name */}
           <h3 className="text-2xl font-heading font-bold text-gray-900 mb-4">
-            {authorName}
+            <Link
+              href={`/author/${author.firstName.toLowerCase()}.${author.lastName.toLowerCase()}`}
+            >
+              {authorName}
+            </Link>
           </h3>
 
           {/* Professional Details - Mobile */}
@@ -206,9 +210,13 @@ export function AuthorBox({ author, className }: AuthorBoxProps) {
           {/* Right Column: Content */}
           <div className="flex-1">
             {/* Author Name */}
-            <h3 className="text-3xl font-heading font-bold text-gray-900 mb-4">
-              {authorName}
-            </h3>
+            <Link
+              href={`/author/${author.firstName.toLowerCase()}.${author.lastName.toLowerCase()}`}
+            >
+              <h3 className="text-3xl font-heading font-bold text-gray-900 mb-4">
+                {authorName}
+              </h3>
+            </Link>
 
             {/* Professional Details - Desktop */}
             <div className="flex flex-wrap gap-4 mb-6 text-sm">

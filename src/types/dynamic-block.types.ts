@@ -4,10 +4,10 @@ import type { NewAndLovedSlotsBlock } from "./new-and-loved-slots.types";
 import type {
   StrapiImage,
   BlogData,
+  Author,
 } from "./strapi.types";
 import type { GameData } from "./game.types";
 import type { CasinoData } from "./casino.types";
-import { AuthorData } from "./author.types";
 
 // Define Provider and Category interfaces locally since they're not exported from strapi.types
 interface Provider {
@@ -337,7 +337,7 @@ export interface DynamicBlockProps {
       [blockId: string]: CasinoData[];
     };
     showContentDate?: boolean;
-    authorData?: AuthorData;
+    authorData?: Author;
   };
 }
 

@@ -118,6 +118,7 @@ export default async function CustomPage({
       dynamicCasinosData,
       showContentDate: pageData.showContentDate,
       authorData: pageData.author,
+      timeDate: pageData.updatedAt,
     };
 
     // Separate blocks by section with proper typing

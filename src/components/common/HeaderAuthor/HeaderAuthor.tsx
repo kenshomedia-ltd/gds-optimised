@@ -35,7 +35,9 @@ export function HeaderAuthor({
   className,
 }: HeaderAuthorProps) {
   const authorName = `${author.firstName} ${author.lastName}`;
-  const authorLink = author.slug ? `/author/${author.slug}` : null;
+  const authorLink = author.slug
+    ? `/author/${author.firstName.toLowerCase()}.${author.lastName.toLowerCase()}`
+    : null;
 
   const content = (
     <>
