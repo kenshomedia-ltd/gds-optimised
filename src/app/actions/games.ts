@@ -125,39 +125,34 @@ export async function searchGames(searchQuery: string): Promise<GameData[]> {
 
 /**
  * Server action to fetch game filter providers
- * Fetches from layout endpoint's filterProviders
+ * Fetches all providers from slot-providers endpoint
  */
 export async function getFilterProviders(): Promise<FilterOption[]> {
   try {
     const query = {
-      fields: ["id"],
-      populate: {
-        filterProviders: {
-          fields: ["slug"],
-          populate: {
-            images: {
-              fields: ["url"],
-            },
-          },
-        },
+      fields: ["id", "slug", "title"], // Added title field
+      pagination: {
+        pageSize: 1000, // Get all providers
+        page: 1,
       },
+      sort: ["title:asc"], // Sort alphabetically
     };
 
     const response = await strapiClient.fetchWithCache<{
-      data: {
-        filterProviders?: Array<{
-          id: number;
-          slug: string;
-          images?: { url: string };
-        }>;
-      };
-    }>("layout", query, 3600); // Cache for 1 hour
+      data: Array<{
+        id: number;
+        slug: string;
+        title: string;
+      }>;
+    }>("slot-providers", query, 3600); // Cache for 1 hour
 
-    const providers = response.data?.filterProviders || [];
+    // Note: When fetching from slot-providers endpoint,
+    // the providers are in response.data directly, not response.data.filterProviders
+    const providers = response.data || [];
 
     return providers.map((provider) => ({
       id: provider.id,
-      title: provider.slug, // Using slug as title since title field not available
+      title: provider.title || provider.slug, // Use title if available, fallback to slug
       slug: provider.slug,
     }));
   } catch (error) {

@@ -106,7 +106,7 @@ export function Pagination({
               strokeLinejoin="round"
             />
           </svg>
-          {translations.previous || "Back"}
+          {translations.paginationFirst || "Back"}
         </button>
 
         {/* Page numbers */}
@@ -137,7 +137,11 @@ export function Pagination({
                   variant === "compact" && "min-w-[36px] h-9 px-3 text-sm"
                 )}
                 aria-label={`Go to page ${pageNum}`}
-                aria-current={currentPage === pageNum ? "page" : undefined}
+                aria-current={
+                  currentPage === pageNum
+                    ? translations.page || "page"
+                    : undefined
+                }
               >
                 {pageNum}
               </button>
@@ -158,7 +162,7 @@ export function Pagination({
           )}
           aria-label="Next page"
         >
-          {translations.next || "Next"}
+          {translations.paginationLast || "Next"}
           <svg
             width="16"
             height="16"
@@ -186,8 +190,8 @@ export function Pagination({
             variant === "compact" && "text-xs"
           )}
         >
-          {translations.showing || "Showing"} {startItem}-{endItem}{" "}
-          {translations.of || "of"} {totalItems} {itemName}
+          {startItem}-{endItem} {translations.of || "of"} {totalItems}{" "}
+          {itemName}
         </p>
       )}
     </div>

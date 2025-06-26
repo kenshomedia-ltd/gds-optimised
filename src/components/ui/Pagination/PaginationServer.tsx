@@ -114,7 +114,7 @@ export function PaginationServer({
                 strokeLinejoin="round"
               />
             </svg>
-            {translations.previous || "Back"}
+            {translations.paginationFirst || "Back"}
           </Link>
         ) : (
           <span
@@ -140,7 +140,7 @@ export function PaginationServer({
                 strokeLinejoin="round"
               />
             </svg>
-            {translations.previous || "Back"}
+            {translations.paginationFirst || "Back"}
           </span>
         )}
 
@@ -179,7 +179,7 @@ export function PaginationServer({
                       "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/20",
                       variant === "compact" && "min-w-[36px] h-9 px-3 text-sm"
                     )}
-                    aria-label={`Go to page ${pageNum}`}
+                    aria-label={`${translations.goToPage || "Go to page"} ${pageNum}`}
                   >
                     {pageNum}
                   </Link>
@@ -201,7 +201,7 @@ export function PaginationServer({
             )}
             aria-label="Next page"
           >
-            {translations.next || "Next"}
+            {translations.paginationLast || "Next"}
             <svg
               width="16"
               height="16"
@@ -228,7 +228,7 @@ export function PaginationServer({
             )}
             aria-disabled="true"
           >
-            {translations.next || "Next"}
+            {translations.paginationLast || "Next"}
             <svg
               width="16"
               height="16"
@@ -255,7 +255,7 @@ export function PaginationServer({
         itemsPerPage &&
         itemsPerPage > 0 && (
           <p className="text-sm text-gray-600">
-            {translations.showing || "Showing"} {startItem}–{endItem}{" "}
+            {startItem}–{endItem}{" "}
             {translations.of || "of"} {totalItems} {itemName}
           </p>
         )}

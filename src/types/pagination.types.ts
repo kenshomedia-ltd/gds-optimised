@@ -11,6 +11,10 @@ export interface PaginationTranslations {
   loadMore?: string;
   loading?: string;
   noMore?: string;
+  paginationFirst?: string;
+  paginationLast?: string;
+  page?: string;
+  goToPage?: string;
 }
 
 /**

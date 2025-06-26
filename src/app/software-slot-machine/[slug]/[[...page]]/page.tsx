@@ -17,6 +17,7 @@ import { getAllProviderSlugs } from "@/lib/strapi/provider-data-loader";
 import { getLayoutData } from "@/lib/strapi/data-loader";
 import { generateMetadata as generateSEOMetadata } from "@/lib/utils/seo";
 import type { GamesCarouselBlock } from "@/types/dynamic-block.types";
+import { getFilterProviders } from "@/app/actions/games";
 import type { SelectedFilters } from "@/types/game-list-widget.types";
 
 // Force static generation with ISR
@@ -136,7 +137,7 @@ export default async function ProviderPage({
     };
 
     // Fetch all data in parallel
-    const [providerDataResponse, layoutData, sidebarCasinos] =
+    const [providerDataResponse, layoutData, sidebarCasinos, allProviders] =
       await Promise.all([
         getProviderPageDataSplitWithPagination(
           slug,
@@ -148,6 +149,7 @@ export default async function ProviderPage({
         import("@/lib/strapi/casino-sidebar-loader").then((mod) =>
           mod.getCasinoSidebarData({ cached: true })
         ),
+        getFilterProviders(),
       ]);
 
     const { pageData, games, pagination, filterOptions } = providerDataResponse;
@@ -278,7 +280,7 @@ export default async function ProviderPage({
                   block={gamesBlock}
                   games={games}
                   translations={translations}
-                  providers={filterOptions?.providers}
+                  providers={allProviders}
                   categories={filterOptions?.categories}
                   usePagination={true}
                   currentPage={currentPage}

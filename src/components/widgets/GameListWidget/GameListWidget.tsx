@@ -363,7 +363,7 @@ export function GameListWidget({
         showInfo={true}
         totalItems={totalGames}
         itemsPerPage={numberOfGames}
-        itemName="games"
+        itemName={translations.slots || "games"}
         className="mt-8"
       />
     );
@@ -466,7 +466,7 @@ export function GameListWidget({
             showInfo={true}
             totalItems={localTotalGames}
             itemsPerPage={numberOfGames}
-            itemName="games"
+            itemName={translations.slots || "games"}
             translations={translations}
             className="mt-8"
           />

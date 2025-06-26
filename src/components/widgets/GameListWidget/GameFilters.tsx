@@ -1,7 +1,7 @@
 // src/components/widgets/GameListWidget/GameFilters.tsx
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChevronDown,
@@ -19,7 +19,7 @@ import debounce from "lodash.debounce";
  * Provides filtering UI for games by search, providers, categories, and sort order
  * Features:
  * - Search with Meilisearch integration
- * - Multi-select dropdowns for providers and categories
+ * - Multi-select dropdowns for providers and categories with search
  * - Single-select dropdown for sort order
  * - Mobile-responsive design with full-width fields
  * - Clear filters option
@@ -45,6 +45,15 @@ export function GameFilters({
   const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery || "");
   const [isSearching, setIsSearching] = useState(false);
 
+  // Add search states for dropdowns
+  const [providerSearch, setProviderSearch] = useState("");
+  const [categorySearch, setCategorySearch] = useState("");
+
+  // Add refs for click outside detection
+  const providerDropdownRef = useRef<HTMLDivElement>(null);
+  const categoryDropdownRef = useRef<HTMLDivElement>(null);
+  const sortDropdownRef = useRef<HTMLDivElement>(null);
+
   const hasActiveFilters =
     selectedProviders.length > 0 ||
     selectedCategories.length > 0 ||
@@ -68,6 +77,22 @@ export function GameFilters({
     );
     return currentSort?.label || sortOptions[0]?.label || "Sort";
   }, [selectedSort, sortOptions]);
+
+  // Filter providers based on search
+  const filteredProviders = useMemo(() => {
+    if (!providerSearch) return providers;
+    return providers.filter((provider) =>
+      provider.title.toLowerCase().includes(providerSearch.toLowerCase())
+    );
+  }, [providers, providerSearch]);
+
+  // Filter categories based on search
+  const filteredCategories = useMemo(() => {
+    if (!categorySearch) return categories;
+    return categories.filter((category) =>
+      category.title.toLowerCase().includes(categorySearch.toLowerCase())
+    );
+  }, [categories, categorySearch]);
 
   // Debounced search handler
   const debouncedSearch = useMemo(
@@ -106,6 +131,44 @@ export function GameFilters({
     }
   }, [searchQuery]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Clear dropdown searches when dropdowns close
+  useEffect(() => {
+    if (!showProviders) setProviderSearch("");
+  }, [showProviders]);
+
+  useEffect(() => {
+    if (!showCategories) setCategorySearch("");
+  }, [showCategories]);
+
+  // Click outside handlers
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        providerDropdownRef.current &&
+        !providerDropdownRef.current.contains(event.target as Node)
+      ) {
+        setShowProviders(false);
+      }
+      if (
+        categoryDropdownRef.current &&
+        !categoryDropdownRef.current.contains(event.target as Node)
+      ) {
+        setShowCategories(false);
+      }
+      if (
+        sortDropdownRef.current &&
+        !sortDropdownRef.current.contains(event.target as Node)
+      ) {
+        setShowSort(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   // Handle provider selection
   const handleProviderToggle = (providerSlug: string) => {
     const newProviders = selectedProviders.includes(providerSlug)
@@ -142,7 +205,7 @@ export function GameFilters({
         className
       )}
     >
-      <div className="flex flex-col md:flex-row md:items-center gap-4">
+      <div className="flex flex-col md:flex-row md:items-center gap-2">
         {/* Search Bar - Full width on mobile */}
         {onSearchChange && (
           <div className="w-full md:w-80">
@@ -155,7 +218,7 @@ export function GameFilters({
                 type="text"
                 value={localSearchQuery}
                 onChange={(e) => handleSearchChange(e.target.value)}
-                placeholder={translations.searchGames || "Search games..."}
+                placeholder={translations.search || "Search games..."}
                 className={cn(
                   "w-full pl-10 pr-10 py-2 rounded-lg border",
                   "bg-grey-300 border-gray-300 text-gray-900",
@@ -185,14 +248,13 @@ export function GameFilters({
         <div className="hidden md:block flex-1" />
 
         {/* Filter Controls - Stack vertically on mobile, horizontal on desktop */}
-        <div className="flex flex-col md:flex-row gap-4 md:gap-2">
+        <div className="flex flex-col md:flex-row gap-2 md:gap-2">
           {/* Sort Dropdown - Full width on mobile */}
-          <div className="relative w-full md:w-auto">
+          <div className="relative w-full md:w-auto" ref={sortDropdownRef}>
             <button
               onClick={() => setShowSort(!showSort)}
-              onBlur={() => setTimeout(() => setShowSort(false), 200)}
               className={cn(
-                "w-full md:w-auto flex items-center justify-between gap-2 px-4 py-2 rounded-lg border transition-colors",
+                "w-full md:w-auto flex items-center justify-between gap-2 px-4 py-3 rounded-lg border transition-colors",
                 "bg-filter-bkg hover:bg-gray-200",
                 "border-filter-border",
                 showSort && "!rounded-b-none border-b-0"
@@ -230,12 +292,14 @@ export function GameFilters({
 
           {/* Provider Filter - Full width on mobile */}
           {providers.length > 0 && (
-            <div className="relative w-full md:w-auto">
+            <div
+              className="relative w-full md:w-auto"
+              ref={providerDropdownRef}
+            >
               <button
                 onClick={() => setShowProviders(!showProviders)}
-                onBlur={() => setTimeout(() => setShowProviders(false), 200)}
                 className={cn(
-                  "w-full md:w-auto flex items-center justify-between gap-2 px-4 py-2 rounded-lg border transition-colors",
+                  "w-full md:w-auto flex items-center justify-between gap-2 px-4 py-3 rounded-lg border transition-colors",
                   "bg-gray-300 hover:bg-gray-200",
                   selectedProviders.length > 0
                     ? "!bg-filter-bkg border-filter-border"
@@ -261,23 +325,56 @@ export function GameFilters({
               </button>
 
               {showProviders && (
-                <div className="absolute z-50 w-full md:w-64 max-h-80 overflow-y-auto bg-gray-200 rounded-b-lg shadow-lg border border-t-0 border-gray-300">
-                  {providers.map((provider) => (
-                    <label
-                      key={provider.slug}
-                      className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedProviders.includes(provider.slug)}
-                        onChange={() => handleProviderToggle(provider.slug)}
-                        className="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary"
+                <div className="absolute z-50 w-full md:w-64 bg-gray-200 rounded-b-lg shadow-lg border border-t-0 border-gray-300">
+                  {/* Search input for providers */}
+                  <div className="p-2 border-b border-gray-300">
+                    <div className="relative">
+                      <FontAwesomeIcon
+                        icon={faSearch}
+                        className="absolute left-2 top-1/2 -translate-y-1/2 h-3 w-3 text-gray-500"
                       />
-                      <span className="text-sm md:text-base">
-                        {provider.title}
-                      </span>
-                    </label>
-                  ))}
+                      <input
+                        type="text"
+                        value={providerSearch}
+                        onChange={(e) => setProviderSearch(e.target.value)}
+                        placeholder={
+                          translations.searchProviders || "Search providers..."
+                        }
+                        className={cn(
+                          "w-full pl-7 pr-2 py-1.5 text-sm rounded border",
+                          "bg-white border-gray-300 text-gray-900",
+                          "placeholder:text-gray-500 focus:outline-none",
+                          "focus:ring-1 focus:ring-primary focus:border-transparent"
+                        )}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Provider list */}
+                  <div className="max-h-64 overflow-y-auto">
+                    {filteredProviders.length > 0 ? (
+                      filteredProviders.map((provider) => (
+                        <label
+                          key={provider.slug}
+                          className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedProviders.includes(provider.slug)}
+                            onChange={() => handleProviderToggle(provider.slug)}
+                            className="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary"
+                          />
+                          <span className="text-sm md:text-base">
+                            {provider.title}
+                          </span>
+                        </label>
+                      ))
+                    ) : (
+                      <div className="px-4 py-3 text-sm text-gray-500">
+                        {translations.noResults || "No providers found"}
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
@@ -285,12 +382,14 @@ export function GameFilters({
 
           {/* Category Filter - Full width on mobile */}
           {categories.length > 0 && (
-            <div className="relative w-full md:w-auto">
+            <div
+              className="relative w-full md:w-auto"
+              ref={categoryDropdownRef}
+            >
               <button
                 onClick={() => setShowCategories(!showCategories)}
-                onBlur={() => setTimeout(() => setShowCategories(false), 200)}
                 className={cn(
-                  "w-full md:w-auto flex items-center justify-between gap-2 px-4 py-2 rounded-lg border transition-colors",
+                  "w-full md:w-auto flex items-center justify-between gap-2 px-4 py-3 rounded-lg border transition-colors",
                   "bg-gray-300 hover:bg-gray-200",
                   selectedCategories.length > 0
                     ? "!bg-filter-bkg border-filter-border"
@@ -316,23 +415,57 @@ export function GameFilters({
               </button>
 
               {showCategories && (
-                <div className="absolute z-50 w-full md:w-64 max-h-80 overflow-y-auto bg-gray-200 rounded-b-lg shadow-lg border border-t-0 border-gray-300">
-                  {categories.map((category) => (
-                    <label
-                      key={category.slug}
-                      className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedCategories.includes(category.slug)}
-                        onChange={() => handleCategoryToggle(category.slug)}
-                        className="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary"
+                <div className="absolute z-50 w-full md:w-64 bg-gray-200 rounded-b-lg shadow-lg border border-t-0 border-gray-300">
+                  {/* Search input for categories */}
+                  <div className="p-2 border-b border-gray-300">
+                    <div className="relative">
+                      <FontAwesomeIcon
+                        icon={faSearch}
+                        className="absolute left-2 top-1/2 -translate-y-1/2 h-3 w-3 text-gray-500"
                       />
-                      <span className="text-sm md:text-base">
-                        {category.title}
-                      </span>
-                    </label>
-                  ))}
+                      <input
+                        type="text"
+                        value={categorySearch}
+                        onChange={(e) => setCategorySearch(e.target.value)}
+                        placeholder={
+                          translations.searchCategories ||
+                          "Search categories..."
+                        }
+                        className={cn(
+                          "w-full pl-7 pr-2 py-1.5 text-sm rounded border",
+                          "bg-white border-gray-300 text-gray-900",
+                          "placeholder:text-gray-500 focus:outline-none",
+                          "focus:ring-1 focus:ring-primary focus:border-transparent"
+                        )}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Category list */}
+                  <div className="max-h-64 overflow-y-auto">
+                    {filteredCategories.length > 0 ? (
+                      filteredCategories.map((category) => (
+                        <label
+                          key={category.slug}
+                          className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedCategories.includes(category.slug)}
+                            onChange={() => handleCategoryToggle(category.slug)}
+                            className="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary"
+                          />
+                          <span className="text-sm md:text-base">
+                            {category.title}
+                          </span>
+                        </label>
+                      ))
+                    ) : (
+                      <div className="px-4 py-3 text-sm text-gray-500">
+                        {translations.noResults || "No categories found"}
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
@@ -348,7 +481,7 @@ export function GameFilters({
                 "text-sm md:text-base font-medium"
               )}
             >
-              {translations.clearFilters || "Clear All"}
+              {translations.clear || "Clear All"}
             </button>
           )}
         </div>
