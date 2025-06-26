@@ -21,7 +21,7 @@ interface SubNavProps {
 export function SubNav({ navigation }: SubNavProps) {
   return (
     <nav
-      className="hidden lg:flex h-9 items-center justify-center bg-subnavbar-bkg"
+      className="flex lg:hidden h-9 items-center justify-center bg-subnavbar-bkg"
       aria-label="Secondary navigation"
     >
       <div className="flex items-center space-x-1">

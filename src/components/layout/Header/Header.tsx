@@ -18,6 +18,7 @@ import { MainNav } from "./MainNav";
 import { MobileMenu } from "./MobileMenu";
 import type { HeaderProps } from "@/types/header.types";
 import { cn } from "@/lib/utils/cn";
+import { SubNav } from "./SubNav";
 
 /**
  * Main Header Component
@@ -195,6 +196,9 @@ export function Header({
             </Link>
           </div>
         </nav>
+
+        {/* Sub Navigation - Mobile only */}
+        {subNavigation.length > 0 && <SubNav navigation={subNavigation} />}
       </header>
 
       {/* Mobile Menu */}

@@ -92,6 +92,7 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
 
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [isDropdownExpanded, setIsDropdownExpanded] = useState(false);
 
   // Check for mobile device
   useEffect(() => {
@@ -155,6 +156,11 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
     } catch (error) {
       console.error("Fullscreen error:", error);
     }
+  };
+
+  // Handle dropdown toggle
+  const toggleDropdown = () => {
+    setIsDropdownExpanded(!isDropdownExpanded);
   };
 
   const handleReportGame = () => {
@@ -303,35 +309,53 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
       >
         {/* Floating close button for fullscreen */}
         {isFullscreen && (
-          <div className="absolute top-5 right-5 z-[999] flex flex-col bg-background-800/90 rounded-lg overflow-hidden hover:h-auto h-10">
+          <div
+            className={cn(
+              "absolute top-5 right-5 z-[999] flex flex-col bg-background-800/90 rounded-lg overflow-hidden transition-all duration-300",
+              isDropdownExpanded ? "h-auto" : "h-10"
+            )}
+            onMouseEnter={() => setIsDropdownExpanded(true)}
+            onMouseLeave={() => setIsDropdownExpanded(false)}
+          >
             <div className="flex flex-col p-2.5 gap-1">
               <button
-                className="w-[30px] h-[30px] rounded-full border border-gameplayer-meta-btn-border flex items-center justify-center"
-                onClick={() => {}}
+                className="w-[30px] h-[30px] rounded-full border bg-gray-300 border-gray-400 flex items-center justify-center"
+                onClick={toggleDropdown}
               >
                 <FontAwesomeIcon
                   icon={faChevronDown}
-                  className="w-4 h-4 fill-none"
+                  className={cn(
+                    "w-4 h-4 transition-transform duration-200 text-black",
+                    isDropdownExpanded && "rotate-180"
+                  )}
                   style={{ "--fa-secondary-opacity": 0 }}
                 />
               </button>
               <button
-                className="w-[30px] h-[30px] rounded-full border border-gameplayer-meta-btn-border flex items-center justify-center"
+                className="w-[30px] h-[30px] rounded-full border bg-gray-300 border-gray-400 flex items-center justify-center"
                 onClick={handleReload}
               >
                 <FontAwesomeIcon
                   icon={faRotateRight}
-                  className="w-4 h-4"
+                  className="w-4 h-4 text-black"
                   style={{ "--fa-secondary-opacity": 0 }}
                 />
               </button>
+              <FavoriteButton
+                gameId={game.id}
+                gameTitle={game.title}
+                game={normalizedGame}
+                translations={translations}
+                size="sm"
+                className="!w-[30px] !h-[30px] bg-gray-300 hover:!bg-gray-400  border !border-gray-400"
+              />
               <button
-                className="w-[30px] h-[30px] rounded-full border border-gameplayer-meta-btn-border flex items-center justify-center"
+                className="w-[30px] h-[30px] rounded-full border bg-gray-300 border-gray-400 flex items-center justify-center"
                 onClick={handleFullscreen}
               >
                 <FontAwesomeIcon
                   icon={faExpand}
-                  className="w-4 h-4"
+                  className="w-4 h-4 text-black"
                   style={{ "--fa-secondary-opacity": 0 }}
                 />
               </button>
@@ -466,6 +490,7 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
                 <FontAwesomeIcon
                   icon={faRotateRight}
                   className="w-4 h-4 text-gray-600"
+                  style={{ "--fa-secondary-opacity": 0 }}
                 />
               </button>
               {showReloadTooltip && (
@@ -487,6 +512,7 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
                 <FontAwesomeIcon
                   icon={faExpand}
                   className="w-4 h-4 text-gray-600"
+                  style={{ "--fa-secondary-opacity": 0 }}
                 />
               </button>
               {showFullscreenTooltip && (
@@ -543,6 +569,7 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
                 <FontAwesomeIcon
                   icon={faExclamationTriangle}
                   className="w-4 h-4 text-white"
+                  style={{ "--fa-secondary-opacity": 0 }}
                 />
               </button>
               {showReportTooltip && (
