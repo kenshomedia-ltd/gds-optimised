@@ -6,53 +6,90 @@ import { cache } from "react";
 
 // Lazy-initialized Redis instance
 let redis: Redis | null = null;
+let connectionAttempted = false;
+let connectionFailed = false;
 
 /**
  * Get or create Redis connection
  * This ensures the connection is created after environment variables are available
  */
-function getRedisClient(): Redis {
-  if (!redis) {
+function getRedisClient(): Redis | null {
+  // If we've already tried and failed, don't keep retrying
+  if (connectionFailed) {
+    return null;
+  }
+
+  if (!redis && !connectionAttempted) {
+    connectionAttempted = true;
+
     const redisHost = process.env.REDIS_HOST || "localhost";
     const redisPort = parseInt(process.env.REDIS_PORT || "6379");
     const redisPassword = process.env.REDIS_PASSWORD;
 
+    // During build time, Redis won't be available
+    if (process.env.NODE_ENV === "production" && !process.env.REDIS_HOST) {
+      console.log(
+        "[Redis] No REDIS_HOST configured, skipping Redis initialization"
+      );
+      connectionFailed = true;
+      return null;
+    }
+
     console.log(`[Redis] Initializing connection to ${redisHost}:${redisPort}`);
 
-    redis = new Redis({
-      host: redisHost,
-      port: redisPort,
-      password: redisPassword,
-      maxRetriesPerRequest: 3,
-      enableReadyCheck: true,
-      enableOfflineQueue: true,
-      // Connection pool settings for better performance
-      lazyConnect: true,
-      connectTimeout: 10000,
-      disconnectTimeout: 2000,
-      commandTimeout: 5000,
-      // Enable pipelining for better performance
-      enableAutoPipelining: true,
-      // Retry strategy
-      retryStrategy: (times) => {
-        const delay = Math.min(times * 50, 2000);
-        console.log(`[Redis] Retry attempt ${times}, waiting ${delay}ms`);
-        return delay;
-      },
-    });
+    try {
+      redis = new Redis({
+        host: redisHost,
+        port: redisPort,
+        password: redisPassword,
+        maxRetriesPerRequest: 3,
+        enableReadyCheck: true,
+        enableOfflineQueue: false, // Don't queue commands if not connected
+        lazyConnect: false, // Try to connect immediately
+        connectTimeout: 5000, // Fail fast during build
+        disconnectTimeout: 2000,
+        commandTimeout: 5000,
+        enableAutoPipelining: true,
+        // Retry strategy with limited attempts
+        retryStrategy: (times) => {
+          if (times > 5) {
+            console.error("[Redis] Max retries reached, giving up");
+            connectionFailed = true;
+            return null; // Stop retrying
+          }
+          const delay = Math.min(times * 50, 2000);
+          console.log(`[Redis] Retry attempt ${times}, waiting ${delay}ms`);
+          return delay;
+        },
+      });
 
-    // Add event handlers for debugging
-    redis.on("connect", () => {
-      console.log(`[Redis] Connected to ${redisHost}:${redisPort}`);
-    });
+      // Add event handlers for debugging
+      redis.on("connect", () => {
+        console.log(`[Redis] Connected to ${redisHost}:${redisPort}`);
+        connectionFailed = false;
+      });
 
-    redis.on("error", (err) => {
-      console.error("[Redis] Connection error:", err);
-    });
+      redis.on("error", (err) => {
+        console.error("[Redis] Connection error:", err);
+        // Don't mark as failed on transient errors if we've connected before
+        if (!redis?.status || redis.status === "close") {
+          connectionFailed = true;
+        }
+      });
 
-    redis.on("ready", () => {
-      console.log("[Redis] Ready to accept commands");
-    });
+      redis.on("ready", () => {
+        console.log("[Redis] Ready to accept commands");
+        connectionFailed = false;
+      });
+
+      redis.on("close", () => {
+        console.log("[Redis] Connection closed");
+      });
+    } catch (error) {
+      console.error("[Redis] Failed to initialize:", error);
+      connectionFailed = true;
+      redis = null;
+    }
   }
 
   return redis;
@@ -118,6 +155,10 @@ export class CacheManager {
   async get<T>(key: string): Promise<{ data: T | null; isStale: boolean }> {
     try {
       const client = getRedisClient();
+      if (!client) {
+        return { data: null, isStale: false };
+      }
+
       const cached = await client.get(key);
       if (!cached) {
         return { data: null, isStale: false };
@@ -151,6 +192,10 @@ export class CacheManager {
   ): Promise<void> {
     try {
       const client = getRedisClient();
+      if (!client) {
+        return; // Silently fail if Redis is not available
+      }
+
       const { ttl = 300, swr = 600 } = options;
       const cacheData = {
         data,
@@ -172,6 +217,10 @@ export class CacheManager {
   async delete(pattern: string): Promise<void> {
     try {
       const client = getRedisClient();
+      if (!client) {
+        return;
+      }
+
       const keys = await client.keys(pattern);
       if (keys.length > 0) {
         await client.del(...keys);
@@ -187,6 +236,10 @@ export class CacheManager {
   async mget<T>(keys: string[]): Promise<Map<string, T>> {
     try {
       const client = getRedisClient();
+      if (!client) {
+        return new Map();
+      }
+
       const values = await client.mget(keys);
       const result = new Map<string, T>();
 
@@ -213,6 +266,10 @@ export class CacheManager {
    */
   async warmCache(entries: CacheEntry[]): Promise<void> {
     const client = getRedisClient();
+    if (!client) {
+      return;
+    }
+
     const pipeline = client.pipeline();
 
     for (const { key, data, options } of entries) {
@@ -231,6 +288,14 @@ export class CacheManager {
     } catch (error) {
       console.error("Cache warm error:", error);
     }
+  }
+
+  /**
+   * Check if Redis is available
+   */
+  isAvailable(): boolean {
+    const client = getRedisClient();
+    return client !== null && client.status === "ready";
   }
 }
 
@@ -325,6 +390,12 @@ export function cachedFetch<T>(
  * Prefetch and warm cache for critical data
  */
 export async function prefetchCriticalData(paths: string[]): Promise<void> {
+  // Only attempt if Redis is available
+  if (!cacheManager.isAvailable()) {
+    console.log("[Cache] Redis not available, skipping prefetch");
+    return;
+  }
+
   // Explicitly type the entries array
   const entries: CacheEntry[] = [];
 
@@ -358,6 +429,10 @@ export async function closeRedisConnection(): Promise<void> {
       console.log("[Redis] Connection closed gracefully");
     } catch (error) {
       console.error("[Redis] Error closing connection:", error);
+    } finally {
+      redis = null;
+      connectionAttempted = false;
+      connectionFailed = false;
     }
   }
 }

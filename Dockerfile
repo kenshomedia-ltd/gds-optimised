@@ -11,7 +11,6 @@ COPY package.json package-lock.json* ./
 COPY .npmrc* ./
 
 # Install dependencies with cache mount
-# --- MODIFIED LINE ---
 RUN --mount=type=cache,target=/root/.npm sh -c "npm cache verify && npm ci --only=production"
 
 # Stage 2: Builder
@@ -21,7 +20,6 @@ WORKDIR /app
 # Copy package files and install all dependencies (including dev)
 COPY package.json package-lock.json* ./
 COPY .npmrc* ./
-# --- MODIFIED LINE ---
 RUN --mount=type=cache,target=/root/.npm sh -c "npm cache verify && npm ci"
 
 # Copy source code
@@ -57,9 +55,8 @@ ENV NEXT_PUBLIC_IMAGE_BUCKET=$NEXT_PUBLIC_IMAGE_BUCKET
 ENV NEXT_PUBLIC_GAMES_API_URL=$NEXT_PUBLIC_GAMES_API_URL
 ENV NEXT_PUBLIC_GAMES_API_TOKEN=$NEXT_PUBLIC_GAMES_API_TOKEN
 
-# --- REMOVED RUNTIME SECRETS ---
-# ARG REDIS_HOST, REDIS_PORT, REDIS_PASSWORD and their ENV counterparts have been removed.
-# They are not needed for the build and should not be baked into the image.
+# IMPORTANT: Do NOT set REDIS_* variables at build time
+# They should only be set at runtime via Cloud Run
 
 # Disable telemetry during build
 ENV NEXT_TELEMETRY_DISABLED=1
@@ -92,8 +89,8 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 
-# The critical runtime variables (REDIS_HOST, API tokens, etc.) will be
-# injected by Cloud Run via the cloudbuild.yaml 'set-env-vars' flag.
+# The critical runtime variables (REDIS_HOST, REDIS_PORT, REDIS_PASSWORD) 
+# will be injected by Cloud Run via the cloudbuild.yaml 'set-env-vars' flag.
 # There is no need to declare them here.
 
 # A more robust healthcheck

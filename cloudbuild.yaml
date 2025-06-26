@@ -5,9 +5,7 @@ steps:
   # Step 1: Build the Docker image
   - name: 'gcr.io/cloud-builders/docker'
     id: 'Build Docker Image'
-    # ---- ADD THIS LINE ----
     env: ['DOCKER_BUILDKIT=1']
-    # -----------------------
     args:
       - 'build'
       - '-t'
@@ -15,7 +13,8 @@ steps:
       - '.' # Docker context
       - '-f'
       - 'Dockerfile'
-      # Pass substitutions as build arguments to the Dockerfile
+      # Pass ONLY PUBLIC substitutions as build arguments to the Dockerfile
+      # Redis connection details are NOT needed at build time
       - '--build-arg'
       - 'NEXT_PUBLIC_API_URL=${_NEXT_PUBLIC_API_URL}'
       - '--build-arg'
@@ -39,15 +38,10 @@ steps:
       - '--build-arg'
       - 'NEXT_PUBLIC_IMAGE_BUCKET=${_NEXT_PUBLIC_IMAGE_BUCKET}'
       - '--build-arg'
-      - 'REDIS_HOST=${_REDIS_HOST}'
-      - '--build-arg'
-      - 'REDIS_PORT=${_REDIS_PORT}'
-      - '--build-arg'
-      - 'REDIS_PASSWORD=${_REDIS_PASSWORD}'
-      - '--build-arg'
       - 'NEXT_PUBLIC_GAMES_API_URL=${_NEXT_PUBLIC_GAMES_API_URL}'
       - '--build-arg'
       - 'NEXT_PUBLIC_GAMES_API_TOKEN=${_NEXT_PUBLIC_GAMES_API_TOKEN}'
+      # REMOVED Redis build args - they should only be set at runtime
   
   # Step 2: Push the Docker image to Google Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
