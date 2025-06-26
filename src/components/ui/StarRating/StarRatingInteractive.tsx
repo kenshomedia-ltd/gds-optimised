@@ -146,7 +146,7 @@ export function StarRatingInteractive({
   );
 
   return (
-    <div className={className}>
+    <div className={`flex flex-col gap-2 items-center ${className}`}>
       <div className="flex items-center gap-3">
         <StarRating
           initialRating={userRating !== null ? userRating : currentRating}
@@ -176,7 +176,7 @@ export function StarRatingInteractive({
         )}
       </div>
 
-      <div className="flex items-center gap-2 text-sm">
+      <div className="flex items-center gap-2 text-xs">
         <span className="font-medium text-gray-700">
           {currentRating.toFixed(1)}/5
         </span>

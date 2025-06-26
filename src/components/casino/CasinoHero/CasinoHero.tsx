@@ -15,7 +15,8 @@ import {
 import { Collapsible } from "@/components/ui/Collapsible";
 import type { CasinoPageData } from "@/types/casino-page.types";
 import type { BonusSection } from "@/types/casino.types";
-import { Button, StarRating } from "@/components/ui";
+import { Button } from "@/components/ui";
+import { StarRatingInteractive } from "@/components/ui/StarRating/StarRatingInteractive";
 
 interface CasinoHeroProps {
   casino: CasinoPageData;
@@ -70,18 +71,6 @@ export function CasinoHero({ casino, translations }: CasinoHeroProps) {
   const reloadBonus = formatBonus(casino.bonusSection);
   const noDepositBonus = formatNoDepositBonus();
 
-  // Handle rating change
-  const handleRatingChange = async (newRating: number) => {
-    // TODO: Implement the API call to update the rating
-    console.log(`New rating for casino ${casino.id}: ${newRating}`);
-    // You would typically call an API endpoint here to save the rating
-    // Example:
-    // await fetch('/api/casino-ratings', {
-    //   method: 'POST',
-    //   body: JSON.stringify({ casinoId: casino.id, rating: newRating }),
-    // });
-  };
-
   return (
     <div className="casino-hero-section bg-gradient-to-b from-background-900 via-background-700 to-background-500 rounded-b-3xl pb-3">
       <div className="container mx-auto px-4">
@@ -118,14 +107,15 @@ export function CasinoHero({ casino, translations }: CasinoHeroProps) {
 
             {/* Rating */}
             <div className="mt-4 flex flex-col items-center justify-center">
-              <StarRating
+              <StarRatingInteractive
+                documentId={casino.documentId}
+                slug={casino.slug}
                 initialRating={casino.ratingAvg}
-                maxRating={5}
+                initialCount={casino.ratingCount}
                 size="md"
-                showValue={true}
-                valuePosition="bottom"
-                onRatingChange={handleRatingChange}
-                ariaLabel={`Rate ${casino.title}`}
+                ratingType="casinos"
+                itemTitle={casino.title}
+                showCount={true}
               />
               <a
                 href="#casino-review"
