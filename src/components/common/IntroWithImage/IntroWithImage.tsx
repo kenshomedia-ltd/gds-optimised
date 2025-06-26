@@ -70,8 +70,6 @@ export function IntroWithImage({
 }: IntroWithImageProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  console.log("authorData", authorData);
-
   // Process image data - handle both nested and direct structures
   const imageData = extractImageData(image);
   const imageUrl = imageData?.url;

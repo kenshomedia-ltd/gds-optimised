@@ -226,14 +226,6 @@ export default async function ProviderPage({
         : []),
     ];
 
-    console.log("Provider page - Before GameListWidget:", {
-      currentPage,
-      "pagination.pageCount": pagination.pageCount,
-      "pagination.total": pagination.total,
-      "games.length": games.length,
-      baseUrl: `/software-slot-machine/${slug}`,
-    });
-
     return (
       <>
         {/* Structured Data */}

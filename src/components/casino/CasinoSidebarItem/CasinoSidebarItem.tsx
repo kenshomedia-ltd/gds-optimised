@@ -31,8 +31,6 @@ export function CasinoSidebarItem({
     }
   };
 
-  console.log("casino", casino);
-
   const bonusText = getBonusText();
 
   return (

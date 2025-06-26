@@ -107,8 +107,6 @@ export default async function CustomPage({
 
     const { translations } = layoutData;
 
-    console.log("pageData", pageData);
-
     // Additional data for blocks
     const additionalData = {
       games,

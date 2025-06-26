@@ -89,8 +89,6 @@ class StrapiClient {
 
     // Fetch from API
     const data = await this.fetch<T>(endpoint, query);
-
-    console.log("data", data, query);
     
     // Cache the result
     if (ttl && ttl > 0) {

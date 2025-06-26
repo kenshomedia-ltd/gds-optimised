@@ -21,7 +21,7 @@ import debounce from "lodash.debounce";
  * - Search with Meilisearch integration
  * - Multi-select dropdowns for providers and categories
  * - Single-select dropdown for sort order
- * - Mobile-responsive design
+ * - Mobile-responsive design with full-width fields
  * - Clear filters option
  * - Accessible keyboard navigation
  */
@@ -54,146 +54,151 @@ export function GameFilters({
   const sortOptions = GAME_SORT_OPTIONS.map((option) => ({
     value: option.value,
     label:
-      translations?.[`sort${option.value.replace(/\s+/g, "")}`] || option.label,
+      translations?.[option.label] ||
+      option.label
+        .replace(/^sort/, "")
+        .replace(/([A-Z])/g, " $1")
+        .trim(),
   }));
 
-  // Debounced search function
+  // Get current sort label
+  const currentSortLabel = useMemo(() => {
+    const currentSort = sortOptions.find(
+      (option) => option.value === selectedSort
+    );
+    return currentSort?.label || sortOptions[0]?.label || "Sort";
+  }, [selectedSort, sortOptions]);
+
+  // Debounced search handler
   const debouncedSearch = useMemo(
     () =>
-    debounce(async (query: string) => {
-      if (onSearchChange) {
-        setIsSearching(true);
-        try {
-          // Perform Meilisearch query if needed for autocomplete
-          // For now, just pass the query to parent
+      debounce((query: string) => {
+        setIsSearching(false);
+        if (onSearchChange) {
           onSearchChange(query);
-        } catch (error) {
-          console.error("Search error:", error);
-        } finally {
-          setIsSearching(false);
         }
-      }
-    }, 300),
+      }, 300),
     [onSearchChange]
   );
 
-  // Handle search input change
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+  // Handle search input changes
+  const handleSearchChange = (value: string) => {
     setLocalSearchQuery(value);
-    debouncedSearch(value);
+    if (onSearchChange) {
+      setIsSearching(true);
+      debouncedSearch(value);
+    }
   };
 
   // Clear search
   const clearSearch = () => {
     setLocalSearchQuery("");
+    setIsSearching(false);
     if (onSearchChange) {
       onSearchChange("");
     }
   };
 
-  const handleProviderToggle = (slug: string) => {
-    if (selectedProviders.includes(slug)) {
-      onProviderChange(selectedProviders.filter((p) => p !== slug));
-    } else {
-      onProviderChange([...selectedProviders, slug]);
+  // Effect to sync external search query changes
+  useEffect(() => {
+    if (searchQuery !== undefined && searchQuery !== localSearchQuery) {
+      setLocalSearchQuery(searchQuery);
     }
+  }, [searchQuery]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Handle provider selection
+  const handleProviderToggle = (providerSlug: string) => {
+    const newProviders = selectedProviders.includes(providerSlug)
+      ? selectedProviders.filter((p) => p !== providerSlug)
+      : [...selectedProviders, providerSlug];
+    onProviderChange(newProviders);
   };
 
-  const handleCategoryToggle = (slug: string) => {
-    if (selectedCategories.includes(slug)) {
-      onCategoryChange(selectedCategories.filter((c) => c !== slug));
-    } else {
-      onCategoryChange([...selectedCategories, slug]);
-    }
+  // Handle category selection
+  const handleCategoryToggle = (categorySlug: string) => {
+    const newCategories = selectedCategories.includes(categorySlug)
+      ? selectedCategories.filter((c) => c !== categorySlug)
+      : [...selectedCategories, categorySlug];
+    onCategoryChange(newCategories);
   };
 
-  const handleSortSelect = (value: string) => {
-    onSortChange(value);
+  // Handle sort selection
+  const handleSortSelect = (sortValue: string) => {
+    onSortChange(sortValue);
     setShowSort(false);
   };
 
+  // Clear all filters
   const clearAllFilters = () => {
     onProviderChange([]);
     onCategoryChange([]);
     clearSearch();
   };
 
-  // Get current sort label
-  const currentSortLabel =
-    sortOptions.find((opt) => opt.value === selectedSort)?.label ||
-    sortOptions[0].label;
-
-  // Sync local search with prop
-  useEffect(() => {
-    setLocalSearchQuery(searchQuery || "");
-  }, [searchQuery]);
-
   return (
     <div
       className={cn(
-        "bg-white/30 rounded-lg backdrop-blur-sm relative z-10 border border-white/30 shadow-sm p-4",
+        "bg-white/30 rounded-lg backdrop-blur-sm relative z-10 border border-white/30 shadow-sm p-3",
         className
       )}
     >
-      <div className="flex flex-wrap items-center gap-4">
-        {/* Search Bar - Left Side */}
-        <div className="flex-1 min-w-[200px] max-w-md">
-          <div className="relative text-gray-700">
-            <FontAwesomeIcon
-              icon={faSearch}
-              className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-700"
-            />
-            <input
-              type="text"
-              value={localSearchQuery}
-              onChange={handleSearchChange}
-              placeholder={translations?.search || "Search games..."}
-              className={cn(
-                "w-full pl-10 pr-8 py-2 rounded-lg border transition-colors",
-                "bg-gray-300 placeholder-gray-500 border-gray-300",
-                "hover:border-gray-400 hover:bg-gray-200",
-                "focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+      <div className="flex flex-col md:flex-row md:items-center gap-4">
+        {/* Search Bar - Full width on mobile */}
+        {onSearchChange && (
+          <div className="w-full md:w-80">
+            <div className="relative">
+              <FontAwesomeIcon
+                icon={faSearch}
+                className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500"
+              />
+              <input
+                type="text"
+                value={localSearchQuery}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                placeholder={translations.searchGames || "Search games..."}
+                className={cn(
+                  "w-full pl-10 pr-10 py-2 rounded-lg border",
+                  "bg-grey-300 border-gray-300 text-gray-900",
+                  "placeholder:text-gray-500 focus:outline-none",
+                  "focus:ring-2 focus:ring-primary focus:border-transparent"
+                )}
+              />
+              {localSearchQuery && (
+                <button
+                  onClick={clearSearch}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  aria-label="Clear search"
+                >
+                  <FontAwesomeIcon icon={faTimes} className="h-4 w-4" />
+                </button>
               )}
-            />
-            {localSearchQuery && (
-              <button
-                onClick={clearSearch}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-700"
-              >
-                <FontAwesomeIcon
-                  icon={faTimes}
-                  className="h-4 w-4 text-gray-700"
-                />
-              </button>
-            )}
-            {isSearching && (
-              <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                <div className="h-4 w-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-              </div>
-            )}
+              {isSearching && (
+                <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                  <div className="h-4 w-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Spacer to push filters to the right */}
-        <div className="flex-1" />
+        {/* Spacer to push filters to the right on desktop */}
+        <div className="hidden md:block flex-1" />
 
-        {/* Right Side - Filters and Sort */}
-        <div className="flex flex-wrap items-center gap-4">
-
-          {/* Sort Dropdown */}
-          <div className="relative">
+        {/* Filter Controls - Stack vertically on mobile, horizontal on desktop */}
+        <div className="flex flex-col md:flex-row gap-4 md:gap-2">
+          {/* Sort Dropdown - Full width on mobile */}
+          <div className="relative w-full md:w-auto">
             <button
               onClick={() => setShowSort(!showSort)}
               onBlur={() => setTimeout(() => setShowSort(false), 200)}
               className={cn(
-                "flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors",
-                "bg-filter-bkg",
+                "w-full md:w-auto flex items-center justify-between gap-2 px-4 py-2 rounded-lg border transition-colors",
+                "bg-filter-bkg hover:bg-gray-200",
                 "border-filter-border",
-                showSort && "!rounded-b-none"
+                showSort && "!rounded-b-none border-b-0"
               )}
             >
-              <span>{translations?.[currentSortLabel]}</span>
+              <span className="text-sm md:text-base">{currentSortLabel}</span>
               <FontAwesomeIcon
                 icon={faChevronDown}
                 className={cn(
@@ -204,41 +209,47 @@ export function GameFilters({
             </button>
 
             {showSort && (
-              <div className="absolute z-50 w-48 bg-gray-300 hover:bg-gray-200 rounded-b-lg shadow-lg border border-gray-300">
+              <div className="absolute z-50 w-full md:w-48 bg-gray-200 rounded-b-lg shadow-lg border border-t-0 border-gray-300">
                 {sortOptions.map((option) => (
                   <button
                     key={option.value}
                     onClick={() => handleSortSelect(option.value)}
                     className={cn(
-                      "w-full text-left px-4 py-2 bg-gray-300 hover:bg-gray-200 transition-colors",
-                      selectedSort === option.value && "bg-gray-100 font-medium"
+                      "w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors",
+                      "text-sm md:text-base",
+                      selectedSort === option.value &&
+                        "bg-gray-100 dark:bg-gray-700 font-medium"
                     )}
                   >
-                    {translations?.[option.label]}
+                    {option.label}
                   </button>
                 ))}
               </div>
             )}
           </div>
 
-          {/* Provider Filter */}
+          {/* Provider Filter - Full width on mobile */}
           {providers.length > 0 && (
-            <div className="relative">
+            <div className="relative w-full md:w-auto">
               <button
                 onClick={() => setShowProviders(!showProviders)}
                 onBlur={() => setTimeout(() => setShowProviders(false), 200)}
                 className={cn(
-                  "flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors",
+                  "w-full md:w-auto flex items-center justify-between gap-2 px-4 py-2 rounded-lg border transition-colors",
                   "bg-gray-300 hover:bg-gray-200",
                   selectedProviders.length > 0
                     ? "!bg-filter-bkg border-filter-border"
-                    : "border-gray-300"
+                    : "border-gray-300",
+                  showProviders && "!rounded-b-none border-b-0"
                 )}
               >
-                <span>
-                  {translations?.providers || "Providers"}
-                  {selectedProviders.length > 0 &&
-                    ` (${selectedProviders.length})`}
+                <span className="text-sm md:text-base">
+                  {translations.providers || "Providers"}
+                  {selectedProviders.length > 0 && (
+                    <span className="ml-1 text-xs font-medium bg-primary text-white px-1.5 py-0.5 rounded-full">
+                      {selectedProviders.length}
+                    </span>
+                  )}
                 </span>
                 <FontAwesomeIcon
                   icon={faChevronDown}
@@ -250,19 +261,21 @@ export function GameFilters({
               </button>
 
               {showProviders && (
-                <div className="absolute z-50 mt-2 w-64 bg-gray-300 hover:bg-gray-200 rounded-lg shadow-lg border border-gray-300 max-h-64 overflow-y-auto">
+                <div className="absolute z-50 w-full md:w-64 max-h-80 overflow-y-auto bg-gray-200 rounded-b-lg shadow-lg border border-t-0 border-gray-300">
                   {providers.map((provider) => (
                     <label
                       key={provider.slug}
-                      className="flex items-center gap-3 px-4 py-2 bg-gray-300 hover:bg-gray-200 cursor-pointer"
+                      className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 cursor-pointer"
                     >
                       <input
                         type="checkbox"
                         checked={selectedProviders.includes(provider.slug)}
                         onChange={() => handleProviderToggle(provider.slug)}
-                        className="rounded border-gray-300 text-primary focus:ring-primary"
+                        className="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary"
                       />
-                      <span className="text-sm">{provider.title}</span>
+                      <span className="text-sm md:text-base">
+                        {provider.title}
+                      </span>
                     </label>
                   ))}
                 </div>
@@ -270,24 +283,28 @@ export function GameFilters({
             </div>
           )}
 
-          {/* Category Filter */}
+          {/* Category Filter - Full width on mobile */}
           {categories.length > 0 && (
-            <div className="relative">
+            <div className="relative w-full md:w-auto">
               <button
                 onClick={() => setShowCategories(!showCategories)}
                 onBlur={() => setTimeout(() => setShowCategories(false), 200)}
                 className={cn(
-                  "flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors",
+                  "w-full md:w-auto flex items-center justify-between gap-2 px-4 py-2 rounded-lg border transition-colors",
                   "bg-gray-300 hover:bg-gray-200",
                   selectedCategories.length > 0
-                    ? "border-primary bg-primary/5 text-primary"
-                    : "border-gray-300"
+                    ? "!bg-filter-bkg border-filter-border"
+                    : "border-gray-300",
+                  showCategories && "!rounded-b-none border-b-0"
                 )}
               >
-                <span>
-                  {translations?.categories || "Categories"}
-                  {selectedCategories.length > 0 &&
-                    ` (${selectedCategories.length})`}
+                <span className="text-sm md:text-base">
+                  {translations.categories || "Categories"}
+                  {selectedCategories.length > 0 && (
+                    <span className="ml-1 text-xs font-medium bg-primary text-white px-1.5 py-0.5 rounded-full">
+                      {selectedCategories.length}
+                    </span>
+                  )}
                 </span>
                 <FontAwesomeIcon
                   icon={faChevronDown}
@@ -299,19 +316,21 @@ export function GameFilters({
               </button>
 
               {showCategories && (
-                <div className="absolute z-50 mt-2 w-64 bg-gray-300 hover:bg-gray-200 rounded-lg shadow-lg border border-gray-300 max-h-64 overflow-y-auto">
+                <div className="absolute z-50 w-full md:w-64 max-h-80 overflow-y-auto bg-gray-200 rounded-b-lg shadow-lg border border-t-0 border-gray-300">
                   {categories.map((category) => (
                     <label
                       key={category.slug}
-                      className="flex items-center gap-3 px-4 py-2 bg-gray-300 hover:bg-gray-200 cursor-pointer"
+                      className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
                     >
                       <input
                         type="checkbox"
                         checked={selectedCategories.includes(category.slug)}
                         onChange={() => handleCategoryToggle(category.slug)}
-                        className="rounded border-gray-300 text-primary focus:ring-primary"
+                        className="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary"
                       />
-                      <span className="text-sm">{category.title}</span>
+                      <span className="text-sm md:text-base">
+                        {category.title}
+                      </span>
                     </label>
                   ))}
                 </div>
@@ -319,13 +338,17 @@ export function GameFilters({
             </div>
           )}
 
-          {/* Clear Filters */}
+          {/* Clear Filters Button - Show when filters are active */}
           {hasActiveFilters && (
             <button
               onClick={clearAllFilters}
-              className="text-sm text-white transition-colors"
+              className={cn(
+                "w-full md:w-auto px-4 py-2 rounded-lg transition-colors",
+                "bg-danger text-white hover:bg-danger/90",
+                "text-sm md:text-base font-medium"
+              )}
             >
-              {translations?.clearFilters || "Clear all filters"}
+              {translations.clearFilters || "Clear All"}
             </button>
           )}
         </div>
