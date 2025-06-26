@@ -56,8 +56,9 @@ export interface CasinoListWidgetProps {
   casinos: CasinoData[];
   translations?: Record<string, string>;
   className?: string;
-  providers?: CasinoFilterOption[];
+  providers?: FilterOption[];
   showCasinoFilters?: boolean;
+  currentPage?: number;
 }
 
 /**
@@ -68,17 +69,27 @@ export interface CasinoListBlock {
   id: number;
   heading?: string;
   showCasinoTableHeader?: boolean;
+  casinoSort?: string;
+  casinoFilters?: string;
   showCasinoFilters?: boolean;
+  showLoadMore?: boolean;
+  numberPerLoadMore?: number;
+  usePagination?: boolean; // Use pagination instead of load more
   casinosList?: Array<{
     id: number;
-    casinoName: string;
     casino?: CasinoData;
   }>;
   link?: {
     url: string;
     label: string;
   };
-  casinoTableTitle?: string; // For homepage casino list
+}
+
+// Props for filter option
+export interface FilterOption {
+  id: string | number;
+  label: string;
+  value: string;
 }
 
 /**

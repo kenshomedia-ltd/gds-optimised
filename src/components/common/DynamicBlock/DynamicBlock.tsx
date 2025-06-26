@@ -12,12 +12,13 @@ import type {
   GamesCarouselBlock,
   GamesNewAndLovedSlotsBlock,
   QuicklinksBlock,
-  DynamicBlockProps
+  DynamicBlockProps,
 } from "@/types/dynamic-block.types";
 import type { OverviewBlock } from "@/types/homepage.types";
 import type { CasinoListBlock } from "@/types/casino-filters.types";
 import type { FeaturedProvider } from "@/types/featured-providers.types";
 import { Skeleton } from "@/components/ui";
+
 // Lazy load all widget components
 const IntroWithImage = dynamic(
   () =>
@@ -141,7 +142,7 @@ export function DynamicBlock({
       );
 
     case "homepage.home-casino-list":
-      // Use the original CasinoList for homepage (no filters)
+      // Use the original CasinoList for homepage (no filters, no pagination)
       return (
         <CasinoList
           block={blockData as HomeCasinoListBlock}
@@ -195,14 +196,21 @@ export function DynamicBlock({
       );
 
     case "casinos.casino-list":
-      // For custom pages, check if filters should be shown
+      // For custom pages, use CasinoListWidget with filters and pagination support
       const casinoBlock = blockData as CasinoListBlock;
+      // Get casinos from dynamicCasinosData if available, otherwise fall back to casinos array
+      const blockCasinos =
+        additionalData.dynamicCasinosData?.[`block-${blockData.id}`] ||
+        casinos ||
+        [];
+
       return (
         <CasinoListWidget
           block={casinoBlock}
-          casinos={casinos}
+          casinos={blockCasinos}
           translations={translations}
           showCasinoFilters={casinoBlock.showCasinoFilters || false}
+          currentPage={additionalData.currentPage || 1}
         />
       );
 

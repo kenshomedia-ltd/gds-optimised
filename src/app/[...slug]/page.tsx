@@ -1,132 +1,173 @@
 // src/app/[...slug]/page.tsx
+
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
-import { AuthorBox } from "@/components/common";
-import {
-  getCustomPageMetadata,
-  getCustomPageDataSplit,
-} from "@/lib/strapi/custom-page-split-query";
+import { getCustomPageDataSplit } from "@/lib/strapi/custom-page-split-query";
+import { getAllCustomPagePaths } from "@/lib/strapi/custom-page-loader";
 import { getLayoutData } from "@/lib/strapi/data-loader";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
+import { getCasinoSidebarData } from "@/lib/strapi/casino-sidebar-loader";
 import { DynamicBlock } from "@/components/common/DynamicBlock";
+import { CasinoListServer } from "@/components/widgets/CasinoList/CasinoListServer";
+import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { generateMetadata as generateSEOMetadata } from "@/lib/utils/seo";
+import { AuthorBox } from "@/components/common/AuthorBox/AuthorBox";
 import { CasinoSidebar } from "@/components/casino";
-import type { CustomPageBlock } from "@/types/custom-page.types";
+import { mapBlockToBlockData } from "@/lib/utils/block-type-utils";
+import type { CasinoListBlock } from "@/types/casino-filters.types";
+import type { SidebarCasinoSections } from "@/types/sidebar.types";
 
 // Force static generation with ISR
 export const dynamic = "force-static";
-export const revalidate = 60; // 1 minute for edge cache
+export const revalidate = 60; // 1 minute
 
-// Hero block types configuration (same as homepage)
+interface CustomPageProps {
+  params: Promise<{
+    slug: string[];
+  }>;
+}
+
+// Hero block types configuration
 const HERO_BLOCK_TYPES = [
   "shared.introduction-with-image",
   "homepage.home-game-list",
   "homepage.home-featured-providers",
   "shared.overview-block",
-  "games.games-carousel", // Also support custom page blocks in hero
-  "games.new-and-loved-slots",
   "casinos.casino-list",
 ];
 
-// Generate static params for known pages
-export async function generateStaticParams() {
-  // Implement this when you want to pre-generate pages
-  // For now, return empty array to rely on on-demand generation
-  return [];
-}
-
-// Generate metadata
+/**
+ * Generate metadata for custom pages
+ */
 export async function generateMetadata({
   params,
-}: {
-  params: Promise<{ slug: string[] }>;
-}): Promise<Metadata> {
-  // Await params as required in Next.js 15
+}: CustomPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const path = slug.join("/");
+  const path = "/" + slug.join("/");
 
-  try {
-    const metadata = await getCustomPageMetadata(path);
+  const { pageData } = await getCustomPageDataSplit(path);
 
-    if (!metadata) {
-      return {
-        title: "Page Not Found",
-        description: "The requested page could not be found.",
-      };
-    }
-
-    return generateSEOMetadata({
-      title: metadata.seo?.metaTitle || metadata.title,
-      description: metadata.seo?.metaDescription || "",
-      keywords: metadata.seo?.keywords,
-      canonicalUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/${path}`,
-    });
-  } catch (error) {
-    console.error("Error generating metadata:", error);
+  if (!pageData) {
     return {
       title: "Page Not Found",
-      description: "The requested page could not be found.",
+      description: "The page you are looking for does not exist.",
     };
+  }
+
+  return generateSEOMetadata({
+    title: pageData.seo?.metaTitle || pageData.title,
+    description: pageData.seo?.metaDescription || "",
+    keywords: pageData.seo?.keywords,
+    canonicalUrl: `${process.env.NEXT_PUBLIC_SITE_URL}${path}`,
+    // image: pageData.seo?.metaImage?.url,
+  });
+}
+
+/**
+ * Generate static params for ISR
+ */
+export async function generateStaticParams() {
+  try {
+    const paths = await getAllCustomPagePaths();
+    return paths.map((path) => ({
+      slug: path.split("/").filter(Boolean),
+    }));
+  } catch (error) {
+    console.error("Error generating static params:", error);
+    return [];
   }
 }
 
-// Main page component
-export default async function CustomPage({
-  params,
-}: {
-  params: Promise<{ slug: string[] }>;
-}) {
+/**
+ * Helper to extract page number from URL
+ */
+function extractPageNumber(slug: string[]): {
+  cleanSlug: string[];
+  page: number;
+} {
+  const lastSegment = slug[slug.length - 1];
+  const pageMatch = lastSegment?.match(/^p(\d+)$/);
+
+  if (pageMatch) {
+    const page = parseInt(pageMatch[1], 10);
+    return {
+      cleanSlug: slug.slice(0, -1),
+      page: page >= 1 ? page : 1,
+    };
+  }
+
+  return {
+    cleanSlug: slug,
+    page: 1,
+  };
+}
+
+/**
+ * Custom Page Component
+ */
+export default async function CustomPage({ params }: CustomPageProps) {
   try {
     const startTime = Date.now();
-
-    // Await params as required in Next.js 15
     const { slug } = await params;
-    const path = slug.join("/");
 
-    // First, fetch page data to check if we need casino sidebar
-    const customPageResponse = await getCustomPageDataSplit(path);
+    // Extract page number if present (for paginated casino lists)
+    const { cleanSlug, page: currentPage } = extractPageNumber(slug);
+    const path = "/" + cleanSlug.join("/");
+
+    // First fetch page data to check if it exists
+    const pageDataResult = await getCustomPageDataSplit(path);
+
+    if (!pageDataResult.pageData) {
+      notFound();
+    }
+
     const { pageData, games, casinos, dynamicGamesData, dynamicCasinosData } =
-      customPageResponse;
+      pageDataResult;
+
+    // Fetch layout and sidebar data in parallel
+    const [{ translations }, sidebarCasinos] = await Promise.all([
+      getLayoutData({ cached: true }),
+      (!pageData.sideBarToShow ||
+      pageData.sideBarToShow === "casinos" ||
+      pageData.sideBarToShow === "casino"
+        ? getCasinoSidebarData({ cached: true })
+        : Promise.resolve(null)) as Promise<SidebarCasinoSections | null>,
+    ]);
 
     if (!pageData) {
       notFound();
     }
 
-    // Conditionally fetch casino sidebar data ONLY if needed
-    const [layoutData, sidebarCasinos] = await Promise.all([
-      getLayoutData({ cached: true }),
-      // Only fetch casino sidebar if the page requires it
-      pageData.sideBarToShow === "casinos" ||
-      pageData.sideBarToShow === "casino" ||
-      !pageData.sideBarToShow
-        ? import("@/lib/strapi/casino-sidebar-loader").then((mod) =>
-            mod.getCasinoSidebarData({ cached: true })
-          )
-        : Promise.resolve(null),
-    ]);
-
-    const { translations } = layoutData;
-
-    // Additional data for blocks
+    // Additional data for dynamic blocks
     const additionalData = {
+      translations,
       games,
       casinos,
-      translations,
-      dynamicGamesData,
+      currentPage,
+      dynamicGamesData: {
+        ...dynamicGamesData,
+        // Merge with game carousel blocks if they exist
+        ...(pageData.blocks &&
+          pageData.blocks.reduce((acc, block) => {
+            if (
+              block.__component === "games.games-carousel" &&
+              games.length > 0
+            ) {
+              acc[`block-${block.id}`] = { games };
+            }
+            return acc;
+          }, {} as Record<string, { games: typeof games }>)),
+      },
       dynamicCasinosData,
-      showContentDate: pageData.showContentDate,
-      authorData: pageData.author,
-      timeDate: pageData.updatedAt,
     };
 
-    // Separate blocks by section with proper typing
-    const blocks = (pageData?.blocks || []) as CustomPageBlock[];
+    // Separate blocks by type (hero vs main)
+    const blocks = pageData?.blocks || [];
     const heroBlocks = blocks.filter(
-      (block: CustomPageBlock, index: number) =>
+      (block, index) =>
         index < 4 && HERO_BLOCK_TYPES.includes(block.__component)
     );
     const mainBlocks = blocks.filter(
-      (block: CustomPageBlock, index: number) =>
+      (block, index) =>
         !(index < 4 && HERO_BLOCK_TYPES.includes(block.__component))
     );
 
@@ -161,6 +202,9 @@ export default async function CustomPage({
       }),
     };
 
+    // Build the base URL for pagination
+    const baseUrl = `/${cleanSlug.join("/")}`;
+
     return (
       <>
         {/* Structured Data */}
@@ -179,14 +223,14 @@ export default async function CustomPage({
         {heroBlocks.length > 0 && (
           <section className="featured-header relative overflow-hidden bg-gradient-to-b from-background-900 from-30% via-background-700 via-80% to-background-500 rounded-b-3xl">
             <div className="container relative mx-auto px-4 z-10">
-              {heroBlocks.map((block: CustomPageBlock, index: number) => (
+              {heroBlocks.map((block, index: number) => (
                 <div
                   key={`hero-${block.__component}-${index}`}
                   className="mb-8"
                 >
                   <DynamicBlock
                     blockType={block.__component}
-                    blockData={block}
+                    blockData={mapBlockToBlockData(block)}
                     additionalData={additionalData}
                   />
                 </div>
@@ -223,22 +267,99 @@ export default async function CustomPage({
               }
             >
               <div className="space-y-12">
-                {mainBlocks.map((block: CustomPageBlock, index: number) => (
-                  <section
-                    key={`main-${block.__component}-${index}`}
-                    className="opacity-0 animate-fadeIn"
-                    style={{
-                      animationDelay: `${index * 100}ms`,
-                      animationFillMode: "forwards",
-                    }}
-                  >
-                    <DynamicBlock
-                      blockType={block.__component}
-                      blockData={block}
-                      additionalData={additionalData}
-                    />
-                  </section>
-                ))}
+                {mainBlocks.map((block, index: number) => {
+                  // Special handling for casino list blocks
+                  if (block.__component === "casinos.casino-list") {
+                    const casinoBlock = block as CasinoListBlock;
+                    // Get casinos for this specific block
+                    const blockCasinos =
+                      dynamicCasinosData[`block-${block.id}`] || [];
+
+                    // If showLoadMore is enabled, use server-side rendering for no-JS support
+                    if (
+                      casinoBlock.showLoadMore &&
+                      casinoBlock.numberPerLoadMore
+                    ) {
+                      // Calculate which casinos to show based on current page
+                      const itemsPerPage = casinoBlock.numberPerLoadMore;
+                      const paginatedCasinos = blockCasinos.slice(
+                        0,
+                        currentPage * itemsPerPage
+                      );
+
+                      return (
+                        <section
+                          key={`main-${block.__component}-${index}`}
+                          className="opacity-0 animate-fadeIn"
+                          style={{
+                            animationDelay: `${index * 100}ms`,
+                            animationFillMode: "forwards",
+                          }}
+                        >
+                          {/* Server-side rendered version for no-JS */}
+                          <noscript>
+                            <CasinoListServer
+                              block={casinoBlock}
+                              casinos={blockCasinos}
+                              translations={translations}
+                              currentPage={currentPage}
+                              baseUrl={baseUrl}
+                            />
+                          </noscript>
+
+                          {/* Client-side enhanced version */}
+                          <DynamicBlock
+                            blockType={block.__component}
+                            blockData={mapBlockToBlockData(block)}
+                            additionalData={{
+                              ...additionalData,
+                              casinos: paginatedCasinos,
+                            }}
+                          />
+                        </section>
+                      );
+                    }
+
+                    // Regular casino list without pagination
+                    return (
+                      <section
+                        key={`main-${block.__component}-${index}`}
+                        className="opacity-0 animate-fadeIn"
+                        style={{
+                          animationDelay: `${index * 100}ms`,
+                          animationFillMode: "forwards",
+                        }}
+                      >
+                        <DynamicBlock
+                          blockType={block.__component}
+                          blockData={mapBlockToBlockData(block)}
+                          additionalData={{
+                            ...additionalData,
+                            casinos: blockCasinos,
+                          }}
+                        />
+                      </section>
+                    );
+                  }
+
+                  // Regular block rendering
+                  return (
+                    <section
+                      key={`main-${block.__component}-${index}`}
+                      className="opacity-0 animate-fadeIn"
+                      style={{
+                        animationDelay: `${index * 100}ms`,
+                        animationFillMode: "forwards",
+                      }}
+                    >
+                      <DynamicBlock
+                        blockType={block.__component}
+                        blockData={mapBlockToBlockData(block)}
+                        additionalData={additionalData}
+                      />
+                    </section>
+                  );
+                })}
               </div>
 
               {/* Author Box - Show after main content if author exists */}

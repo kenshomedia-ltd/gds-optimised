@@ -275,3 +275,86 @@ export async function getCasinoProviders(): Promise<CasinoFilterOption[]> {
     return [];
   }
 }
+
+/**
+ * Fetch paginated casinos for server-side rendering
+ * This is a simplified version for pagination without filters
+ */
+export async function getPaginatedCasinos(
+  page: number = 1,
+  itemsPerPage: number = 10,
+  country: string = "IT"
+): Promise<GetCasinosResponse> {
+  try {
+    const query = {
+      fields: [
+        "title",
+        "slug",
+        "ratingAvg",
+        "ratingCount",
+        "publishedAt",
+        "Badges",
+      ],
+      populate: {
+        images: {
+          fields: ["url", "width", "height"],
+        },
+        casinoBonus: {
+          fields: ["bonusUrl", "bonusLabel", "bonusCode"],
+        },
+        noDepositSection: {
+          fields: ["bonusAmount", "termsConditions"],
+        },
+        freeSpinsSection: {
+          fields: ["bonusAmount", "termsConditions"],
+        },
+        termsAndConditions: {
+          fields: ["copy", "gambleResponsibly"],
+        },
+        bonusSection: {
+          fields: [
+            "bonusAmount",
+            "termsConditions",
+            "cashBack",
+            "freeSpin",
+          ],
+        },
+      },
+      filters: {
+        countries: { $containsi: country },
+      },
+      sort: ["ratingAvg:desc"],
+      pagination: {
+        page,
+        pageSize: itemsPerPage,
+      },
+    };
+
+    const response = await strapiClient.fetchWithCache<{
+      data: CasinoData[];
+      meta: {
+        pagination: {
+          page: number;
+          pageSize: number;
+          pageCount: number;
+          total: number;
+        };
+      };
+    }>("casinos", query, 60); // 1 minute cache
+
+    return {
+      casinos: response.data || [],
+      total: response.meta?.pagination?.total || 0,
+      page: response.meta?.pagination?.page || 1,
+      pageSize: response.meta?.pagination?.pageSize || itemsPerPage,
+    };
+  } catch (error) {
+    console.error("Failed to fetch paginated casinos:", error);
+    return {
+      casinos: [],
+      total: 0,
+      page: 1,
+      pageSize: itemsPerPage,
+    };
+  }
+}

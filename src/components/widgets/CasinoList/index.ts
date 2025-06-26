@@ -3,6 +3,7 @@
 export { CasinoList } from "./CasinoList";
 export { CasinoListWidget } from "./CasinoListWidget";
 export { CasinoFilters } from "./CasinoFilters";
+export { CasinoListServer } from "./CasinoListServer";
 export { CasinoFiltersSkeleton } from "./CasinoFiltersSkeleton";
 
 // Export types

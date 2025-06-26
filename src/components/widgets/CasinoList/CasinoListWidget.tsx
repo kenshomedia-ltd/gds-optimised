@@ -6,10 +6,12 @@ import Link from "next/link";
 import { CasinoTable } from "@/components/casino/CasinoTable/CasinoTable";
 import { CasinoFilters } from "./CasinoFilters";
 import { CasinoFiltersSkeleton } from "./CasinoFiltersSkeleton";
+import { Pagination } from "@/components/ui/Pagination/Pagination";
 import { Skeleton } from "@/components/ui/Skeleton";
 import type {
   CasinoListWidgetProps,
   CasinoFiltersState,
+  CasinoFilterOption,
 } from "@/types/casino-filters.types";
 import type { CasinoData } from "@/types/casino.types";
 import { cn } from "@/lib/utils/cn";
@@ -29,10 +31,12 @@ const initialFilters: CasinoFiltersState = {
 /**
  * CasinoListWidget Component
  *
- * Enhanced CasinoList component with filtering capabilities
+ * Enhanced CasinoList component with filtering and pagination capabilities
  * Features:
+ * - Progressive enhancement (works without JS)
  * - Displays casino comparison table
  * - Optional filters when showCasinoFilters is true
+ * - Pagination/Load More functionality
  * - Responsive layout
  * - Real-time filtering
  * - Loading states
@@ -44,87 +48,149 @@ export function CasinoListWidget({
   className,
   providers: initialProviders,
   showCasinoFilters = false,
+  currentPage: initialPage = 1,
 }: CasinoListWidgetProps) {
-  const [casinos, setCasinos] = useState<CasinoData[]>(initialCasinos);
+  // Pagination settings from block
+  const showLoadMore = block.showLoadMore || false;
+  const itemsPerPage = block.numberPerLoadMore || 10;
+
+  // State management
+  const [allCasinos, setAllCasinos] = useState<CasinoData[]>(initialCasinos);
+  const [displayedCasinos, setDisplayedCasinos] = useState<CasinoData[]>([]);
   const [loading, setLoading] = useState(false);
-  const [providers, setProviders] = useState(initialProviders || []);
+  const [providers, setProviders] = useState<CasinoFilterOption[]>(
+    initialProviders || []
+  );
   const [providersLoading, setProvidersLoading] = useState(!initialProviders);
   const [filters, setFilters] = useState<CasinoFiltersState>(initialFilters);
+  const [currentPage, setCurrentPage] = useState(initialPage);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Calculate pagination
+  const totalPages = Math.ceil(allCasinos.length / itemsPerPage);
+  const hasMore = currentPage < totalPages;
 
   // Use showCasinoFilters from block if available, otherwise use prop
   const shouldShowFilters = block.showCasinoFilters ?? showCasinoFilters;
 
-  // Fetch providers if not provided and filters are shown
+  // Initialize displayed casinos based on current page
+  useEffect(() => {
+    if (!isInitialized && allCasinos.length > 0) {
+      // On first load, show casinos based on current page
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const endIndex = showLoadMore
+        ? startIndex + itemsPerPage
+        : allCasinos.length;
+      setDisplayedCasinos(allCasinos.slice(0, endIndex));
+      setIsInitialized(true);
+    }
+  }, [allCasinos, currentPage, itemsPerPage, showLoadMore, isInitialized]);
+
+  // Fetch providers for filters if needed
   useEffect(() => {
     const fetchProviders = async () => {
-      if (!shouldShowFilters || initialProviders) {
-        setProvidersLoading(false);
-        return;
-      }
-
-      try {
-        const fetchedProviders = await getCasinoProviders();
-        setProviders(fetchedProviders);
-      } catch (error) {
-        console.error("Failed to fetch providers:", error);
-      } finally {
-        setProvidersLoading(false);
+      if (shouldShowFilters && !providers.length && !providersLoading) {
+        setProvidersLoading(true);
+        try {
+          const providersData = await getCasinoProviders();
+          setProviders(providersData);
+        } catch (error) {
+          console.error("Failed to fetch providers:", error);
+        } finally {
+          setProvidersLoading(false);
+        }
       }
     };
 
     fetchProviders();
-  }, [shouldShowFilters, initialProviders]);
+  }, [shouldShowFilters, providers.length, providersLoading]);
 
-  // Load casinos with filters
-  const loadCasinos = useCallback(async () => {
-    if (loading) return;
+  // Fetch filtered casinos
+  const fetchFilteredCasinos = useCallback(async () => {
+    if (!shouldShowFilters) return;
 
     setLoading(true);
     try {
-      const result = await getCasinos({
-        page: 1,
-        pageSize: 50,
-        filters,
+      const response = await getCasinos({
+        filters: {
+          bonusKey: filters.bonusKey,
+          condition: filters.condition,
+          amount: filters.amount,
+          wagering: filters.wagering,
+          speed: filters.speed,
+          providers: filters.providers,
+          sort: filters.sort,
+        },
+        pageSize: 100, // Get all for client-side pagination
       });
 
-      setCasinos(result.casinos);
+      setAllCasinos(response.casinos);
+      setCurrentPage(1); // Reset to first page
+
+      // Show first page of results
+      const endIndex = showLoadMore ? itemsPerPage : response.casinos.length;
+      setDisplayedCasinos(response.casinos.slice(0, endIndex));
     } catch (error) {
-      console.error("Failed to load casinos:", error);
-      // Keep initial casinos on error
+      console.error("Failed to fetch filtered casinos:", error);
     } finally {
       setLoading(false);
     }
-  }, [filters, loading]);
+  }, [filters, shouldShowFilters, showLoadMore, itemsPerPage]);
 
-  // Handle filter change
-  const handleFilterChange = useCallback(
-    (newFilters: Partial<CasinoFiltersState>) => {
-      setFilters((prev) => ({ ...prev, ...newFilters }));
-    },
-    []
-  );
+  // Handle filter changes
+  const handleFilterChange = useCallback((newFilters: CasinoFiltersState) => {
+    setFilters(newFilters);
+  }, []);
 
-  // Clear all filters
+  // Handle clear filters
   const handleClearFilters = useCallback(() => {
     setFilters(initialFilters);
   }, []);
 
-  // Reload casinos when filters change
+  // Fetch casinos when filters change
   useEffect(() => {
-    if (shouldShowFilters) {
-      loadCasinos();
+    if (shouldShowFilters && isInitialized) {
+      fetchFilteredCasinos();
     }
-  }, [filters]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [filters, shouldShowFilters, fetchFilteredCasinos, isInitialized]);
 
-  // Show skeleton during initial load
-  if (
-    shouldShowFilters &&
-    (providersLoading || (filters !== initialFilters && loading))
-  ) {
+  // Handle load more
+  const handleLoadMore = useCallback(() => {
+    if (!hasMore || loading) return;
+
+    const nextPage = currentPage + 1;
+    const startIndex = currentPage * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const newCasinos = allCasinos.slice(startIndex, endIndex);
+
+    setDisplayedCasinos((prev) => [...prev, ...newCasinos]);
+    setCurrentPage(nextPage);
+  }, [currentPage, itemsPerPage, allCasinos, hasMore, loading]);
+
+  // Handle page change (for pagination)
+  const handlePageChange = useCallback(
+    (page: number) => {
+      if (page === currentPage || page < 1 || page > totalPages) return;
+
+      const startIndex = (page - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      setDisplayedCasinos(allCasinos.slice(startIndex, endIndex));
+      setCurrentPage(page);
+
+      // Scroll to top of casino list
+      const element = document.querySelector("[data-casino-list-top]");
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    },
+    [currentPage, totalPages, itemsPerPage, allCasinos]
+  );
+
+  // Show skeleton while filters are loading
+  if (shouldShowFilters && providersLoading && !allCasinos.length) {
     return (
       <section className={cn("relative", className)}>
         <div className="relative xl:container px-2 z-20">
-          {/* Title */}
           {block.heading && (
             <div className="mb-[30px]">
               <h2 className="text-2xl md:text-3xl font-bold text-heading-text text-center">
@@ -132,13 +198,7 @@ export function CasinoListWidget({
               </h2>
             </div>
           )}
-
-          {/* Filters Skeleton */}
-          <div className="mb-6">
-            <CasinoFiltersSkeleton />
-          </div>
-
-          {/* Table Skeleton */}
+          <CasinoFiltersSkeleton />
           <div className="pt-2.5">
             <div className="table-wrapper bg-casino-table-bkg rounded-[6px] overflow-hidden relative z-[8] mb-5">
               <div className="w-full p-4 space-y-3">
@@ -153,13 +213,73 @@ export function CasinoListWidget({
     );
   }
 
-  // Filter out any null casinos
-  const validCasinos = casinos.filter(Boolean);
+  // Filter out any null casinos and handle empty initial state
+  const validCasinos = displayedCasinos.filter(Boolean);
+
+  // If we have no casinos at all (not even initial ones), don't show skeleton
+  if (allCasinos.length === 0 && !loading && !shouldShowFilters) {
+    return null;
+  }
+
+  // If we have initial casinos but haven't displayed them yet, show them
+  if (!isInitialized && allCasinos.length > 0 && validCasinos.length === 0) {
+    const endIndex = showLoadMore ? itemsPerPage : allCasinos.length;
+    const initialCasinos = allCasinos.slice(0, endIndex).filter(Boolean);
+
+    return (
+      <section className={cn("relative", className)} data-casino-list-top>
+        <div className="relative xl:container px-2 z-20">
+          {/* Title */}
+          {block.heading && (
+            <div className="mb-[30px]">
+              <h2 className="text-2xl md:text-3xl font-bold text-heading-text text-center">
+                {block.heading}
+              </h2>
+            </div>
+          )}
+
+          {/* Casino Table */}
+          <div className="pt-2.5">
+            <CasinoTable
+              casinos={initialCasinos}
+              showCasinoTableHeader={block.showCasinoTableHeader !== false}
+              translations={translations}
+            />
+          </div>
+
+          {/* Pagination or Load More for initial display */}
+          {showLoadMore && initialCasinos.length < allCasinos.length && (
+            <div className="flex justify-center mt-8">
+              {block.usePagination ? (
+                <Pagination
+                  currentPage={1}
+                  totalPages={Math.ceil(allCasinos.length / itemsPerPage)}
+                  onPageChange={() => {}} // Will be handled once initialized
+                  showInfo={true}
+                  totalItems={allCasinos.length}
+                  itemsPerPage={itemsPerPage}
+                  itemName="casinos"
+                  translations={translations}
+                />
+              ) : (
+                <button
+                  onClick={() => setIsInitialized(true)}
+                  className="btn btn-secondary min-w-[200px] inline-flex items-center justify-center"
+                >
+                  {translations.loadMore || "Load More"}
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      </section>
+    );
+  }
 
   if (!validCasinos.length && !loading) return null;
 
   return (
-    <section className={cn("relative", className)}>
+    <section className={cn("relative", className)} data-casino-list-top>
       <div className="relative xl:container px-2 z-20">
         {/* Title */}
         {block.heading && (
@@ -203,12 +323,45 @@ export function CasinoListWidget({
           )}
         </div>
 
+        {/* Pagination or Load More */}
+        {showLoadMore && !loading && allCasinos.length > itemsPerPage && (
+          <div className="flex justify-center mt-8">
+            {block.usePagination ? (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+                showInfo={true}
+                totalItems={allCasinos.length}
+                itemsPerPage={itemsPerPage}
+                itemName="casinos"
+                translations={translations}
+              />
+            ) : (
+              hasMore && (
+                <button
+                  onClick={handleLoadMore}
+                  disabled={loading}
+                  className={cn(
+                    "btn btn-secondary min-w-[200px] inline-flex items-center justify-center",
+                    loading && "opacity-50 cursor-not-allowed"
+                  )}
+                >
+                  {loading
+                    ? translations.loading || "Loading..."
+                    : translations.loadMore || "Load More"}
+                </button>
+              )
+            )}
+          </div>
+        )}
+
         {/* View All Link */}
-        {block.link && (
-          <div className="flex justify-center">
+        {block.link && !showLoadMore && (
+          <div className="flex justify-center mt-5">
             <Link
               href={block.link.url}
-              className="btn self-center mt-5 btn-secondary min-w-[300px] md:min-w-[500px] inline-flex items-center justify-center"
+              className="btn self-center btn-secondary min-w-[300px] md:min-w-[500px] inline-flex items-center justify-center"
             >
               {block.link.label}
             </Link>

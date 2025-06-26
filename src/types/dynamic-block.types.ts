@@ -325,6 +325,7 @@ export interface DynamicBlockProps {
     casinos?: CasinoData[];
     blogs?: BlogData[];
     country?: string;
+    currentPage?: number;
     dynamicGamesData?: {
       [blockId: string]: {
         newGames?: GameData[];
