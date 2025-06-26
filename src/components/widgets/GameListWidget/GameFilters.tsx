@@ -24,6 +24,7 @@ import debounce from "lodash.debounce";
  * - Mobile-responsive design with full-width fields
  * - Clear filters option
  * - Accessible keyboard navigation
+ * - Fixed z-index layering for mobile touch interactions
  */
 export function GameFilters({
   providers,
@@ -140,53 +141,90 @@ export function GameFilters({
     if (!showCategories) setCategorySearch("");
   }, [showCategories]);
 
-  // Click outside handlers
+  // Click outside handlers with improved touch support
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+      const target = event.target as Node;
+
       if (
         providerDropdownRef.current &&
-        !providerDropdownRef.current.contains(event.target as Node)
+        !providerDropdownRef.current.contains(target)
       ) {
         setShowProviders(false);
       }
       if (
         categoryDropdownRef.current &&
-        !categoryDropdownRef.current.contains(event.target as Node)
+        !categoryDropdownRef.current.contains(target)
       ) {
         setShowCategories(false);
       }
       if (
         sortDropdownRef.current &&
-        !sortDropdownRef.current.contains(event.target as Node)
+        !sortDropdownRef.current.contains(target)
       ) {
         setShowSort(false);
       }
     };
 
+    // Use both mouse and touch events for better mobile support
     document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
     };
   }, []);
 
-  // Handle provider selection
-  const handleProviderToggle = (providerSlug: string) => {
+  // Handle provider selection with event stop propagation
+  const handleProviderToggle = (
+    e: React.MouseEvent | React.TouchEvent,
+    providerSlug: string
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
     const newProviders = selectedProviders.includes(providerSlug)
       ? selectedProviders.filter((p) => p !== providerSlug)
       : [...selectedProviders, providerSlug];
     onProviderChange(newProviders);
   };
 
-  // Handle category selection
-  const handleCategoryToggle = (categorySlug: string) => {
+  // Handle provider checkbox change
+  const handleProviderCheckboxChange = (providerSlug: string) => {
+    const newProviders = selectedProviders.includes(providerSlug)
+      ? selectedProviders.filter((p) => p !== providerSlug)
+      : [...selectedProviders, providerSlug];
+    onProviderChange(newProviders);
+  };
+
+  // Handle category selection with event stop propagation
+  const handleCategoryToggle = (
+    e: React.MouseEvent | React.TouchEvent,
+    categorySlug: string
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
     const newCategories = selectedCategories.includes(categorySlug)
       ? selectedCategories.filter((c) => c !== categorySlug)
       : [...selectedCategories, categorySlug];
     onCategoryChange(newCategories);
   };
 
-  // Handle sort selection
-  const handleSortSelect = (sortValue: string) => {
+  // Handle category checkbox change
+  const handleCategoryCheckboxChange = (categorySlug: string) => {
+    const newCategories = selectedCategories.includes(categorySlug)
+      ? selectedCategories.filter((c) => c !== categorySlug)
+      : [...selectedCategories, categorySlug];
+    onCategoryChange(newCategories);
+  };
+
+  // Handle sort selection with event stop propagation
+  const handleSortSelect = (
+    e: React.MouseEvent | React.TouchEvent,
+    sortValue: string
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
     onSortChange(sortValue);
     setShowSort(false);
   };
@@ -201,7 +239,7 @@ export function GameFilters({
   return (
     <div
       className={cn(
-        "bg-white/30 rounded-lg backdrop-blur-sm relative z-10 border border-white/30 shadow-sm p-3",
+        "bg-white/30 rounded-lg backdrop-blur-sm relative z-20 border border-white/30 shadow-sm p-3",
         className
       )}
     >
@@ -271,11 +309,18 @@ export function GameFilters({
             </button>
 
             {showSort && (
-              <div className="absolute z-50 w-full md:w-48 bg-gray-200 rounded-b-lg shadow-lg border border-t-0 border-gray-300">
+              <div
+                className="absolute z-[100] w-full md:w-48 bg-gray-200 rounded-b-lg shadow-lg border border-t-0 border-gray-300"
+                onTouchStart={(e) => e.stopPropagation()}
+              >
                 {sortOptions.map((option) => (
                   <button
                     key={option.value}
-                    onClick={() => handleSortSelect(option.value)}
+                    onClick={(e) => handleSortSelect(e, option.value)}
+                    onTouchEnd={(e) => {
+                      e.preventDefault();
+                      handleSortSelect(e, option.value);
+                    }}
                     className={cn(
                       "w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors",
                       "text-sm md:text-base",
@@ -302,18 +347,17 @@ export function GameFilters({
                   "w-full md:w-auto flex items-center justify-between gap-2 px-4 py-3 rounded-lg border transition-colors",
                   "bg-gray-300 hover:bg-gray-200",
                   selectedProviders.length > 0
-                    ? "!bg-filter-bkg border-filter-border"
-                    : "border-gray-300",
+                    ? "border-primary text-primary"
+                    : "border-filter-border",
                   showProviders && "!rounded-b-none border-b-0"
                 )}
               >
                 <span className="text-sm md:text-base">
-                  {translations.providers || "Providers"}
-                  {selectedProviders.length > 0 && (
-                    <span className="ml-1 text-xs font-medium bg-primary text-white px-1.5 py-0.5 rounded-full">
-                      {selectedProviders.length}
-                    </span>
-                  )}
+                  {selectedProviders.length > 0
+                    ? `${translations.providers || "Providers"} (${
+                        selectedProviders.length
+                      })`
+                    : translations.providers || "Providers"}
                 </span>
                 <FontAwesomeIcon
                   icon={faChevronDown}
@@ -325,44 +369,43 @@ export function GameFilters({
               </button>
 
               {showProviders && (
-                <div className="absolute z-50 w-full md:w-64 bg-gray-200 rounded-b-lg shadow-lg border border-t-0 border-gray-300">
+                <div
+                  className="absolute z-[100] w-full md:w-64 bg-gray-200 rounded-b-lg shadow-lg border border-t-0 border-gray-300 max-h-80 overflow-y-auto"
+                  onTouchStart={(e) => e.stopPropagation()}
+                >
                   {/* Search input for providers */}
-                  <div className="p-2 border-b border-gray-300">
-                    <div className="relative">
-                      <FontAwesomeIcon
-                        icon={faSearch}
-                        className="absolute left-2 top-1/2 -translate-y-1/2 h-3 w-3 text-gray-500"
-                      />
-                      <input
-                        type="text"
-                        value={providerSearch}
-                        onChange={(e) => setProviderSearch(e.target.value)}
-                        placeholder={
-                          translations.searchProviders || "Search providers..."
-                        }
-                        className={cn(
-                          "w-full pl-7 pr-2 py-1.5 text-sm rounded border",
-                          "bg-white border-gray-300 text-gray-900",
-                          "placeholder:text-gray-500 focus:outline-none",
-                          "focus:ring-1 focus:ring-primary focus:border-transparent"
-                        )}
-                      />
-                    </div>
+                  <div className="sticky top-0 bg-gray-200 p-2 border-b border-gray-300">
+                    <input
+                      type="text"
+                      value={providerSearch}
+                      onChange={(e) => setProviderSearch(e.target.value)}
+                      onClick={(e) => e.stopPropagation()}
+                      placeholder={
+                        translations.searchProviders || "Search providers..."
+                      }
+                      className="w-full px-3 py-1 text-sm rounded border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary"
+                    />
                   </div>
 
                   {/* Provider list */}
-                  <div className="max-h-64 overflow-y-auto">
+                  <div className="p-1">
                     {filteredProviders.length > 0 ? (
                       filteredProviders.map((provider) => (
                         <label
                           key={provider.slug}
-                          className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                          className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 transition-colors cursor-pointer"
+                          onTouchEnd={(e) => {
+                            e.preventDefault();
+                            handleProviderToggle(e, provider.slug);
+                          }}
                         >
                           <input
                             type="checkbox"
                             checked={selectedProviders.includes(provider.slug)}
-                            onChange={() => handleProviderToggle(provider.slug)}
-                            className="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary"
+                            onChange={() =>
+                              handleProviderCheckboxChange(provider.slug)
+                            }
+                            className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
                           />
                           <span className="text-sm md:text-base">
                             {provider.title}
@@ -370,8 +413,8 @@ export function GameFilters({
                         </label>
                       ))
                     ) : (
-                      <div className="px-4 py-3 text-sm text-gray-500">
-                        {translations.noResults || "No providers found"}
+                      <div className="px-3 py-2 text-sm text-gray-500">
+                        {translations.noProvidersFound || "No providers found"}
                       </div>
                     )}
                   </div>
@@ -392,18 +435,17 @@ export function GameFilters({
                   "w-full md:w-auto flex items-center justify-between gap-2 px-4 py-3 rounded-lg border transition-colors",
                   "bg-gray-300 hover:bg-gray-200",
                   selectedCategories.length > 0
-                    ? "!bg-filter-bkg border-filter-border"
-                    : "border-gray-300",
+                    ? "border-primary text-primary"
+                    : "border-filter-border",
                   showCategories && "!rounded-b-none border-b-0"
                 )}
               >
                 <span className="text-sm md:text-base">
-                  {translations.categories || "Categories"}
-                  {selectedCategories.length > 0 && (
-                    <span className="ml-1 text-xs font-medium bg-primary text-white px-1.5 py-0.5 rounded-full">
-                      {selectedCategories.length}
-                    </span>
-                  )}
+                  {selectedCategories.length > 0
+                    ? `${translations.categories || "Categories"} (${
+                        selectedCategories.length
+                      })`
+                    : translations.categories || "Categories"}
                 </span>
                 <FontAwesomeIcon
                   icon={faChevronDown}
@@ -415,45 +457,43 @@ export function GameFilters({
               </button>
 
               {showCategories && (
-                <div className="absolute z-50 w-full md:w-64 bg-gray-200 rounded-b-lg shadow-lg border border-t-0 border-gray-300">
+                <div
+                  className="absolute z-[100] w-full md:w-64 bg-gray-200 rounded-b-lg shadow-lg border border-t-0 border-gray-300 max-h-80 overflow-y-auto"
+                  onTouchStart={(e) => e.stopPropagation()}
+                >
                   {/* Search input for categories */}
-                  <div className="p-2 border-b border-gray-300">
-                    <div className="relative">
-                      <FontAwesomeIcon
-                        icon={faSearch}
-                        className="absolute left-2 top-1/2 -translate-y-1/2 h-3 w-3 text-gray-500"
-                      />
-                      <input
-                        type="text"
-                        value={categorySearch}
-                        onChange={(e) => setCategorySearch(e.target.value)}
-                        placeholder={
-                          translations.searchCategories ||
-                          "Search categories..."
-                        }
-                        className={cn(
-                          "w-full pl-7 pr-2 py-1.5 text-sm rounded border",
-                          "bg-white border-gray-300 text-gray-900",
-                          "placeholder:text-gray-500 focus:outline-none",
-                          "focus:ring-1 focus:ring-primary focus:border-transparent"
-                        )}
-                      />
-                    </div>
+                  <div className="sticky top-0 bg-gray-200 p-2 border-b border-gray-300">
+                    <input
+                      type="text"
+                      value={categorySearch}
+                      onChange={(e) => setCategorySearch(e.target.value)}
+                      onClick={(e) => e.stopPropagation()}
+                      placeholder={
+                        translations.searchCategories || "Search categories..."
+                      }
+                      className="w-full px-3 py-1 text-sm rounded border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary"
+                    />
                   </div>
 
                   {/* Category list */}
-                  <div className="max-h-64 overflow-y-auto">
+                  <div className="p-1">
                     {filteredCategories.length > 0 ? (
                       filteredCategories.map((category) => (
                         <label
                           key={category.slug}
-                          className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                          className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 transition-colors cursor-pointer"
+                          onTouchEnd={(e) => {
+                            e.preventDefault();
+                            handleCategoryToggle(e, category.slug);
+                          }}
                         >
                           <input
                             type="checkbox"
                             checked={selectedCategories.includes(category.slug)}
-                            onChange={() => handleCategoryToggle(category.slug)}
-                            className="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary"
+                            onChange={() =>
+                              handleCategoryCheckboxChange(category.slug)
+                            }
+                            className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
                           />
                           <span className="text-sm md:text-base">
                             {category.title}
@@ -461,8 +501,9 @@ export function GameFilters({
                         </label>
                       ))
                     ) : (
-                      <div className="px-4 py-3 text-sm text-gray-500">
-                        {translations.noResults || "No categories found"}
+                      <div className="px-3 py-2 text-sm text-gray-500">
+                        {translations.noCategoriesFound ||
+                          "No categories found"}
                       </div>
                     )}
                   </div>
@@ -471,17 +512,20 @@ export function GameFilters({
             </div>
           )}
 
-          {/* Clear Filters Button - Show when filters are active */}
+          {/* Clear Filters Button */}
           {hasActiveFilters && (
             <button
               onClick={clearAllFilters}
               className={cn(
-                "w-full md:w-auto px-4 py-2 rounded-lg transition-colors",
-                "bg-danger text-white hover:bg-danger/90",
-                "text-sm md:text-base font-medium"
+                "w-full md:w-auto px-4 py-3 rounded-lg border transition-colors",
+                "bg-red-500 hover:bg-red-600 text-white border-red-600",
+                "flex items-center justify-center gap-2"
               )}
             >
-              {translations.clear || "Clear All"}
+              <FontAwesomeIcon icon={faTimes} className="h-4 w-4" />
+              <span className="text-sm md:text-base">
+                {translations.clear || "Clear Filters"}
+              </span>
             </button>
           )}
         </div>
