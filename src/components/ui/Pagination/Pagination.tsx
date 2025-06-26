@@ -14,6 +14,7 @@ import type { PaginationProps } from "@/types/pagination.types";
  * - Optional info text (showing X-Y of Z items)
  * - Configurable styling and text
  * - Supports both default and compact variants
+ * - Auto-responsive mobile layout
  */
 export function Pagination({
   currentPage,
@@ -31,9 +32,9 @@ export function Pagination({
   // Don't render if only one page
   if (totalPages <= 1) return null;
 
-  // Generate page numbers to display
-  const getPageNumbers = () => {
-    const delta = variant === "compact" ? 1 : 2; // Number of pages to show on each side
+  // Generate page numbers to display for desktop
+  const getDesktopPageNumbers = () => {
+    const delta = variant === "compact" ? 1 : 2;
     const range = [];
     const rangeWithDots = [];
 
@@ -71,10 +72,87 @@ export function Pagination({
       : 0;
 
   return (
-    <div className={cn("flex flex-col items-center gap-4", className)}>
-      {/* Pagination controls */}
+    <div className={cn("flex flex-col items-center gap-2 sm:gap-4", className)}>
+      {/* Mobile Pagination - Simplified for small screens */}
       <nav
-        className="inline-flex items-center gap-3 p-1 bg-white rounded-2xl shadow-sm border border-gray-100"
+        className="flex sm:hidden items-center gap-2 p-1 bg-white rounded-xl shadow-sm border border-gray-100"
+        aria-label="Pagination"
+      >
+        {/* Previous button */}
+        <button
+          onClick={() => onPageChange(currentPage - 1)}
+          disabled={currentPage === 1 || disabled}
+          className={cn(
+            "flex items-center justify-center w-10 h-10 rounded-lg",
+            "text-primary hover:text-primary-shade",
+            "hover:bg-primary/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/20",
+            "disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-primary"
+          )}
+          aria-label="Previous page"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M10 12L6 8L10 4"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+
+        {/* Current page indicator */}
+        <div className="flex items-center gap-1 px-3">
+          <span className="text-sm text-gray-600">
+            {translations.page || "Page"}
+          </span>
+          <span className="text-sm font-semibold text-primary">
+            {currentPage}
+          </span>
+          <span className="text-sm text-gray-600">
+            {translations.of || "of"} {totalPages}
+          </span>
+        </div>
+
+        {/* Next button */}
+        <button
+          onClick={() => onPageChange(currentPage + 1)}
+          disabled={currentPage === totalPages || disabled}
+          className={cn(
+            "flex items-center justify-center w-10 h-10 rounded-lg",
+            "text-primary hover:text-primary-shade",
+            "hover:bg-primary/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/20",
+            "disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-primary"
+          )}
+          aria-label="Next page"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M6 12L10 8L6 4"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+      </nav>
+
+      {/* Desktop Pagination - Full featured */}
+      <nav
+        className="hidden sm:inline-flex items-center gap-3 p-1 bg-white rounded-2xl shadow-sm border border-gray-100"
         aria-label="Pagination"
       >
         {/* Previous button */}
@@ -111,7 +189,7 @@ export function Pagination({
 
         {/* Page numbers */}
         <div className="flex items-center gap-2">
-          {getPageNumbers().map((pageNum, index) =>
+          {getDesktopPageNumbers().map((pageNum, index) =>
             pageNum === "..." ? (
               <span
                 key={`dots-${index}`}
@@ -137,11 +215,7 @@ export function Pagination({
                   variant === "compact" && "min-w-[36px] h-9 px-3 text-sm"
                 )}
                 aria-label={`Go to page ${pageNum}`}
-                aria-current={
-                  currentPage === pageNum
-                    ? translations.page || "page"
-                    : undefined
-                }
+                aria-current={currentPage === pageNum ? "page" : undefined}
               >
                 {pageNum}
               </button>
@@ -186,7 +260,7 @@ export function Pagination({
       {showInfo && totalItems && itemsPerPage && (
         <p
           className={cn(
-            "text-sm text-white",
+            "text-xs sm:text-sm text-white",
             variant === "compact" && "text-xs"
           )}
         >

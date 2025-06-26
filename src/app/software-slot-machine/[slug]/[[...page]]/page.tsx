@@ -217,7 +217,7 @@ export default async function ProviderPage({
       { breadCrumbText: "HOME", breadCrumbUrl: "/" },
       {
         breadCrumbText: "SOFTWARE SLOT MACHINE",
-        breadCrumbUrl: "/software-slot-machine",
+        breadCrumbUrl: "/slot-software",
       },
       {
         breadCrumbText: pageData.title.toUpperCase(),

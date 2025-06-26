@@ -9,6 +9,7 @@ import type { PaginationServerProps } from "@/types/pagination.types";
  * Server-side Pagination Component
  * Works without JavaScript enabled
  * Uses Link components for navigation
+ * Mobile-responsive with simplified layout on small screens
  */
 export function PaginationServer({
   currentPage,
@@ -40,9 +41,9 @@ export function PaginationServer({
     return `${cleanBaseUrl}/p${page}`;
   };
 
-  // Generate page numbers to display
-  const getPageNumbers = () => {
-    const delta = variant === "compact" ? 1 : 2; // Number of pages to show on each side
+  // Generate page numbers to display for desktop
+  const getDesktopPageNumbers = () => {
+    const delta = variant === "compact" ? 1 : 2;
     const range = [];
     const rangeWithDots = [];
 
@@ -80,10 +81,135 @@ export function PaginationServer({
       : 0;
 
   return (
-    <div className={cn("flex flex-col items-center gap-4", className)}>
-      {/* Pagination controls */}
+    <div className={cn("flex flex-col items-center gap-2 sm:gap-4", className)}>
+      {/* Mobile Pagination - Simplified for small screens */}
       <nav
-        className="inline-flex items-center gap-3 p-1 bg-white rounded-2xl shadow-sm border border-gray-100"
+        className="flex sm:hidden items-center gap-2 p-1 bg-white rounded-xl shadow-sm border border-gray-100"
+        aria-label="Pagination"
+      >
+        {/* Previous button */}
+        {currentPage > 1 ? (
+          <Link
+            href={getPageUrl(currentPage - 1)}
+            className={cn(
+              "flex items-center justify-center w-10 h-10 rounded-lg",
+              "text-primary hover:text-primary-shade",
+              "hover:bg-primary/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/20"
+            )}
+            aria-label="Previous page"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M10 12L6 8L10 4"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </Link>
+        ) : (
+          <span
+            className={cn(
+              "flex items-center justify-center w-10 h-10 rounded-lg",
+              "text-gray-400 cursor-not-allowed"
+            )}
+            aria-disabled="true"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M10 12L6 8L10 4"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </span>
+        )}
+
+        {/* Current page indicator */}
+        <div className="flex items-center gap-1 px-3">
+          <span className="text-sm text-gray-600">
+            {translations.page || "Page"}
+          </span>
+          <span className="text-sm font-semibold text-primary">
+            {currentPage}
+          </span>
+          <span className="text-sm text-gray-600">
+            {translations.of || "of"} {totalPages}
+          </span>
+        </div>
+
+        {/* Next button */}
+        {currentPage < totalPages ? (
+          <Link
+            href={getPageUrl(currentPage + 1)}
+            className={cn(
+              "flex items-center justify-center w-10 h-10 rounded-lg",
+              "text-primary hover:text-primary-shade",
+              "hover:bg-primary/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/20"
+            )}
+            aria-label="Next page"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M6 4L10 8L6 12"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </Link>
+        ) : (
+          <span
+            className={cn(
+              "flex items-center justify-center w-10 h-10 rounded-lg",
+              "text-gray-400 cursor-not-allowed"
+            )}
+            aria-disabled="true"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M6 4L10 8L6 12"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </span>
+        )}
+      </nav>
+
+      {/* Desktop Pagination - Full featured */}
+      <nav
+        className="hidden sm:inline-flex items-center gap-3 p-1 bg-white rounded-2xl shadow-sm border border-gray-100"
         aria-label="Pagination"
       >
         {/* Previous button */}
@@ -146,7 +272,7 @@ export function PaginationServer({
 
         {/* Page numbers */}
         <div className="flex items-center gap-2">
-          {getPageNumbers().map((pageNum, index) =>
+          {getDesktopPageNumbers().map((pageNum, index) =>
             pageNum === "..." ? (
               <span
                 key={`dots-${index}`}
@@ -179,7 +305,9 @@ export function PaginationServer({
                       "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/20",
                       variant === "compact" && "min-w-[36px] h-9 px-3 text-sm"
                     )}
-                    aria-label={`${translations.goToPage || "Go to page"} ${pageNum}`}
+                    aria-label={`${
+                      translations.goToPage || "Go to page"
+                    } ${pageNum}`}
                   >
                     {pageNum}
                   </Link>
@@ -254,9 +382,9 @@ export function PaginationServer({
         totalItems > 0 &&
         itemsPerPage &&
         itemsPerPage > 0 && (
-          <p className="text-sm text-gray-600">
-            {startItem}–{endItem}{" "}
-            {translations.of || "of"} {totalItems} {itemName}
+          <p className="text-xs sm:text-sm text-gray-600">
+            {startItem}–{endItem} {translations.of || "of"} {totalItems}{" "}
+            {itemName}
           </p>
         )}
     </div>

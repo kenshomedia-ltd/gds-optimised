@@ -460,7 +460,7 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
                 onClick={handleReload}
                 onMouseEnter={() => setShowReloadTooltip(true)}
                 onMouseLeave={() => setShowReloadTooltip(false)}
-                className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 transition-colors"
+                className="w-8 h-8 rounded-[5px] bg-gray-300 border border-gray-400 flex items-center justify-center hover:bg-gray-400 hover:*:text-white transition-colors"
                 aria-label={translations.reload || "Reload"}
               >
                 <FontAwesomeIcon
@@ -481,7 +481,7 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
                 onClick={handleFullscreen}
                 onMouseEnter={() => setShowFullscreenTooltip(true)}
                 onMouseLeave={() => setShowFullscreenTooltip(false)}
-                className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 transition-colors"
+                className="w-8 h-8 rounded-[5px] bg-gray-300 border border-gray-400 flex items-center justify-center hover:bg-gray-400 transition-colors"
                 aria-label={translations.fullscreen || "Fullscreen"}
               >
                 <FontAwesomeIcon
@@ -508,7 +508,7 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
                 game={normalizedGame}
                 translations={translations}
                 size="sm"
-                className="!w-[30px] !h-[30px] bg-grey-300 !rounded-[5px] border border-grey-500"
+                className="!w-[33px] !h-[33px] bg-gray-300 hover:!bg-gray-400 !rounded-[5px] border !border-gray-400"
               />
               {showFavoriteTooltip && (
                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-5 py-2 bg-grey-100 text-black text-sm rounded shadow-lg z-20 w-fit whitespace-nowrap -ml-[180px]">
@@ -521,7 +521,7 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
             <div className="relative">
               <button
                 onClick={() => setShowInfo(!showInfo)}
-                className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 transition-colors"
+                className="w-8 h-8 rounded-[5px] border bg-gray-300 border-gray-400 flex items-center justify-center hover:bg-gray-400 hover:*:text-white transition-colors"
                 aria-label={translations.info || "Info"}
               >
                 <FontAwesomeIcon
@@ -537,12 +537,12 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
                 onClick={handleReportGame}
                 onMouseEnter={() => setShowReportTooltip(true)}
                 onMouseLeave={() => setShowReportTooltip(false)}
-                className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 transition-colors"
+                className="w-8 h-8 rounded-[5px] bg-danger border border-gray-300 flex items-center justify-center hover:bg-danger transition-colors"
                 aria-label={translations.report || "Report"}
               >
                 <FontAwesomeIcon
                   icon={faExclamationTriangle}
-                  className="w-4 h-4 text-gray-600"
+                  className="w-4 h-4 text-white"
                 />
               </button>
               {showReportTooltip && (

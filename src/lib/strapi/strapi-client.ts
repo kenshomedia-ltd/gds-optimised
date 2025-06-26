@@ -195,6 +195,13 @@ class StrapiClient {
           },
         },
         homeBreadcrumbs: "*",
+        gamesBreadcrumbs: "*",
+        casinoBreadcrumbs: "*",
+        blogBreadcrumbs: "*",
+        slotCasinosBreadcrumbs: "*",
+        providersBreadcrumbs: "*",
+        categoriesBreadcrumbs: "*",
+        casinoProvidersBreadcrumbs: "*",
       },
     };
 

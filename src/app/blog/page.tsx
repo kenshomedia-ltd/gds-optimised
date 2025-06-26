@@ -97,7 +97,7 @@ export default async function BlogIndexPage({
       />
 
       {/* Breadcrumbs */}
-      <Breadcrumbs items={breadcrumbs} />
+      <Breadcrumbs items={breadcrumbs} showHome={false} />
 
       {/* Hero Section with Featured Post (only on first page) */}
       {currentPage === 1 && featuredBlog && (

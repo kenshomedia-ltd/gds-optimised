@@ -34,7 +34,6 @@ export function CasinoRow({
   const noDepositBonus = formatNoDepositBonus(casino, translations);
   const welcomeBonus = formatWelcomeBonus(casino, translations.reloadBonus);
 
-  const siteId = process.env.NEXT_PUBLIC_SITE_ID || "default";
   const casinoPagePath =
     process.env.NEXT_PUBLIC_CASINO_PAGE_PATH || "/casino/recensione/";
 
@@ -122,7 +121,7 @@ export function CasinoRow({
           {/* Review link */}
           <div className="flex items-center justify-center">
             <Link
-              href={`${siteId === "gds" ? "/it" : ""}${casinoPagePath}/${
+              href={`${casinoPagePath}/${
                 casino.slug
               }/`}
               className="casino-name text-[14px] text-grey-900 mr-[11px] hover:text-primary transition-colors group"

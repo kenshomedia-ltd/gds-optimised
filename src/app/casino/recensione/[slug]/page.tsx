@@ -10,8 +10,9 @@ import { getLayoutData } from "@/lib/strapi/data-loader";
 import { generateMetadata as generateSEOMetadata } from "@/lib/utils/seo";
 import { CasinoHero } from "@/components/casino/CasinoHero/CasinoHero";
 import { CasinoContent } from "@/components/casino/CasinoContent/CasinoContent";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
+import { BreadcrumbsWithLayout } from "@/components/layout/Breadcrumbs";
 import type { CasinoPageData, FAQ, HowToStep } from "@/types/casino-page.types";
+import type { BreadcrumbItem } from "@/types/breadcrumbs.types";
 
 // Force static generation with ISR
 export const dynamic = "force-static";
@@ -66,7 +67,7 @@ export default async function CasinoPage({ params }: CasinoPageProps) {
   const { slug } = await params;
 
   // Fetch casino data with games and layout data in parallel
-  const [casinoResponse, layoutData] = await Promise.all([
+  const [casinoResponse, { layout, translations }] = await Promise.all([
     getCasinoPageDataWithGames(slug, { cached: true, gamesLimit: 12 }),
     getLayoutData({ cached: true }),
   ]);
@@ -76,27 +77,18 @@ export default async function CasinoPage({ params }: CasinoPageProps) {
   }
 
   const { casinoData, games } = casinoResponse;
-  const { translations } = layoutData;
 
   if (!casinoData) {
     notFound();
   }
 
-  // Generate breadcrumbs
-  const breadcrumbItems = [
-    {
-      breadCrumbText: translations.home || "Home",
-      breadCrumbUrl: "/",
-    },
-    {
-      breadCrumbText: translations.casinos || "Casinos",
-      breadCrumbUrl: "/casino",
-    },
-    {
-      breadCrumbText: casinoData.title,
-      breadCrumbUrl: "", // Empty string for current page
-    },
-  ];
+  // Get all layout breadcrumb collections
+  const layoutBreadcrumbs: Record<string, BreadcrumbItem[]> = {};
+  Object.keys(layout).forEach((key) => {
+    if (key.endsWith("Breadcrumbs") && Array.isArray(layout[key])) {
+      layoutBreadcrumbs[key] = layout[key];
+    }
+  });
 
   // Generate structured data for SEO
   const structuredData = generateStructuredData(casinoData);
@@ -113,7 +105,17 @@ export default async function CasinoPage({ params }: CasinoPageProps) {
       ))}
 
       {/* Breadcrumbs - Outside hero section to match other pages */}
-      <Breadcrumbs items={breadcrumbItems} showHome={false} />
+      <BreadcrumbsWithLayout
+        items={[
+          {
+            breadCrumbText: casinoData.title,
+            breadCrumbUrl: "", // Empty URL for current page
+          },
+        ]}
+        breadcrumbKey="casinoBreadcrumbs"
+        layoutBreadcrumbs={layoutBreadcrumbs}
+        showHome={false}
+      />
 
       {/* Hero Section - Consistent with other pages */}
       <section className="featured-header relative overflow-hidden bg-gradient-to-b from-background-900 from-30% via-background-700 via-80% to-background-500 rounded-b-3xl">

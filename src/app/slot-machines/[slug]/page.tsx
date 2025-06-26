@@ -111,7 +111,7 @@ async function GameContent({ game }: { game: GamePageData }) {
 
   return (
     <>
-      {/* Breadcrumbs - Outside hero section to match other pages */}
+      {/* Breadcrumbs */}
       <BreadcrumbsWithLayout
         items={[
           {
@@ -121,7 +121,7 @@ async function GameContent({ game }: { game: GamePageData }) {
         ]}
         breadcrumbKey="gamesBreadcrumbs"
         layoutBreadcrumbs={layoutBreadcrumbs}
-        showHome={true}
+        showHome={false}
       />
 
       {/* Hero Section with Game Player */}

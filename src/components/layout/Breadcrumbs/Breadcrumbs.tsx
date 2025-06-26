@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils/cn";
 export function Breadcrumbs({
   items,
   className,
-  showHome = true,
+  showHome = false,
 }: BreadcrumbsProps) {
   // Filter out any empty items (but keep items with null URLs as they represent current page)
   const validItems = items.filter((item) => item.breadCrumbText);
