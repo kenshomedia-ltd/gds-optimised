@@ -89,11 +89,11 @@ export function getMultipleSorts(
  * Casino sort options
  */
 export const CASINO_SORT_OPTIONS = [
-  { value: "ratingAvg:desc", label: "topRatedUsers" },
-  { value: "authorRatings:desc", label: "topRatedAuthor" },
-  { value: "bonusSection.bonusAmount:desc", label: "welcomeBonus" },
-  { value: "title:asc", label: "alphabetic" },
-  { value: "createdAt:desc", label: "newest" },
+  { value: "ratingAvg:desc", label: "casinoTopRated" },
+  { value: "authorRatings:desc", label: "casinoAuthorRatings" },
+  { value: "bonusSection.bonusAmount:desc", label: "casinoWelcomeBonus" },
+  { value: "title:asc", label: "casinoAlphabetic" },
+  { value: "createdAt:desc", label: "casinoPostDate" },
 ] as const;
 
 /**

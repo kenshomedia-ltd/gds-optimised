@@ -434,7 +434,7 @@ export function CasinoFilters({
 
               {openDropdown === "sort" && (
                 <div className="absolute top-full mt-1 w-full bg-filter-bkg rounded-b-lg shadow-lg z-[100] border border-filter-border max-h-64 overflow-y-auto">
-                  <div className="p-2 flex flex-col gap-1">
+                  <div className="p-2 flex flex-col">
                     {CASINO_SORT_OPTIONS.map((option) => (
                       <button
                         key={option.value}

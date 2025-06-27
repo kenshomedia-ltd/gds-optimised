@@ -32,6 +32,8 @@ const HERO_BLOCK_TYPES = [
   "homepage.home-game-list",
   "homepage.home-featured-providers",
   "shared.overview-block",
+  "games.games-carousel",
+  "games.new-and-loved-slots",
   "casinos.casino-list",
 ];
 
