@@ -51,7 +51,7 @@ export function CasinoPaymentSoftwareClient({
 
       if (isMobile) {
         // On mobile, show max 4 icons + overflow button
-        setVisibleProviderCount(Math.min(4, casino.providers.length));
+        setVisibleProviderCount(Math.min(3, casino.providers.length));
       } else {
         // On desktop, calculate based on available space
         const iconWidth = 56; // Width of each icon including gap (55px + 1px gap)

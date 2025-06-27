@@ -177,7 +177,7 @@ export default async function CategoryPage({
 
             {/* Games Section - In Hero */}
             <div className="relative z-10">
-              <GameListWidget block={gamesBlock} games={games} />
+              <GameListWidget block={gamesBlock} games={games} translations={translations} />
             </div>
           </div>
 

@@ -1,7 +1,7 @@
 // src/components/casino/CasinoHero/CasinoHero.tsx
 "use client";
 
-import { useState } from "react";
+// import { useState } from "react";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -19,7 +19,8 @@ import { CasinoFeaturesTable } from "./CasinoFeaturesTable";
 import { CasinoGeneralInfoTable } from "./CasinoGeneralInfoTable";
 import { CasinoTestimonial } from "./CasinoTestimonial";
 import { CasinoPaymentSoftware } from "./CasinoPaymentSoftware";
-import type { CasinoPageData } from "@/types/casino.types";
+import type { CasinoPageData } from "@/types/casino-page.types";
+import { BonusSection } from "@/types/casino.types";
 
 interface CasinoHeroProps {
   casino: CasinoPageData;
@@ -28,22 +29,22 @@ interface CasinoHeroProps {
 
 export function CasinoHero({ casino, translations }: CasinoHeroProps) {
   // Process terms and conditions
-  const termsAndConditionsCleaned = casino.termsConditions
-    ?.replace(/<[^>]+>/g, "")
-    .replace(/&nbsp;/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+  const termsAndConditionsCleaned =
+    casino.termsAndConditions?.copy?.replace(/(<([^>]+)>)/gi, "") || "";
 
-  // Format bonus amounts
-  const formatBonus = (bonusSection: typeof casino.bonusSection) => {
-    if (!bonusSection) return null;
+  // Format bonus amounts - properly typed parameter
+  const formatBonus = (section: BonusSection | null | undefined) => {
+    if (!section) return null;
 
     const parts = [];
-    if (bonusSection.bonusType === "percentage" && bonusSection.percentage) {
-      parts.push(`${bonusSection.percentage}%`);
+    if (section.bonusAmount) {
+      parts.push(`${section.bonusAmount}€`);
     }
-    if (bonusSection.bonusAmount) {
-      parts.push(`${bonusSection.bonusAmount}€`);
+    if (section.cashBack) {
+      parts.push(section.cashBack);
+    }
+    if (section.freeSpin) {
+      parts.push(section.freeSpin);
     }
 
     return parts.length > 0 ? parts.join(" + ") : null;
@@ -214,6 +215,11 @@ export function CasinoHero({ casino, translations }: CasinoHeroProps) {
               contentClass="text-xs text-gray-600"
               defaultOpen={true}
             />
+          </div>
+
+          {/* Casino summary */}
+          <div className="md:col-span-3">
+            <CasinoSummary casino={casino} translations={translations} />
           </div>
         </div>
       </div>
