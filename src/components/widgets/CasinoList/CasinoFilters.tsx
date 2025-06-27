@@ -50,6 +50,16 @@ export function CasinoFilters({
     options: ReadonlyArray<{ readonly value: string; readonly label: string }>,
     value: string
   ) => {
+    // Check if this is a sort value (contains colon)
+    if (value.includes(":")) {
+      // Extract just the sort key without the direction
+      const sortKey = value.split(":")[0];
+      // Find the option that matches the sort key (ignoring direction)
+      const option = options.find((opt) => opt.value.startsWith(sortKey + ":"));
+      return option ? translations[option.label] || option.label : "";
+    }
+
+    // For non-sort values, find exact match
     const option = options.find((opt) => opt.value === value);
     return option ? translations[option.label] || option.label : "";
   };
@@ -81,10 +91,16 @@ export function CasinoFilters({
   // Handle filter change
   const handleFilterChange = useCallback(
     (key: keyof CasinoFiltersState, value: string | string[]) => {
+      if (key === "sort" && typeof value === "string") {
+        // When selecting from dropdown, preserve the current sort order
+        const newSortKey = value.split(":")[0];
+        const currentOrder = selectedFilters.sort?.split(":")[1] || "desc";
+        value = `${newSortKey}:${currentOrder}`;
+      }
       onFilterChange({ [key]: value });
       setOpenDropdown(null);
     },
-    [onFilterChange]
+    [onFilterChange, selectedFilters.sort]
   );
 
   // Handle clear filter
@@ -434,7 +450,7 @@ export function CasinoFilters({
 
               {openDropdown === "sort" && (
                 <div className="absolute top-full mt-1 w-full bg-filter-bkg rounded-b-lg shadow-lg z-[100] border border-filter-border max-h-64 overflow-y-auto">
-                  <div className="p-2 flex flex-col">
+                  <div className="p-2 flex flex-col gap-1">
                     {CASINO_SORT_OPTIONS.map((option) => (
                       <button
                         key={option.value}
