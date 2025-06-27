@@ -1,0 +1,4507 @@
+{
+  "timestamp": "2025-06-27T14:30:59.279Z",
+  "totalOriginal": 172,
+  "totalProcessed": 344,
+  "redirects": [
+    {
+      "source": "/slot-casinos/",
+      "destination": "/slot-machine/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos",
+      "destination": "/slot-machine/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/casino-paypal/",
+      "destination": "/guida-casino/metodi-di-pagamento/paypal/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/casino-paypal",
+      "destination": "/guida-casino/metodi-di-pagamento/paypal/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/slottery",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/slottery/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/blackout-pubblicit%C3%A0-ora-per-il-gioco-dazzardo-si-fa-dura",
+      "destination": "/blog/blackout-pubblicita-ora-per-il-gioco-dazzardo-si-fa-dura/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/blackout-pubblicit%C3%A0-ora-per-il-gioco-dazzardo-si-fa-dura/",
+      "destination": "/blog/blackout-pubblicita-ora-per-il-gioco-dazzardo-si-fa-dura/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-machine/marvel",
+      "destination": "/slot-machine/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-machine/marvel/",
+      "destination": "/slot-machine/",
+      "permanent": true
+    },
+    {
+      "source": "/go/hardrock/",
+      "destination": "https://www.hardrockcasino.it/slot-machine",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/hardrock",
+      "destination": "https://www.hardrockcasino.it/slot-machine",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betsson/",
+      "destination": "https://record.betsson.it/_QFO0Ve3sy0uI-QCHHOFI22Nd7ZgqdRLk/1/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betsson",
+      "destination": "https://record.betsson.it/_QFO0Ve3sy0uI-QCHHOFI22Nd7ZgqdRLk/1/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/casino/recensione/betfair-casino",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/betfair-casino/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/betfair-casino/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/betfair-casino",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/eazybet",
+      "destination": "/casino/recensione/sportbet/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/eazybet/",
+      "destination": "/casino/recensione/sportbet/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/star-casino",
+      "destination": "/casino/recensione/star-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/star-casino/",
+      "destination": "/casino/recensione/star-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/post/97973695063/gioco-dazzardo-quali-sono-i-paesi-dove-si-perde-di",
+      "destination": "/blog/gioco-dazzardo-quali-sono-i-paesi-dove-si-perde-di-pi/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/post/97973695063/gioco-dazzardo-quali-sono-i-paesi-dove-si-perde-di/",
+      "destination": "/blog/gioco-dazzardo-quali-sono-i-paesi-dove-si-perde-di-pi/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/betflag-casino",
+      "destination": "/casino/recensione/betflag-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/betflag-casino/",
+      "destination": "/casino/recensione/betflag-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/report-sostenibilità-hbg-gaming-tra-i-temi-anche-gioco-responsabile-ed-agenda-onu-2030",
+      "destination": "/blog/report-sostenibilita-hbg-gaming-tra-i-temi-anche-gioco-responsabile-ed-agenda-onu-2030/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/report-sostenibilità-hbg-gaming-tra-i-temi-anche-gioco-responsabile-ed-agenda-onu-2030/",
+      "destination": "/blog/report-sostenibilita-hbg-gaming-tra-i-temi-anche-gioco-responsabile-ed-agenda-onu-2030/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/blackout-pubblicità-ora-per-il-gioco-dazzardo-si-fa-dura",
+      "destination": "/blog/blackout-pubblicita-ora-per-il-gioco-dazzardo-si-fa-dura/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/blackout-pubblicità-ora-per-il-gioco-dazzardo-si-fa-dura/",
+      "destination": "/blog/blackout-pubblicita-ora-per-il-gioco-dazzardo-si-fa-dura/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/come-industria-del-gioco-legale-ha-reagito-alle-restrizioni-normative-in-italia-e-spagna",
+      "destination": "/blog/come-lindustria-del-gioco-legale-ha-reagito-alle-restrizioni-normative-in-italia-e-spagna/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/come-industria-del-gioco-legale-ha-reagito-alle-restrizioni-normative-in-italia-e-spagna/",
+      "destination": "/blog/come-lindustria-del-gioco-legale-ha-reagito-alle-restrizioni-normative-in-italia-e-spagna/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/post/89065033038/7-incredibili-storie-da-casino",
+      "destination": "/blog/7-incredibili-storie-da-casin/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/post/89065033038/7-incredibili-storie-da-casino/",
+      "destination": "/blog/7-incredibili-storie-da-casin/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/post/100154507863/danni-e-benefici-e-numeri-del-gioco-dazzardo",
+      "destination": "/blog/danni-e-benefici-e-numeri-del-gioco-dazzardo-infografica/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/post/100154507863/danni-e-benefici-e-numeri-del-gioco-dazzardo/",
+      "destination": "/blog/danni-e-benefici-e-numeri-del-gioco-dazzardo-infografica/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/post/112972918888/la-storia-delle-scommesse-online-lorigine-la",
+      "destination": "/blog/la-storia-delle-scommesse-online-lorigine-la-crescita-e-le-nuove-tecnologie/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/post/112972918888/la-storia-delle-scommesse-online-lorigine-la/",
+      "destination": "/blog/la-storia-delle-scommesse-online-lorigine-la-crescita-e-le-nuove-tecnologie/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/lingegneria-della-dipendenza-da-slot.-la-tecnologia-vuole-i-suoi-segreti",
+      "destination": "/blog/lingegneria-della-dipendenza-da-slot-la-tecnologia-vuole-i-suoi-segreti/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/lingegneria-della-dipendenza-da-slot.-la-tecnologia-vuole-i-suoi-segreti/",
+      "destination": "/blog/lingegneria-della-dipendenza-da-slot-la-tecnologia-vuole-i-suoi-segreti/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/snai-casino",
+      "destination": "/casino/recensione/snai-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/snai-casino/",
+      "destination": "/casino/recensione/snai-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/eazybet/",
+      "destination": "/casino/recensione/sportbet/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/eazybet",
+      "destination": "/casino/recensione/sportbet/",
+      "permanent": true
+    },
+    {
+      "source": "/go/sportbet/",
+      "destination": "https://www.sportbet.it/signup?codAffiliato=SPWEB30&affiliato=SPWEB30",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/sportbet",
+      "destination": "https://www.sportbet.it/signup?codAffiliato=SPWEB30&affiliato=SPWEB30",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/slot-casinos/leo-vegas-casino",
+      "destination": "/casino/recensione/leo-vegas-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/leo-vegas-casino/",
+      "destination": "/casino/recensione/leo-vegas-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/about-us",
+      "destination": "/author/",
+      "permanent": false
+    },
+    {
+      "source": "/about-us/",
+      "destination": "/author/",
+      "permanent": false
+    },
+    {
+      "source": "/blog/post/80253856516/guida-completa-ai-piu-grandi-e-belli-casino-al-mondo",
+      "destination": "/blog/post/80253856516/guida-completa-ai-piu-grandi-e-belli-casino-al-mondo/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/post/80253856516/guida-completa-ai-piu-grandi-e-belli-casino-al-mondo/",
+      "destination": "/blog/post/80253856516/guida-completa-ai-piu-grandi-e-belli-casino-al-mondo/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/post/82280209345/alla-scoperta-dellinsula-larea-del-cervello-che",
+      "destination": "/blog/alla-scoperta-dellinsula-larea-del-cervello-che-innesca-la-dipendenza-al-gi/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/post/82280209345/alla-scoperta-dellinsula-larea-del-cervello-che/",
+      "destination": "/blog/alla-scoperta-dellinsula-larea-del-cervello-che-innesca-la-dipendenza-al-gi/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/post/80253856516/guida-completa-ai-piu-grandi-e-belli-casino-al-mondo/",
+      "destination": "/blog/guida-completa-ai-pi-grandi-e-belli-casin-al-mondo/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/post/80253856516/guida-completa-ai-piu-grandi-e-belli-casino-al-mondo",
+      "destination": "/blog/guida-completa-ai-pi-grandi-e-belli-casin-al-mondo/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/casinoyes",
+      "destination": "/casino/recensione/admiral-yes-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/casinoyes/",
+      "destination": "/casino/recensione/admiral-yes-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/leovegas",
+      "destination": "/casino/recensione/leo-vegas-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/leovegas/",
+      "destination": "/casino/recensione/leo-vegas-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/sisal",
+      "destination": "/casino/recensione/sisal/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/sisal/",
+      "destination": "/casino/recensione/sisal/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/pokerstars",
+      "destination": "/casino/recensione/pokerstars-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/pokerstars/",
+      "destination": "/casino/recensione/pokerstars-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/starvegas-casino",
+      "destination": "/casino/recensione/starvegas-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/starvegas-casino/",
+      "destination": "/casino/recensione/starvegas-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/pokerstars-casino",
+      "destination": "/casino/recensione/pokerstars-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/pokerstars-casino/",
+      "destination": "/casino/recensione/pokerstars-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/big-bonus",
+      "destination": "/casino/recensione/best-in-games/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/big-bonus/",
+      "destination": "/casino/recensione/best-in-games/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/betwin360",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/betwin360/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/slot-yes",
+      "destination": "/casino/recensione/admiral-yes-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/slot-yes/",
+      "destination": "/casino/recensione/admiral-yes-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/merkur-win-casino",
+      "destination": "/casino/recensione/casino-mania/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/merkur-win-casino/",
+      "destination": "/casino/recensione/casino-mania/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/starcasino",
+      "destination": "/casino/recensione/star-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/starcasino/",
+      "destination": "/casino/recensione/star-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/starvegas",
+      "destination": "/casino/recensione/starvegas-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/starvegas/",
+      "destination": "/casino/recensione/starvegas-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-machine/piu-giocate",
+      "destination": "/slot-machine/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-machine/piu-giocate/",
+      "destination": "/slot-machine/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-machine/migliori",
+      "destination": "/slot-machine/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-machine/migliori/",
+      "destination": "/slot-machine/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/voglia-di-vincere-casino",
+      "destination": "/casino/recensione/jackpot-city/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/voglia-di-vincere-casino/",
+      "destination": "/casino/recensione/jackpot-city/",
+      "permanent": true
+    },
+    {
+      "source": "/go/quigioco/",
+      "destination": "https://promozioni.quigioco.it/landing-giochi-di-slots/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/quigioco",
+      "destination": "https://promozioni.quigioco.it/landing-giochi-di-slots/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/software-slot-machine/bg-gaming",
+      "destination": "/software-slot-machine/b-gaming/",
+      "permanent": true
+    },
+    {
+      "source": "/software-slot-machine/bg-gaming/",
+      "destination": "/software-slot-machine/b-gaming/",
+      "permanent": true
+    },
+    {
+      "source": "/go/admiralyes/",
+      "destination": "https://www.admiralbet.it/gmg/refer/6756fb56fb8cad000114dfba",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/admiralyes",
+      "destination": "https://www.admiralbet.it/gmg/refer/6756fb56fb8cad000114dfba",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/star-casino/",
+      "destination": "https://record.starcasino.it/_QFO0Ve3sy0t_4fiThTieLWNd7ZgqdRLk/6/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/star-casino",
+      "destination": "https://record.starcasino.it/_QFO0Ve3sy0t_4fiThTieLWNd7ZgqdRLk/6/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/stanleybet/",
+      "destination": "https://www.stanleybet.it/affiliati.jsp?codaffiliato=rosso&p=BSD",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/stanleybet",
+      "destination": "https://www.stanleybet.it/affiliati.jsp?codaffiliato=rosso&p=BSD",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/snai/",
+      "destination": "https://informatoriads.snai.it/redirect.aspx?pid=9834&bid=2786",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/snai",
+      "destination": "https://informatoriads.snai.it/redirect.aspx?pid=9834&bid=2786",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/slotyes/",
+      "destination": "http://affiliazione.playyes.it/processing/clickthrgh.asp?btag=a_91b_217",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/slotyes",
+      "destination": "http://affiliazione.playyes.it/processing/clickthrgh.asp?btag=a_91b_217",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/slottery/",
+      "destination": "https://betly.co/fa1cb48952",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/slottery",
+      "destination": "https://betly.co/fa1cb48952",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/skiller/",
+      "destination": "https://www.skiller.it/signup?codAffiliato=SKIKEN&promo=GSC600",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/skiller",
+      "destination": "https://www.skiller.it/signup?codAffiliato=SKIKEN&promo=GSC600",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/sisal/",
+      "destination": "https://ads.sisal.it/promoRedirect?key=ej0xMzUyNDE2MyZsPTE0MTcyMTk1JnA9NjQ0NTc%3D",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/sisal",
+      "destination": "https://ads.sisal.it/promoRedirect?key=ej0xMzUyNDE2MyZsPTE0MTcyMTk1JnA9NjQ0NTc%3D",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/scommettendo/",
+      "destination": "https://www.scommettendo.it/landing",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/scommettendo",
+      "destination": "https://www.scommettendo.it/landing",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/pokerstarscasino/",
+      "destination": "https://secure.starsaffiliateclub.com/C.ashx?btag=a_183086b_5711c_&affid=93843987&siteid=183086&adid=5711&c=",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/pokerstarscasino",
+      "destination": "https://secure.starsaffiliateclub.com/C.ashx?btag=a_183086b_5711c_&affid=93843987&siteid=183086&adid=5711&c=",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/paddypower/",
+      "destination": "http://media.paddypower.com/redirect.aspx?pid=10083302&bid=6758",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/paddypower",
+      "destination": "http://media.paddypower.com/redirect.aspx?pid=10083302&bid=6758",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/netbet/",
+      "destination": "https://netbetit.livepartners.com/view.php?z=165695",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/netbet",
+      "destination": "https://netbetit.livepartners.com/view.php?z=165695",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/mybet",
+      "destination": "http://www.livepartners.it/affiliate/tracking/click/?id=202701&bid=869",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/mybet/",
+      "destination": "http://www.livepartners.it/affiliate/tracking/click/?id=202701&bid=869",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/mrgreen/",
+      "destination": "http://ads.mrgreen.com/redirect.aspx?pid=4362498&bid=7329&lpid=1533",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/mrgreen",
+      "destination": "http://ads.mrgreen.com/redirect.aspx?pid=4362498&bid=7329&lpid=1533",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/merkur-win/",
+      "destination": "https://record.piattaforma97.it/_Xk8cQ-T_tNoLak7-PYDSdWNd7ZgqdRLk/1/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/merkur-win",
+      "destination": "https://record.piattaforma97.it/_Xk8cQ-T_tNoLak7-PYDSdWNd7ZgqdRLk/1/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/luckyclic/",
+      "destination": "http://record.affiliatelounge.com/_QFO0Ve3sy0tt2C4VD0nVEWNd7ZgqdRLk/6/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/luckyclic",
+      "destination": "http://record.affiliatelounge.com/_QFO0Ve3sy0tt2C4VD0nVEWNd7ZgqdRLk/6/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/jackpot.it/",
+      "destination": "https://jackpot.onelink.me/1833068633/8cc5dde9",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/jackpot.it",
+      "destination": "https://jackpot.onelink.me/1833068633/8cc5dde9",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/intralot/",
+      "destination": "https://media.intralot.it/redirect.aspx?pid=8818&bid=1538",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/intralot",
+      "destination": "https://media.intralot.it/redirect.aspx?pid=8818&bid=1538",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/goldbet/",
+      "destination": "https://media.goldbetpartners.it/redirect.aspx?pid=4779&bid=1485",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/goldbet",
+      "destination": "https://media.goldbetpartners.it/redirect.aspx?pid=4779&bid=1485",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/fantasy-team/",
+      "destination": "https://casino.fantasyteam.it/FTGIOCHIDISLOTS/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/fantasy-team",
+      "destination": "https://casino.fantasyteam.it/FTGIOCHIDISLOTS/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/eurobet/",
+      "destination": "https://record.betpartners.it/_xW3cdT1l49QZV93hC2dJ_GNd7ZgqdRLk/4/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/eurobet",
+      "destination": "https://record.betpartners.it/_xW3cdT1l49QZV93hC2dJ_GNd7ZgqdRLk/4/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betx/",
+      "destination": "https://www.xpartners.it/bonus-senza-deposito-30-betx/?brand=BETX2",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betx",
+      "destination": "https://www.xpartners.it/bonus-senza-deposito-30-betx/?brand=BETX2",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betwin360/",
+      "destination": "https://bw360.it/bet?father=B360adamson®ister=true&force=false&withFather=false",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betwin360",
+      "destination": "https://bw360.it/bet?father=B360adamson®ister=true&force=false&withFather=false",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betnero/",
+      "destination": "https://record.piattaforma97.it/_shPApe2vTI5w9PUHBV5BDWNd7ZgqdRLk/1/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betnero",
+      "destination": "https://record.piattaforma97.it/_shPApe2vTI5w9PUHBV5BDWNd7ZgqdRLk/1/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betflag/",
+      "destination": "https://info.betflag.it/promozioni-e-bonus/promo-casino/bonus-senza-deposito-slot/?btag=PV3_389E6472D9BC49B08BC8D060F07FE8DE",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betflag",
+      "destination": "https://info.betflag.it/promozioni-e-bonus/promo-casino/bonus-senza-deposito-slot/?btag=PV3_389E6472D9BC49B08BC8D060F07FE8DE",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betfair/",
+      "destination": "https://ads.betfair.com/redirect.aspx?pid=2660102&bid=10991",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betfair",
+      "destination": "https://ads.betfair.com/redirect.aspx?pid=2660102&bid=10991",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betclic/",
+      "destination": "https://wlbetclic.adsrv.eacdn.com/C.ashx?btag=a_28415b_12231c_&affid=18352&siteid=28415&adid=12231&c=",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betclic",
+      "destination": "https://wlbetclic.adsrv.eacdn.com/C.ashx?btag=a_28415b_12231c_&affid=18352&siteid=28415&adid=12231&c=",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betaland/",
+      "destination": "https://promopage.betaland.it/?promoCode=GDS",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betaland",
+      "destination": "https://promopage.betaland.it/?promoCode=GDS",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/bestingames/",
+      "destination": "https://informatoriads.snai.it/redirect.aspx?pid=28687&bid=2737",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/bestingames",
+      "destination": "https://informatoriads.snai.it/redirect.aspx?pid=28687&bid=2737",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/slot-machine-online/",
+      "destination": "/slot-machine/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-machine-online",
+      "destination": "/slot-machine/",
+      "permanent": true
+    },
+    {
+      "source": "/stanleybet/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/stanleybet",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-machines/dogfather/",
+      "destination": "/slot-machine/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-machines/dogfather",
+      "destination": "/slot-machine/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-machines/cosmic-fortune/",
+      "destination": "/slot-machine/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-machines/cosmic-fortune",
+      "destination": "/slot-machine/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-machine/piu-giocate/",
+      "destination": "/slot-machine/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-machine/piu-giocate",
+      "destination": "/slot-machine/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-machine/migliori/",
+      "destination": "/slot-machine/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-machine/migliori",
+      "destination": "/slot-machine/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/voglia-di-vincere-casino/",
+      "destination": "/casino/recensione/voglia-di-vincere-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/voglia-di-vincere-casino",
+      "destination": "/casino/recensione/voglia-di-vincere-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/voglia-di-vincere-casino/",
+      "destination": "/casino/recensione/jackpot-city/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/voglia-di-vincere-casino",
+      "destination": "/casino/recensione/jackpot-city/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/starvegas-casino/",
+      "destination": "/casino/recensione/starvegas-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/starvegas-casino",
+      "destination": "/casino/recensione/starvegas-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/starvegas/",
+      "destination": "/casino/recensione/starvegas-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/starvegas",
+      "destination": "/casino/recensione/starvegas-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/star-casino/",
+      "destination": "/casino/recensione/star-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/star-casino",
+      "destination": "/casino/recensione/star-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/snai-casino/",
+      "destination": "/casino/recensione/snai-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/snai-casino",
+      "destination": "/casino/recensione/snai-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/slot-yes/",
+      "destination": "/casino/recensione/admiral-yes-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/slot-yes",
+      "destination": "/casino/recensione/admiral-yes-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/sisal/",
+      "destination": "/casino/recensione/sisal/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/sisal",
+      "destination": "/casino/recensione/sisal/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/pokerstars-casino/",
+      "destination": "/casino/recensione/pokerstars-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/pokerstars-casino",
+      "destination": "/casino/recensione/pokerstars-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/netbet-casino/",
+      "destination": "/casino/recensione/netbet-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/netbet-casino",
+      "destination": "/casino/recensione/netbet-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/netbet-casino/",
+      "destination": "/casino/recensione/netbet-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/netbet-casino",
+      "destination": "/casino/recensione/netbet-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/lottomatica/",
+      "destination": "/casino/recensione/lottomatica/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/lottomatica",
+      "destination": "/casino/recensione/lottomatica/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/leo-vegas-casino/",
+      "destination": "/casino/recensione/leo-vegas-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/leo-vegas-casino",
+      "destination": "/casino/recensione/leo-vegas-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/fastbet/",
+      "destination": "/casino/recensione/fastbet/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/fastbet",
+      "destination": "/casino/recensione/fastbet/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/casino-mania/",
+      "destination": "/casino/recensione/casino-mania/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/casino-mania",
+      "destination": "/casino/recensione/casino-mania/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/casino-mania/",
+      "destination": "/casino/recensione/casino-mania/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/casino-mania",
+      "destination": "/casino/recensione/casino-mania/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/betway/",
+      "destination": "/casino/recensione/betway/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/betway",
+      "destination": "/casino/recensione/betway/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/betflag-casino/",
+      "destination": "/casino/recensione/betflag-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/betflag-casino",
+      "destination": "/casino/recensione/betflag-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/888-casino/",
+      "destination": "/casino/recensione/888-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/888-casino",
+      "destination": "/casino/recensione/888-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/promozioni/",
+      "destination": "/blog/",
+      "permanent": true
+    },
+    {
+      "source": "/promozioni",
+      "destination": "/blog/",
+      "permanent": true
+    },
+    {
+      "source": "/monopoly-live/",
+      "destination": "/casino-live/monopoly-live/",
+      "permanent": true
+    },
+    {
+      "source": "/monopoly-live",
+      "destination": "/casino-live/monopoly-live/",
+      "permanent": true
+    },
+    {
+      "source": "/casinos/",
+      "destination": "/casino/",
+      "permanent": true
+    },
+    {
+      "source": "/casinos",
+      "destination": "/casino/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/voglia-di-vincere-casino/",
+      "destination": "/casino/recensione/jackpot-city/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/voglia-di-vincere-casino",
+      "destination": "/casino/recensione/jackpot-city/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/titanbet-casino/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/titanbet-casino",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/stanleybet/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/stanleybet",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/slottery/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/slottery",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/slot-yes/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/slot-yes",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/skiller/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/skiller",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/scommettendo/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/scommettendo",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/mr-green/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/mr-green",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/fantasy-team/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/fantasy-team",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/codere/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/codere",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/casinoyes/",
+      "destination": "/casino/recensione/admiral-yes-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/casinoyes",
+      "destination": "/casino/recensione/admiral-yes-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/betx/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/betx",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/betwin360/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/betwin360",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/betclic/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/betclic",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/andromedabet-people-casino/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/andromedabet-people-casino",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/admiral-bet/",
+      "destination": "/casino/recensione/admiral-yes-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/admiral-bet",
+      "destination": "/casino/recensione/admiral-yes-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/",
+      "destination": "/casino-bonus-senza-deposito/",
+      "permanent": true
+    },
+    {
+      "source": "/casino",
+      "destination": "/casino-bonus-senza-deposito/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/starvegas/",
+      "destination": "/casino/recensione/starvegas-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/starvegas",
+      "destination": "/casino/recensione/starvegas-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/starcasino/",
+      "destination": "/casino/recensione/star-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/starcasino",
+      "destination": "/casino/recensione/star-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/sisal/",
+      "destination": "/casino/recensione/sisal/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/sisal",
+      "destination": "/casino/recensione/sisal/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/pokerstars/",
+      "destination": "/casino/recensione/pokerstars-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/pokerstars",
+      "destination": "/casino/recensione/pokerstars-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/merkur-win/",
+      "destination": "/casino/recensione/casino-mania/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/merkur-win",
+      "destination": "/casino/recensione/casino-mania/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/betflag/",
+      "destination": "/casino/recensione/betflag-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/betflag",
+      "destination": "/casino/recensione/betflag-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/betfair/",
+      "destination": "/casino/recensione/betfair-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/betfair",
+      "destination": "/casino/recensione/betfair-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/888/",
+      "destination": "/casino/recensione/888-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/888",
+      "destination": "/casino/recensione/888-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/go/888casino/",
+      "destination": "https://ic.aff-handler.com/C/48223?sr=1836821",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/888casino",
+      "destination": "https://ic.aff-handler.com/C/48223?sr=1836821",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/william-hill-tb/",
+      "destination": "http://serve.williamhill.it/promoRedirect?member=luca93897643507&campaign=DEFAULT&channel=DEFAULT&zone=1480829148&lp=1480320958",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/william-hill-tb",
+      "destination": "http://serve.williamhill.it/promoRedirect?member=luca93897643507&campaign=DEFAULT&channel=DEFAULT&zone=1480829148&lp=1480320958",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/william-hill/",
+      "destination": "https://campaigns.williamhill.it/C.ashx?btag=a_57246b_1236c_&affid=1737229&siteid=57246&adid=1236&c=",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/william-hill",
+      "destination": "https://campaigns.williamhill.it/C.ashx?btag=a_57246b_1236c_&affid=1737229&siteid=57246&adid=1236&c=",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/vogliadivincere/",
+      "destination": "https://www.vogliadivincere.it?s=bfp19125&a=bfpadid115071",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/vogliadivincere",
+      "destination": "https://www.vogliadivincere.it?s=bfp19125&a=bfpadid115071",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/vincitu/",
+      "destination": "https://media.vincitu.it/C.ashx?btag=a_142b_139c_&affid=70&siteid=142&adid=139&c=",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/vincitu",
+      "destination": "https://media.vincitu.it/C.ashx?btag=a_142b_139c_&affid=70&siteid=142&adid=139&c=",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/unibet/",
+      "destination": "https://b1.trickyrock.com/redirect.aspx?pid=50572830&bid=27508",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/unibet",
+      "destination": "https://b1.trickyrock.com/redirect.aspx?pid=50572830&bid=27508",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/titanbet/",
+      "destination": "http://online.europartners.com/promoRedirect?member=giochidislots&campaign=DEFAULT&channel=DEFAULT&zone=13523998&lp=13523989",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/titanbet",
+      "destination": "http://online.europartners.com/promoRedirect?member=giochidislots&campaign=DEFAULT&channel=DEFAULT&zone=13523998&lp=13523989",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/starvegas/",
+      "destination": "https://www.starvegas.it/gmg/refer/653bd30e844bd600010899e9",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/starvegas",
+      "destination": "https://www.starvegas.it/gmg/refer/653bd30e844bd600010899e9",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/starcasino-hom/",
+      "destination": "https://record.starcasino.it/_QFO0Ve3sy0t_4fiThTieLWNd7ZgqdRLk/6/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/starcasino-hom",
+      "destination": "https://record.starcasino.it/_QFO0Ve3sy0t_4fiThTieLWNd7ZgqdRLk/6/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/starcasino-gam/",
+      "destination": "https://record.starcasino.it/_QFO0Ve3sy0t_4fiThTieLWNd7ZgqdRLk/6/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/starcasino-gam",
+      "destination": "https://record.starcasino.it/_QFO0Ve3sy0t_4fiThTieLWNd7ZgqdRLk/6/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/planetwin365/",
+      "destination": "https://ads.planetwin365affiliate.com/redirect.aspx?pid=6592&bid=1675",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/planetwin365",
+      "destination": "https://ads.planetwin365affiliate.com/redirect.aspx?pid=6592&bid=1675",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/lottomatica/",
+      "destination": "https://media.lottomaticapartners.it/redirect.aspx?pid=6632&bid=1509",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/lottomatica",
+      "destination": "https://media.lottomaticapartners.it/redirect.aspx?pid=6632&bid=1509",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/leovegas/",
+      "destination": "https://ntrfr.leovegas.com/redirect.aspx?pid=3639581&lpid=1756&bid=19140",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/leovegas",
+      "destination": "https://ntrfr.leovegas.com/redirect.aspx?pid=3639581&lpid=1756&bid=19140",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/fastbet/",
+      "destination": "https://www.fastbet.it/landing/fastlink?page=register.html&tracking=BackOfficeLink&agent=76819",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/fastbet",
+      "destination": "https://www.fastbet.it/landing/fastlink?page=register.html&tracking=BackOfficeLink&agent=76819",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betway/",
+      "destination": "https://www.betway.it/bwp/cas001?s=bpi29948&a=bpiadid167197",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betway",
+      "destination": "https://www.betway.it/bwp/cas001?s=bpi29948&a=bpiadid167197",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/blog/read/le-8-superstizioni-cinesi-sui-casino/",
+      "destination": "/blog/le-8-superstizioni-cinesi-sui-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/read/le-8-superstizioni-cinesi-sui-casino",
+      "destination": "/blog/le-8-superstizioni-cinesi-sui-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/888/",
+      "destination": "/casino/recensione/888-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/888",
+      "destination": "/casino/recensione/888-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino-big-bonus/",
+      "destination": "/casino/recensione/best-in-games/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino-big-bonus",
+      "destination": "/casino/recensione/best-in-games/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/betflag-casino/",
+      "destination": "/casino/recensione/betflag-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/betflag-casino",
+      "destination": "/casino/recensione/betflag-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/lingegneria-della-dipendenza-da-slot.-la-tecnologia-vuole-i-suoi-segreti/",
+      "destination": "/blog/lingegneria-della-dipendenza-da-slot-la-tecnologia-vuole-i-suoi-segreti/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/lingegneria-della-dipendenza-da-slot.-la-tecnologia-vuole-i-suoi-segreti",
+      "destination": "/blog/lingegneria-della-dipendenza-da-slot-la-tecnologia-vuole-i-suoi-segreti/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/big-bonus/",
+      "destination": "/casino/recensione/best-in-games/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/big-bonus",
+      "destination": "/casino/recensione/best-in-games/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/leovegas/",
+      "destination": "/casino/recensione/leo-vegas-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/leovegas",
+      "destination": "/casino/recensione/leo-vegas-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/intervista-torm-horn-gaming/",
+      "destination": "/blog/intervista-tom-horn-gaming/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/intervista-torm-horn-gaming",
+      "destination": "/blog/intervista-tom-horn-gaming/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/betfair/",
+      "destination": "/casino/recensione/betfair-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/betfair",
+      "destination": "/casino/recensione/betfair-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/casino-online/merkurwin/",
+      "destination": "/software-slot-machine/cristaltec/",
+      "permanent": true
+    },
+    {
+      "source": "/casino-online/merkurwin",
+      "destination": "/software-slot-machine/cristaltec/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/mr-green/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/mr-green",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/32-red/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/32-red",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino-betfair/",
+      "destination": "/casino/recensione/betfair-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino-betfair",
+      "destination": "/casino/recensione/betfair-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-machine-online/",
+      "destination": "/slot-machine/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-machine-online",
+      "destination": "/slot-machine/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/merkur-win-casino/",
+      "destination": "/casino/recensione/casino-mania/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/merkur-win-casino",
+      "destination": "/casino/recensione/casino-mania/",
+      "permanent": true
+    },
+    {
+      "source": "/crazy-time/",
+      "destination": "/casino-live/crazy-time/",
+      "permanent": true
+    },
+    {
+      "source": "/crazy-time",
+      "destination": "/casino-live/crazy-time/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/gambling-fitness-sharing-e-tech-lItalia-odierna-tra-vizi-e-virtu/",
+      "destination": "/blog/gambling-fitness-sharing-e-tech-litalia-odierna-tra-vizi-e-virtu/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/gambling-fitness-sharing-e-tech-lItalia-odierna-tra-vizi-e-virtu",
+      "destination": "/blog/gambling-fitness-sharing-e-tech-litalia-odierna-tra-vizi-e-virtu/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/fantasy-team/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/fantasy-team",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino-888/",
+      "destination": "/casino/recensione/888-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino-888",
+      "destination": "/casino/recensione/888-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/post/87886387038/dal-tentato-suicidio-al-ruolo-di-simbolo-nella-lotta/",
+      "destination": "/blog/dal-tentato-suicidio-al-ruolo-di-simbolo-nella-lotta-contro-la-ludopatia-li/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/post/87886387038/dal-tentato-suicidio-al-ruolo-di-simbolo-nella-lotta",
+      "destination": "/blog/dal-tentato-suicidio-al-ruolo-di-simbolo-nella-lotta-contro-la-ludopatia-li/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/un-anno-di-gambling-al-di-fuori-delle-alpi.-i-fatti-piu-importanti-del-2015/",
+      "destination": "/blog/un-anno-di-gambling-al-di-fuori-delle-alpi-i-fatti-piu-importanti-del-2015/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/un-anno-di-gambling-al-di-fuori-delle-alpi.-i-fatti-piu-importanti-del-2015",
+      "destination": "/blog/un-anno-di-gambling-al-di-fuori-delle-alpi-i-fatti-piu-importanti-del-2015/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/report-sostenibilità-hbg-gaming-tra-i-temi-anche-gioco-responsabile-ed-agenda-onu-2030/",
+      "destination": "/blog/report-sostenibilita-hbg-gaming-tra-i-temi-anche-gioco-responsabile-ed-agenda-onu-2030/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/report-sostenibilità-hbg-gaming-tra-i-temi-anche-gioco-responsabile-ed-agenda-onu-2030",
+      "destination": "/blog/report-sostenibilita-hbg-gaming-tra-i-temi-anche-gioco-responsabile-ed-agenda-onu-2030/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/post/82280209345/alla-scoperta-dellinsula-larea-del-cervello-che/",
+      "destination": "/blog/alla-scoperta-dellinsula-larea-del-cervello-che-innesca-la-dipendenza-al-gi/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/post/82280209345/alla-scoperta-dellinsula-larea-del-cervello-che",
+      "destination": "/blog/alla-scoperta-dellinsula-larea-del-cervello-che-innesca-la-dipendenza-al-gi/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/post/80253856516/guida-completa-ai-piu-grandi-e-belli-casino-al-mondo//",
+      "destination": "/blog/guida-completa-ai-pi-grandi-e-belli-casin-al-mondo/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/post/80253856516/guida-completa-ai-piu-grandi-e-belli-casino-al-mondo/",
+      "destination": "/blog/guida-completa-ai-pi-grandi-e-belli-casin-al-mondo/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/codere/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/codere",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/merkur-win/",
+      "destination": "/casino/recensione/casino-mania/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/merkur-win",
+      "destination": "/casino/recensione/casino-mania/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/betflag/",
+      "destination": "/casino/recensione/betflag-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/betflag",
+      "destination": "/casino/recensione/betflag-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/casino-mania/",
+      "destination": "/casino/recensione/casino-mania/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/casino-mania",
+      "destination": "/casino/recensione/casino-mania/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/fastbet/",
+      "destination": "/casino/recensione/fastbet/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/fastbet",
+      "destination": "/casino/recensione/fastbet/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-machine-online/",
+      "destination": "/slot-machine/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-machine-online",
+      "destination": "/slot-machine/",
+      "permanent": true
+    }
+  ],
+  "externalRedirects": [
+    {
+      "source": "/go/hardrock/",
+      "destination": "https://www.hardrockcasino.it/slot-machine",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/hardrock",
+      "destination": "https://www.hardrockcasino.it/slot-machine",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betsson/",
+      "destination": "https://record.betsson.it/_QFO0Ve3sy0uI-QCHHOFI22Nd7ZgqdRLk/1/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betsson",
+      "destination": "https://record.betsson.it/_QFO0Ve3sy0uI-QCHHOFI22Nd7ZgqdRLk/1/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/sportbet/",
+      "destination": "https://www.sportbet.it/signup?codAffiliato=SPWEB30&affiliato=SPWEB30",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/sportbet",
+      "destination": "https://www.sportbet.it/signup?codAffiliato=SPWEB30&affiliato=SPWEB30",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/quigioco/",
+      "destination": "https://promozioni.quigioco.it/landing-giochi-di-slots/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/quigioco",
+      "destination": "https://promozioni.quigioco.it/landing-giochi-di-slots/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/admiralyes/",
+      "destination": "https://www.admiralbet.it/gmg/refer/6756fb56fb8cad000114dfba",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/admiralyes",
+      "destination": "https://www.admiralbet.it/gmg/refer/6756fb56fb8cad000114dfba",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/star-casino/",
+      "destination": "https://record.starcasino.it/_QFO0Ve3sy0t_4fiThTieLWNd7ZgqdRLk/6/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/star-casino",
+      "destination": "https://record.starcasino.it/_QFO0Ve3sy0t_4fiThTieLWNd7ZgqdRLk/6/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/stanleybet/",
+      "destination": "https://www.stanleybet.it/affiliati.jsp?codaffiliato=rosso&p=BSD",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/stanleybet",
+      "destination": "https://www.stanleybet.it/affiliati.jsp?codaffiliato=rosso&p=BSD",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/snai/",
+      "destination": "https://informatoriads.snai.it/redirect.aspx?pid=9834&bid=2786",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/snai",
+      "destination": "https://informatoriads.snai.it/redirect.aspx?pid=9834&bid=2786",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/slotyes/",
+      "destination": "http://affiliazione.playyes.it/processing/clickthrgh.asp?btag=a_91b_217",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/slotyes",
+      "destination": "http://affiliazione.playyes.it/processing/clickthrgh.asp?btag=a_91b_217",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/slottery/",
+      "destination": "https://betly.co/fa1cb48952",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/slottery",
+      "destination": "https://betly.co/fa1cb48952",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/skiller/",
+      "destination": "https://www.skiller.it/signup?codAffiliato=SKIKEN&promo=GSC600",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/skiller",
+      "destination": "https://www.skiller.it/signup?codAffiliato=SKIKEN&promo=GSC600",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/sisal/",
+      "destination": "https://ads.sisal.it/promoRedirect?key=ej0xMzUyNDE2MyZsPTE0MTcyMTk1JnA9NjQ0NTc%3D",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/sisal",
+      "destination": "https://ads.sisal.it/promoRedirect?key=ej0xMzUyNDE2MyZsPTE0MTcyMTk1JnA9NjQ0NTc%3D",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/scommettendo/",
+      "destination": "https://www.scommettendo.it/landing",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/scommettendo",
+      "destination": "https://www.scommettendo.it/landing",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/pokerstarscasino/",
+      "destination": "https://secure.starsaffiliateclub.com/C.ashx?btag=a_183086b_5711c_&affid=93843987&siteid=183086&adid=5711&c=",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/pokerstarscasino",
+      "destination": "https://secure.starsaffiliateclub.com/C.ashx?btag=a_183086b_5711c_&affid=93843987&siteid=183086&adid=5711&c=",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/paddypower/",
+      "destination": "http://media.paddypower.com/redirect.aspx?pid=10083302&bid=6758",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/paddypower",
+      "destination": "http://media.paddypower.com/redirect.aspx?pid=10083302&bid=6758",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/netbet/",
+      "destination": "https://netbetit.livepartners.com/view.php?z=165695",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/netbet",
+      "destination": "https://netbetit.livepartners.com/view.php?z=165695",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/mybet",
+      "destination": "http://www.livepartners.it/affiliate/tracking/click/?id=202701&bid=869",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/mybet/",
+      "destination": "http://www.livepartners.it/affiliate/tracking/click/?id=202701&bid=869",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/mrgreen/",
+      "destination": "http://ads.mrgreen.com/redirect.aspx?pid=4362498&bid=7329&lpid=1533",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/mrgreen",
+      "destination": "http://ads.mrgreen.com/redirect.aspx?pid=4362498&bid=7329&lpid=1533",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/merkur-win/",
+      "destination": "https://record.piattaforma97.it/_Xk8cQ-T_tNoLak7-PYDSdWNd7ZgqdRLk/1/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/merkur-win",
+      "destination": "https://record.piattaforma97.it/_Xk8cQ-T_tNoLak7-PYDSdWNd7ZgqdRLk/1/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/luckyclic/",
+      "destination": "http://record.affiliatelounge.com/_QFO0Ve3sy0tt2C4VD0nVEWNd7ZgqdRLk/6/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/luckyclic",
+      "destination": "http://record.affiliatelounge.com/_QFO0Ve3sy0tt2C4VD0nVEWNd7ZgqdRLk/6/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/jackpot.it/",
+      "destination": "https://jackpot.onelink.me/1833068633/8cc5dde9",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/jackpot.it",
+      "destination": "https://jackpot.onelink.me/1833068633/8cc5dde9",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/intralot/",
+      "destination": "https://media.intralot.it/redirect.aspx?pid=8818&bid=1538",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/intralot",
+      "destination": "https://media.intralot.it/redirect.aspx?pid=8818&bid=1538",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/goldbet/",
+      "destination": "https://media.goldbetpartners.it/redirect.aspx?pid=4779&bid=1485",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/goldbet",
+      "destination": "https://media.goldbetpartners.it/redirect.aspx?pid=4779&bid=1485",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/fantasy-team/",
+      "destination": "https://casino.fantasyteam.it/FTGIOCHIDISLOTS/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/fantasy-team",
+      "destination": "https://casino.fantasyteam.it/FTGIOCHIDISLOTS/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/eurobet/",
+      "destination": "https://record.betpartners.it/_xW3cdT1l49QZV93hC2dJ_GNd7ZgqdRLk/4/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/eurobet",
+      "destination": "https://record.betpartners.it/_xW3cdT1l49QZV93hC2dJ_GNd7ZgqdRLk/4/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betx/",
+      "destination": "https://www.xpartners.it/bonus-senza-deposito-30-betx/?brand=BETX2",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betx",
+      "destination": "https://www.xpartners.it/bonus-senza-deposito-30-betx/?brand=BETX2",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betwin360/",
+      "destination": "https://bw360.it/bet?father=B360adamson®ister=true&force=false&withFather=false",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betwin360",
+      "destination": "https://bw360.it/bet?father=B360adamson®ister=true&force=false&withFather=false",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betnero/",
+      "destination": "https://record.piattaforma97.it/_shPApe2vTI5w9PUHBV5BDWNd7ZgqdRLk/1/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betnero",
+      "destination": "https://record.piattaforma97.it/_shPApe2vTI5w9PUHBV5BDWNd7ZgqdRLk/1/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betflag/",
+      "destination": "https://info.betflag.it/promozioni-e-bonus/promo-casino/bonus-senza-deposito-slot/?btag=PV3_389E6472D9BC49B08BC8D060F07FE8DE",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betflag",
+      "destination": "https://info.betflag.it/promozioni-e-bonus/promo-casino/bonus-senza-deposito-slot/?btag=PV3_389E6472D9BC49B08BC8D060F07FE8DE",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betfair/",
+      "destination": "https://ads.betfair.com/redirect.aspx?pid=2660102&bid=10991",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betfair",
+      "destination": "https://ads.betfair.com/redirect.aspx?pid=2660102&bid=10991",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betclic/",
+      "destination": "https://wlbetclic.adsrv.eacdn.com/C.ashx?btag=a_28415b_12231c_&affid=18352&siteid=28415&adid=12231&c=",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betclic",
+      "destination": "https://wlbetclic.adsrv.eacdn.com/C.ashx?btag=a_28415b_12231c_&affid=18352&siteid=28415&adid=12231&c=",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betaland/",
+      "destination": "https://promopage.betaland.it/?promoCode=GDS",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betaland",
+      "destination": "https://promopage.betaland.it/?promoCode=GDS",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/bestingames/",
+      "destination": "https://informatoriads.snai.it/redirect.aspx?pid=28687&bid=2737",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/bestingames",
+      "destination": "https://informatoriads.snai.it/redirect.aspx?pid=28687&bid=2737",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/888casino/",
+      "destination": "https://ic.aff-handler.com/C/48223?sr=1836821",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/888casino",
+      "destination": "https://ic.aff-handler.com/C/48223?sr=1836821",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/william-hill-tb/",
+      "destination": "http://serve.williamhill.it/promoRedirect?member=luca93897643507&campaign=DEFAULT&channel=DEFAULT&zone=1480829148&lp=1480320958",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/william-hill-tb",
+      "destination": "http://serve.williamhill.it/promoRedirect?member=luca93897643507&campaign=DEFAULT&channel=DEFAULT&zone=1480829148&lp=1480320958",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/william-hill/",
+      "destination": "https://campaigns.williamhill.it/C.ashx?btag=a_57246b_1236c_&affid=1737229&siteid=57246&adid=1236&c=",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/william-hill",
+      "destination": "https://campaigns.williamhill.it/C.ashx?btag=a_57246b_1236c_&affid=1737229&siteid=57246&adid=1236&c=",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/vogliadivincere/",
+      "destination": "https://www.vogliadivincere.it?s=bfp19125&a=bfpadid115071",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/vogliadivincere",
+      "destination": "https://www.vogliadivincere.it?s=bfp19125&a=bfpadid115071",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/vincitu/",
+      "destination": "https://media.vincitu.it/C.ashx?btag=a_142b_139c_&affid=70&siteid=142&adid=139&c=",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/vincitu",
+      "destination": "https://media.vincitu.it/C.ashx?btag=a_142b_139c_&affid=70&siteid=142&adid=139&c=",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/unibet/",
+      "destination": "https://b1.trickyrock.com/redirect.aspx?pid=50572830&bid=27508",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/unibet",
+      "destination": "https://b1.trickyrock.com/redirect.aspx?pid=50572830&bid=27508",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/titanbet/",
+      "destination": "http://online.europartners.com/promoRedirect?member=giochidislots&campaign=DEFAULT&channel=DEFAULT&zone=13523998&lp=13523989",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/titanbet",
+      "destination": "http://online.europartners.com/promoRedirect?member=giochidislots&campaign=DEFAULT&channel=DEFAULT&zone=13523998&lp=13523989",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/starvegas/",
+      "destination": "https://www.starvegas.it/gmg/refer/653bd30e844bd600010899e9",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/starvegas",
+      "destination": "https://www.starvegas.it/gmg/refer/653bd30e844bd600010899e9",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/starcasino-hom/",
+      "destination": "https://record.starcasino.it/_QFO0Ve3sy0t_4fiThTieLWNd7ZgqdRLk/6/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/starcasino-hom",
+      "destination": "https://record.starcasino.it/_QFO0Ve3sy0t_4fiThTieLWNd7ZgqdRLk/6/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/starcasino-gam/",
+      "destination": "https://record.starcasino.it/_QFO0Ve3sy0t_4fiThTieLWNd7ZgqdRLk/6/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/starcasino-gam",
+      "destination": "https://record.starcasino.it/_QFO0Ve3sy0t_4fiThTieLWNd7ZgqdRLk/6/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/planetwin365/",
+      "destination": "https://ads.planetwin365affiliate.com/redirect.aspx?pid=6592&bid=1675",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/planetwin365",
+      "destination": "https://ads.planetwin365affiliate.com/redirect.aspx?pid=6592&bid=1675",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/lottomatica/",
+      "destination": "https://media.lottomaticapartners.it/redirect.aspx?pid=6632&bid=1509",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/lottomatica",
+      "destination": "https://media.lottomaticapartners.it/redirect.aspx?pid=6632&bid=1509",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/leovegas/",
+      "destination": "https://ntrfr.leovegas.com/redirect.aspx?pid=3639581&lpid=1756&bid=19140",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/leovegas",
+      "destination": "https://ntrfr.leovegas.com/redirect.aspx?pid=3639581&lpid=1756&bid=19140",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/fastbet/",
+      "destination": "https://www.fastbet.it/landing/fastlink?page=register.html&tracking=BackOfficeLink&agent=76819",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/fastbet",
+      "destination": "https://www.fastbet.it/landing/fastlink?page=register.html&tracking=BackOfficeLink&agent=76819",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betway/",
+      "destination": "https://www.betway.it/bwp/cas001?s=bpi29948&a=bpiadid167197",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betway",
+      "destination": "https://www.betway.it/bwp/cas001?s=bpi29948&a=bpiadid167197",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    }
+  ],
+  "internalRedirects": [
+    {
+      "source": "/slot-casinos/",
+      "destination": "/slot-machine/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos",
+      "destination": "/slot-machine/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/casino-paypal/",
+      "destination": "/guida-casino/metodi-di-pagamento/paypal/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/casino-paypal",
+      "destination": "/guida-casino/metodi-di-pagamento/paypal/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/slottery",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/slottery/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/blackout-pubblicit%C3%A0-ora-per-il-gioco-dazzardo-si-fa-dura",
+      "destination": "/blog/blackout-pubblicita-ora-per-il-gioco-dazzardo-si-fa-dura/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/blackout-pubblicit%C3%A0-ora-per-il-gioco-dazzardo-si-fa-dura/",
+      "destination": "/blog/blackout-pubblicita-ora-per-il-gioco-dazzardo-si-fa-dura/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-machine/marvel",
+      "destination": "/slot-machine/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-machine/marvel/",
+      "destination": "/slot-machine/",
+      "permanent": true
+    },
+    {
+      "source": "/go/hardrock/",
+      "destination": "https://www.hardrockcasino.it/slot-machine",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/hardrock",
+      "destination": "https://www.hardrockcasino.it/slot-machine",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betsson/",
+      "destination": "https://record.betsson.it/_QFO0Ve3sy0uI-QCHHOFI22Nd7ZgqdRLk/1/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betsson",
+      "destination": "https://record.betsson.it/_QFO0Ve3sy0uI-QCHHOFI22Nd7ZgqdRLk/1/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/casino/recensione/betfair-casino",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/betfair-casino/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/betfair-casino/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/betfair-casino",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/eazybet",
+      "destination": "/casino/recensione/sportbet/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/eazybet/",
+      "destination": "/casino/recensione/sportbet/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/star-casino",
+      "destination": "/casino/recensione/star-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/star-casino/",
+      "destination": "/casino/recensione/star-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/post/97973695063/gioco-dazzardo-quali-sono-i-paesi-dove-si-perde-di",
+      "destination": "/blog/gioco-dazzardo-quali-sono-i-paesi-dove-si-perde-di-pi/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/post/97973695063/gioco-dazzardo-quali-sono-i-paesi-dove-si-perde-di/",
+      "destination": "/blog/gioco-dazzardo-quali-sono-i-paesi-dove-si-perde-di-pi/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/betflag-casino",
+      "destination": "/casino/recensione/betflag-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/betflag-casino/",
+      "destination": "/casino/recensione/betflag-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/report-sostenibilità-hbg-gaming-tra-i-temi-anche-gioco-responsabile-ed-agenda-onu-2030",
+      "destination": "/blog/report-sostenibilita-hbg-gaming-tra-i-temi-anche-gioco-responsabile-ed-agenda-onu-2030/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/report-sostenibilità-hbg-gaming-tra-i-temi-anche-gioco-responsabile-ed-agenda-onu-2030/",
+      "destination": "/blog/report-sostenibilita-hbg-gaming-tra-i-temi-anche-gioco-responsabile-ed-agenda-onu-2030/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/blackout-pubblicità-ora-per-il-gioco-dazzardo-si-fa-dura",
+      "destination": "/blog/blackout-pubblicita-ora-per-il-gioco-dazzardo-si-fa-dura/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/blackout-pubblicità-ora-per-il-gioco-dazzardo-si-fa-dura/",
+      "destination": "/blog/blackout-pubblicita-ora-per-il-gioco-dazzardo-si-fa-dura/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/come-industria-del-gioco-legale-ha-reagito-alle-restrizioni-normative-in-italia-e-spagna",
+      "destination": "/blog/come-lindustria-del-gioco-legale-ha-reagito-alle-restrizioni-normative-in-italia-e-spagna/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/come-industria-del-gioco-legale-ha-reagito-alle-restrizioni-normative-in-italia-e-spagna/",
+      "destination": "/blog/come-lindustria-del-gioco-legale-ha-reagito-alle-restrizioni-normative-in-italia-e-spagna/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/post/89065033038/7-incredibili-storie-da-casino",
+      "destination": "/blog/7-incredibili-storie-da-casin/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/post/89065033038/7-incredibili-storie-da-casino/",
+      "destination": "/blog/7-incredibili-storie-da-casin/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/post/100154507863/danni-e-benefici-e-numeri-del-gioco-dazzardo",
+      "destination": "/blog/danni-e-benefici-e-numeri-del-gioco-dazzardo-infografica/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/post/100154507863/danni-e-benefici-e-numeri-del-gioco-dazzardo/",
+      "destination": "/blog/danni-e-benefici-e-numeri-del-gioco-dazzardo-infografica/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/post/112972918888/la-storia-delle-scommesse-online-lorigine-la",
+      "destination": "/blog/la-storia-delle-scommesse-online-lorigine-la-crescita-e-le-nuove-tecnologie/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/post/112972918888/la-storia-delle-scommesse-online-lorigine-la/",
+      "destination": "/blog/la-storia-delle-scommesse-online-lorigine-la-crescita-e-le-nuove-tecnologie/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/lingegneria-della-dipendenza-da-slot.-la-tecnologia-vuole-i-suoi-segreti",
+      "destination": "/blog/lingegneria-della-dipendenza-da-slot-la-tecnologia-vuole-i-suoi-segreti/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/lingegneria-della-dipendenza-da-slot.-la-tecnologia-vuole-i-suoi-segreti/",
+      "destination": "/blog/lingegneria-della-dipendenza-da-slot-la-tecnologia-vuole-i-suoi-segreti/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/snai-casino",
+      "destination": "/casino/recensione/snai-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/snai-casino/",
+      "destination": "/casino/recensione/snai-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/eazybet/",
+      "destination": "/casino/recensione/sportbet/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/eazybet",
+      "destination": "/casino/recensione/sportbet/",
+      "permanent": true
+    },
+    {
+      "source": "/go/sportbet/",
+      "destination": "https://www.sportbet.it/signup?codAffiliato=SPWEB30&affiliato=SPWEB30",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/sportbet",
+      "destination": "https://www.sportbet.it/signup?codAffiliato=SPWEB30&affiliato=SPWEB30",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/slot-casinos/leo-vegas-casino",
+      "destination": "/casino/recensione/leo-vegas-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/leo-vegas-casino/",
+      "destination": "/casino/recensione/leo-vegas-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/about-us",
+      "destination": "/author/",
+      "permanent": false
+    },
+    {
+      "source": "/about-us/",
+      "destination": "/author/",
+      "permanent": false
+    },
+    {
+      "source": "/blog/post/80253856516/guida-completa-ai-piu-grandi-e-belli-casino-al-mondo",
+      "destination": "/blog/post/80253856516/guida-completa-ai-piu-grandi-e-belli-casino-al-mondo/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/post/80253856516/guida-completa-ai-piu-grandi-e-belli-casino-al-mondo/",
+      "destination": "/blog/post/80253856516/guida-completa-ai-piu-grandi-e-belli-casino-al-mondo/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/post/82280209345/alla-scoperta-dellinsula-larea-del-cervello-che",
+      "destination": "/blog/alla-scoperta-dellinsula-larea-del-cervello-che-innesca-la-dipendenza-al-gi/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/post/82280209345/alla-scoperta-dellinsula-larea-del-cervello-che/",
+      "destination": "/blog/alla-scoperta-dellinsula-larea-del-cervello-che-innesca-la-dipendenza-al-gi/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/post/80253856516/guida-completa-ai-piu-grandi-e-belli-casino-al-mondo/",
+      "destination": "/blog/guida-completa-ai-pi-grandi-e-belli-casin-al-mondo/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/post/80253856516/guida-completa-ai-piu-grandi-e-belli-casino-al-mondo",
+      "destination": "/blog/guida-completa-ai-pi-grandi-e-belli-casin-al-mondo/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/casinoyes",
+      "destination": "/casino/recensione/admiral-yes-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/casinoyes/",
+      "destination": "/casino/recensione/admiral-yes-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/leovegas",
+      "destination": "/casino/recensione/leo-vegas-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/leovegas/",
+      "destination": "/casino/recensione/leo-vegas-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/sisal",
+      "destination": "/casino/recensione/sisal/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/sisal/",
+      "destination": "/casino/recensione/sisal/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/pokerstars",
+      "destination": "/casino/recensione/pokerstars-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/pokerstars/",
+      "destination": "/casino/recensione/pokerstars-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/starvegas-casino",
+      "destination": "/casino/recensione/starvegas-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/starvegas-casino/",
+      "destination": "/casino/recensione/starvegas-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/pokerstars-casino",
+      "destination": "/casino/recensione/pokerstars-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/pokerstars-casino/",
+      "destination": "/casino/recensione/pokerstars-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/big-bonus",
+      "destination": "/casino/recensione/best-in-games/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/big-bonus/",
+      "destination": "/casino/recensione/best-in-games/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/betwin360",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/betwin360/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/slot-yes",
+      "destination": "/casino/recensione/admiral-yes-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/slot-yes/",
+      "destination": "/casino/recensione/admiral-yes-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/merkur-win-casino",
+      "destination": "/casino/recensione/casino-mania/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/merkur-win-casino/",
+      "destination": "/casino/recensione/casino-mania/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/starcasino",
+      "destination": "/casino/recensione/star-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/starcasino/",
+      "destination": "/casino/recensione/star-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/starvegas",
+      "destination": "/casino/recensione/starvegas-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/starvegas/",
+      "destination": "/casino/recensione/starvegas-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-machine/piu-giocate",
+      "destination": "/slot-machine/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-machine/piu-giocate/",
+      "destination": "/slot-machine/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-machine/migliori",
+      "destination": "/slot-machine/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-machine/migliori/",
+      "destination": "/slot-machine/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/voglia-di-vincere-casino",
+      "destination": "/casino/recensione/jackpot-city/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/voglia-di-vincere-casino/",
+      "destination": "/casino/recensione/jackpot-city/",
+      "permanent": true
+    },
+    {
+      "source": "/go/quigioco/",
+      "destination": "https://promozioni.quigioco.it/landing-giochi-di-slots/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/quigioco",
+      "destination": "https://promozioni.quigioco.it/landing-giochi-di-slots/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/software-slot-machine/bg-gaming",
+      "destination": "/software-slot-machine/b-gaming/",
+      "permanent": true
+    },
+    {
+      "source": "/software-slot-machine/bg-gaming/",
+      "destination": "/software-slot-machine/b-gaming/",
+      "permanent": true
+    },
+    {
+      "source": "/go/admiralyes/",
+      "destination": "https://www.admiralbet.it/gmg/refer/6756fb56fb8cad000114dfba",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/admiralyes",
+      "destination": "https://www.admiralbet.it/gmg/refer/6756fb56fb8cad000114dfba",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/star-casino/",
+      "destination": "https://record.starcasino.it/_QFO0Ve3sy0t_4fiThTieLWNd7ZgqdRLk/6/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/star-casino",
+      "destination": "https://record.starcasino.it/_QFO0Ve3sy0t_4fiThTieLWNd7ZgqdRLk/6/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/stanleybet/",
+      "destination": "https://www.stanleybet.it/affiliati.jsp?codaffiliato=rosso&p=BSD",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/stanleybet",
+      "destination": "https://www.stanleybet.it/affiliati.jsp?codaffiliato=rosso&p=BSD",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/snai/",
+      "destination": "https://informatoriads.snai.it/redirect.aspx?pid=9834&bid=2786",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/snai",
+      "destination": "https://informatoriads.snai.it/redirect.aspx?pid=9834&bid=2786",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/slotyes/",
+      "destination": "http://affiliazione.playyes.it/processing/clickthrgh.asp?btag=a_91b_217",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/slotyes",
+      "destination": "http://affiliazione.playyes.it/processing/clickthrgh.asp?btag=a_91b_217",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/slottery/",
+      "destination": "https://betly.co/fa1cb48952",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/slottery",
+      "destination": "https://betly.co/fa1cb48952",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/skiller/",
+      "destination": "https://www.skiller.it/signup?codAffiliato=SKIKEN&promo=GSC600",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/skiller",
+      "destination": "https://www.skiller.it/signup?codAffiliato=SKIKEN&promo=GSC600",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/sisal/",
+      "destination": "https://ads.sisal.it/promoRedirect?key=ej0xMzUyNDE2MyZsPTE0MTcyMTk1JnA9NjQ0NTc%3D",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/sisal",
+      "destination": "https://ads.sisal.it/promoRedirect?key=ej0xMzUyNDE2MyZsPTE0MTcyMTk1JnA9NjQ0NTc%3D",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/scommettendo/",
+      "destination": "https://www.scommettendo.it/landing",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/scommettendo",
+      "destination": "https://www.scommettendo.it/landing",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/pokerstarscasino/",
+      "destination": "https://secure.starsaffiliateclub.com/C.ashx?btag=a_183086b_5711c_&affid=93843987&siteid=183086&adid=5711&c=",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/pokerstarscasino",
+      "destination": "https://secure.starsaffiliateclub.com/C.ashx?btag=a_183086b_5711c_&affid=93843987&siteid=183086&adid=5711&c=",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/paddypower/",
+      "destination": "http://media.paddypower.com/redirect.aspx?pid=10083302&bid=6758",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/paddypower",
+      "destination": "http://media.paddypower.com/redirect.aspx?pid=10083302&bid=6758",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/netbet/",
+      "destination": "https://netbetit.livepartners.com/view.php?z=165695",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/netbet",
+      "destination": "https://netbetit.livepartners.com/view.php?z=165695",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/mybet",
+      "destination": "http://www.livepartners.it/affiliate/tracking/click/?id=202701&bid=869",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/mybet/",
+      "destination": "http://www.livepartners.it/affiliate/tracking/click/?id=202701&bid=869",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/mrgreen/",
+      "destination": "http://ads.mrgreen.com/redirect.aspx?pid=4362498&bid=7329&lpid=1533",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/mrgreen",
+      "destination": "http://ads.mrgreen.com/redirect.aspx?pid=4362498&bid=7329&lpid=1533",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/merkur-win/",
+      "destination": "https://record.piattaforma97.it/_Xk8cQ-T_tNoLak7-PYDSdWNd7ZgqdRLk/1/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/merkur-win",
+      "destination": "https://record.piattaforma97.it/_Xk8cQ-T_tNoLak7-PYDSdWNd7ZgqdRLk/1/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/luckyclic/",
+      "destination": "http://record.affiliatelounge.com/_QFO0Ve3sy0tt2C4VD0nVEWNd7ZgqdRLk/6/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/luckyclic",
+      "destination": "http://record.affiliatelounge.com/_QFO0Ve3sy0tt2C4VD0nVEWNd7ZgqdRLk/6/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/jackpot.it/",
+      "destination": "https://jackpot.onelink.me/1833068633/8cc5dde9",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/jackpot.it",
+      "destination": "https://jackpot.onelink.me/1833068633/8cc5dde9",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/intralot/",
+      "destination": "https://media.intralot.it/redirect.aspx?pid=8818&bid=1538",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/intralot",
+      "destination": "https://media.intralot.it/redirect.aspx?pid=8818&bid=1538",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/goldbet/",
+      "destination": "https://media.goldbetpartners.it/redirect.aspx?pid=4779&bid=1485",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/goldbet",
+      "destination": "https://media.goldbetpartners.it/redirect.aspx?pid=4779&bid=1485",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/fantasy-team/",
+      "destination": "https://casino.fantasyteam.it/FTGIOCHIDISLOTS/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/fantasy-team",
+      "destination": "https://casino.fantasyteam.it/FTGIOCHIDISLOTS/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/eurobet/",
+      "destination": "https://record.betpartners.it/_xW3cdT1l49QZV93hC2dJ_GNd7ZgqdRLk/4/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/eurobet",
+      "destination": "https://record.betpartners.it/_xW3cdT1l49QZV93hC2dJ_GNd7ZgqdRLk/4/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betx/",
+      "destination": "https://www.xpartners.it/bonus-senza-deposito-30-betx/?brand=BETX2",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betx",
+      "destination": "https://www.xpartners.it/bonus-senza-deposito-30-betx/?brand=BETX2",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betwin360/",
+      "destination": "https://bw360.it/bet?father=B360adamson®ister=true&force=false&withFather=false",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betwin360",
+      "destination": "https://bw360.it/bet?father=B360adamson®ister=true&force=false&withFather=false",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betnero/",
+      "destination": "https://record.piattaforma97.it/_shPApe2vTI5w9PUHBV5BDWNd7ZgqdRLk/1/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betnero",
+      "destination": "https://record.piattaforma97.it/_shPApe2vTI5w9PUHBV5BDWNd7ZgqdRLk/1/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betflag/",
+      "destination": "https://info.betflag.it/promozioni-e-bonus/promo-casino/bonus-senza-deposito-slot/?btag=PV3_389E6472D9BC49B08BC8D060F07FE8DE",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betflag",
+      "destination": "https://info.betflag.it/promozioni-e-bonus/promo-casino/bonus-senza-deposito-slot/?btag=PV3_389E6472D9BC49B08BC8D060F07FE8DE",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betfair/",
+      "destination": "https://ads.betfair.com/redirect.aspx?pid=2660102&bid=10991",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betfair",
+      "destination": "https://ads.betfair.com/redirect.aspx?pid=2660102&bid=10991",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betclic/",
+      "destination": "https://wlbetclic.adsrv.eacdn.com/C.ashx?btag=a_28415b_12231c_&affid=18352&siteid=28415&adid=12231&c=",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betclic",
+      "destination": "https://wlbetclic.adsrv.eacdn.com/C.ashx?btag=a_28415b_12231c_&affid=18352&siteid=28415&adid=12231&c=",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betaland/",
+      "destination": "https://promopage.betaland.it/?promoCode=GDS",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betaland",
+      "destination": "https://promopage.betaland.it/?promoCode=GDS",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/bestingames/",
+      "destination": "https://informatoriads.snai.it/redirect.aspx?pid=28687&bid=2737",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/bestingames",
+      "destination": "https://informatoriads.snai.it/redirect.aspx?pid=28687&bid=2737",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/slot-machine-online/",
+      "destination": "/slot-machine/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-machine-online",
+      "destination": "/slot-machine/",
+      "permanent": true
+    },
+    {
+      "source": "/stanleybet/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/stanleybet",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-machines/dogfather/",
+      "destination": "/slot-machine/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-machines/dogfather",
+      "destination": "/slot-machine/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-machines/cosmic-fortune/",
+      "destination": "/slot-machine/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-machines/cosmic-fortune",
+      "destination": "/slot-machine/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-machine/piu-giocate/",
+      "destination": "/slot-machine/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-machine/piu-giocate",
+      "destination": "/slot-machine/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-machine/migliori/",
+      "destination": "/slot-machine/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-machine/migliori",
+      "destination": "/slot-machine/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/voglia-di-vincere-casino/",
+      "destination": "/casino/recensione/voglia-di-vincere-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/voglia-di-vincere-casino",
+      "destination": "/casino/recensione/voglia-di-vincere-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/voglia-di-vincere-casino/",
+      "destination": "/casino/recensione/jackpot-city/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/voglia-di-vincere-casino",
+      "destination": "/casino/recensione/jackpot-city/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/starvegas-casino/",
+      "destination": "/casino/recensione/starvegas-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/starvegas-casino",
+      "destination": "/casino/recensione/starvegas-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/starvegas/",
+      "destination": "/casino/recensione/starvegas-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/starvegas",
+      "destination": "/casino/recensione/starvegas-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/star-casino/",
+      "destination": "/casino/recensione/star-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/star-casino",
+      "destination": "/casino/recensione/star-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/snai-casino/",
+      "destination": "/casino/recensione/snai-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/snai-casino",
+      "destination": "/casino/recensione/snai-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/slot-yes/",
+      "destination": "/casino/recensione/admiral-yes-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/slot-yes",
+      "destination": "/casino/recensione/admiral-yes-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/sisal/",
+      "destination": "/casino/recensione/sisal/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/sisal",
+      "destination": "/casino/recensione/sisal/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/pokerstars-casino/",
+      "destination": "/casino/recensione/pokerstars-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/pokerstars-casino",
+      "destination": "/casino/recensione/pokerstars-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/netbet-casino/",
+      "destination": "/casino/recensione/netbet-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/netbet-casino",
+      "destination": "/casino/recensione/netbet-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/netbet-casino/",
+      "destination": "/casino/recensione/netbet-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/netbet-casino",
+      "destination": "/casino/recensione/netbet-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/lottomatica/",
+      "destination": "/casino/recensione/lottomatica/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/lottomatica",
+      "destination": "/casino/recensione/lottomatica/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/leo-vegas-casino/",
+      "destination": "/casino/recensione/leo-vegas-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/leo-vegas-casino",
+      "destination": "/casino/recensione/leo-vegas-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/fastbet/",
+      "destination": "/casino/recensione/fastbet/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/fastbet",
+      "destination": "/casino/recensione/fastbet/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/casino-mania/",
+      "destination": "/casino/recensione/casino-mania/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/casino-mania",
+      "destination": "/casino/recensione/casino-mania/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/casino-mania/",
+      "destination": "/casino/recensione/casino-mania/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/casino-mania",
+      "destination": "/casino/recensione/casino-mania/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/betway/",
+      "destination": "/casino/recensione/betway/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/betway",
+      "destination": "/casino/recensione/betway/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/betflag-casino/",
+      "destination": "/casino/recensione/betflag-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/betflag-casino",
+      "destination": "/casino/recensione/betflag-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/888-casino/",
+      "destination": "/casino/recensione/888-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/888-casino",
+      "destination": "/casino/recensione/888-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/promozioni/",
+      "destination": "/blog/",
+      "permanent": true
+    },
+    {
+      "source": "/promozioni",
+      "destination": "/blog/",
+      "permanent": true
+    },
+    {
+      "source": "/monopoly-live/",
+      "destination": "/casino-live/monopoly-live/",
+      "permanent": true
+    },
+    {
+      "source": "/monopoly-live",
+      "destination": "/casino-live/monopoly-live/",
+      "permanent": true
+    },
+    {
+      "source": "/casinos/",
+      "destination": "/casino/",
+      "permanent": true
+    },
+    {
+      "source": "/casinos",
+      "destination": "/casino/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/voglia-di-vincere-casino/",
+      "destination": "/casino/recensione/jackpot-city/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/voglia-di-vincere-casino",
+      "destination": "/casino/recensione/jackpot-city/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/titanbet-casino/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/titanbet-casino",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/stanleybet/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/stanleybet",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/slottery/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/slottery",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/slot-yes/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/slot-yes",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/skiller/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/skiller",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/scommettendo/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/scommettendo",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/mr-green/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/mr-green",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/fantasy-team/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/fantasy-team",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/codere/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/codere",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/casinoyes/",
+      "destination": "/casino/recensione/admiral-yes-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/casinoyes",
+      "destination": "/casino/recensione/admiral-yes-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/betx/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/betx",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/betwin360/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/betwin360",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/betclic/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/betclic",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/andromedabet-people-casino/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/andromedabet-people-casino",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/admiral-bet/",
+      "destination": "/casino/recensione/admiral-yes-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/admiral-bet",
+      "destination": "/casino/recensione/admiral-yes-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/",
+      "destination": "/casino-bonus-senza-deposito/",
+      "permanent": true
+    },
+    {
+      "source": "/casino",
+      "destination": "/casino-bonus-senza-deposito/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/starvegas/",
+      "destination": "/casino/recensione/starvegas-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/starvegas",
+      "destination": "/casino/recensione/starvegas-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/starcasino/",
+      "destination": "/casino/recensione/star-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/starcasino",
+      "destination": "/casino/recensione/star-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/sisal/",
+      "destination": "/casino/recensione/sisal/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/sisal",
+      "destination": "/casino/recensione/sisal/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/pokerstars/",
+      "destination": "/casino/recensione/pokerstars-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/pokerstars",
+      "destination": "/casino/recensione/pokerstars-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/merkur-win/",
+      "destination": "/casino/recensione/casino-mania/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/merkur-win",
+      "destination": "/casino/recensione/casino-mania/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/betflag/",
+      "destination": "/casino/recensione/betflag-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/betflag",
+      "destination": "/casino/recensione/betflag-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/betfair/",
+      "destination": "/casino/recensione/betfair-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/betfair",
+      "destination": "/casino/recensione/betfair-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/888/",
+      "destination": "/casino/recensione/888-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/888",
+      "destination": "/casino/recensione/888-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/go/888casino/",
+      "destination": "https://ic.aff-handler.com/C/48223?sr=1836821",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/888casino",
+      "destination": "https://ic.aff-handler.com/C/48223?sr=1836821",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/william-hill-tb/",
+      "destination": "http://serve.williamhill.it/promoRedirect?member=luca93897643507&campaign=DEFAULT&channel=DEFAULT&zone=1480829148&lp=1480320958",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/william-hill-tb",
+      "destination": "http://serve.williamhill.it/promoRedirect?member=luca93897643507&campaign=DEFAULT&channel=DEFAULT&zone=1480829148&lp=1480320958",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/william-hill/",
+      "destination": "https://campaigns.williamhill.it/C.ashx?btag=a_57246b_1236c_&affid=1737229&siteid=57246&adid=1236&c=",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/william-hill",
+      "destination": "https://campaigns.williamhill.it/C.ashx?btag=a_57246b_1236c_&affid=1737229&siteid=57246&adid=1236&c=",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/vogliadivincere/",
+      "destination": "https://www.vogliadivincere.it?s=bfp19125&a=bfpadid115071",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/vogliadivincere",
+      "destination": "https://www.vogliadivincere.it?s=bfp19125&a=bfpadid115071",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/vincitu/",
+      "destination": "https://media.vincitu.it/C.ashx?btag=a_142b_139c_&affid=70&siteid=142&adid=139&c=",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/vincitu",
+      "destination": "https://media.vincitu.it/C.ashx?btag=a_142b_139c_&affid=70&siteid=142&adid=139&c=",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/unibet/",
+      "destination": "https://b1.trickyrock.com/redirect.aspx?pid=50572830&bid=27508",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/unibet",
+      "destination": "https://b1.trickyrock.com/redirect.aspx?pid=50572830&bid=27508",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/titanbet/",
+      "destination": "http://online.europartners.com/promoRedirect?member=giochidislots&campaign=DEFAULT&channel=DEFAULT&zone=13523998&lp=13523989",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/titanbet",
+      "destination": "http://online.europartners.com/promoRedirect?member=giochidislots&campaign=DEFAULT&channel=DEFAULT&zone=13523998&lp=13523989",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/starvegas/",
+      "destination": "https://www.starvegas.it/gmg/refer/653bd30e844bd600010899e9",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/starvegas",
+      "destination": "https://www.starvegas.it/gmg/refer/653bd30e844bd600010899e9",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/starcasino-hom/",
+      "destination": "https://record.starcasino.it/_QFO0Ve3sy0t_4fiThTieLWNd7ZgqdRLk/6/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/starcasino-hom",
+      "destination": "https://record.starcasino.it/_QFO0Ve3sy0t_4fiThTieLWNd7ZgqdRLk/6/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/starcasino-gam/",
+      "destination": "https://record.starcasino.it/_QFO0Ve3sy0t_4fiThTieLWNd7ZgqdRLk/6/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/starcasino-gam",
+      "destination": "https://record.starcasino.it/_QFO0Ve3sy0t_4fiThTieLWNd7ZgqdRLk/6/",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/planetwin365/",
+      "destination": "https://ads.planetwin365affiliate.com/redirect.aspx?pid=6592&bid=1675",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/planetwin365",
+      "destination": "https://ads.planetwin365affiliate.com/redirect.aspx?pid=6592&bid=1675",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/lottomatica/",
+      "destination": "https://media.lottomaticapartners.it/redirect.aspx?pid=6632&bid=1509",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/lottomatica",
+      "destination": "https://media.lottomaticapartners.it/redirect.aspx?pid=6632&bid=1509",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/leovegas/",
+      "destination": "https://ntrfr.leovegas.com/redirect.aspx?pid=3639581&lpid=1756&bid=19140",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/leovegas",
+      "destination": "https://ntrfr.leovegas.com/redirect.aspx?pid=3639581&lpid=1756&bid=19140",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/fastbet/",
+      "destination": "https://www.fastbet.it/landing/fastlink?page=register.html&tracking=BackOfficeLink&agent=76819",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/fastbet",
+      "destination": "https://www.fastbet.it/landing/fastlink?page=register.html&tracking=BackOfficeLink&agent=76819",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betway/",
+      "destination": "https://www.betway.it/bwp/cas001?s=bpi29948&a=bpiadid167197",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/go/betway",
+      "destination": "https://www.betway.it/bwp/cas001?s=bpi29948&a=bpiadid167197",
+      "permanent": true,
+      "basePath": false,
+      "locale": false
+    },
+    {
+      "source": "/blog/read/le-8-superstizioni-cinesi-sui-casino/",
+      "destination": "/blog/le-8-superstizioni-cinesi-sui-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/read/le-8-superstizioni-cinesi-sui-casino",
+      "destination": "/blog/le-8-superstizioni-cinesi-sui-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/888/",
+      "destination": "/casino/recensione/888-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/888",
+      "destination": "/casino/recensione/888-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino-big-bonus/",
+      "destination": "/casino/recensione/best-in-games/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino-big-bonus",
+      "destination": "/casino/recensione/best-in-games/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/betflag-casino/",
+      "destination": "/casino/recensione/betflag-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/betflag-casino",
+      "destination": "/casino/recensione/betflag-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/lingegneria-della-dipendenza-da-slot.-la-tecnologia-vuole-i-suoi-segreti/",
+      "destination": "/blog/lingegneria-della-dipendenza-da-slot-la-tecnologia-vuole-i-suoi-segreti/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/lingegneria-della-dipendenza-da-slot.-la-tecnologia-vuole-i-suoi-segreti",
+      "destination": "/blog/lingegneria-della-dipendenza-da-slot-la-tecnologia-vuole-i-suoi-segreti/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/big-bonus/",
+      "destination": "/casino/recensione/best-in-games/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/big-bonus",
+      "destination": "/casino/recensione/best-in-games/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/leovegas/",
+      "destination": "/casino/recensione/leo-vegas-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/leovegas",
+      "destination": "/casino/recensione/leo-vegas-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/intervista-torm-horn-gaming/",
+      "destination": "/blog/intervista-tom-horn-gaming/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/intervista-torm-horn-gaming",
+      "destination": "/blog/intervista-tom-horn-gaming/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/betfair/",
+      "destination": "/casino/recensione/betfair-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/betfair",
+      "destination": "/casino/recensione/betfair-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/casino-online/merkurwin/",
+      "destination": "/software-slot-machine/cristaltec/",
+      "permanent": true
+    },
+    {
+      "source": "/casino-online/merkurwin",
+      "destination": "/software-slot-machine/cristaltec/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/mr-green/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/mr-green",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/32-red/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/32-red",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino-betfair/",
+      "destination": "/casino/recensione/betfair-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino-betfair",
+      "destination": "/casino/recensione/betfair-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-machine-online/",
+      "destination": "/slot-machine/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-machine-online",
+      "destination": "/slot-machine/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/merkur-win-casino/",
+      "destination": "/casino/recensione/casino-mania/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/merkur-win-casino",
+      "destination": "/casino/recensione/casino-mania/",
+      "permanent": true
+    },
+    {
+      "source": "/crazy-time/",
+      "destination": "/casino-live/crazy-time/",
+      "permanent": true
+    },
+    {
+      "source": "/crazy-time",
+      "destination": "/casino-live/crazy-time/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/gambling-fitness-sharing-e-tech-lItalia-odierna-tra-vizi-e-virtu/",
+      "destination": "/blog/gambling-fitness-sharing-e-tech-litalia-odierna-tra-vizi-e-virtu/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/gambling-fitness-sharing-e-tech-lItalia-odierna-tra-vizi-e-virtu",
+      "destination": "/blog/gambling-fitness-sharing-e-tech-litalia-odierna-tra-vizi-e-virtu/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/fantasy-team/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/fantasy-team",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino-888/",
+      "destination": "/casino/recensione/888-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino-888",
+      "destination": "/casino/recensione/888-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/post/87886387038/dal-tentato-suicidio-al-ruolo-di-simbolo-nella-lotta/",
+      "destination": "/blog/dal-tentato-suicidio-al-ruolo-di-simbolo-nella-lotta-contro-la-ludopatia-li/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/post/87886387038/dal-tentato-suicidio-al-ruolo-di-simbolo-nella-lotta",
+      "destination": "/blog/dal-tentato-suicidio-al-ruolo-di-simbolo-nella-lotta-contro-la-ludopatia-li/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/un-anno-di-gambling-al-di-fuori-delle-alpi.-i-fatti-piu-importanti-del-2015/",
+      "destination": "/blog/un-anno-di-gambling-al-di-fuori-delle-alpi-i-fatti-piu-importanti-del-2015/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/un-anno-di-gambling-al-di-fuori-delle-alpi.-i-fatti-piu-importanti-del-2015",
+      "destination": "/blog/un-anno-di-gambling-al-di-fuori-delle-alpi-i-fatti-piu-importanti-del-2015/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/report-sostenibilità-hbg-gaming-tra-i-temi-anche-gioco-responsabile-ed-agenda-onu-2030/",
+      "destination": "/blog/report-sostenibilita-hbg-gaming-tra-i-temi-anche-gioco-responsabile-ed-agenda-onu-2030/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/report-sostenibilità-hbg-gaming-tra-i-temi-anche-gioco-responsabile-ed-agenda-onu-2030",
+      "destination": "/blog/report-sostenibilita-hbg-gaming-tra-i-temi-anche-gioco-responsabile-ed-agenda-onu-2030/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/post/82280209345/alla-scoperta-dellinsula-larea-del-cervello-che/",
+      "destination": "/blog/alla-scoperta-dellinsula-larea-del-cervello-che-innesca-la-dipendenza-al-gi/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/post/82280209345/alla-scoperta-dellinsula-larea-del-cervello-che",
+      "destination": "/blog/alla-scoperta-dellinsula-larea-del-cervello-che-innesca-la-dipendenza-al-gi/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/post/80253856516/guida-completa-ai-piu-grandi-e-belli-casino-al-mondo//",
+      "destination": "/blog/guida-completa-ai-pi-grandi-e-belli-casin-al-mondo/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/post/80253856516/guida-completa-ai-piu-grandi-e-belli-casino-al-mondo/",
+      "destination": "/blog/guida-completa-ai-pi-grandi-e-belli-casin-al-mondo/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/codere/",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/casino/recensione/codere",
+      "destination": "/casino-online/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/merkur-win/",
+      "destination": "/casino/recensione/casino-mania/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/merkur-win",
+      "destination": "/casino/recensione/casino-mania/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/betflag/",
+      "destination": "/casino/recensione/betflag-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/bonus-casino/betflag",
+      "destination": "/casino/recensione/betflag-casino/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/casino-mania/",
+      "destination": "/casino/recensione/casino-mania/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/casino-mania",
+      "destination": "/casino/recensione/casino-mania/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/fastbet/",
+      "destination": "/casino/recensione/fastbet/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-casinos/fastbet",
+      "destination": "/casino/recensione/fastbet/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-machine-online/",
+      "destination": "/slot-machine/",
+      "permanent": true
+    },
+    {
+      "source": "/slot-machine-online",
+      "destination": "/slot-machine/",
+      "permanent": true
+    }
+  ]
+}
