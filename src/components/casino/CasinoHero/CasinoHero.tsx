@@ -1,22 +1,25 @@
 // src/components/casino/CasinoHero/CasinoHero.tsx
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { Image } from "@/components/common/Image";
-import { TimeDate } from "@/components/common/TimeDate";
-import { HeaderAuthor } from "@/components/common/HeaderAuthor";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { CasinoFeaturesTable, CasinoGeneralInfoTable, CasinoTestimonial, CasinoPaymentSoftware } from "@/components/casino";
 import {
   faCoins,
   faSackDollar,
   faGift,
-} from "@awesome.me/kit-0e07a43543/icons/duotone/solid";
-import { Collapsible } from "@/components/ui/Collapsible";
-import type { CasinoPageData } from "@/types/casino-page.types";
-import type { BonusSection } from "@/types/casino.types";
-import { Button } from "@/components/ui";
+} from "@awesome.me/kit-0e07a43543/icons/duotone/light";
+import { Image } from "@/components/common/Image";
+import { Button } from "@/components/ui/Button";
 import { StarRatingInteractive } from "@/components/ui/StarRating/StarRatingInteractive";
+import { TimeDate } from "@/components/common/TimeDate";
+import { HeaderAuthor } from "@/components/common/HeaderAuthor";
+import { Collapsible } from "@/components/ui/Collapsible";
+import { CasinoFeaturesTable } from "./CasinoFeaturesTable";
+import { CasinoGeneralInfoTable } from "./CasinoGeneralInfoTable";
+import { CasinoTestimonial } from "./CasinoTestimonial";
+import { CasinoPaymentSoftware } from "./CasinoPaymentSoftware";
+import type { CasinoPageData } from "@/types/casino.types";
 
 interface CasinoHeroProps {
   casino: CasinoPageData;
@@ -24,23 +27,23 @@ interface CasinoHeroProps {
 }
 
 export function CasinoHero({ casino, translations }: CasinoHeroProps) {
-  // Clean terms and conditions from HTML
-  const termsAndConditionsCleaned =
-    casino.termsAndConditions?.copy?.replace(/(<([^>]+)>)/gi, "") || "";
+  // Process terms and conditions
+  const termsAndConditionsCleaned = casino.termsConditions
+    ?.replace(/<[^>]+>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 
-  // Format bonus amounts - properly typed parameter
-  const formatBonus = (section: BonusSection | null | undefined) => {
-    if (!section) return null;
+  // Format bonus amounts
+  const formatBonus = (bonusSection: typeof casino.bonusSection) => {
+    if (!bonusSection) return null;
 
     const parts = [];
-    if (section.bonusAmount) {
-      parts.push(`${section.bonusAmount}€`);
+    if (bonusSection.bonusType === "percentage" && bonusSection.percentage) {
+      parts.push(`${bonusSection.percentage}%`);
     }
-    if (section.cashBack) {
-      parts.push(section.cashBack);
-    }
-    if (section.freeSpin) {
-      parts.push(section.freeSpin);
+    if (bonusSection.bonusAmount) {
+      parts.push(`${bonusSection.bonusAmount}€`);
     }
 
     return parts.length > 0 ? parts.join(" + ") : null;
@@ -87,8 +90,8 @@ export function CasinoHero({ casino, translations }: CasinoHeroProps) {
 
         {/* Main content grid */}
         <div className="grid md:grid-cols-4 gap-5 pb-12">
-          {/* Casino details card */}
-          <div className="bg-white flex flex-col p-3 rounded relative z-10">
+          {/* Casino details card - add overflow-x-hidden to prevent horizontal scroll */}
+          <div className="bg-white flex flex-col p-3 rounded relative z-10 overflow-x-hidden">
             {/* Casino image */}
             <Link
               href={casino.casinoBonus?.bonusUrl || "#"}
@@ -131,7 +134,7 @@ export function CasinoHero({ casino, translations }: CasinoHeroProps) {
               <div className="flex items-center">
                 <FontAwesomeIcon
                   icon={faCoins}
-                  className="w-10 h-6 text-primary mr-5"
+                  className="w-10 h-6 text-primary mr-5 flex-shrink-0"
                 />
                 <Link
                   href={casino.casinoBonus?.bonusUrl || "#"}
@@ -143,24 +146,24 @@ export function CasinoHero({ casino, translations }: CasinoHeroProps) {
                 </Link>
               </div>
 
-              {/* Bonus details table */}
-              <table className="w-full text-sm">
+              {/* Bonus details table - add table-layout fixed and proper width constraints */}
+              <table className="w-full text-sm table-fixed">
                 <tbody>
                   {/* Reload bonus */}
                   <tr className="border-b-0">
-                    <td className="py-2">
+                    <td className="py-2 w-[60%]">
                       <div className="flex items-center">
                         <FontAwesomeIcon
                           icon={faSackDollar}
-                          className="w-10 h-6 text-gray-700 mr-5"
+                          className="w-10 h-6 text-gray-700 mr-5 flex-shrink-0"
                         />
                         <span className="text-xs uppercase">
                           {translations.reloadBonus || "Reload Bonus"}
                         </span>
                       </div>
                     </td>
-                    <td className="py-2 text-right">
-                      <div className="font-bold text-primary">
+                    <td className="py-2 text-right w-[40%]">
+                      <div className="font-bold text-primary break-all">
                         {reloadBonus || "-"}
                       </div>
                     </td>
@@ -168,19 +171,19 @@ export function CasinoHero({ casino, translations }: CasinoHeroProps) {
 
                   {/* No deposit bonus */}
                   <tr className="border-b-0">
-                    <td className="py-2">
+                    <td className="py-2 w-[60%]">
                       <div className="flex items-center">
                         <FontAwesomeIcon
                           icon={faGift}
-                          className="w-10 h-6 text-gray-700 mr-5"
+                          className="w-10 h-6 text-gray-700 mr-5 flex-shrink-0"
                         />
                         <span className="text-xs uppercase">
                           {translations.withoutDeposit || "Without Deposit"}
                         </span>
                       </div>
                     </td>
-                    <td className="py-2 text-right">
-                      <div className="font-bold text-primary">
+                    <td className="py-2 text-right w-[40%]">
+                      <div className="font-bold text-primary break-all">
                         {noDepositBonus || "-"}
                       </div>
                     </td>
@@ -211,11 +214,6 @@ export function CasinoHero({ casino, translations }: CasinoHeroProps) {
               contentClass="text-xs text-gray-600"
               defaultOpen={true}
             />
-          </div>
-
-          {/* Casino summary */}
-          <div className="md:col-span-3">
-            <CasinoSummary casino={casino} translations={translations} />
           </div>
         </div>
       </div>

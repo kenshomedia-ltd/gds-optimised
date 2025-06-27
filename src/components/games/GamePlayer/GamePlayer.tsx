@@ -445,7 +445,7 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
         </div>
 
         {/* Center Section - Rating and Play Button */}
-        <div className="px-2.5 shrink-0 justify-between basis-full flex items-center order-3 grow-0 md:basis-[300px] md:grow mt-4 md:mt-0 md:order-2">
+        <div className="px-2.5 shrink-0 justify-between basis-full flex items-center order-3 grow-0 md:basis-[300px] md:grow mt-4 md:mt-0 md:order-2 relative">
           <div className="p-2.5 md:p-0 shrink-0 justify-between basis-full flex items-center order-3 grow-0 md:basis-[300px] md:grow rounded-lg md:rounded-none md:border-0 md:order-2">
             <div className="ml-0 md:ml-4">
               {game.documentId && (
@@ -461,45 +461,25 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
               )}
             </div>
 
-            {/* Play Again Button - Only show when playing */}
-            {isPlaying && (
+            {/* Play Again Button - Centered with absolute positioning */}
+            {/* {isPlaying && ( */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <Button
-                onClick={handleReload}
+                href={`${providerPagePath}`}
                 variant="default"
-                size="sm"
-                className="ml-4"
+                size="lg"
+                className="bg-misc pointer-events-auto"
               >
-                {translations.playAgain || "Play Again"}
+                {translations.playRealBtn || "Play Again"}
               </Button>
-            )}
+            </div>
+            {/* )} */}
           </div>
         </div>
 
         {/* Control Icons */}
         <div className="p-2.5 md:p-0 flex order-2 md:order-3 grow md:grow-0">
           <div className="flex items-center gap-2 ml-auto">
-            {/* Reload button */}
-            <div className="relative">
-              <button
-                onClick={handleReload}
-                onMouseEnter={() => setShowReloadTooltip(true)}
-                onMouseLeave={() => setShowReloadTooltip(false)}
-                className="w-8 h-8 rounded-[5px] bg-gray-300 border border-gray-400 flex items-center justify-center hover:bg-gray-400 hover:*:text-white transition-colors"
-                aria-label={translations.reload || "Reload"}
-              >
-                <FontAwesomeIcon
-                  icon={faRotateRight}
-                  className="w-4 h-4 text-gray-600"
-                  style={{ "--fa-secondary-opacity": 0 }}
-                />
-              </button>
-              {showReloadTooltip && (
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded whitespace-nowrap z-10">
-                  {translations.reload || "Reload"}
-                </div>
-              )}
-            </div>
-
             {/* Fullscreen button */}
             <div className="relative">
               <button
@@ -518,6 +498,28 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
               {showFullscreenTooltip && (
                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded whitespace-nowrap z-10">
                   {translations.fullscreen || "Fullscreen"}
+                </div>
+              )}
+            </div>
+
+            {/* Reload button */}
+            <div className="relative">
+              <button
+                onClick={handleReload}
+                onMouseEnter={() => setShowReloadTooltip(true)}
+                onMouseLeave={() => setShowReloadTooltip(false)}
+                className="w-8 h-8 rounded-[5px] bg-gray-300 border border-gray-400 flex items-center justify-center hover:bg-gray-400 hover:*:text-white transition-colors"
+                aria-label={translations.reload || "Reload"}
+              >
+                <FontAwesomeIcon
+                  icon={faRotateRight}
+                  className="w-4 h-4 text-gray-600"
+                  style={{ "--fa-secondary-opacity": 0 }}
+                />
+              </button>
+              {showReloadTooltip && (
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded whitespace-nowrap z-10">
+                  {translations.reload || "Reload"}
                 </div>
               )}
             </div>
