@@ -69,7 +69,7 @@ export default async function AuthorsIndexPage({
 
       {/* Hero Section - Using proper theming */}
       <section className="featured-header relative overflow-hidden bg-gradient-to-b from-background-900 from-30% via-background-700 via-80% to-background-500 rounded-b-3xl">
-        <div className="container relative mx-auto px-4 z-10 py-12">
+        <div className="lg:container relative mx-auto px-4 z-10 py-12">
           {/* Page Title */}
           <div className="text-center">
             <h1 className="text-4xl lg:text-5xl font-heading font-bold text-white mb-4">
@@ -91,7 +91,7 @@ export default async function AuthorsIndexPage({
 
       {/* Main Content Section */}
       <section className="main py-12 lg:py-16">
-        <div className="xl:container mx-auto px-4">
+        <div className="lg:container mx-auto px-4">
           {/* Authors Grid */}
           {authors.length > 0 ? (
             <>

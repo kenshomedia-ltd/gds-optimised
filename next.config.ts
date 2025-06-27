@@ -1,8 +1,6 @@
 // next.config.ts
 import type { NextConfig } from "next";
 import type { RedirectsResponse } from "@/types/redirect.types";
-import path from "path";
-import fs from "fs";
 
 const nextConfig: NextConfig = {
   // Configure base path to serve from /it/
@@ -123,24 +121,120 @@ const nextConfig: NextConfig = {
 
   // Redirects from Strapi
   async redirects() {
-    return [
-      {
-        source: "/go/hardrock",
-        destination: "https://www.hardrockcasino.it/slot-machine",
-        permanent: false,
-        basePath: false,
-        locale: false,
-      },
-      {
-        source: "/go/star-casino",
-        destination:
-          "https://offerte.starcasino.it/it/bonus-benvenuto-casino?from=3AofSeKqaZZ09ljkoFnMbWNd7ZgqdRLk-AQ2391140206&affcode=AQ2391140206&utm_medium=MA_Affiliates&utm_source=10069751",
-        permanent: false,
-        basePath: false,
-        locale: false,
-      },
-    ];
+    const STRAPI_API_URL =
+      process.env.NEXT_PUBLIC_API_URL || process.env.PUBLIC_API_URL || "";
+    const STRAPI_API_TOKEN =
+      process.env.NEXT_PUBLIC_API_TOKEN || process.env.PUBLIC_API_TOKEN || "";
+    const BASE_PATH = "/it";
 
+    // Helper functions
+    function normalizeRedirectUrl(url: string): string {
+      if (
+        !url.startsWith("http://") &&
+        !url.startsWith("https://") &&
+        !url.startsWith("/")
+      ) {
+        return `/${url}`;
+      }
+      return url;
+    }
+
+    function removeBasePath(url: string): string {
+      if (url.startsWith(BASE_PATH)) {
+        return url.slice(BASE_PATH.length) || "/";
+      }
+      return url;
+    }
+
+    function ensureBasePath(url: string): string {
+      if (!url.startsWith(BASE_PATH)) {
+        return BASE_PATH + url;
+      }
+      return url;
+    }
+
+    try {
+      // Build query string
+      const params = new URLSearchParams({
+        "pagination[pageSize]": "1000",
+        "pagination[page]": "1",
+        sort: "createdAt:desc",
+      });
+
+      const url = `${STRAPI_API_URL}/api/redirects?${params}`;
+
+      // Fetch redirects
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${STRAPI_API_TOKEN}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          `Strapi API error: ${response.status} ${response.statusText}`
+        );
+      }
+
+      const data = (await response.json()) as RedirectsResponse;
+
+      if (!data?.data) {
+        console.warn("[Redirects] No redirects found");
+        return [];
+      }
+
+      // Transform redirects
+      const processedRedirects: Array<{
+        source: string;
+        destination: string;
+        permanent: boolean;
+        basePath?: false;
+      }> = [];
+
+      data.data.forEach((redirect) => {
+        if (!redirect.redirectUrl || !redirect.redirectTarget) {
+          return;
+        }
+
+        let source = normalizeRedirectUrl(redirect.redirectUrl);
+        let destination = redirect.redirectTarget;
+
+        const isExternal =
+          destination.startsWith("http://") ||
+          destination.startsWith("https://");
+
+        if (isExternal) {
+          // For external redirects, ensure source has /it prefix
+          source = ensureBasePath(source);
+        } else {
+          // For internal redirects, remove basePath from both source and destination
+          source = removeBasePath(source);
+          destination = removeBasePath(destination);
+        }
+
+        // Remove trailing slash from source (unless it's root)
+        if (source !== "/" && source !== "/it" && source.endsWith("/")) {
+          source = source.slice(0, -1);
+        }
+
+        // Create single redirect rule
+        processedRedirects.push({
+          source,
+          destination,
+          permanent: redirect.redirectMethod === "permanent",
+          ...(isExternal && { basePath: false as const }),
+        });
+      });
+
+      console.log(`[Redirects] Processed ${data.data.length} redirects`);
+
+      return processedRedirects;
+    } catch (error) {
+      console.error("[Redirects] Failed to load redirects:", error);
+      return [];
+    }
   },
 
   // Rewrites for image optimization

@@ -126,7 +126,7 @@ async function GameContent({ game }: { game: GamePageData }) {
 
       {/* Hero Section with Game Player */}
       <section className="featured-header relative overflow-hidden bg-gradient-to-b from-background-900 from-30% via-background-700 via-80% to-background-500 rounded-b-3xl">
-        <div className="container relative mx-auto px-4 z-10 py-8">
+        <div className="lg:container relative mx-auto px-4 z-10 py-8">
           {/* Game Player */}
           <div className="mb-8">
             <GamePlayer game={game} translations={translations} />
@@ -150,7 +150,7 @@ async function GameContent({ game }: { game: GamePageData }) {
       </section>
 
       {/* Main Content Section */}
-      <main className="container mx-auto px-4 py-8">
+      <main className="lg:container mx-auto px-4 py-8">
         <div className="space-y-12">
           {/* Related Casinos Widget - Full width */}
           {game.provider && (

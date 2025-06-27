@@ -83,7 +83,7 @@ export default async function AuthorPage({ params }: AuthorPageProps) {
 
       {/* Hero Section with Author Bio - Using proper theming */}
       <section className="featured-header relative overflow-hidden bg-gradient-to-b from-background-900 from-30% via-background-700 via-80% to-background-500 rounded-b-3xl">
-        <div className="container relative mx-auto px-4 z-10 py-12 pb-16">
+        <div className="lg:container relative mx-auto px-4 z-10 py-12 pb-16">
           {/* Author Bio */}
           <AuthorBio author={author} translations={translations} />
 
@@ -113,7 +113,7 @@ export default async function AuthorPage({ params }: AuthorPageProps) {
       {/* Main Content Section - Blogs */}
       {author.blogs && author.blogs.length > 0 && (
         <section className="main py-12 lg:py-16">
-          <div className="xl:container mx-auto px-4">
+          <div className="lg:container mx-auto px-4">
             <h2 className="text-3xl lg:text-4xl font-heading font-bold text-center mb-10">
               {translations?.articlesByAuthor || "Articles by"}{" "}
               {author.firstName}

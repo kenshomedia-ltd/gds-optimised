@@ -191,7 +191,7 @@ export function IntroWithImage({
             className={cn(
               "col-span-12 lg:col-span-5",
               "order-1 lg:order-2",
-              "relative aspect-[16/9] lg:aspect-auto lg:h-full",
+              "relative md:aspect-auto lg:h-full",
               "overflow-hidden rounded-xl lg:rounded-2xl",
               "mix-blend-lighten shadow-lg"
             )}

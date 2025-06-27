@@ -118,7 +118,7 @@ export default async function HomePage() {
       {/* Hero Section with Featured Blocks */}
       {heroBlocks.length > 0 && (
         <section className="featured-header relative overflow-hidden bg-gradient-to-b from-background-900 from-30% via-background-700 via-80% to-background-500 rounded-b-3xl">
-          <div className="container relative mx-auto px-4 z-10">
+          <div className="lg:container relative mx-auto px-4 z-10">
             {heroBlocks.map((block, index) => (
               <div key={`hero-${block.__component}-${index}`} className="mb-8">
                 <DynamicBlock
@@ -139,7 +139,7 @@ export default async function HomePage() {
       )}
 
       {/* Main Content Section with Progressive Loading */}
-      <section className="main container mx-auto px-2 py-8">
+      <section className="main lg:container mx-auto px-4 lg:px-2 py-8">
         <div className="space-y-12">
           {mainBlocks.map((block, index) => (
             <section

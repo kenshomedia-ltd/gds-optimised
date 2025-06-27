@@ -102,7 +102,7 @@ export default async function BlogIndexPage({
       {/* Hero Section with Featured Post (only on first page) */}
       {currentPage === 1 && featuredBlog && (
         <section className="featured-header relative overflow-hidden bg-gradient-to-b from-background-900 from-30% via-background-700 via-80% to-background-500 rounded-b-3xl">
-          <div className="container relative mx-auto px-4 z-10 py-12">
+          <div className="lg:container relative mx-auto px-4 z-10 py-12">
             <BlogFeatured blog={featuredBlog} translations={translations} />
           </div>
 
@@ -115,7 +115,7 @@ export default async function BlogIndexPage({
       )}
 
       {/* Main Content Section */}
-      <section className="main container mx-auto px-4 py-12">
+      <section className="main lg:container mx-auto px-4 py-12">
         {/* Page Title (shown on pages other than first) */}
         {currentPage > 1 && (
           <h1 className="text-4xl font-bold mb-8">

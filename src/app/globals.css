@@ -13,6 +13,9 @@
   /* Font families */
   --font-family-heading: var(--font-lato), system-ui, sans-serif;
   --font-family-body: var(--font-roboto), system-ui, sans-serif;
+
+  /* Container */
+  --container-md: 100%;
   
   /* Extend default Tailwind theme */
   --font-family-sans: var(--font-roboto), system-ui, sans-serif;
