@@ -7,13 +7,13 @@ import {
   fetchRedirects,
   transformRedirectsForNextJs,
 } from "./redirects-loader";
-import type { Redirect } from "next/dist/lib/load-custom-routes";
 
 /**
  * Get redirects for Next.js config at build time
  * This function is called during the build process
+ * We don't specify return type to let TypeScript infer it
  */
-export async function getBuildTimeRedirects(): Promise<Redirect[]> {
+export async function getBuildTimeRedirects() {
   try {
     // Fetch redirects from Strapi
     const strapiRedirects = await fetchRedirects();

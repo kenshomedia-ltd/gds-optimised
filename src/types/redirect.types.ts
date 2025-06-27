@@ -21,3 +21,12 @@ export interface RedirectsResponse {
     };
   };
 }
+
+// Next.js redirect type - matching the actual Next.js config expectations
+export interface NextJsRedirect {
+  source: string;
+  destination: string;
+  permanent: boolean;
+  basePath?: false;
+  locale?: false;
+}

@@ -1,4 +1,3 @@
-// src/app/api/webhooks/redirects/route.ts
 /**
  * Webhook endpoint to handle redirect updates from Strapi
  * This allows for cache invalidation when redirects are updated

@@ -1,6 +1,6 @@
 // next.config.ts
-import type { NextConfig, Redirect } from "next";
-import { getBuildTimeRedirects } from "./src/lib/strapi/build-time-redirects";
+import type { NextConfig } from "next";
+import type { RedirectsResponse } from "@/types/redirect.types";
 
 const nextConfig: NextConfig = {
   // Configure base path to serve from /it/
@@ -20,10 +20,10 @@ const nextConfig: NextConfig = {
         hostname: "giochigatsby.s3.amazonaws.com",
       },
       {
-        protocol: 'https',
-        hostname: 'giochigatsby.s3.eu-west-1.amazonaws.com',
-        port: '',
-        pathname: '/**',
+        protocol: "https",
+        hostname: "giochigatsby.s3.eu-west-1.amazonaws.com",
+        port: "",
+        pathname: "/**",
       },
       // Add your Strapi domain if needed
       {
@@ -119,27 +119,155 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  // Redirects if needed
+  // Redirects from Strapi
   async redirects() {
+    const STRAPI_API_URL =
+      process.env.NEXT_PUBLIC_API_URL || process.env.PUBLIC_API_URL || "";
+    const STRAPI_API_TOKEN =
+      process.env.NEXT_PUBLIC_API_TOKEN || process.env.PUBLIC_API_TOKEN || "";
+    const BASE_PATH = "/it";
+
+    // Helper functions
+    function normalizeRedirectUrl(url: string): string {
+      if (
+        !url.startsWith("http://") &&
+        !url.startsWith("https://") &&
+        !url.startsWith("/")
+      ) {
+        return `/${url}`;
+      }
+      return url;
+    }
+
+    function removeBasePath(url: string): string {
+      if (url.startsWith(BASE_PATH)) {
+        return url.slice(BASE_PATH.length) || "/";
+      }
+      return url;
+    }
+
     try {
-      // Fetch redirects from Strapi at build time
-      const strapiRedirects = await getBuildTimeRedirects();
+      console.log("[Redirects] Fetching redirects from Strapi...");
 
-      // You can also add static redirects here if needed
-      const staticRedirects: Redirect[] = [
-        // Example static redirect
-        // {
-        //   source: '/old-page',
-        //   destination: '/new-page',
-        //   permanent: true,
-        // },
-      ];
+      // Build query string
+      const params = new URLSearchParams({
+        "pagination[pageSize]": "1000",
+        "pagination[page]": "1",
+        "fields[0]": "redirectUrl",
+        "fields[1]": "redirectTarget",
+        "fields[2]": "redirectMethod",
+        "sort[0]": "createdAt:desc",
+      });
 
-      // Combine Strapi and static redirects
-      return [...strapiRedirects, ...staticRedirects];
+      const url = `${STRAPI_API_URL}/api/redirects?${params}`;
+
+      // Fetch redirects
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${STRAPI_API_TOKEN}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          `Strapi API error: ${response.status} ${response.statusText}`
+        );
+      }
+
+      const data = (await response.json()) as RedirectsResponse;
+
+      if (!data?.data) {
+        console.warn("[Redirects] No redirects found");
+        return [];
+      }
+
+      console.log(`[Redirects] Fetched ${data.data.length} redirects`);
+
+      // Transform redirects
+      const redirects = data.data
+        .filter((redirect) => {
+          if (!redirect.redirectUrl || !redirect.redirectTarget) {
+            console.warn(
+              `[Redirects] Skipping invalid redirect: ${JSON.stringify(
+                redirect
+              )}`
+            );
+            return false;
+          }
+          return true;
+        })
+        .map((redirect, index) => {
+          let source = normalizeRedirectUrl(redirect.redirectUrl);
+          let destination = redirect.redirectTarget;
+
+          const isExternal =
+            destination.startsWith("http://") ||
+            destination.startsWith("https://");
+
+          // Debug logging for first 5 redirects
+          if (index < 5) {
+            console.log(
+              `[Redirects] Original: ${redirect.redirectUrl} -> ${redirect.redirectTarget}`
+            );
+          }
+
+          // Remove basePath for internal redirects
+          if (!isExternal) {
+            source = removeBasePath(source);
+            destination = removeBasePath(destination);
+
+            // Debug logging for first 5 internal redirects
+            if (index < 5) {
+              console.log(
+                `[Redirects] Processed Internal: ${source} -> ${destination}`
+              );
+            }
+          } else {
+            // For external redirects, also remove basePath from source
+            source = removeBasePath(source);
+
+            // Debug logging for first 5 external redirects
+            if (index < 5) {
+              console.log(
+                `[Redirects] Processed External: ${source} -> ${destination}`
+              );
+            }
+          }
+
+          // Build redirect object
+          if (isExternal) {
+            return {
+              source,
+              destination,
+              permanent: redirect.redirectMethod === "permanent",
+              basePath: false as const,
+            };
+          }
+
+          return {
+            source,
+            destination,
+            permanent: redirect.redirectMethod === "permanent",
+          };
+        });
+
+      console.log(`[Redirects] Processed ${redirects.length} redirects`);
+
+      // Log some example redirects for debugging
+      console.log("[Redirects] Sample processed redirects:");
+      redirects.slice(0, 3).forEach((r, i) => {
+        console.log(
+          `  ${i + 1}. ${r.source} -> ${r.destination} (permanent: ${
+            r.permanent
+          }, basePath: ${"basePath" in r ? r.basePath : "not set"})`
+        );
+      });
+
+      return redirects;
     } catch (error) {
-      console.error("Failed to load redirects:", error);
-      // Return empty array to prevent build failure
+      console.error("[Redirects] Failed to load redirects:", error);
       return [];
     }
   },

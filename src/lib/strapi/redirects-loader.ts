@@ -1,6 +1,10 @@
+// src/lib/strapi/redirects-loader.ts
 import { strapiClient } from "./strapi-client";
-import type { RedirectData, RedirectsResponse } from "@/types/redirect.types";
-import type { Redirect } from "next/dist/lib/load-custom-routes";
+import type {
+  RedirectData,
+  RedirectsResponse,
+  NextJsRedirect,
+} from "@/types/redirect.types";
 
 /**
  * Validate and normalize redirect URL
@@ -68,7 +72,7 @@ export async function fetchRedirects(): Promise<RedirectData[]> {
  */
 export function transformRedirectsForNextJs(
   redirects: RedirectData[]
-): Redirect[] {
+): NextJsRedirect[] {
   const basePath = "/it"; // Your Next.js basePath
 
   return redirects
@@ -82,7 +86,7 @@ export function transformRedirectsForNextJs(
       }
       return true;
     })
-    .map((redirect): Redirect => {
+    .map((redirect): NextJsRedirect => {
       // Normalize URLs
       let source = normalizeRedirectUrl(redirect.redirectUrl);
       let destination = redirect.redirectTarget;
@@ -105,8 +109,8 @@ export function transformRedirectsForNextJs(
         );
       }
 
-      // Build the redirect object according to Next.js Redirect type
-      const redirectObj: Redirect = {
+      // Build the redirect object according to Next.js redirect type
+      const redirectObj: NextJsRedirect = {
         source,
         destination,
         permanent: redirect.redirectMethod === "permanent",
