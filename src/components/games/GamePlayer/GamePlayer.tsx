@@ -413,7 +413,7 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
                   className="uppercase my-5 bg-secondary hover:bg-secondary-600"
                   size="lg"
                 >
-                  {translations.playFunBtn || "GIOCA GRATIS"}
+                  {translations.playFunBtn || "Play for fun"}
                 </Button>
 
                 <div className="text-white text-[11px] border border-danger rounded p-1.5 text-center">
@@ -461,19 +461,33 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
               )}
             </div>
 
-            {/* Play Again Button - Centered with absolute positioning */}
-            {/* {isPlaying && ( */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <Button
-                href={`${providerPagePath}`}
-                variant="default"
-                size="lg"
-                className="bg-misc pointer-events-auto"
-              >
-                {translations.playRealBtn || "Play Again"}
-              </Button>
-            </div>
-            {/* )} */}
+            {/* Play Again Button - Right-aligned on mobile, centered on desktop */}
+
+            <>
+              {/* Desktop: Centered with absolute positioning */}
+              <div className="hidden md:flex absolute inset-0 items-center justify-center pointer-events-none">
+                <Button
+                  href={`${providerPagePath}`}
+                  variant="default"
+                  size="lg"
+                  className="bg-misc pointer-events-auto"
+                >
+                  {translations.playRealBtn || "Play Again"}
+                </Button>
+              </div>
+
+              {/* Mobile: Right-aligned */}
+              <div className="md:hidden ml-auto">
+                <Button
+                  href={`${providerPagePath}`}
+                  variant="default"
+                  size="lg"
+                  className="bg-misc pointer-events-auto"
+                >
+                  {translations.playRealBtn || "Play Again"}
+                </Button>
+              </div>
+            </>
           </div>
         </div>
 
