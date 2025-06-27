@@ -1,4 +1,5 @@
 // src/types/casino-filters.types.ts
+import type { CasinoData } from "./casino.types";
 
 /**
  * Casino filter-related type definitions
@@ -91,55 +92,3 @@ export interface FilterOption {
   label: string;
   value: string;
 }
-
-/**
- * Casino sort options
- */
-export const CASINO_SORT_OPTIONS = [
-  { value: "ratingAvg:desc", label: "topRatedUsers" },
-  { value: "authorRatings:desc", label: "topRatedAuthor" },
-  { value: "bonusSection.bonusAmount:desc", label: "welcomeBonus" },
-  { value: "title:asc", label: "alphabetic" },
-  { value: "createdAt:desc", label: "newest" },
-] as const;
-
-/**
- * Bonus type options
- */
-export const BONUS_TYPE_OPTIONS = [
-  { value: "bonusSection", label: "welcomeBonus" },
-  { value: "noDepositSection", label: "withoutDeposit" },
-  { value: "freeSpinsSection", label: "freeSpins" },
-] as const;
-
-/**
- * Condition options
- */
-export const CONDITION_OPTIONS = [
-  { value: "After Registration", label: "conditionRegistration" },
-  { value: "After Validation", label: "conditionValidateAcct" },
-  { value: "After Deposit", label: "conditionDeposit" },
-] as const;
-
-/**
- * Bonus amount options
- */
-export const BONUS_AMOUNT_OPTIONS = [
-  50, 100, 200, 300, 500, 1000, 1500, 2000, 3000, 5000,
-];
-
-/**
- * Wagering requirement options
- */
-export const WAGERING_OPTIONS = [
-  "0x",
-  "10x",
-  "20x",
-  "30x",
-  "40x",
-  "50x",
-  "60x",
-];
-
-// Import needed types from other files
-import type { CasinoData } from "./casino.types";

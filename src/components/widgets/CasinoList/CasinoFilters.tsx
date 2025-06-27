@@ -20,7 +20,7 @@ import {
   CONDITION_OPTIONS,
   BONUS_AMOUNT_OPTIONS,
   WAGERING_OPTIONS,
-} from "@/types/casino-filters.types";
+} from "@/lib/utils/sort-mappings";
 
 /**
  * CasinoFilters Component
@@ -478,7 +478,7 @@ export function CasinoFilters({
             className="w-full p-2 text-sm font-medium bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
             onClick={onClearFilters}
           >
-            {translations.clearFilters || "Clear All Filters"}
+            {translations.clear || "Clear All Filters"}
           </button>
         </div>
       </section>
