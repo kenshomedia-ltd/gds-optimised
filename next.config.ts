@@ -1,7 +1,10 @@
 // next.config.ts
-import type { NextConfig } from "next";
+import type { NextConfig, Redirect } from "next";
+import { getBuildTimeRedirects } from "./src/lib/strapi/build-time-redirects";
 
 const nextConfig: NextConfig = {
+  // Configure base path to serve from /it/
+  basePath: "/it",
   // Enable standalone output for Docker deployment
   output: "standalone",
   // Image optimization configuration
@@ -118,7 +121,27 @@ const nextConfig: NextConfig = {
 
   // Redirects if needed
   async redirects() {
-    return [];
+    try {
+      // Fetch redirects from Strapi at build time
+      const strapiRedirects = await getBuildTimeRedirects();
+
+      // You can also add static redirects here if needed
+      const staticRedirects: Redirect[] = [
+        // Example static redirect
+        // {
+        //   source: '/old-page',
+        //   destination: '/new-page',
+        //   permanent: true,
+        // },
+      ];
+
+      // Combine Strapi and static redirects
+      return [...strapiRedirects, ...staticRedirects];
+    } catch (error) {
+      console.error("Failed to load redirects:", error);
+      // Return empty array to prevent build failure
+      return [];
+    }
   },
 
   // Rewrites for image optimization

@@ -22,7 +22,7 @@ export function CasinoPaymentSoftwareServer({
   casino,
   translations,
 }: CasinoPaymentSoftwareServerProps) {
-  // Helper to render payment icons (same logic as original working version)
+  // Helper to render payment icons (same logic as client version)
   const renderPaymentIcons = () => {
     const paymentIcons: React.ReactElement[] = [];
 
@@ -106,11 +106,12 @@ export function CasinoPaymentSoftwareServer({
     );
   };
 
+  // Server-side default visible count (matches client's mobile default)
   const providers = casino.providers || [];
-  // Limit server-side display to prevent CLS
-  // Show only 4 on mobile, 7 on desktop (matching client defaults)
-  const visibleProviders = providers.slice(0, 7);
-  const remainingCount = Math.max(0, providers.length - 7);
+  const visibleProviderCount = Math.min(3, providers.length);
+  const visibleProviders = providers.slice(0, visibleProviderCount);
+  const remainingProviders = providers.slice(visibleProviderCount);
+  const remainingCount = remainingProviders.length;
 
   return (
     <div className="grid md:grid-cols-2 mt-5">
@@ -130,7 +131,7 @@ export function CasinoPaymentSoftwareServer({
       </div>
 
       {/* Software Providers */}
-      <div className="md:ml-4">
+      <div className="md:ml-4 relative">
         <div className="flex py-3 text-white items-center mb-3">
           <FontAwesomeIcon
             icon={faGamepad}
@@ -141,10 +142,10 @@ export function CasinoPaymentSoftwareServer({
           </h5>
         </div>
 
-        {/* Match client component layout structure */}
-        <div className="relative">
+        {/* Container with relative positioning for consistency with client */}
+        <div className="relative z-0">
           <div className="flex items-center gap-1 max-w-full">
-            {/* Visible provider icons - limit to prevent CLS */}
+            {/* Visible provider icons */}
             <div className="flex gap-1 flex-shrink-0">
               {visibleProviders.map((provider) => (
                 <div
@@ -168,7 +169,7 @@ export function CasinoPaymentSoftwareServer({
                 </div>
               ))}
 
-              {/* Show static overflow indicator if there are more providers */}
+              {/* Static overflow indicator - will be replaced by interactive button on client */}
               {remainingCount > 0 && (
                 <div
                   className="flex items-center justify-center bg-white rounded p-1 w-[55px] h-[35px] text-primary font-semibold"
