@@ -8,6 +8,7 @@ import {
   faHeart,
   faUser,
   faBars,
+  faSearch,
 } from "@awesome.me/kit-0e07a43543/icons/duotone/light";
 import { faHeart as faHeartSolid } from "@awesome.me/kit-0e07a43543/icons/duotone/solid";
 import { Image } from "@/components/common/Image";
@@ -27,7 +28,7 @@ import { SubNav } from "./SubNav";
  * - Sticky header with scroll detection
  * - Responsive navigation with search, favorites, and user account
  * - Favorites drawer with red heart indicator when items are favorited
- * - Mobile-first approach
+ * - Mobile-first approach with improved mobile layout
  * - Accessibility compliant
  * - Performance optimized with React hooks
  */
@@ -41,6 +42,7 @@ export function Header({
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
+  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const { favoritesCount } = useFavorites();
 
   const siteName = process.env.NEXT_PUBLIC_SITE_NAME || "GiochiDiSlots";
@@ -84,6 +86,10 @@ export function Header({
     setIsFavoritesOpen(!isFavoritesOpen);
   };
 
+  const toggleSearch = () => {
+    setIsSearchExpanded(!isSearchExpanded);
+  };
+
   return (
     <>
       {/* Main Header */}
@@ -98,108 +104,235 @@ export function Header({
           className="mx-auto flex h-16 items-center justify-between px-4 py-2 xl:container"
           aria-label="Main navigation"
         >
-          {/* Mobile Menu Button */}
-          <button
-            type="button"
-            onClick={toggleMobileMenu}
-            className="lg:hidden p-2 rounded-md text-navbar-text hover:bg-white/10 transition-colors"
-            aria-expanded={isMobileMenuOpen}
-            aria-label={translations.menu || "Open menu"}
-          >
-            <FontAwesomeIcon icon={faBars} className="h-6 w-6" />
-          </button>
+          {/* Mobile Layout (lg and below) */}
+          <div className="flex items-center justify-between w-full lg:hidden">
+            {/* Left side - Mobile Menu + Auth */}
+            <div className="flex items-center gap-2">
+              {/* Mobile Menu Button */}
+              <button
+                type="button"
+                onClick={toggleMobileMenu}
+                className="p-2 rounded-md text-navbar-text hover:bg-white/10 transition-colors"
+                aria-expanded={isMobileMenuOpen}
+                aria-label={translations.menu || "Open menu"}
+              >
+                <FontAwesomeIcon icon={faBars} className="h-7 w-7" />
+              </button>
 
-          {/* Logo - Centered on mobile, left-aligned on desktop */}
-          <div className="absolute left-1/2 -translate-x-1/2 flex lg:relative lg:left-auto lg:flex-1 lg:translate-x-0">
-            <Link
-              href="/"
-              className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75"
-              onClick={closeMobileMenu}
-              aria-label={`${siteName} Home`}
-            >
-              <span className="sr-only">{siteName}</span>
-              {logo ? (
-                <Image
-                  src={logo.url}
-                  alt={`${siteName} Logo`}
-                  width={logo.width || 200}
-                  height={logo.height || 56}
-                  className={
-                    siteId === "csi"
-                      ? "w-[130px] md:w-auto h-[50px] object-contain"
-                      : "h-[50px] w-auto"
-                  }
-                  priority
-                  quality={90}
-                  unoptimized={logo.url.endsWith(".svg")}
-                />
-              ) : (
-                <div className="h-[50px] flex items-center text-navbar-text font-bold text-xl">
-                  {siteName}
-                </div>
-              )}
-            </Link>
-          </div>
+              {/* Authentication Button - Mobile */}
+              <Link
+                href={user?.isAuthenticated ? "/account" : "/login"}
+                className="p-2 rounded-md text-navbar-text hover:bg-white/10 transition-colors"
+                aria-label={
+                  user?.isAuthenticated
+                    ? translations.account || "My Account"
+                    : translations.login || "Login"
+                }
+              >
+                <FontAwesomeIcon icon={faUser} className="h-7 w-7" />
+              </Link>
+            </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden lg:flex lg:flex-1">
-            <MainNav navigation={mainNavigation} translations={translations} />
-          </div>
-
-          {/* User Actions */}
-          <div className="flex items-center gap-2">
-            {/* Search Bar */}
-            <SearchBar
-              position="header"
-              placeholder={translations.searchPlaceholder || "Search games..."}
-            />
-
-            {/* Favorites Button */}
-            <button
-              type="button"
-              className={cn(
-                "relative p-2 rounded-md transition-colors",
-                "hover:bg-white/10",
-                "focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
-              )}
-              onClick={toggleFavorites}
-              aria-label={translations.favorite || "Favorites"}
-              data-favorites-trigger
-            >
-              <FontAwesomeIcon
-                icon={favoritesCount > 0 ? faHeartSolid : faHeart}
-                className={cn(
-                  "h-5 w-5 transition-colors",
-                  favoritesCount > 0 ? "text-danger" : "text-navbar-text"
+            {/* Center - Logo */}
+            <div className="absolute left-1/2 -translate-x-1/2">
+              <Link
+                href="/"
+                className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75"
+                onClick={closeMobileMenu}
+                aria-label={`${siteName} Home`}
+              >
+                <span className="sr-only">{siteName}</span>
+                {logo ? (
+                  <Image
+                    src={logo.url}
+                    alt={`${siteName} Logo`}
+                    width={logo.width || 200}
+                    height={logo.height || 56}
+                    className={
+                      siteId === "csi"
+                        ? "w-[130px] md:w-auto h-[50px] object-contain"
+                        : "h-[50px] w-auto"
+                    }
+                    priority
+                    quality={90}
+                    unoptimized={logo.url.endsWith(".svg")}
+                  />
+                ) : (
+                  <div className="h-[50px] flex items-center text-navbar-text font-bold text-xl">
+                    {siteName}
+                  </div>
                 )}
-                swapOpacity
-              />
-              {/* Optional badge for favorites count */}
-              {favoritesCount > 0 && (
-                <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-danger text-white text-[10px] font-bold flex items-center justify-center">
-                  {favoritesCount > 9 ? "9+" : favoritesCount}
-                </span>
-              )}
-            </button>
+              </Link>
+            </div>
 
-            {/* User Account */}
-            <Link
-              href={user?.isAuthenticated ? "/account" : "/login"}
-              className="p-2 rounded-md text-navbar-text hover:bg-white/10 transition-colors"
-              aria-label={
-                user?.isAuthenticated
-                  ? translations.account || "My Account"
-                  : translations.login || "Login"
-              }
-            >
-              <FontAwesomeIcon icon={faUser} className="h-5 w-5" />
-            </Link>
+            {/* Right side - Favorites + Search */}
+            <div className="flex items-center gap-2">
+              {/* Favorites Button - Mobile */}
+              <button
+                type="button"
+                className={cn(
+                  "relative p-2 rounded-md transition-colors",
+                  "hover:bg-white/10",
+                  "focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
+                )}
+                onClick={toggleFavorites}
+                aria-label={translations.favorite || "Favorites"}
+                data-favorites-trigger
+              >
+                <FontAwesomeIcon
+                  icon={favoritesCount > 0 ? faHeartSolid : faHeart}
+                  className={cn(
+                    "h-7 w-7 transition-colors",
+                    favoritesCount > 0 ? "text-danger" : "text-navbar-text"
+                  )}
+                  swapOpacity
+                />
+                {/* Favorites count badge */}
+                {favoritesCount > 0 && (
+                  <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-danger text-white text-[10px] font-bold flex items-center justify-center">
+                    {favoritesCount > 9 ? "9+" : favoritesCount}
+                  </span>
+                )}
+              </button>
+
+              {/* Search Button - Mobile */}
+              <button
+                type="button"
+                onClick={toggleSearch}
+                className="p-2 rounded-md text-navbar-text hover:bg-white/10 transition-colors"
+                aria-label={translations.search || "Search"}
+              >
+                <FontAwesomeIcon icon={faSearch} className="h-7 w-7" />
+              </button>
+            </div>
+          </div>
+
+          {/* Desktop Layout (lg and above) */}
+          <div className="hidden lg:flex lg:items-center lg:justify-between lg:w-full">
+            {/* Desktop Logo */}
+            <div className="flex lg:flex-1">
+              <Link
+                href="/"
+                className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75"
+                onClick={closeMobileMenu}
+                aria-label={`${siteName} Home`}
+              >
+                <span className="sr-only">{siteName}</span>
+                {logo ? (
+                  <Image
+                    src={logo.url}
+                    alt={`${siteName} Logo`}
+                    width={logo.width || 200}
+                    height={logo.height || 56}
+                    className={
+                      siteId === "csi"
+                        ? "w-[130px] md:w-auto h-[50px] object-contain"
+                        : "h-[50px] w-auto"
+                    }
+                    priority
+                    quality={90}
+                    unoptimized={logo.url.endsWith(".svg")}
+                  />
+                ) : (
+                  <div className="h-[50px] flex items-center text-navbar-text font-bold text-xl">
+                    {siteName}
+                  </div>
+                )}
+              </Link>
+            </div>
+
+            {/* Desktop Navigation */}
+            <div className="hidden lg:flex lg:flex-1">
+              <MainNav
+                navigation={mainNavigation}
+                translations={translations}
+              />
+            </div>
+
+            {/* Desktop User Actions - Reordered: Favorites, Auth, Search */}
+            <div className="flex items-center gap-2">
+              {/* Favorites Button - Desktop (First) */}
+              <button
+                type="button"
+                className={cn(
+                  "relative p-2 rounded-md transition-colors",
+                  "hover:bg-white/10",
+                  "focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
+                )}
+                onClick={toggleFavorites}
+                aria-label={translations.favorite || "Favorites"}
+                data-favorites-trigger
+              >
+                <FontAwesomeIcon
+                  icon={favoritesCount > 0 ? faHeartSolid : faHeart}
+                  className={cn(
+                    "h-5 w-5 transition-colors",
+                    favoritesCount > 0 ? "text-danger" : "text-navbar-text"
+                  )}
+                  swapOpacity
+                />
+                {/* Favorites count badge */}
+                {favoritesCount > 0 && (
+                  <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-danger text-white text-[10px] font-bold flex items-center justify-center">
+                    {favoritesCount > 9 ? "9+" : favoritesCount}
+                  </span>
+                )}
+              </button>
+
+              {/* User Account - Desktop (Second) */}
+              <Link
+                href={user?.isAuthenticated ? "/account" : "/login"}
+                className="p-2 rounded-md text-navbar-text hover:bg-white/10 transition-colors"
+                aria-label={
+                  user?.isAuthenticated
+                    ? translations.account || "My Account"
+                    : translations.login || "Login"
+                }
+              >
+                <FontAwesomeIcon icon={faUser} className="h-5 w-5" />
+              </Link>
+
+              {/* Search Bar - Desktop (Last) */}
+              <SearchBar
+                position="header"
+                placeholder={
+                  translations.searchPlaceholder || "Search games..."
+                }
+              />
+            </div>
           </div>
         </nav>
 
         {/* Sub Navigation - Mobile only */}
         {subNavigation.length > 0 && <SubNav navigation={subNavigation} />}
       </header>
+
+      {/* Mobile Search Overlay */}
+      {isSearchExpanded && (
+        <div className="fixed inset-0 z-50 bg-black/50 lg:hidden">
+          <div className="absolute top-4 inset-x-4 bg-white rounded-lg shadow-xl p-4">
+            <div className="flex items-center gap-3 mb-4">
+              <SearchBar
+                position="page"
+                placeholder={
+                  translations.searchPlaceholder || "Search games..."
+                }
+                autoFocus
+              />
+              <button
+                type="button"
+                onClick={toggleSearch}
+                className="p-2 text-gray-500 hover:text-gray-700"
+                aria-label="Close search"
+              >
+                <span className="text-sm font-medium">
+                  {translations.cancel || "Cancel"}
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Mobile Menu */}
       <MobileMenu
