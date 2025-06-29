@@ -26,8 +26,6 @@ async function fetchGamesEmbedData(
   try {
     const url = `${apiUrl}/api/slots/slug/${slug}/embed-data`;
 
-    console.log(`[Games API] Fetching embed data for: ${slug}`);
-
     const response = await fetch(url, {
       method: "GET",
       headers: {

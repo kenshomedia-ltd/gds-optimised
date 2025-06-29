@@ -67,16 +67,12 @@ interface DynamicCasinosData {
 async function fetchNewAndLovedSlotsGames(
   block: CustomPageNewAndLovedSlotsBlock
 ): Promise<{ newGames: GameData[]; popularGames: GameData[] }> {
-  console.log("Fetching games for NewAndLovedSlots block:", block.id);
 
   // Extract provider and category IDs from the objects
   const providerIds =
     block.slot_providers?.map((provider) => provider.id) || [];
   const categoryIds =
     block.slot_categories?.map((category) => category.id) || [];
-
-  console.log("Provider IDs:", providerIds);
-  console.log("Category IDs:", categoryIds);
 
   // Create cache keys based on IDs
   const newGamesCacheKey = `games:new:providers-${providerIds.join(
@@ -94,7 +90,6 @@ async function fetchNewAndLovedSlotsGames(
     ]);
 
     if (newGamesCache.data && popularGamesCache.data) {
-      console.log("Returning cached games data");
       return {
         newGames: newGamesCache.data,
         popularGames: popularGamesCache.data,
@@ -176,7 +171,6 @@ async function fetchNewAndLovedSlotsGames(
 async function fetchGamesCarouselGames(
   block: GamesCarouselBlock
 ): Promise<GameData[]> {
-  console.log("Fetching games for GamesCarousel block:", block.id);
 
   // Extract provider and category slugs
   const providerSlugs =
@@ -225,18 +219,15 @@ async function fetchGamesCarouselGames(
 async function fetchDynamicDataForBlocks(
   blocks: CustomPageBlock[]
 ): Promise<DynamicGamesData> {
-  console.log("Analyzing blocks for dynamic data fetching...");
   const gamesData: DynamicGamesData = {};
   const fetchPromises: Promise<void>[] = [];
 
   // Analyze each block and prepare fetch promises
   blocks.forEach((block) => {
-    console.log(`Found block: ${block.__component} (ID: ${block.id})`);
 
     if (block.__component === "games.new-and-loved-slots") {
       const typedBlock = block as CustomPageNewAndLovedSlotsBlock;
       if (typedBlock.newSlots) {
-        console.log("Adding NewAndLovedSlots block to fetch queue");
         fetchPromises.push(
           fetchNewAndLovedSlotsGames(typedBlock).then((data) => {
             gamesData[`block-${block.id}`] = data;
@@ -245,7 +236,6 @@ async function fetchDynamicDataForBlocks(
       }
     } else if (block.__component === "games.games-carousel") {
       const typedBlock = block as GamesCarouselBlock;
-      console.log("Adding GamesCarousel block to fetch queue");
       fetchPromises.push(
         fetchGamesCarouselGames(typedBlock).then((games) => {
           gamesData[`block-${block.id}`] = { games };
@@ -255,12 +245,9 @@ async function fetchDynamicDataForBlocks(
     // Add more block types here as needed
   });
 
-  console.log(`Fetching dynamic data for ${fetchPromises.length} blocks...`);
-
   // Execute all fetches in parallel
   await Promise.all(fetchPromises);
 
-  console.log("Dynamic data fetching complete:", Object.keys(gamesData));
   return gamesData;
 }
 

@@ -236,8 +236,6 @@ export const getCustomPageData = unstable_cache(
     try {
       const query = buildFullPageQuery(path, casinoCountry, localisation);
 
-      console.log("Fetching page data for:", normalizePath(path));
-
       const response = await strapiClient.fetchWithCache<{
         data: CustomPageData[];
       }>("custom-pages", query, CACHE_CONFIG.page.ttl);
@@ -245,7 +243,6 @@ export const getCustomPageData = unstable_cache(
       const pageData = response.data?.[0];
 
       if (!pageData) {
-        console.log("No page data found for path:", normalizePath(path));
         return null;
       }
 

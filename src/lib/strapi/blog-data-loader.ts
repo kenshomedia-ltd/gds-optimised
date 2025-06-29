@@ -26,13 +26,7 @@ const getBlogIndexDataCached = cache(
     pageSize: number = 12
   ): Promise<BlogIndexPageData> => {
     try {
-      console.log(`[Blog Index Loader] Fetching page ${page}`);
       const data = await getBlogIndexDataSplit(page, pageSize);
-
-      console.log(
-        `[Blog Index Loader] Fetched ${data.blogs.length} blogs, ` +
-          `page ${data.pagination.page}/${data.pagination.pageCount}`
-      );
 
       return data;
     } catch (error) {
@@ -58,18 +52,11 @@ const getBlogIndexDataCached = cache(
 const getBlogSingleDataCached = cache(
   async (slug: string): Promise<BlogSinglePageData | null> => {
     try {
-      console.log(`[Blog Single Loader] Fetching blog: ${slug}`);
       const data = await getBlogSingleDataSplit(slug);
 
       if (!data) {
-        console.log(`[Blog Single Loader] Blog not found: ${slug}`);
         return null;
       }
-
-      console.log(
-        `[Blog Single Loader] Fetched blog "${data.blog.title}" with ` +
-          `${data.relatedBlogs.length} related blogs`
-      );
 
       return data;
     } catch (error) {

@@ -2,9 +2,8 @@
 "use client";
 
 import { Image } from "@/components/common/Image";
-import { normalizeImageSrc, debugBasePath } from "@/lib/utils/image";
+import { normalizeImageSrc } from "@/lib/utils/image";
 import type { LegalProps } from "./legal.types";
-import { useEffect } from "react";
 
 /**
  * Legal bar component that displays legal text and compliance icons
@@ -20,12 +19,6 @@ import { useEffect } from "react";
  * @returns {JSX.Element} Legal bar component
  */
 export function Legal({ legalText, className }: LegalProps) {
-  // Debug basePath in development
-  useEffect(() => {
-    if (process.env.NODE_ENV === "development") {
-      debugBasePath();
-    }
-  }, []);
 
   // Pre-normalize all image paths to ensure consistent basePath handling
   const iconPaths = {
@@ -33,11 +26,6 @@ export function Legal({ legalText, className }: LegalProps) {
     adm: normalizeImageSrc("/icons/logo-adm.svg"),
     plus18: normalizeImageSrc("/icons/plus-18.svg"),
   };
-
-  // Log the normalized paths in development for debugging
-  if (process.env.NODE_ENV === "development") {
-    console.log("🖼️ Legal component icon paths:", iconPaths);
-  }
 
   return (
     <div

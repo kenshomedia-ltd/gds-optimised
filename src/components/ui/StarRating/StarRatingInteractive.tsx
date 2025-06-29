@@ -45,16 +45,6 @@ export function StarRatingInteractive({
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
-  // Debug logging
-  useEffect(() => {
-    console.log("[StarRatingInteractive] Props:", {
-      documentId,
-      initialRating,
-      initialCount,
-      ratingType,
-    });
-  }, [documentId, initialRating, initialCount, ratingType]);
-
   // Update current rating/count when props change
   useEffect(() => {
     setCurrentRating(initialRating);

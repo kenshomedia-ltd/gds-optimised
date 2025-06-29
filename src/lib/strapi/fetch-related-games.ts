@@ -34,10 +34,6 @@ const fetchRelatedGamesCached = cache(
         return cached.data;
       }
 
-      console.log(
-        `Fetching related games for provider: ${providerSlug}, excluding: ${currentGameSlug}`
-      );
-
       // Use the getGames server action with provider filter
       const filters = {
         provider: {
@@ -54,33 +50,16 @@ const fetchRelatedGamesCached = cache(
         filters,
       });
 
-      console.log(`Related games response:`, {
-        total: response.total,
-        fetched: response.games.length,
-        provider: providerSlug,
-      });
-
       // Filter out the current game and take only the requested number
       const filteredGames = response.games
         .filter((game) => game.slug !== currentGameSlug)
         .slice(0, limit);
-
-      console.log(`Filtered games details:`, {
-        beforeFilter: response.games.length,
-        afterFilter: filteredGames.length,
-        currentSlug: currentGameSlug,
-        filteredSlugs: filteredGames.map((g) => g.slug),
-      });
 
       // Cache the result
       await cacheManager.set(cacheKey, filteredGames, {
         ttl: CACHE_CONFIG.ttl,
         swr: CACHE_CONFIG.ttl * 2,
       });
-
-      console.log(
-        `Returning ${filteredGames.length} related games for provider: ${providerSlug}`
-      );
 
       return filteredGames;
     } catch (error) {

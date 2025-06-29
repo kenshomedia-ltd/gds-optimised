@@ -38,7 +38,6 @@ function removeBasePath(url: string, basePath: string): string {
  */
 export async function fetchRedirects(): Promise<RedirectData[]> {
   try {
-    console.log("[Redirects] Fetching redirects from Strapi...");
 
     const response = await strapiClient.fetchWithCache<RedirectsResponse>(
       "redirects",

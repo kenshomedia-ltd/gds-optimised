@@ -43,14 +43,14 @@ class StrapiClient {
     this.baseURL = apiUrl;
     this.token = apiToken;
 
-    if (process.env.NODE_ENV === "development") {
-      console.log("Strapi Client Configuration:");
-      console.log("API URL:", apiUrl || "NOT SET");
-      console.log(
-        "API Token:",
-        apiToken ? "***" + apiToken.slice(-4) : "NOT SET"
-      );
-    }
+    // if (process.env.NODE_ENV === "development") {
+    //   console.log("Strapi Client Configuration:");
+    //   console.log("API URL:", apiUrl || "NOT SET");
+    //   console.log(
+    //     "API Token:",
+    //     apiToken ? "***" + apiToken.slice(-4) : "NOT SET"
+    //   );
+    // }
   }
 
   /**
@@ -123,12 +123,12 @@ class StrapiClient {
     }`;
 
     // Enhanced logging for game queries
-    if (endpoint === "games") {
-      console.log(`[STRAPI GAMES API] Fetching from: ${url}`);
-      console.log(`[STRAPI GAMES API] Query String:`, queryString);
-    } else {
-      console.log("url", url);
-    }
+    // if (endpoint === "games") {
+    //   console.log(`[STRAPI GAMES API] Fetching from: ${url}`);
+    //   console.log(`[STRAPI GAMES API] Query String:`, queryString);
+    // } else {
+    //   console.log("url", url);
+    // }
 
     let lastError: Error | null = null;
 

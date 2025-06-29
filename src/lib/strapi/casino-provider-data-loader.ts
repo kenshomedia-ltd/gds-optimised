@@ -45,10 +45,6 @@ const getAllCasinoProviderSlugsUncached = async (): Promise<string[]> => {
         );
       }
     }
-
-    console.log(
-      `Fetched ${slugs.length} casino provider slugs for static generation`
-    );
     return slugs;
   } catch (error) {
     console.error("Failed to fetch casino provider slugs:", error);

@@ -26,11 +26,6 @@ export function LegalServer({ legalText, className }: LegalProps) {
     plus18: normalizeImageSrc("/icons/plus-18.svg"),
   };
 
-  // Debug in development
-  if (process.env.NODE_ENV === "development") {
-    console.log("🏛️ LegalServer component icon paths:", iconPaths);
-  }
-
   return (
     <>
       {/* Preload SVG assets for faster loading with proper basePath */}

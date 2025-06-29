@@ -134,7 +134,7 @@ export default async function CasinoProviderPage({
 
       {/* Hero Section with Introduction and Casino Table */}
       <section className="featured-header relative overflow-hidden bg-gradient-to-b from-background-900 from-30% via-background-700 via-80% to-background-500 rounded-b-3xl">
-        <div className="lg:container relative mx-auto lg:px-4 z-10 py-12">
+        <div className="lg:container relative mx-auto lg:px-4 z-10 pb-4">
           {/* Introduction (if exists) */}
           {pageData.IntroductionWithImage && (
             <div className="mb-2">
@@ -169,7 +169,7 @@ export default async function CasinoProviderPage({
       </section>
 
       {/* Main Content Section with Sidebar Layout */}
-      <section className="main lg:container mx-auto px-4 py-8">
+      <section className="main lg:container mx-auto px-2 py-8">
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
           {/* Main Content Column */}
           <div className="flex-1 min-w-0">

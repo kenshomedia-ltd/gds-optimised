@@ -173,13 +173,6 @@ export default async function CustomPage({ params }: CustomPageProps) {
         !(index < 4 && HERO_BLOCK_TYPES.includes(block.__component))
     );
 
-    // Log performance in development
-    if (process.env.NODE_ENV === "development") {
-      console.log(
-        `Custom page data fetching took: ${Date.now() - startTime}ms`
-      );
-    }
-
     // Schema.org structured data for custom pages
     const pageSchema = {
       "@context": "https://schema.org",
@@ -228,7 +221,6 @@ export default async function CustomPage({ params }: CustomPageProps) {
               {heroBlocks.map((block, index: number) => (
                 <div
                   key={`hero-${block.__component}-${index}`}
-                  className="mb-8"
                 >
                   <DynamicBlock
                     blockType={block.__component}
@@ -248,7 +240,7 @@ export default async function CustomPage({ params }: CustomPageProps) {
         )}
 
         {/* Main Content Section with Sidebar Layout */}
-        <section className="main lg:container mx-auto px-4 py-8">
+        <section className="main lg:container mx-auto px-2 py-8">
           <div
             className={
               !pageData.sideBarToShow ||

@@ -187,21 +187,6 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
     ? extractIframeAttributes(embedCode)
     : {};
 
-  // Debug log embed code
-  if (process.env.NODE_ENV === "development") {
-    console.log("[GamePlayer] Embed code data:", {
-      embedCode: game.embedCode,
-      gamesApiOverride: game.gamesApiOverride,
-      mobileCode: game.embedCode?.mobileEmbedCode?.substring(0, 100) + "...",
-      desktopCode: game.embedCode?.desktopEmbedCode?.substring(0, 100) + "...",
-      selectedCode: embedCode?.substring(0, 100) + "...",
-      isDirectUrl,
-      hasExistingIframe,
-      extractedAttributes: iframeAttributes,
-      isMobile,
-    });
-  }
-
   // Get game image
   const gameImage = Array.isArray(game.images) ? game.images[0] : game.images;
   const hasImage = gameImage && gameImage.url;

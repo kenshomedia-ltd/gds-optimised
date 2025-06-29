@@ -64,11 +64,6 @@ const getGameStaticDataCached = cache(
 
       // Create and log the query
       const staticQuery = createGameStaticQuery(slug);
-      console.log(`[Game Static Query] Fetching for slug: ${slug}`);
-      console.log(
-        `[Game Static Query] Query:`,
-        JSON.stringify(staticQuery, null, 2)
-      );
 
       // Fetch from Strapi - also bypass strapi client cache if forceRefresh
       console.log(
@@ -80,10 +75,6 @@ const getGameStaticDataCached = cache(
         data: GamePageData[];
       }>("games", staticQuery, forceRefresh ? 0 : REVALIDATE_TIMES.static);
 
-      console.log(
-        `[Game Static Query] Response received, data length:`,
-        response?.data?.length || 0
-      );
 
       if (!response?.data?.[0]) {
         console.log(`[Game Static Query] No data found for slug: ${slug}`);
@@ -110,11 +101,6 @@ const getGameStaticDataCached = cache(
         updatedAt: response.data[0].updatedAt,
         publishedAt: response.data[0].publishedAt,
       };
-
-      console.log(
-        `[Game Static Query] Extracted static data fields:`,
-        Object.keys(staticData)
-      );
 
       // Cache the result
       await cacheManager.set(cacheKey, staticData, {
@@ -174,11 +160,6 @@ const getGameDynamicDataCached = cache(
 
       // Create and log the query
       const dynamicQuery = createGameDynamicQuery(slug);
-      console.log(`[Game Dynamic Query] Fetching for slug: ${slug}`);
-      console.log(
-        `[Game Dynamic Query] Query:`,
-        JSON.stringify(dynamicQuery, null, 2)
-      );
 
       // Fetch from Strapi - also bypass strapi client cache if forceRefresh
       console.log(
@@ -189,23 +170,6 @@ const getGameDynamicDataCached = cache(
       const response = await strapiClient.fetchWithCache<{
         data: GamePageData[];
       }>("games", dynamicQuery, forceRefresh ? 0 : REVALIDATE_TIMES.dynamic);
-
-      console.log(
-        `[Game Dynamic Query] Response received, data length:`,
-        response?.data?.length || 0
-      );
-
-      // Debug log the raw response to check embedCode
-      if (response?.data?.[0]) {
-        console.log(
-          `[Game Dynamic Query] Raw response embedCode:`,
-          response.data[0].embedCode
-        );
-        console.log(
-          `[Game Dynamic Query] Raw response keys:`,
-          Object.keys(response.data[0])
-        );
-      }
 
       if (!response?.data?.[0]) {
         console.log(`[Game Dynamic Query] No data found for slug: ${slug}`);
@@ -225,19 +189,6 @@ const getGameDynamicDataCached = cache(
         provider: response.data[0].provider,
         categories: response.data[0].categories,
       };
-
-      console.log(
-        `[Game Dynamic Query] Extracted dynamic data fields:`,
-        Object.keys(dynamicData)
-      );
-      console.log(
-        `[Game Dynamic Query] embedCode value:`,
-        dynamicData.embedCode
-      );
-      console.log(
-        `[Game Dynamic Query] gamesApiOverride:`,
-        dynamicData.gamesApiOverride
-      );
 
       // If gamesApiOverride is false and embedCode is null, fetch from games API
       if (!dynamicData.gamesApiOverride && !dynamicData.embedCode) {
@@ -315,10 +266,6 @@ export async function getGamePageData(
 ): Promise<GamePageData | null> {
   const startTime = Date.now();
 
-  console.log(`[Game Page Data Loader] Starting fetch for slug: ${slug}`);
-  console.log(`[Game Page Data Loader] Options:`, options);
-  console.log(`[Game Page Data Loader] Will use cached:`, options.cached);
-
   try {
     // When cached is false, we want to bypass ALL caches
     const forceRefresh = !options.cached;
@@ -332,14 +279,6 @@ export async function getGamePageData(
         ? getGameDynamicDataPersistent(slug)
         : getGameDynamicDataCached(slug, forceRefresh),
     ]);
-
-    console.log(
-      `[Game Page Data Loader] Results - Static data: ${!!staticData}, Dynamic data: ${!!dynamicData}`
-    );
-
-    // Debug log the actual data
-    console.log(`[Game Page Data Loader] Static data value:`, staticData);
-    console.log(`[Game Page Data Loader] Dynamic data value:`, dynamicData);
 
     // Type guard to ensure we have the right data
     if (

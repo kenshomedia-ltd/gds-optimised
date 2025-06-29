@@ -120,17 +120,6 @@ async function fetchGamesForBlock(
   // Flatten the array of arrays into a single array
   const allGames = gamesPerProviderArray.flat();
 
-  // Log for debugging
-  if (process.env.NODE_ENV === "development") {
-    console.log("Game fetching summary:");
-    providers.forEach((provider, index) => {
-      console.log(
-        `- ${provider}: ${gamesPerProviderArray[index].length} games`
-      );
-    });
-    console.log(`Total games fetched: ${allGames.length}`);
-  }
-
   return allGames;
 }
 

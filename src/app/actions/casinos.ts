@@ -29,9 +29,6 @@ function buildCasinoFilters(
 ): Record<string, unknown> {
   const strapiFilters: Record<string, unknown> = {};
 
-  console.log("=== Building Casino Filters ===");
-  console.log("Input filters:", filters);
-
   // Add provider filters
   if (filters.providers && filters.providers.length > 0) {
     strapiFilters.providers = {
@@ -39,7 +36,6 @@ function buildCasinoFilters(
         $in: filters.providers,
       },
     };
-    console.log("Added provider filters:", strapiFilters.providers);
   }
 
   // Add wagering filter - using casinoGeneralInfo.wageringRequirements
@@ -49,7 +45,6 @@ function buildCasinoFilters(
         $eq: filters.wagering,
       },
     };
-    console.log("Added wagering filter:", strapiFilters.casinoGeneralInfo);
   }
 
   // Add bonus key filters with $and operator for complex conditions
@@ -85,10 +80,6 @@ function buildCasinoFilters(
           },
         },
       });
-      console.log(
-        `Added condition filter for ${filters.bonusKey}:`,
-        filters.condition
-      );
     }
 
     // Add amount filter - using $eq instead of $gte
@@ -100,10 +91,6 @@ function buildCasinoFilters(
           },
         },
       });
-      console.log(
-        `Added amount filter for ${filters.bonusKey}:`,
-        filters.amount
-      );
     }
 
     // Add speed filter - capitalize "Immediate"
@@ -115,18 +102,10 @@ function buildCasinoFilters(
           },
         },
       });
-      console.log(`Added speed filter for ${filters.bonusKey}: Immediate`);
     }
 
     strapiFilters.$and = andConditions;
-    console.log(
-      "Added bonus key filters with $and:",
-      JSON.stringify(andConditions, null, 2)
-    );
   }
-
-  console.log("=== Final Strapi Filters ===");
-  console.log(JSON.stringify(strapiFilters, null, 2));
 
   return strapiFilters;
 }
@@ -139,10 +118,6 @@ export async function getCasinos({
   pageSize = 50,
   filters = {},
 }: GetCasinosParams): Promise<GetCasinosResponse> {
-  console.log("=== getCasinos Server Action Called ===");
-  console.log("Page:", page);
-  console.log("PageSize:", pageSize);
-  console.log("Filters received:", filters);
 
   try {
     const strapiFilters = buildCasinoFilters(filters);
@@ -195,26 +170,10 @@ export async function getCasinos({
       pagination: { pageSize, page },
     };
 
-    console.log("=== Strapi Query ===");
-    console.log(JSON.stringify(query, null, 2));
-
     const response = await strapiClient.fetchWithCache<{
       data: CasinoData[];
       meta: { pagination: { total: number } };
     }>("casinos", query, 300); // Cache for 5 minutes
-
-    console.log("=== Strapi Response ===");
-    console.log("Total casinos found:", response.meta?.pagination?.total || 0);
-    console.log("Casinos returned:", response.data?.length || 0);
-
-    if (response.data && response.data.length > 0) {
-      console.log("First casino:", {
-        title: response.data[0].title,
-        bonusSection: response.data[0].bonusSection,
-        noDepositSection: response.data[0].noDepositSection,
-        freeSpinsSection: response.data[0].freeSpinsSection,
-      });
-    }
 
     return {
       casinos: response.data || [],

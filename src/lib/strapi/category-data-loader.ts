@@ -94,8 +94,6 @@ export const getCategoryPageData = unstable_cache(
     try {
       const query = buildFullCategoryQuery(slug);
 
-      console.log("Fetching category page data for:", slug);
-
       const response = await strapiClient.fetchWithCache<{
         data: CategoryPageData[];
       }>("slot-categories", query, CACHE_CONFIG.page.ttl);

@@ -38,8 +38,6 @@ const HERO_BLOCK_TYPES = [
 ];
 
 export default async function HomePage() {
-  // Performance timing
-  const startTime = Date.now();
 
   // Parallel data fetching with split queries
   const [layoutData, homepageData] = await Promise.all([
@@ -67,11 +65,6 @@ export default async function HomePage() {
     (block, index) =>
       !(index < 4 && HERO_BLOCK_TYPES.includes(block.__component))
   );
-
-  // Log performance in development
-  if (process.env.NODE_ENV === "development") {
-    console.log(`Homepage data fetching took: ${Date.now() - startTime}ms`);
-  }
 
   // Schema.org structured data
   const homepageSchema = {
@@ -139,7 +132,7 @@ export default async function HomePage() {
       )}
 
       {/* Main Content Section with Progressive Loading */}
-      <section className="main lg:container mx-auto px-4 lg:px-2 py-8">
+      <section className="main lg:container mx-auto px-2 py-8">
         <div className="space-y-12">
           {mainBlocks.map((block, index) => (
             <section

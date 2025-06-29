@@ -132,7 +132,7 @@ export default async function CasinoPage({ params }: CasinoPageProps) {
       </section>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-2 py-8">
         <CasinoContent
           casino={casinoData}
           games={games}

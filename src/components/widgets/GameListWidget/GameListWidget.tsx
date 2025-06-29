@@ -95,35 +95,6 @@ export function GameListWidget({
     setIsClientLoaded(true);
   }, []);
 
-  // Debug logging in development
-  useEffect(() => {
-    if (process.env.NODE_ENV === "development" && usePagination) {
-      console.log("GameListWidget Pagination Debug:", {
-        usePagination,
-        isClientLoaded,
-        totalPages: calculatedTotalPages,
-        passedTotalPages: totalPages,
-        totalGames: localTotalGames,
-        passedTotalGames: totalGames,
-        numberOfGames,
-        baseUrl,
-        currentPage: page,
-        passedCurrentPage: currentPage,
-      });
-    }
-  }, [
-    usePagination,
-    isClientLoaded,
-    calculatedTotalPages,
-    totalPages,
-    localTotalGames,
-    totalGames,
-    numberOfGames,
-    baseUrl,
-    page,
-    currentPage,
-  ]);
-
   // Extract initial filters from block
   const initialProviderFilters = useMemo(() => {
     return (
@@ -373,7 +344,7 @@ export function GameListWidget({
   const shouldShowFilterArea = showFilters;
 
   return (
-    <section className={cn("pb-8", className)} data-game-list-top>
+    <section className={cn("pb-8 px-2", className)} data-game-list-top>
       <div className="xl:container mx-auto">
         {/* Filter Panel - Show skeleton during loading */}
         {shouldShowFilterArea &&

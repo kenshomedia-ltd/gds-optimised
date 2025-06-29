@@ -147,13 +147,6 @@ export function createGameStaticQuery(slug: string) {
     },
   };
 
-  if (process.env.NODE_ENV === "development") {
-    console.log(
-      `[Game Static Query Builder] Generated query for slug '${slug}':`,
-      JSON.stringify(query, null, 2)
-    );
-  }
-
   return query;
 }
 
@@ -174,13 +167,6 @@ export function createGameDynamicQuery(slug: string) {
       pageSize: 1,
     },
   };
-
-  if (process.env.NODE_ENV === "development") {
-    console.log(
-      `[Game Dynamic Query Builder] Generated query for slug '${slug}':`,
-      JSON.stringify(query, null, 2)
-    );
-  }
 
   return query;
 }

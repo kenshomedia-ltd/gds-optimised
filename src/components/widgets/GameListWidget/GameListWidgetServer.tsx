@@ -31,7 +31,7 @@ export async function GameListWidgetServer({
   // If no games are provided, show skeleton loader
   if (!games || games.length === 0) {
     return (
-      <section className="py-8 lg:py-12">
+      <section className="pb-8 px-2">
         <div className="xl:container mx-auto px-4">
           {/* Show filter skeleton if filters are enabled */}
           {showFilters && <GameFiltersSkeleton className="mb-8" />}

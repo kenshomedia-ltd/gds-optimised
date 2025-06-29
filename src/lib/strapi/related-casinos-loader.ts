@@ -56,8 +56,6 @@ const getProviderWithCasinosCached = cache(
         return cached.data;
       }
 
-      console.log(`Fetching provider with casinos for slug: ${providerSlug}`);
-
       // Build and execute query
       const query = buildProviderQuery(providerSlug);
 
@@ -125,7 +123,6 @@ export async function getRelatedCasinos(
   const provider = await getProviderWithCasinos(providerSlug);
 
   if (!provider?.relatedCasinos) {
-    console.log(`No related casinos found for provider: ${providerSlug}`);
     return [];
   }
 
@@ -134,10 +131,6 @@ export async function getRelatedCasinos(
     maxCasinos && maxCasinos > 0
       ? provider.relatedCasinos.slice(0, maxCasinos)
       : provider.relatedCasinos;
-
-  console.log(
-    `Returning ${casinos.length} related casinos for provider: ${providerSlug}`
-  );
 
   return casinos;
 }

@@ -172,8 +172,8 @@ export function SingleContent({
 
           // Tables - with center alignment
           "prose-table:border-collapse prose-table:my-6",
-          "prose-thead:border-b-2 prose-thead:border-gray-300",
-          "prose-th:text-center prose-th:p-3 prose-th:font-semibold prose-th:bg-table-header-bkg prose-th:text-white",
+          "prose-thead:border-b-2 prose-thead:border-gray-300 prose-thead:text-white",
+          "prose-th:text-center prose-th:p-3 prose-th:font-semibold prose-th:bg-table-header-bkg prose-th:!text-white",
           "prose-tbody:divide-y prose-tbody:divide-gray-200",
           "prose-td:p-3 prose-td:text-body-text prose-td:text-center",
           "prose-tr:transition-colors prose-tr:bg-white hover:prose-tr:bg-gray-50",

@@ -126,21 +126,3 @@ export function StarRatingLive({
     </div>
   );
 }
-
-// Example usage with real-time updates:
-/*
-// In a game page where you want live rating updates
-<StarRatingLive
-  documentId={game.documentId}
-  slug={game.slug}
-  initialRating={game.ratingAvg}
-  initialCount={game.ratingCount}
-  ratingType="games"
-  itemTitle={game.title}
-  enablePolling={true}
-  pollingInterval={20000} // Update every 20 seconds
-  onRatingUpdate={(avg, count) => {
-    console.log(`Rating updated: ${avg} (${count} ratings)`);
-  }}
-/>
-*/

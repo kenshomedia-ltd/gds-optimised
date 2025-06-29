@@ -115,7 +115,7 @@ export default async function BlogIndexPage({
       )}
 
       {/* Main Content Section */}
-      <section className="main lg:container mx-auto px-4 py-12">
+      <section className="main lg:container mx-auto px-2 py-12">
         {/* Page Title (shown on pages other than first) */}
         {currentPage > 1 && (
           <h1 className="text-4xl font-bold mb-8">

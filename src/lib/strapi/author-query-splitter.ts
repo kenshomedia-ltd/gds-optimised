@@ -315,11 +315,6 @@ async function fetchAuthorsForIndex(
     };
   }>("users", query, CACHE_CONFIG.authors.ttl);
 
-  // Log the response for debugging
-  if (process.env.NODE_ENV === "development") {
-    console.log("Authors response:", response);
-  }
-
   // Handle both possible response structures
   let authorsData: AuthorCardData[] = [];
 

@@ -45,10 +45,6 @@ export async function updateRating({
       };
     }
 
-    console.log(
-      `[updateRating] Updating ${ratingType} rating for ${documentId}: ${ratingValue}`
-    );
-
     // Use the same environment variables as Astro
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
     const apiToken = process.env.NEXT_PUBLIC_API_TOKEN;
@@ -89,14 +85,6 @@ export async function updateRating({
     const newCount = currentCount + 1;
     const newAvg = (currentAvg * currentCount + ratingValue) / newCount;
 
-    console.log("[updateRating] Calculation:", {
-      currentAvg,
-      currentCount,
-      userRating: ratingValue,
-      newAvg: newAvg.toFixed(2),
-      newCount,
-    });
-
     // Match Astro's request structure exactly, but with correct values
     const body = {
       data: {
@@ -117,7 +105,6 @@ export async function updateRating({
 
     // Use the same URL pattern as Astro: /api/${itemPath}/${id}
     const updateUrl = `${apiUrl}/api/${ratingType}/${documentId}`;
-    console.log("[updateRating] Updating at:", updateUrl);
 
     const res = await fetch(updateUrl, opts);
 
@@ -132,11 +119,6 @@ export async function updateRating({
 
     const responseData = await res.json();
     const updatedItem = responseData.data || responseData;
-
-    console.log("[updateRating] Successfully updated:", {
-      ratingAvg: updatedItem.ratingAvg,
-      ratingCount: updatedItem.ratingCount,
-    });
 
     // Clear caches after successful update
     if (ratingType === "games") {
@@ -204,8 +186,6 @@ export async function getCurrentRating({
     });
 
     const url = `${apiUrl}/api/${type}/${documentId}?${params.toString()}`;
-
-    console.log(`[getCurrentRating] Fetching from: ${url}`);
 
     const response = await fetch(url, {
       method: "GET",

@@ -281,7 +281,7 @@ export function Image({
         try {
           sessionStorage?.setItem(cacheKey, responsiveSvg);
         } catch (e) {
-          console.log("Error caching SVG:", e);
+          console.error("Error caching SVG:", e);
         }
 
         setSvgContent(responsiveSvg);

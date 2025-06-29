@@ -111,7 +111,6 @@ export default async function ProviderPage({
   searchParams,
 }: ProviderPageProps) {
   try {
-    const startTime = Date.now();
     const { slug, page: pageParam } = await params;
     const currentPage = getPageNumber(pageParam);
     const gamesPerPage = 24;
@@ -162,13 +161,6 @@ export default async function ProviderPage({
     // Check if page exists
     if (currentPage > pagination.pageCount && pagination.pageCount > 0) {
       notFound();
-    }
-
-    // Log performance in development
-    if (process.env.NODE_ENV === "development") {
-      console.log(
-        `Provider page data fetching took: ${Date.now() - startTime}ms`
-      );
     }
 
     // Create games block for the GameListWidget
@@ -267,7 +259,7 @@ export default async function ProviderPage({
             {currentPage > 1 && (
               <div className="text-center py-8">
                 <h1 className="text-4xl font-bold text-white mb-2">
-                  {pageData.title} Games
+                  {pageData.title} {translations.slots || "Slot"}
                 </h1>
                 <p className="text-xl text-gray-300">Page {currentPage}</p>
               </div>
@@ -300,7 +292,7 @@ export default async function ProviderPage({
 
         {/* Main Content Section - Only show on first page */}
         {currentPage === 1 && (
-          <section className="main lg:container mx-auto px-4 py-8">
+          <section className="main lg:container mx-auto px-2 py-8">
             <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
               {/* Main Content Column */}
               <div className="flex-1 min-w-0">

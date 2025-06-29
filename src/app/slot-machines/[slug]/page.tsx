@@ -150,7 +150,7 @@ async function GameContent({ game }: { game: GamePageData }) {
       </section>
 
       {/* Main Content Section */}
-      <main className="lg:container mx-auto px-4 py-8">
+      <main className="lg:container mx-auto px-2 py-8">
         <div className="space-y-12">
           {/* Related Casinos Widget - Full width */}
           {game.provider && (
@@ -409,10 +409,6 @@ export default async function GamePage({
 
   // Check if we should bypass cache for debugging
   const bypassCache = nocache === "true";
-
-  console.log(
-    `[Game Page] Loading game: ${slug}, bypass cache: ${bypassCache}`
-  );
 
   const game = await getGamePageData(slug, { cached: !bypassCache });
 
