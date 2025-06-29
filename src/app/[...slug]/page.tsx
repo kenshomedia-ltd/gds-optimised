@@ -108,7 +108,6 @@ function extractPageNumber(slug: string[]): {
  */
 export default async function CustomPage({ params }: CustomPageProps) {
   try {
-    const startTime = Date.now();
     const { slug } = await params;
 
     // Extract page number if present (for paginated casino lists)
