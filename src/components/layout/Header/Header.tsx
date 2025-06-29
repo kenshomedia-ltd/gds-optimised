@@ -116,7 +116,7 @@ export function Header({
                 aria-expanded={isMobileMenuOpen}
                 aria-label={translations.menu || "Open menu"}
               >
-                <FontAwesomeIcon icon={faBars} className="h-7 w-7" />
+                <FontAwesomeIcon icon={faBars} className="!h-7 !w-7" />
               </button>
 
               {/* Authentication Button - Mobile */}
@@ -129,7 +129,11 @@ export function Header({
                     : translations.login || "Login"
                 }
               >
-                <FontAwesomeIcon icon={faUser} className="h-7 w-7" />
+                <FontAwesomeIcon
+                  icon={faUser}
+                  className="!h-7 !w-7"
+                  style={{ "--fa-secondary-opacity": 0 }}
+                />
               </Link>
             </div>
 
@@ -182,10 +186,10 @@ export function Header({
                 <FontAwesomeIcon
                   icon={favoritesCount > 0 ? faHeartSolid : faHeart}
                   className={cn(
-                    "h-7 w-7 transition-colors",
+                    "!h-7 !w-7 transition-colors",
                     favoritesCount > 0 ? "text-danger" : "text-navbar-text"
                   )}
-                  swapOpacity
+                  style={{ "--fa-secondary-opacity": 0 }}
                 />
                 {/* Favorites count badge */}
                 {favoritesCount > 0 && (
@@ -202,7 +206,11 @@ export function Header({
                 className="p-2 rounded-md text-navbar-text hover:bg-white/10 transition-colors"
                 aria-label={translations.search || "Search"}
               >
-                <FontAwesomeIcon icon={faSearch} className="h-7 w-7" />
+                <FontAwesomeIcon
+                  icon={faSearch}
+                  className="!h-7 !w-7"
+                  style={{ "--fa-secondary-opacity": 0 }}
+                />
               </button>
             </div>
           </div>

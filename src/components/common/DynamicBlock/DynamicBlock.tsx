@@ -14,6 +14,7 @@ import type {
   QuicklinksBlock,
   DynamicBlockProps,
   HomeTestimoniesBlock,
+  HowToGroupBlock,
 } from "@/types/dynamic-block.types";
 import type { OverviewBlock } from "@/types/homepage.types";
 import type { CasinoListBlock } from "@/types/casino-filters.types";
@@ -108,6 +109,11 @@ const FeaturedProviders = dynamic(
   }
 );
 
+const HowTo = dynamic(
+  () => import("@/components/widgets/HowTo").then((mod) => mod.HowTo),
+  { loading: () => <Skeleton className="h-96" /> }
+);
+
 /**
  * DynamicBlock Component
  *
@@ -166,11 +172,13 @@ export function DynamicBlock({
     case "homepage.home-testimonies":
       return (
         <Suspense fallback={<div>Loading testimonials...</div>}>
-          <Testimonials
-            data={blockData as HomeTestimoniesBlock}
-          />
+          <Testimonials data={blockData as HomeTestimoniesBlock} />
         </Suspense>
       );
+
+    case "shared.how-to-group":
+      const howToBlock = blockData as HowToGroupBlock;
+      return <HowTo block={howToBlock} translations={translations} />;
 
     // Shared blocks
     case "shared.introduction-with-image":
