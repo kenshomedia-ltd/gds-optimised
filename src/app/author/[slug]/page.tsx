@@ -113,7 +113,7 @@ export default async function AuthorPage({ params }: AuthorPageProps) {
       {/* Main Content Section - Blogs */}
       {author.blogs && author.blogs.length > 0 && (
         <section className="main py-12 lg:py-16">
-          <div className="lg:container mx-auto px-4">
+          <div className="lg:container mx-auto lg:px-4">
             <h2 className="text-3xl lg:text-4xl font-heading font-bold text-center mb-10">
               {translations?.articlesByAuthor || "Articles by"}{" "}
               {author.firstName}

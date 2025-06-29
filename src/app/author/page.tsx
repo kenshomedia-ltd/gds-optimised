@@ -91,7 +91,7 @@ export default async function AuthorsIndexPage({
 
       {/* Main Content Section */}
       <section className="main py-12 lg:py-16">
-        <div className="lg:container mx-auto px-4">
+        <div className="lg:container mx-auto lg:px-4">
           {/* Authors Grid */}
           {authors.length > 0 ? (
             <>

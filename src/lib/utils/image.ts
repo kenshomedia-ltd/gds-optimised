@@ -7,6 +7,53 @@ import type {
 } from "@/types/image.types";
 
 /**
+ * Get the configured basePath from Next.js
+ * This ensures consistency across the application
+ */
+export function getBasePath(): string {
+  // Access the basePath from Next.js runtime config
+  // In production with basePath: '/it', this will be '/it'
+  // In development, this will be an empty string
+  return process.env.NODE_ENV === "production" ? "/it" : "";
+}
+
+/**
+ * Prepend basePath to a URL if it's a local relative path
+ * This function is specifically designed for image src handling
+ *
+ * @param url - The URL to prepend basePath to
+ * @returns The URL with basePath prepended if applicable
+ */
+export function withBasePath(url: string): string {
+  // Don't modify external URLs or data URLs
+  if (
+    url.startsWith("http://") ||
+    url.startsWith("https://") ||
+    url.startsWith("//") ||
+    url.startsWith("data:") ||
+    url.startsWith("blob:")
+  ) {
+    return url;
+  }
+
+  const basePath = getBasePath();
+
+  // If no basePath is configured, return original URL
+  if (!basePath) {
+    return url;
+  }
+
+  // Don't double-prepend basePath
+  if (url.startsWith(basePath + "/") || url === basePath) {
+    return url;
+  }
+
+  // Ensure URL starts with / and prepend basePath
+  const normalizedUrl = url.startsWith("/") ? url : `/${url}`;
+  return `${basePath}${normalizedUrl}`;
+}
+
+/**
  * Check if the image is a local file (in public folder)
  * Local files are identified by:
  * - Starting with "/" but not containing "http" or "https"
@@ -15,20 +62,19 @@ import type {
  */
 export function isLocalImage(url: string): boolean {
   if (!url) return false;
-  
+
   // Check if it starts with / (indicating public folder)
-  if (!url.startsWith('/')) return false;
-  
+  if (!url.startsWith("/")) return false;
+
   // Make sure it's not an external URL that happens to have a path
-  if (url.includes('http://') || url.includes('https://')) return false;
-  
+  if (url.includes("http://") || url.includes("https://")) return false;
+
   // Check it doesn't contain common domain extensions
-  const domainExtensions = ['.com', '.net', '.org', '.io', '.dev', '.app'];
-  if (domainExtensions.some(ext => url.includes(ext))) return false;
-  
+  const domainExtensions = [".com", ".net", ".org", ".io", ".dev", ".app"];
+  if (domainExtensions.some((ext) => url.includes(ext))) return false;
+
   return true;
 }
-
 
 /**
  * Get the image handler base URL from environment
@@ -69,6 +115,22 @@ export function extractBasePath(src: string): string {
 }
 
 /**
+ * Normalize image src with basePath handling
+ * This is the main function that should be used by Image components
+ */
+export function normalizeImageSrc(src: string): string {
+  if (!src) return src;
+
+  // For local images, add basePath
+  if (isLocalImage(src)) {
+    return withBasePath(src);
+  }
+
+  // For external images, return as-is
+  return src;
+}
+
+/**
  * Build AWS Image Handler URL with transformations
  */
 export function buildImageUrl(
@@ -76,10 +138,10 @@ export function buildImageUrl(
   params: ImageTransformParams
 ): string {
   // Don't transform SVGs
-  if (isSvgUrl(src)) return src;
+  if (isSvgUrl(src)) return normalizeImageSrc(src);
 
-  // Don't transform local images - return as-is
-  if (isLocalImage(src)) return src;
+  // Don't transform local images - just normalize with basePath
+  if (isLocalImage(src)) return normalizeImageSrc(src);
 
   const basePath = extractBasePath(src);
   const imageHandlerUrl = getImageHandlerUrl();
@@ -114,46 +176,6 @@ export function buildImageUrl(
     .join("/");
 
   return finalUrl;
-
-  /*
-  // === Base64 Encoded Implementation (commented out for reference) ===
-  
-  // Build edits object
-  const edits: ImageEdits = {
-    resize: {
-      width: params.width,
-      height: params.height,
-      fit: params.fit || "cover",
-      withoutEnlargement: true,
-    },
-  };
-
-  // Add format conversion if specified
-  if (params.format && params.format !== "auto") {
-    edits.toFormat = params.format;
-  }
-
-  // Add quality settings
-  if (params.quality) {
-    if (params.format === "webp" || !params.format) {
-      edits.webp = { quality: params.quality };
-    } else {
-      edits.jpeg = { quality: params.quality };
-    }
-  }
-
-  // Build the payload
-  const payload: ImageHandlerPayload = {
-    bucket: "giochigatsby",
-    key: basePath.startsWith("/") ? basePath.slice(1) : basePath,
-    edits,
-  };
-
-  // Encode the payload as base64
-  const encodedPayload = btoa(JSON.stringify(payload));
-
-  return `${imageHandlerUrl}/${encodedPayload}`;
-  */
 }
 
 /**
@@ -224,10 +246,10 @@ export function imageLoader({
   src: string;
   width: number;
   quality?: number;
-  }): string {
-    // For local images, return the src as-is
-    if (isLocalImage(src)) return src;
-  
-    // For remote images, build the URL
-    return buildImageUrl(src, { width, quality, format: "webp" });
-  }
+}): string {
+  // For local images, normalize with basePath and return
+  if (isLocalImage(src)) return normalizeImageSrc(src);
+
+  // For remote images, build the URL
+  return buildImageUrl(src, { width, quality, format: "webp" });
+}

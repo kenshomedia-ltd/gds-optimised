@@ -1,7 +1,7 @@
 // src/components/layout/Legal/Legal.tsx
 "use client";
 
-import { SvgImage } from "@/components/common/Image";
+import { Image } from "@/components/common/Image";
 import type { LegalProps } from "./legal.types";
 
 /**
@@ -32,7 +32,7 @@ export function Legal({ legalText, className }: LegalProps) {
           className="flex items-center gap-[2px]"
           aria-label="Compliance certifications"
         >
-          <SvgImage
+          <Image
             src="/icons/logo-timone.svg"
             alt="Logo Timone - Regulatory compliance"
             width={40}
@@ -45,7 +45,7 @@ export function Legal({ legalText, className }: LegalProps) {
             }}
           />
 
-          <SvgImage
+          <Image
             src="/icons/logo-adm.svg"
             alt="ADM - Agenzia delle Dogane e dei Monopoli certification"
             width={60}
@@ -58,7 +58,7 @@ export function Legal({ legalText, className }: LegalProps) {
             }}
           />
 
-          <SvgImage
+          <Image
             src="/icons/plus-18.svg"
             alt="18+ Age restriction - Gambling is prohibited for minors"
             width={40}

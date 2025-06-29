@@ -1,7 +1,7 @@
 // src/components/common/index.ts
 
 // Image components
-export { Image, LazyImage, SvgImage } from "./Image";
+export { Image } from "./Image";
 
 // BackToTop component
 export { BackToTop } from "./BackToTop/BackToTop";

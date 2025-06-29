@@ -185,7 +185,7 @@ async function BlogPaginationPage({ pageNumber }: { pageNumber: number }) {
       <Breadcrumbs items={breadcrumbs} />
 
       {/* Main Content Section */}
-      <section className="main lg:container mx-auto px-4 py-12">
+      <section className="main lg:container mx-auto lg:px-4 py-12">
         {/* Page Title */}
         <h1 className="text-4xl font-bold mb-8">
           {translations?.blogPageTitle || "Blog"} - Page {pageNumber}

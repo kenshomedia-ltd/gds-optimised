@@ -1,9 +1,9 @@
 // src/components/common/Image/Image.tsx
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import NextImage from "next/image";
-import { SvgImage } from "./SvgImage";
+import DOMPurify from "isomorphic-dompurify";
 import type { ImageProps } from "@/types/image.types";
 import {
   isSvgUrl,
@@ -12,22 +12,51 @@ import {
   isLocalImage,
   generateBlurDataURL,
   imageLoader,
+  normalizeImageSrc,
 } from "@/lib/utils/image";
 import { cn } from "@/lib/utils/cn";
 
+// Extended props for the unified component
+interface UnifiedImageProps extends ImageProps {
+  // Progressive/Lazy loading
+  progressive?: boolean;
+  lowQualityUrl?: string;
+  threshold?: number;
+  rootMargin?: string;
+
+  // SVG specific - using more flexible typing
+  embedSvg?: boolean;
+  svgProps?: React.HTMLAttributes<HTMLDivElement>;
+
+  // LazyImage specific
+  fallback?: React.ReactNode;
+  onInView?: () => void;
+  keepPlaceholder?: boolean;
+
+  // Additional
+  responsive?: boolean;
+  isLocal?: boolean;
+}
+
 /**
- * Enhanced Image component with optional progressive loading
+ * Unified Image component with all functionality built-in
+ *
+ * This component consolidates all image functionality into a single, powerful component:
  *
  * Features:
- * - Automatic WebP conversion
+ * - Automatic WebP conversion and optimization
  * - Responsive srcset generation
  * - Blur placeholder support
  * - AWS Image Handler integration
- * - SVG pass-through
- * - Progressive loading with LQIP (opt-in)
- * - Intersection Observer for truly lazy loading
- * - CWV optimizations
- * - Optional responsive height handling
+ * - Built-in SVG handling with embedding and sanitization
+ * - Progressive loading with LQIP
+ * - Intersection Observer lazy loading
+ * - Core Web Vitals optimizations
+ * - Automatic basePath handling
+ * - Error states and fallbacks
+ * - Responsive height handling
+ *
+ * Replaces: Image, LazyImage, and SvgImage components
  */
 export function Image({
   src,
@@ -46,29 +75,47 @@ export function Image({
   fill,
   style,
   unoptimized,
-  embedSvg = false,
-  svgProps,
-  isLocal,
-  // New progressive loading props
+
+  // Progressive/Lazy loading props
   progressive = false,
   lowQualityUrl,
   threshold = 0.1,
   rootMargin = "50px",
-  // New responsive prop
+
+  // SVG specific props
+  embedSvg = false,
+  svgProps = {},
+
+  // LazyImage specific props
+  fallback,
+  onInView,
+  keepPlaceholder = false,
+
+  // Additional props
   responsive = false,
-}: ImageProps & { responsive?: boolean; isLocal?: boolean }) {
+  isLocal,
+}: UnifiedImageProps) {
+  // State management
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState(false);
   const [blurUrl, setBlurUrl] = useState<string | undefined>(blurDataURL);
   const [isInView, setIsInView] = useState(priority || !progressive);
   const [currentSrc, setCurrentSrc] = useState(src);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [svgContent, setSvgContent] = useState<string | null>(null);
+  const [isSvgLoading, setIsSvgLoading] = useState(false);
 
+  // Refs
+  const containerRef = useRef<HTMLDivElement>(null);
+  const svgContainerRef = useRef<HTMLDivElement>(null);
+
+  // Image type detection
   const isSvg = isSvgUrl(src);
   const isExternal = isExternalUrl(src);
-   const isLocalFile = isLocal || isLocalImage(src);
+  const isLocalFile = isLocal || isLocalImage(src);
+  const normalizedSrc = normalizeImageSrc(src);
+  const normalizedCurrentSrc = normalizeImageSrc(currentSrc);
 
-  // Generate low quality URL if progressive and not provided
+  // Generate low quality URL for progressive loading
   useEffect(() => {
     if (progressive && !lowQualityUrl && !isSvg && !isLocalFile) {
       const lqUrl = buildImageUrl(src, {
@@ -96,7 +143,7 @@ export function Image({
     }
   }, [src, width, height, placeholder, blurUrl, isSvg, isLocalFile]);
 
-  // Intersection Observer for progressive loading
+  // Intersection Observer for lazy loading
   useEffect(() => {
     if (!progressive || priority || !containerRef.current) {
       setIsInView(true);
@@ -104,11 +151,20 @@ export function Image({
     }
 
     const element = containerRef.current;
+
+    // Fallback for browsers without Intersection Observer
+    if (!("IntersectionObserver" in window)) {
+      setIsInView(true);
+      onInView?.();
+      return;
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             setIsInView(true);
+            onInView?.();
             observer.unobserve(entry.target);
           }
         });
@@ -126,60 +182,145 @@ export function Image({
         observer.unobserve(element);
       }
     };
-  }, [progressive, priority, threshold, rootMargin]);
+  }, [progressive, priority, threshold, rootMargin, onInView]);
 
-  // Load high quality image when in view (for progressive loading)
+  // Load high quality image when in view (progressive loading)
   useEffect(() => {
-    if (progressive && isInView && currentSrc !== src) {
+    if (progressive && isInView && currentSrc !== src && !isSvg) {
       const img = new window.Image();
-      img.src = src;
+      img.src = normalizedSrc;
       img.onload = () => {
         setCurrentSrc(src);
         setIsLoaded(true);
       };
     }
-  }, [progressive, isInView, currentSrc, src]);
+  }, [progressive, isInView, currentSrc, src, normalizedSrc, isSvg]);
 
-  // Handle image load
-  const handleLoad = () => {
+  // Fetch and embed SVG content if requested
+  useEffect(() => {
+    if (!embedSvg || !normalizedSrc || !isSvg) return;
+
+    const abortController = new AbortController();
+
+    const fetchSvg = async () => {
+      setIsSvgLoading(true);
+      setError(false);
+
+      try {
+        // Check cache first
+        const cacheKey = `svg-${normalizedSrc}`;
+        const cached = sessionStorage.getItem(cacheKey);
+
+        if (cached) {
+          setSvgContent(cached);
+          setIsSvgLoading(false);
+          handleLoad();
+          return;
+        }
+
+        // Fetch SVG content
+        const response = await fetch(normalizedSrc, {
+          signal: abortController.signal,
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch SVG: ${response.statusText}`);
+        }
+
+        const text = await response.text();
+
+        // Sanitize SVG content for security
+        const sanitized = DOMPurify.sanitize(text, {
+          USE_PROFILES: { svg: true },
+          ADD_TAGS: ["svg"],
+          ADD_ATTR: [
+            "viewBox",
+            "fill",
+            "stroke",
+            "xmlns",
+            "width",
+            "height",
+            "class",
+            "style",
+          ],
+        });
+
+        // Make SVG responsive by removing fixed dimensions and ensuring viewBox
+        let responsiveSvg = sanitized;
+
+        // Remove fixed width/height attributes to make it responsive
+        responsiveSvg = responsiveSvg.replace(
+          /\s*width\s*=\s*["'][^"']*["']/gi,
+          ""
+        );
+        responsiveSvg = responsiveSvg.replace(
+          /\s*height\s*=\s*["'][^"']*["']/gi,
+          ""
+        );
+
+        // Add responsive styling
+        responsiveSvg = responsiveSvg.replace(
+          /<svg([^>]*)>/i,
+          `<svg$1 style="width: 100%; height: 100%; display: block;">`
+        );
+
+        // Cache the sanitized SVG
+        try {
+          sessionStorage.setItem(cacheKey, responsiveSvg);
+        } catch (e) {
+          console.log("Error caching SVG:", e);
+        }
+
+        setSvgContent(responsiveSvg);
+        handleLoad();
+      } catch (err) {
+        if (!abortController.signal.aborted) {
+          setError(true);
+          handleError();
+          console.error("Failed to fetch SVG:", err);
+        }
+      } finally {
+        setIsSvgLoading(false);
+      }
+    };
+
+    fetchSvg();
+
+    return () => {
+      abortController.abort();
+    };
+  }, [embedSvg, normalizedSrc, isSvg]);
+
+  // Event handlers
+  const handleLoad = useCallback(() => {
     if (!progressive || currentSrc === src) {
       setIsLoaded(true);
     }
     onLoad?.();
-  };
+  }, [progressive, currentSrc, src, onLoad]);
 
-  // Handle image error
-  const handleError = () => {
+  const handleError = useCallback(() => {
     setError(true);
     onError?.();
+  }, [onError]);
+
+  // Calculate dimensions and styles
+  const placeholderStyle = {
+    width: fill ? "100%" : width,
+    height: fill ? "100%" : height,
+    aspectRatio: width && height && !fill ? `${width} / ${height}` : undefined,
   };
 
-  // For SVGs, use SvgImage component
-  if (isSvg) {
-    return (
-      <SvgImage
-        src={src}
-        alt={alt}
-        width={width}
-        height={height}
-        className={className}
-        embedSvg={embedSvg}
-        svgProps={svgProps}
-        onLoad={handleLoad}
-        onError={handleError}
-      />
-    );
-  }
-
-  // Calculate responsive sizes
-  const imageSizes =
-    sizes || (width ? `(max-width: ${width}px) 100vw, ${width}px` : "100vw");
-
-  // Build optimized URL for non-Next.js optimized images
-  const optimizedSrc =
-    isExternal && !unoptimized && !isLocalFile
-      ? buildImageUrl(currentSrc, { width, height, quality, format: "webp" })
-      : currentSrc;
+  const imageStyles = {
+    ...style,
+    ...(responsive && width && height
+      ? {
+          aspectRatio: `${width} / ${height}`,
+          height: "auto",
+          maxWidth: "100%",
+        }
+      : {}),
+  };
 
   const containerClasses = cn(
     "relative flex overflow-hidden",
@@ -187,120 +328,152 @@ export function Image({
     className
   );
 
+  // SVG Embedded Rendering
+  if (isSvg && embedSvg && svgContent && !error) {
+    return (
+      <div
+        ref={svgContainerRef}
+        className={cn(
+          "inline-block", // Base display
+          className
+        )}
+        style={{
+          width: width || "auto",
+          height: height || "auto",
+          maxWidth: "100%",
+          maxHeight: "100%",
+          overflow: "hidden", // Prevent SVG from breaking out
+          ...style,
+        }}
+        dangerouslySetInnerHTML={{ __html: svgContent }}
+        role="img"
+        aria-label={alt}
+        {...(svgProps as React.HTMLAttributes<HTMLDivElement>)}
+      />
+    );
+  }
+
+  // SVG Loading State
+  if (isSvg && embedSvg && isSvgLoading) {
+    return (
+      <div
+        className={cn("animate-pulse bg-gray-200 inline-block", className)}
+        style={{
+          width: width || "auto",
+          height: height || "auto",
+          maxWidth: "100%",
+          maxHeight: "100%",
+          ...style,
+        }}
+        role="img"
+        aria-label={`Loading ${alt}`}
+      />
+    );
+  }
+
+  // Not in view - show placeholder
+  if (!isInView) {
+    return (
+      <div
+        ref={containerRef}
+        className={containerClasses}
+        style={placeholderStyle}
+        aria-hidden="true"
+      >
+        {fallback || (
+          <div className="absolute inset-0 bg-gray-200 animate-pulse rounded" />
+        )}
+      </div>
+    );
+  }
+
+  // Main image rendering
+  const imageSizes =
+    sizes || (width ? `(max-width: ${width}px) 100vw, ${width}px` : "100vw");
+
+  const optimizedSrc =
+    isExternal && !unoptimized && !isLocalFile
+      ? buildImageUrl(normalizedCurrentSrc, {
+          width,
+          height,
+          quality,
+          format: "webp",
+        })
+      : normalizedCurrentSrc;
+
   const imageClasses = cn(
     "transition-all duration-300",
     progressive && !isLoaded ? "blur-lg scale-110" : "blur-0 scale-100",
     error ? "opacity-50" : "",
-    !isLoaded && placeholder === "blur" && !progressive ? "blur-sm" : ""
+    !isLoaded && placeholder === "blur" && !progressive ? "opacity-0" : "",
+    keepPlaceholder && !isLoaded ? "opacity-0" : "opacity-100"
   );
-
-  // Determine container styles based on responsive prop
-  const containerStyles =
-    !fill && width && height
-      ? responsive
-        ? {
-            width: "100%",
-            maxWidth: width,
-            aspectRatio: `${width} / ${height}`,
-          }
-        : {
-            width,
-            height,
-            maxWidth: "100%",
-          }
-      : undefined;
-
-  // Build image styles - FIXED: Don't set height when fill is true
-  const imageStyles = (() => {
-    const baseStyles = {
-      ...style,
-      objectFit: style?.objectFit || "cover",
-    };
-
-    // If fill is true, don't set width or height
-    if (fill) {
-      return baseStyles;
-    }
-
-    // If responsive is true, use responsive width/height
-    if (responsive) {
-      return {
-        ...baseStyles,
-        width: "100%",
-        height: "auto",
-      };
-    }
-
-    // Otherwise, use default Next.js Image behavior
-    return baseStyles;
-  })();
 
   return (
     <div
       ref={containerRef}
       className={containerClasses}
-      style={containerStyles}
+      style={placeholderStyle}
     >
-      {!progressive || isInView ? (
-        <>
-          <NextImage
-            src={optimizedSrc}
-            alt={alt}
-            width={fill ? undefined : width}
-            height={fill ? undefined : height}
-            fill={fill}
-            sizes={imageSizes}
-            quality={quality}
-            priority={priority}
-            loading={priority ? undefined : loading}
-            placeholder={
-              placeholder === "blur" && blurUrl && !progressive
-                ? "blur"
-                : placeholder === "empty"
-                ? "empty"
-                : undefined
-            }
-            blurDataURL={blurUrl}
-            loader={isExternal ? imageLoader : undefined}
-            unoptimized={unoptimized || isSvg || isLocalFile}
-            className={imageClasses}
-            style={imageStyles}
-            onLoad={handleLoad}
-            onError={handleError}
-          />
-
-          {/* High quality image overlay for progressive loading */}
-          {progressive && isLoaded && currentSrc !== src && (
-            <NextImage
-              src={src}
-              alt={alt}
-              width={fill ? undefined : width}
-              height={fill ? undefined : height}
-              fill={fill}
-              sizes={imageSizes}
-              quality={quality}
-              priority
-              className="absolute inset-0 z-10"
-              style={imageStyles}
-              onLoad={() => setCurrentSrc(src)}
-            />
+      {/* Keep placeholder visible while loading if requested */}
+      {keepPlaceholder && !isLoaded && !error && (
+        <div className="absolute inset-0 z-10 pointer-events-none">
+          {fallback || (
+            <div className="absolute inset-0 bg-gray-200 animate-pulse rounded" />
           )}
-        </>
-      ) : (
-        // Placeholder while not in view
-        <div
-          className="absolute inset-0 bg-gray-200 animate-pulse rounded"
-          aria-hidden="true"
+        </div>
+      )}
+
+      {/* Main image */}
+      <NextImage
+        src={optimizedSrc}
+        alt={alt}
+        width={fill ? undefined : width}
+        height={fill ? undefined : height}
+        fill={fill}
+        sizes={imageSizes}
+        quality={quality}
+        priority={priority}
+        placeholder={placeholder === "blur" && blurUrl ? "blur" : "empty"}
+        blurDataURL={blurUrl}
+        loading={priority ? "eager" : loading}
+        loader={
+          isExternal && !unoptimized && !isLocalFile ? imageLoader : undefined
+        }
+        unoptimized={unoptimized || isSvg || isLocalFile}
+        className={imageClasses}
+        style={imageStyles}
+        onLoad={handleLoad}
+        onError={handleError}
+      />
+
+      {/* High quality image overlay for progressive loading */}
+      {progressive && isLoaded && currentSrc !== src && (
+        <NextImage
+          src={normalizedSrc}
+          alt={alt}
+          width={fill ? undefined : width}
+          height={fill ? undefined : height}
+          fill={fill}
+          sizes={imageSizes}
+          quality={quality}
+          priority
+          className="absolute inset-0 z-10"
+          style={imageStyles}
+          onLoad={() => setCurrentSrc(src)}
         />
       )}
 
       {/* Loading skeleton for non-progressive images */}
-      {!progressive && !isLoaded && placeholder !== "blur" && (
-        <div
-          className="absolute inset-0 bg-gray-200 animate-pulse rounded"
-          aria-hidden="true"
-        />
-      )}
+      {!progressive &&
+        !isLoaded &&
+        placeholder !== "blur" &&
+        !keepPlaceholder && (
+          <div
+            className="absolute inset-0 bg-gray-200 animate-pulse rounded"
+            aria-hidden="true"
+          />
+        )}
 
       {/* Error state */}
       {error && (

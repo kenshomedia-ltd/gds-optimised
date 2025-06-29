@@ -44,7 +44,7 @@ export function FooterImages({ images, className = "" }: FooterImagesProps) {
               className="object-contain"
               quality={90}
               unoptimized={img.image.url.endsWith(".svg")}
-              // Enable progressive loading with similar settings to LazyImage
+              // Use progressive loading (replaces LazyImage functionality)
               progressive={true}
               threshold={0.5}
               rootMargin="100px"

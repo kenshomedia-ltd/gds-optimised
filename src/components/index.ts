@@ -19,8 +19,6 @@ export {
 // Common components
 export {
   Image,
-  LazyImage,
-  SvgImage,
   BackToTop,
   IntroWithImage,
   DynamicBlock,

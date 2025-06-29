@@ -224,7 +224,7 @@ export default async function CustomPage({ params }: CustomPageProps) {
         {/* Hero Section with Featured Blocks (same structure as homepage) */}
         {heroBlocks.length > 0 && (
           <section className="featured-header relative overflow-hidden bg-gradient-to-b from-background-900 from-30% via-background-700 via-80% to-background-500 rounded-b-3xl">
-            <div className="lg:container relative mx-auto px-4 z-10">
+            <div className="lg:container relative mx-auto lg:px-4 z-10">
               {heroBlocks.map((block, index: number) => (
                 <div
                   key={`hero-${block.__component}-${index}`}

@@ -1,14 +1,24 @@
 // src/types/image.types.ts
 
 /**
- * Base image properties
+ * Comprehensive image properties for the unified Image component
+ *
+ * This interface consolidates all image functionality into a single component:
+ * - Basic Next.js Image props
+ * - Progressive/lazy loading capabilities
+ * - SVG embedding and handling
+ * - Custom fallbacks and placeholders
+ * - Advanced optimization features
  */
 export interface ImageProps {
+  // Core image properties
   src: string;
   alt: string;
   width?: number;
   height?: number;
   className?: string;
+
+  // Next.js Image properties
   loading?: "lazy" | "eager";
   priority?: boolean;
   quality?: number;
@@ -20,15 +30,21 @@ export interface ImageProps {
   fill?: boolean;
   style?: React.CSSProperties;
   unoptimized?: boolean;
-  // SVG specific options
-  embedSvg?: boolean;
-  svgProps?: React.SVGProps<SVGSVGElement>;
-  // Progressive loading options
+
+  // Progressive/Lazy loading (replaces LazyImage)
   progressive?: boolean;
   lowQualityUrl?: string;
   threshold?: number;
   rootMargin?: string;
-  // Responsive height option
+  fallback?: React.ReactNode;
+  onInView?: () => void;
+  keepPlaceholder?: boolean;
+
+  // SVG specific options (replaces SvgImage)
+  embedSvg?: boolean;
+  svgProps?: React.HTMLAttributes<HTMLDivElement>;
+
+  // Additional optimization features
   responsive?: boolean;
   isLocal?: boolean;
 }
@@ -44,7 +60,7 @@ export interface ImageHandlerConfig {
 }
 
 /**
- * Image transformation parameters
+ * Image transformation parameters for AWS optimization
  */
 export interface ImageTransformParams {
   width?: number;
@@ -81,3 +97,51 @@ export interface ImageHandlerPayload {
   key: string;
   edits: ImageEdits;
 }
+
+// Extended props for the unified component
+export interface UnifiedImageProps extends ImageProps {
+  // Progressive/Lazy loading
+  progressive?: boolean;
+  lowQualityUrl?: string;
+  threshold?: number;
+  rootMargin?: string;
+
+  // SVG specific - using more flexible typing
+  embedSvg?: boolean;
+  svgProps?: React.HTMLAttributes<HTMLDivElement>;
+
+  // LazyImage specific
+  fallback?: React.ReactNode;
+  onInView?: () => void;
+  keepPlaceholder?: boolean;
+
+  // Additional
+  responsive?: boolean;
+  isLocal?: boolean;
+}
+
+// /**
+//  * Migration helper types for backward compatibility
+//  * @deprecated Use ImageProps directly with the unified Image component
+//  */
+// export interface LazyImageProps extends ImageProps {
+//   /** @deprecated Use progressive={true} instead */
+//   lazy?: boolean;
+// }
+
+// /**
+//  * @deprecated Use ImageProps directly with the unified Image component
+//  */
+// export interface SvgImageProps
+//   extends Pick<
+//     ImageProps,
+//     | "src"
+//     | "alt"
+//     | "width"
+//     | "height"
+//     | "className"
+//     | "embedSvg"
+//     | "svgProps"
+//     | "onLoad"
+//     | "onError"
+//   > {}

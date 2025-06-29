@@ -126,7 +126,7 @@ async function GameContent({ game }: { game: GamePageData }) {
 
       {/* Hero Section with Game Player */}
       <section className="featured-header relative overflow-hidden bg-gradient-to-b from-background-900 from-30% via-background-700 via-80% to-background-500 rounded-b-3xl">
-        <div className="lg:container relative mx-auto px-4 z-10 py-8">
+        <div className="lg:container relative mx-auto lg:px-4 z-10 py-8">
           {/* Game Player */}
           <div className="mb-8">
             <GamePlayer game={game} translations={translations} />

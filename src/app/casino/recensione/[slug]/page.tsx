@@ -119,7 +119,7 @@ export default async function CasinoPage({ params }: CasinoPageProps) {
 
       {/* Hero Section - Consistent with other pages */}
       <section className="featured-header relative overflow-hidden bg-gradient-to-b from-background-900 from-30% via-background-700 via-80% to-background-500 rounded-b-3xl">
-        <div className="container relative mx-auto px-4 z-10">
+        <div className="container relative mx-auto lg:px-4 z-10">
           {/* Casino Hero Component */}
           <CasinoHero casino={casinoData} translations={translations} />
         </div>
