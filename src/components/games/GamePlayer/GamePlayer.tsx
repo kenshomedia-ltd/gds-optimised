@@ -380,22 +380,16 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
               "absolute top-5 right-5 z-[9999] flex flex-col bg-background-800/90 rounded-lg overflow-hidden transition-all duration-300 pointer-events-auto",
               isDropdownExpanded ? "h-auto" : "h-10"
             )}
-            onMouseEnter={() => !isMobile && setIsDropdownExpanded(true)}
-            onMouseLeave={() => !isMobile && setIsDropdownExpanded(false)}
-            onTouchStart={() =>
-              isMobile && setIsDropdownExpanded(!isDropdownExpanded)
-            }
           >
             <div className="flex flex-col p-2.5 gap-1">
               <button
-                className="w-[30px] h-[30px] rounded-full border bg-gray-300 border-gray-400 flex items-center justify-center hover:bg-gray-400 transition-colors touch-manipulation"
+                className="w-[30px] h-[30px] rounded-full border bg-gray-300 border-gray-400 flex items-center justify-center hover:bg-gray-400 transition-colors"
                 onClick={toggleDropdown}
-                onTouchEnd={(e) => e.stopPropagation()}
               >
                 <FontAwesomeIcon
                   icon={faChevronDown}
                   className={cn(
-                    "w-4 h-4 transition-transform duration-200 text-black pointer-events-none",
+                    "w-4 h-4 transition-transform duration-200 text-black",
                     isDropdownExpanded && "rotate-180"
                   )}
                   style={{ "--fa-secondary-opacity": 0 }}
@@ -404,13 +398,12 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
               {isDropdownExpanded && (
                 <>
                   <button
-                    className="w-[30px] h-[30px] rounded-full border bg-gray-300 border-gray-400 flex items-center justify-center hover:bg-gray-400 transition-colors touch-manipulation"
+                    className="w-[30px] h-[30px] rounded-full border bg-gray-300 border-gray-400 flex items-center justify-center hover:bg-gray-400 transition-colors"
                     onClick={handleReload}
-                    onTouchEnd={(e) => e.stopPropagation()}
                   >
                     <FontAwesomeIcon
                       icon={faRotateRight}
-                      className="w-4 h-4 text-black pointer-events-none"
+                      className="w-4 h-4 text-black"
                       style={{ "--fa-secondary-opacity": 0 }}
                     />
                   </button>
@@ -420,16 +413,15 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
                     game={normalizedGame}
                     translations={translations}
                     size="sm"
-                    className="!w-[30px] !h-[30px] bg-gray-300 hover:!bg-gray-400 border !border-gray-400 touch-manipulation"
+                    className="!w-[30px] !h-[30px] bg-gray-300 hover:!bg-gray-400 border !border-gray-400"
                   />
                   <button
-                    className="w-[30px] h-[30px] rounded-full border bg-gray-300 border-gray-400 flex items-center justify-center hover:bg-gray-400 transition-colors touch-manipulation"
+                    className="w-[30px] h-[30px] rounded-full border bg-gray-300 border-gray-400 flex items-center justify-center hover:bg-gray-400 transition-colors"
                     onClick={handleFullscreen}
-                    onTouchEnd={(e) => e.stopPropagation()}
                   >
                     <FontAwesomeIcon
                       icon={faExpand}
-                      className="w-4 h-4 text-black pointer-events-none"
+                      className="w-4 h-4 text-black"
                       style={{ "--fa-secondary-opacity": 0 }}
                     />
                   </button>
@@ -507,11 +499,7 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
           </div>
         ) : (
           // Render the game iframe using our smart logic
-          <div className="w-full h-full relative">
-            <div className="absolute inset-0 pointer-events-auto">
-              {renderGameIframe()}
-            </div>
-          </div>
+          renderGameIframe()
         )}
       </div>
 

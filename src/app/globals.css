@@ -482,7 +482,6 @@
     width: 100vw !important;
     height: 100vh !important;
     border: none !important;
-    pointer-events: auto !important;
   }
 
   /* Hide any potential scrollbars on iOS fullscreen */
@@ -495,16 +494,6 @@
   .fixed.inset-0 .absolute.top-5.right-5 {
     pointer-events: auto !important;
     z-index: 99999 !important;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  /* Improve touch targets for mobile */
-  .touch-manipulation {
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    user-select: none;
   }
 
   /* Support for landscape orientation on iOS */
@@ -533,38 +522,6 @@
         height: 100vh !important;
         width: 100vw !important;
       }
-    }
-  }
-
-  /* Ensure proper stacking for fullscreen mode */
-  .fixed.inset-0 {
-    pointer-events: auto !important;
-  }
-
-  .fixed.inset-0 iframe {
-    pointer-events: auto !important;
-  }
-}
-
-/* Component styles */
-@layer components {
-  /* Container with responsive padding */
-  .container {
-    width: 100%;
-    margin-inline: auto;
-    padding-inline: 1rem;
-    max-width: 1280px;
-  }
-
-  @media (min-width: 640px) {
-    .container {
-      padding-inline: 1.5rem;
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .container {
-      padding-inline: 2rem;
     }
   }
 }
