@@ -13,11 +13,14 @@ import type {
   GamesNewAndLovedSlotsBlock,
   QuicklinksBlock,
   DynamicBlockProps,
+  HomeTestimoniesBlock,
 } from "@/types/dynamic-block.types";
 import type { OverviewBlock } from "@/types/homepage.types";
 import type { CasinoListBlock } from "@/types/casino-filters.types";
 import type { FeaturedProvider } from "@/types/featured-providers.types";
 import { Skeleton } from "@/components/ui";
+import { Testimonials } from "@/components/widgets/Testimonials";
+import { Suspense } from "react";
 
 // Lazy load all widget components
 const IntroWithImage = dynamic(
@@ -158,6 +161,15 @@ export function DynamicBlock({
           blogs={additionalData.blogs || []}
           translations={translations}
         />
+      );
+
+    case "homepage.home-testimonies":
+      return (
+        <Suspense fallback={<div>Loading testimonials...</div>}>
+          <Testimonials
+            data={blockData as HomeTestimoniesBlock}
+          />
+        </Suspense>
       );
 
     // Shared blocks
