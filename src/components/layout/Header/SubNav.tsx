@@ -18,6 +18,7 @@ interface SubNavProps {
  * - Proper responsive layout with scrolling for overflow
  * - Smooth hover effects
  * - Optimized image loading
+ * - CENTER ALIGNED navigation items (FIXED)
  */
 export function SubNav({ navigation }: SubNavProps) {
   return (
@@ -25,7 +26,12 @@ export function SubNav({ navigation }: SubNavProps) {
       className="flex lg:hidden h-9 items-center bg-subnavbar-bkg overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
       aria-label="Secondary navigation"
     >
-      <div className="flex items-center space-x-1 px-2 min-w-max">
+      {/* 
+        FIXED: Added justify-center to center-align the navigation items.
+        The flex container now centers its content horizontally.
+        For cases where content overflows, it will still scroll properly.
+      */}
+      <div className="flex items-center justify-center space-x-1 px-2 min-w-full w-max">
         {navigation.map((item) => (
           <Link
             key={item.id}
