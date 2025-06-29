@@ -126,7 +126,9 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
   // Handle fullscreen changes
   useEffect(() => {
     const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
+      const isNativeFullscreen =
+        !!document.fullscreenElement || !!document.webkitFullscreenElement;
+      setIsFullscreen(isNativeFullscreen);
     };
 
     const handleIOSFullscreenChange = () => {
@@ -137,26 +139,26 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
       }
     };
 
-    if (!isIOS) {
-      document.addEventListener("fullscreenchange", handleFullscreenChange);
-    } else {
-      if (containerRef.current) {
-        const observer = new MutationObserver(handleIOSFullscreenChange);
-        observer.observe(containerRef.current, {
-          attributes: true,
-          attributeFilter: ["class"],
-        });
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
 
-        return () => observer.disconnect();
-      }
+    let observer: MutationObserver | undefined;
+    if (isIOS && containerRef.current) {
+      observer = new MutationObserver(handleIOSFullscreenChange);
+      observer.observe(containerRef.current, {
+        attributes: true,
+        attributeFilter: ["class"],
+      });
     }
 
     return () => {
-      if (!isIOS) {
-        document.removeEventListener(
-          "fullscreenchange",
-          handleFullscreenChange
-        );
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+      document.removeEventListener(
+        "webkitfullscreenchange",
+        handleFullscreenChange
+      );
+      if (observer) {
+        observer.disconnect();
       }
     };
   }, [isIOS]);
@@ -173,24 +175,52 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
   };
 
   const handleFullscreen = async () => {
-    if (!containerRef.current) return;
-  
-    const isCurrentlyFullscreen =
-      document.fullscreenElement || document.webkitFullscreenElement;
-  
+    const container = containerRef.current;
+    if (!container) return;
+
+    const requestFullscreen = async () => {
+      if (isIOS) {
+        if (container.webkitRequestFullscreen) {
+          await container.webkitRequestFullscreen();
+        } else {
+          // Fallback for iPhones
+          container.classList.add("ios-fullscreen");
+          document.body.style.overflow = "hidden";
+          // Hide header
+          const header = document.querySelector("header");
+          if (header) {
+            header.style.zIndex = "0";
+          }
+        }
+      } else if (container.requestFullscreen) {
+        await container.requestFullscreen();
+      }
+    };
+
+    const exitFullscreen = async () => {
+      if (isIOS) {
+        if (document.webkitExitFullscreen) {
+          await document.webkitExitFullscreen();
+        } else {
+          // Fallback for iPhones
+          container.classList.remove("ios-fullscreen");
+          document.body.style.overflow = "unset";
+          // Restore header
+          const header = document.querySelector("header");
+          if (header) {
+            header.style.zIndex = "50"; // Restore original z-index
+          }
+        }
+      } else if (document.exitFullscreen) {
+        await document.exitFullscreen();
+      }
+    };
+
     try {
-      if (!isCurrentlyFullscreen) {
-        if (containerRef.current.requestFullscreen) {
-          await containerRef.current.requestFullscreen();
-        } else if (containerRef.current.webkitRequestFullscreen) {
-          await containerRef.current.webkitRequestFullscreen(); // iOS
-        }
+      if (!isFullscreen) {
+        await requestFullscreen();
       } else {
-        if (document.exitFullscreen) {
-          await document.exitFullscreen();
-        } else if (document.webkitExitFullscreen) {
-          await document.webkitExitFullscreen(); // iOS
-        }
+        await exitFullscreen();
       }
     } catch (error) {
       console.error("Fullscreen error:", error);
@@ -241,7 +271,6 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
     publishedAt: game.publishedAt,
     provider: game.provider,
     images: gameImage,
-    categories: game.categories,
     // Provide default values for optional date fields
     createdAt: game.createdAt || new Date().toISOString(),
     updatedAt: game.updatedAt || new Date().toISOString(),
@@ -343,15 +372,14 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
             )}
             onMouseEnter={() => !isMobile && setIsDropdownExpanded(true)}
             onMouseLeave={() => !isMobile && setIsDropdownExpanded(false)}
-            onTouchStart={() =>
-              isMobile && setIsDropdownExpanded(!isDropdownExpanded)
-            }
           >
             <div className="flex flex-col p-2.5 gap-1">
               <button
                 className="w-[30px] h-[30px] rounded-full border bg-gray-300 border-gray-400 flex items-center justify-center hover:bg-gray-400 transition-colors touch-manipulation"
-                onClick={toggleDropdown}
-                onTouchEnd={(e) => e.stopPropagation()}
+                onTouchEnd={(e) => {
+                  e.stopPropagation();
+                  toggleDropdown();
+                }}
               >
                 <FontAwesomeIcon
                   icon={faChevronDown}
@@ -366,8 +394,10 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
                 <>
                   <button
                     className="w-[30px] h-[30px] rounded-full border bg-gray-300 border-gray-400 flex items-center justify-center hover:bg-gray-400 transition-colors touch-manipulation"
-                    onClick={handleReload}
-                    onTouchEnd={(e) => e.stopPropagation()}
+                    onTouchEnd={(e) => {
+                      e.stopPropagation();
+                      handleReload();
+                    }}
                   >
                     <FontAwesomeIcon
                       icon={faRotateRight}
@@ -385,8 +415,10 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
                   />
                   <button
                     className="w-[30px] h-[30px] rounded-full border bg-gray-300 border-gray-400 flex items-center justify-center hover:bg-gray-400 transition-colors touch-manipulation"
-                    onClick={handleFullscreen}
-                    onTouchEnd={(e) => e.stopPropagation()}
+                    onTouchEnd={(e) => {
+                      e.stopPropagation();
+                      handleFullscreen();
+                    }}
                   >
                     <FontAwesomeIcon
                       icon={faExpand}
