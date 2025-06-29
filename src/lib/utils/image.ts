@@ -16,8 +16,11 @@ export function getBasePath(): string {
     typeof window !== "undefined" &&
     window.__NEXT_DATA__?.nextExport === false
   ) {
-    // Client-side: access from window.__NEXT_DATA__.basePath
-    return window.__NEXT_DATA__.basePath || "";
+    // Client-side: access from window.__NEXT_DATA__.basePath with type assertion
+    const nextData = window.__NEXT_DATA__ as typeof window.__NEXT_DATA__ & {
+      basePath?: string;
+    };
+    return nextData.basePath || "";
   }
 
   // Server-side or fallback: use environment-based logic
@@ -287,10 +290,10 @@ export function debugBasePath(): void {
     console.log("getBasePath():", getBasePath());
 
     if (typeof window !== "undefined") {
-      console.log(
-        "window.__NEXT_DATA__.basePath:",
-        window.__NEXT_DATA__?.basePath
-      );
+      const nextData = window.__NEXT_DATA__ as typeof window.__NEXT_DATA__ & {
+        basePath?: string;
+      };
+      console.log("window.__NEXT_DATA__.basePath:", nextData.basePath);
       console.log("window.location.pathname:", window.location.pathname);
     }
 

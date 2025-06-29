@@ -115,6 +115,19 @@ export function Image({
   const normalizedSrc = normalizeImageSrc(src);
   const normalizedCurrentSrc = normalizeImageSrc(currentSrc);
 
+  // Event handlers - defined with useCallback to maintain stable references
+  const handleLoad = useCallback(() => {
+    if (!progressive || currentSrc === src) {
+      setIsLoaded(true);
+    }
+    onLoad?.();
+  }, [progressive, currentSrc, src, onLoad]);
+
+  const handleError = useCallback(() => {
+    setError(true);
+    onError?.();
+  }, [onError]);
+
   // Generate low quality URL for progressive loading
   useEffect(() => {
     if (progressive && !lowQualityUrl && !isSvg && !isLocalFile) {
@@ -209,7 +222,7 @@ export function Image({
       try {
         // Check cache first
         const cacheKey = `svg-${normalizedSrc}`;
-        const cached = sessionStorage.getItem(cacheKey);
+        const cached = sessionStorage?.getItem(cacheKey);
 
         if (cached) {
           setSvgContent(cached);
@@ -266,7 +279,7 @@ export function Image({
 
         // Cache the sanitized SVG
         try {
-          sessionStorage.setItem(cacheKey, responsiveSvg);
+          sessionStorage?.setItem(cacheKey, responsiveSvg);
         } catch (e) {
           console.log("Error caching SVG:", e);
         }
@@ -289,20 +302,7 @@ export function Image({
     return () => {
       abortController.abort();
     };
-  }, [embedSvg, normalizedSrc, isSvg]);
-
-  // Event handlers
-  const handleLoad = useCallback(() => {
-    if (!progressive || currentSrc === src) {
-      setIsLoaded(true);
-    }
-    onLoad?.();
-  }, [progressive, currentSrc, src, onLoad]);
-
-  const handleError = useCallback(() => {
-    setError(true);
-    onError?.();
-  }, [onError]);
+  }, [embedSvg, normalizedSrc, isSvg, handleLoad, handleError]);
 
   // Calculate dimensions and styles
   const placeholderStyle = {
@@ -328,66 +328,46 @@ export function Image({
     className
   );
 
-  // SVG Embedded Rendering
-  if (isSvg && embedSvg && svgContent && !error) {
+  // SVG rendering with embedded content
+  if (embedSvg && isSvg) {
     return (
       <div
         ref={svgContainerRef}
-        className={cn(
-          "inline-block", // Base display
-          className
-        )}
-        style={{
-          width: width || "auto",
-          height: height || "auto",
-          maxWidth: "100%",
-          maxHeight: "100%",
-          overflow: "hidden", // Prevent SVG from breaking out
-          ...style,
-        }}
-        dangerouslySetInnerHTML={{ __html: svgContent }}
-        role="img"
-        aria-label={alt}
-        {...(svgProps as React.HTMLAttributes<HTMLDivElement>)}
-      />
-    );
-  }
-
-  // SVG Loading State
-  if (isSvg && embedSvg && isSvgLoading) {
-    return (
-      <div
-        className={cn("animate-pulse bg-gray-200 inline-block", className)}
-        style={{
-          width: width || "auto",
-          height: height || "auto",
-          maxWidth: "100%",
-          maxHeight: "100%",
-          ...style,
-        }}
-        role="img"
-        aria-label={`Loading ${alt}`}
-      />
-    );
-  }
-
-  // Not in view - show placeholder
-  if (!isInView) {
-    return (
-      <div
-        ref={containerRef}
         className={containerClasses}
         style={placeholderStyle}
-        aria-hidden="true"
+        {...svgProps}
       >
-        {fallback || (
+        {isSvgLoading && (
           <div className="absolute inset-0 bg-gray-200 animate-pulse rounded" />
+        )}
+        {svgContent && (
+          <div
+            className="w-full h-full"
+            dangerouslySetInnerHTML={{ __html: svgContent }}
+          />
+        )}
+        {error && (
+          <div className="absolute inset-0 flex items-center justify-center bg-gray-100 text-gray-500">
+            <svg
+              className="w-8 h-8"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+          </div>
         )}
       </div>
     );
   }
 
-  // Main image rendering
+  // Calculate responsive sizes
   const imageSizes =
     sizes || (width ? `(max-width: ${width}px) 100vw, ${width}px` : "100vw");
 
@@ -488,7 +468,7 @@ export function Image({
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth={2}
-              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2 2v12a2 2 0 002 2z"
             />
           </svg>
         </div>
