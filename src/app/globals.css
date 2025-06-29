@@ -456,6 +456,94 @@
       scroll-behavior: auto !important;
     }
   }
+
+  /* iOS fullscreen */
+  .ios-fullscreen {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 9999 !important;
+    border-radius: 0 !important;
+    
+    /* Ensure it covers everything including iOS Safari UI */
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+    
+    /* Hide iOS Safari bars when possible */
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Ensure iframe takes full space in iOS fullscreen */
+  .ios-fullscreen iframe {
+    width: 100vw !important;
+    height: 100vh !important;
+    border: none !important;
+    pointer-events: auto !important;
+  }
+
+  /* Hide any potential scrollbars on iOS fullscreen */
+  .ios-fullscreen::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Fullscreen controls styling */
+  .ios-fullscreen .absolute.top-5.right-5,
+  .fixed.inset-0 .absolute.top-5.right-5 {
+    pointer-events: auto !important;
+    z-index: 99999 !important;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Improve touch targets for mobile */
+  .touch-manipulation {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* Support for landscape orientation on iOS */
+  @media screen and (orientation: landscape) {
+    .ios-fullscreen {
+      /* Try to use available viewport units that work better on mobile */
+      height: 100dvh !important; /* Dynamic viewport height */
+      width: 100dvw !important;  /* Dynamic viewport width */
+    }
+    
+    .ios-fullscreen iframe {
+      height: 100dvh !important;
+      width: 100dvw !important;
+    }
+  }
+
+  /* Fallback for older browsers that don't support dvh */
+  @supports not (height: 100dvh) {
+    @media screen and (orientation: landscape) {
+      .ios-fullscreen {
+        height: 100vh !important;
+        width: 100vw !important;
+      }
+      
+      .ios-fullscreen iframe {
+        height: 100vh !important;
+        width: 100vw !important;
+      }
+    }
+  }
+
+  /* Ensure proper stacking for fullscreen mode */
+  .fixed.inset-0 {
+    pointer-events: auto !important;
+  }
+
+  .fixed.inset-0 iframe {
+    pointer-events: auto !important;
+  }
 }
 
 /* Component styles */

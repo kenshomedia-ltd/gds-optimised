@@ -116,7 +116,7 @@ export function Header({
                 aria-expanded={isMobileMenuOpen}
                 aria-label={translations.menu || "Open menu"}
               >
-                <FontAwesomeIcon icon={faBars} className="!h-7 !w-7" />
+                <FontAwesomeIcon icon={faBars} className="!h-6 !w-6" />
               </button>
 
               {/* Authentication Button - Mobile */}
@@ -131,7 +131,7 @@ export function Header({
               >
                 <FontAwesomeIcon
                   icon={faUser}
-                  className="!h-7 !w-7"
+                  className="!h-6 !w-6"
                   style={{ "--fa-secondary-opacity": 0 }}
                 />
               </Link>
@@ -186,7 +186,7 @@ export function Header({
                 <FontAwesomeIcon
                   icon={favoritesCount > 0 ? faHeartSolid : faHeart}
                   className={cn(
-                    "!h-7 !w-7 transition-colors",
+                    "!h-6 !w-6 transition-colors",
                     favoritesCount > 0 ? "text-danger" : "text-navbar-text"
                   )}
                   style={{ "--fa-secondary-opacity": 0 }}
@@ -208,7 +208,7 @@ export function Header({
               >
                 <FontAwesomeIcon
                   icon={faSearch}
-                  className="!h-7 !w-7"
+                  className="!h-6 !w-6"
                   style={{ "--fa-secondary-opacity": 0 }}
                 />
               </button>
