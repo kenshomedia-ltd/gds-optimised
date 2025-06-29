@@ -174,61 +174,22 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
 
   const handleFullscreen = async () => {
     if (!containerRef.current) return;
-
+  
+    const isCurrentlyFullscreen =
+      document.fullscreenElement || document.webkitFullscreenElement;
+  
     try {
-      if (isIOS) {
-        // iOS-specific fullscreen implementation
-        if (!isFullscreen) {
-          containerRef.current.classList.add("ios-fullscreen");
-          document.body.style.overflow = "hidden";
-
-          const favBtnNav = document.getElementById("fav-search");
-          const burgerMenu = document.getElementById("burger-menu");
-          const backToTop = document.getElementById("back-to-top");
-
-          if (favBtnNav) favBtnNav.style.zIndex = "-1";
-          if (burgerMenu) burgerMenu.style.zIndex = "-1";
-          if (backToTop) backToTop.style.zIndex = "-1";
-
-          setIsFullscreen(true);
-        } else {
-          containerRef.current.classList.remove("ios-fullscreen");
-          document.body.style.overflow = "unset";
-
-          const favBtnNav = document.getElementById("fav-search");
-          const burgerMenu = document.getElementById("burger-menu");
-          const backToTop = document.getElementById("back-to-top");
-
-          if (favBtnNav) favBtnNav.style.zIndex = "40";
-          if (burgerMenu) burgerMenu.style.zIndex = "40";
-          if (backToTop) backToTop.style.zIndex = "40";
-
-          setIsFullscreen(false);
+      if (!isCurrentlyFullscreen) {
+        if (containerRef.current.requestFullscreen) {
+          await containerRef.current.requestFullscreen();
+        } else if (containerRef.current.webkitRequestFullscreen) {
+          await containerRef.current.webkitRequestFullscreen(); // iOS
         }
       } else {
-        // Standard fullscreen API for non-iOS devices
-        if (!document.fullscreenElement) {
-          await containerRef.current.requestFullscreen();
-
-          // Adjust z-index for other elements
-          const favBtnNav = document.getElementById("fav-search");
-          const burgerMenu = document.getElementById("burger-menu");
-          const backToTop = document.getElementById("back-to-top");
-
-          if (favBtnNav) favBtnNav.style.zIndex = "-1";
-          if (burgerMenu) burgerMenu.style.zIndex = "-1";
-          if (backToTop) backToTop.style.zIndex = "-1";
-        } else {
+        if (document.exitFullscreen) {
           await document.exitFullscreen();
-
-          // Restore z-index
-          const favBtnNav = document.getElementById("fav-search");
-          const burgerMenu = document.getElementById("burger-menu");
-          const backToTop = document.getElementById("back-to-top");
-
-          if (favBtnNav) favBtnNav.style.zIndex = "40";
-          if (burgerMenu) burgerMenu.style.zIndex = "40";
-          if (backToTop) backToTop.style.zIndex = "40";
+        } else if (document.webkitExitFullscreen) {
+          await document.webkitExitFullscreen(); // iOS
         }
       }
     } catch (error) {
@@ -380,16 +341,22 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
               "absolute top-5 right-5 z-[9999] flex flex-col bg-background-800/90 rounded-lg overflow-hidden transition-all duration-300 pointer-events-auto",
               isDropdownExpanded ? "h-auto" : "h-10"
             )}
+            onMouseEnter={() => !isMobile && setIsDropdownExpanded(true)}
+            onMouseLeave={() => !isMobile && setIsDropdownExpanded(false)}
+            onTouchStart={() =>
+              isMobile && setIsDropdownExpanded(!isDropdownExpanded)
+            }
           >
             <div className="flex flex-col p-2.5 gap-1">
               <button
-                className="w-[30px] h-[30px] rounded-full border bg-gray-300 border-gray-400 flex items-center justify-center hover:bg-gray-400 transition-colors"
+                className="w-[30px] h-[30px] rounded-full border bg-gray-300 border-gray-400 flex items-center justify-center hover:bg-gray-400 transition-colors touch-manipulation"
                 onClick={toggleDropdown}
+                onTouchEnd={(e) => e.stopPropagation()}
               >
                 <FontAwesomeIcon
                   icon={faChevronDown}
                   className={cn(
-                    "w-4 h-4 transition-transform duration-200 text-black",
+                    "w-4 h-4 transition-transform duration-200 text-black pointer-events-none",
                     isDropdownExpanded && "rotate-180"
                   )}
                   style={{ "--fa-secondary-opacity": 0 }}
@@ -398,12 +365,13 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
               {isDropdownExpanded && (
                 <>
                   <button
-                    className="w-[30px] h-[30px] rounded-full border bg-gray-300 border-gray-400 flex items-center justify-center hover:bg-gray-400 transition-colors"
+                    className="w-[30px] h-[30px] rounded-full border bg-gray-300 border-gray-400 flex items-center justify-center hover:bg-gray-400 transition-colors touch-manipulation"
                     onClick={handleReload}
+                    onTouchEnd={(e) => e.stopPropagation()}
                   >
                     <FontAwesomeIcon
                       icon={faRotateRight}
-                      className="w-4 h-4 text-black"
+                      className="w-4 h-4 text-black pointer-events-none"
                       style={{ "--fa-secondary-opacity": 0 }}
                     />
                   </button>
@@ -413,15 +381,16 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
                     game={normalizedGame}
                     translations={translations}
                     size="sm"
-                    className="!w-[30px] !h-[30px] bg-gray-300 hover:!bg-gray-400 border !border-gray-400"
+                    className="!w-[30px] !h-[30px] bg-gray-300 hover:!bg-gray-400 border !border-gray-400 touch-manipulation"
                   />
                   <button
-                    className="w-[30px] h-[30px] rounded-full border bg-gray-300 border-gray-400 flex items-center justify-center hover:bg-gray-400 transition-colors"
+                    className="w-[30px] h-[30px] rounded-full border bg-gray-300 border-gray-400 flex items-center justify-center hover:bg-gray-400 transition-colors touch-manipulation"
                     onClick={handleFullscreen}
+                    onTouchEnd={(e) => e.stopPropagation()}
                   >
                     <FontAwesomeIcon
                       icon={faExpand}
-                      className="w-4 h-4 text-black"
+                      className="w-4 h-4 text-black pointer-events-none"
                       style={{ "--fa-secondary-opacity": 0 }}
                     />
                   </button>
@@ -499,7 +468,11 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
           </div>
         ) : (
           // Render the game iframe using our smart logic
-          renderGameIframe()
+          <div className="w-full h-full relative">
+            <div className="absolute inset-0 pointer-events-auto">
+              {renderGameIframe()}
+            </div>
+          </div>
         )}
       </div>
 
