@@ -10,10 +10,29 @@ let connectionAttempted = false;
 let connectionFailed = false;
 
 /**
+ * Check if we should use Redis caching
+ * Skip Redis entirely in development to avoid connection issues
+ */
+function shouldUseRedis(): boolean {
+  // Skip Redis in development environment
+  if (process.env.NODE_ENV === "development") {
+    return false;
+  }
+
+  // In production, require Redis configuration
+  return !!process.env.REDIS_HOST;
+}
+
+/**
  * Get or create Redis connection
  * This ensures the connection is created after environment variables are available
  */
 function getRedisClient(): Redis | null {
+  // Early return if we shouldn't use Redis
+  if (!shouldUseRedis()) {
+    return null;
+  }
+
   // If we've already tried and failed, don't keep retrying
   if (connectionFailed) {
     return null;
@@ -26,8 +45,8 @@ function getRedisClient(): Redis | null {
     const redisPort = parseInt(process.env.REDIS_PORT || "6379");
     const redisPassword = process.env.REDIS_PASSWORD;
 
-    // During build time, Redis won't be available
-    if (process.env.NODE_ENV === "production" && !process.env.REDIS_HOST) {
+    // In production, Redis must be configured
+    if (!process.env.REDIS_HOST) {
       console.log(
         "[Redis] No REDIS_HOST configured, skipping Redis initialization"
       );
@@ -147,6 +166,7 @@ interface CacheEntry {
 
 /**
  * Enhanced cache manager with stale-while-revalidate pattern
+ * Automatically skips Redis in development environment
  */
 export class CacheManager {
   /**
@@ -156,6 +176,9 @@ export class CacheManager {
     try {
       const client = getRedisClient();
       if (!client) {
+        if (process.env.NODE_ENV === "development") {
+          console.log(`[Cache] Skipping Redis in development for key: ${key}`);
+        }
         return { data: null, isStale: false };
       }
 
@@ -193,7 +216,12 @@ export class CacheManager {
     try {
       const client = getRedisClient();
       if (!client) {
-        return; // Silently fail if Redis is not available
+        if (process.env.NODE_ENV === "development") {
+          console.log(
+            `[Cache] Skipping Redis set in development for key: ${key}`
+          );
+        }
+        return; // Silently skip if Redis is not available
       }
 
       const { ttl = 300, swr = 600 } = options;
@@ -218,6 +246,11 @@ export class CacheManager {
     try {
       const client = getRedisClient();
       if (!client) {
+        if (process.env.NODE_ENV === "development") {
+          console.log(
+            `[Cache] Skipping Redis delete in development for pattern: ${pattern}`
+          );
+        }
         return;
       }
 
@@ -237,6 +270,13 @@ export class CacheManager {
     try {
       const client = getRedisClient();
       if (!client) {
+        if (process.env.NODE_ENV === "development") {
+          console.log(
+            `[Cache] Skipping Redis mget in development for keys: ${keys.join(
+              ", "
+            )}`
+          );
+        }
         return new Map();
       }
 
@@ -267,6 +307,9 @@ export class CacheManager {
   async warmCache(entries: CacheEntry[]): Promise<void> {
     const client = getRedisClient();
     if (!client) {
+      if (process.env.NODE_ENV === "development") {
+        console.log(`[Cache] Skipping Redis warm cache in development`);
+      }
       return;
     }
 
@@ -294,86 +337,97 @@ export class CacheManager {
    * Check if Redis is available
    */
   isAvailable(): boolean {
+    if (!shouldUseRedis()) {
+      return false;
+    }
     const client = getRedisClient();
-    return client !== null && client.status === "ready";
+    return client !== null && !connectionFailed;
+  }
+
+  /**
+   * Invalidate cache entries by tags or patterns
+   */
+  async invalidate(patterns: string[]): Promise<void> {
+    const client = getRedisClient();
+    if (!client) {
+      if (process.env.NODE_ENV === "development") {
+        console.log(
+          `[Cache] Skipping Redis invalidation in development for patterns: ${patterns.join(
+            ", "
+          )}`
+        );
+      }
+      return;
+    }
+
+    try {
+      for (const pattern of patterns) {
+        const keys = await client.keys(pattern);
+        if (keys.length > 0) {
+          await client.del(...keys);
+          console.log(
+            `[Cache] Invalidated ${keys.length} keys for pattern: ${pattern}`
+          );
+        }
+      }
+    } catch (error) {
+      console.error("Cache invalidation error:", error);
+    }
+  }
+
+  /**
+   * Get cache statistics
+   */
+  async getStats(): Promise<{ totalKeys: number; memory: string }> {
+    const client = getRedisClient();
+    if (!client) {
+      return { totalKeys: 0, memory: "0B (Redis disabled in development)" };
+    }
+
+    try {
+      const totalKeys = await client.dbsize();
+      const info = await client.info("memory");
+      const memoryMatch = info.match(/used_memory_human:([^\r\n]+)/);
+      const memory = memoryMatch ? memoryMatch[1] : "Unknown";
+
+      return { totalKeys, memory };
+    } catch (error) {
+      console.error("Cache stats error:", error);
+      return { totalKeys: 0, memory: "Error" };
+    }
   }
 }
 
-// Export singleton instance
+// Create singleton instance
 export const cacheManager = new CacheManager();
 
 /**
- * Create a cached function with stale-while-revalidate
- * Fixed type constraints for proper TypeScript inference
+ * Create a cache-wrapped function with React cache and Next.js unstable_cache
+ * This function now gracefully handles development environment without Redis
  */
-export function createCachedFunction<TArgs extends unknown[], TReturn>(
-  fn: (...args: TArgs) => Promise<TReturn>,
-  options: CacheOptions
-): (...args: TArgs) => Promise<TReturn> {
-  const wrappedFn = async (...args: TArgs): Promise<TReturn> => {
-    const cacheKey = `${options.key}:${JSON.stringify(args)}`;
+export function createCachedFunction<
+  T extends (...args: any[]) => Promise<any>
+>(fetcher: T, options: CacheOptions): T {
+  const { key, ttl = 300, swr = 600, tags = [], revalidate } = options;
 
-    // Try to get from cache
-    const { data, isStale } = await cacheManager.get<TReturn>(cacheKey);
-
-    if (data && !isStale) {
-      // Fresh data, return immediately
-      return data;
-    }
-
-    if (data && isStale) {
-      // Stale data, return it but trigger background revalidation
-      setImmediate(async () => {
-        try {
-          const fresh = await fn(...args);
-          await cacheManager.set(cacheKey, fresh, {
-            ttl: options.ttl,
-            swr: options.swr,
-          });
-        } catch (error) {
-          console.error("Background revalidation error:", error);
-        }
-      });
-
-      return data;
-    }
-
-    // No data, fetch and cache
-    const fresh = await fn(...args);
-    await cacheManager.set(cacheKey, fresh, {
-      ttl: options.ttl,
-      swr: options.swr,
-    });
-
-    return fresh;
-  };
-
-  return wrappedFn;
-}
-
-/**
- * React cache wrapper with Redis backing
- */
-export function cachedFetch<T>(
-  key: string,
-  fetcher: () => Promise<T>,
-  options: CacheOptions
-): () => Promise<T> {
-  // Use React cache for request deduplication
-  const reactCached = cache(async () => {
-    const { data, isStale } = await cacheManager.get<T>(key);
+  // Create React cache for request-level deduplication
+  const reactCached = cache(async (...args: Parameters<T>) => {
+    // Try cache first (will skip Redis in development)
+    const { data, isStale } = await cacheManager.get<Awaited<ReturnType<T>>>(
+      key
+    );
 
     if (data && !isStale) {
       return data;
     }
 
     // Fetch fresh data
-    const fresh = await fetcher();
+    const fresh = await fetcher(...args);
 
-    // Cache it
+    // Cache it (will skip Redis in development)
     await cacheManager.set(key, fresh, {
-      ttl: options.ttl,
-      swr: options.swr,
+      ttl: ttl,
+      swr: swr,
     });
 
     return fresh;
@@ -381,8 +435,8 @@ export function cachedFetch<T>(
 
   // Use Next.js unstable_cache for persistent caching
   return unstable_cache(reactCached, [key], {
-    revalidate: options.revalidate || options.ttl,
-    tags: options.tags,
+    revalidate: revalidate || ttl,
+    tags: tags,
   });
 }
 
@@ -392,7 +446,13 @@ export function cachedFetch<T>(
 export async function prefetchCriticalData(paths: string[]): Promise<void> {
   // Only attempt if Redis is available
   if (!cacheManager.isAvailable()) {
-    console.log("[Cache] Redis not available, skipping prefetch");
+    if (process.env.NODE_ENV === "development") {
+      console.log(
+        "[Cache] Redis not available in development, skipping prefetch"
+      );
+    } else {
+      console.log("[Cache] Redis not available, skipping prefetch");
+    }
     return;
   }
 

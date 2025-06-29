@@ -87,29 +87,7 @@ export default async function RootLayout({
         {/* Preconnect to critical third-party origins */}
         <link rel="preconnect" href={process.env.NEXT_PUBLIC_API_URL || ""} />
         <link rel="dns-prefetch" href={process.env.NEXT_PUBLIC_API_URL || ""} />
-
-        {/* Preload critical assets */}
-        <link
-          rel="preload"
-          href="/icons/logo-timone.svg"
-          as="image"
-          type="image/svg+xml"
-          crossOrigin="anonymous"
-        />
-        <link
-          rel="preload"
-          href="/icons/logo-adm.svg"
-          as="image"
-          type="image/svg+xml"
-          crossOrigin="anonymous"
-        />
-        <link
-          rel="preload"
-          href="/icons/plus-18.svg"
-          as="image"
-          type="image/svg+xml"
-          crossOrigin="anonymous"
-        />
+        
       </head>
 
       <body

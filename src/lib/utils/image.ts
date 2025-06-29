@@ -11,10 +11,32 @@ import type {
  * This ensures consistency across the application
  */
 export function getBasePath(): string {
-  // Access the basePath from Next.js runtime config
+  // Try to access Next.js runtime config first
+  if (
+    typeof window !== "undefined" &&
+    window.__NEXT_DATA__?.nextExport === false
+  ) {
+    // Client-side: access from window.__NEXT_DATA__.basePath
+    return window.__NEXT_DATA__.basePath || "";
+  }
+
+  // Server-side or fallback: use environment-based logic
   // In production with basePath: '/it', this will be '/it'
-  // In development, this will be an empty string
-  return process.env.NODE_ENV === "production" ? "/it" : "";
+  // In development, check if we have a basePath configured
+  if (process.env.NODE_ENV === "production") {
+    return "/it";
+  }
+
+  // Development: check if basePath is configured in Next.js
+  // This handles cases where you might want to test basePath in development
+  try {
+    // Try to access Next.js config if available
+    const nextConfig = process.env.__NEXT_ROUTER_BASEPATH || "";
+    return nextConfig;
+  } catch {
+    // Fallback to empty string for development
+    return "";
+  }
 }
 
 /**
@@ -252,4 +274,41 @@ export function imageLoader({
 
   // For remote images, build the URL
   return buildImageUrl(src, { width, quality, format: "webp" });
+}
+
+/**
+ * Debug function to log basePath resolution
+ * Use this for troubleshooting basePath issues in development
+ */
+export function debugBasePath(): void {
+  if (process.env.NODE_ENV === "development") {
+    console.group("🔍 BasePath Debug Info");
+    console.log("NODE_ENV:", process.env.NODE_ENV);
+    console.log("getBasePath():", getBasePath());
+
+    if (typeof window !== "undefined") {
+      console.log(
+        "window.__NEXT_DATA__.basePath:",
+        window.__NEXT_DATA__?.basePath
+      );
+      console.log("window.location.pathname:", window.location.pathname);
+    }
+
+    console.log(
+      "process.env.__NEXT_ROUTER_BASEPATH:",
+      process.env.__NEXT_ROUTER_BASEPATH
+    );
+
+    // Test some example paths
+    const testPaths = [
+      "/icons/logo-timone.svg",
+      "/images/test.jpg",
+      "https://example.com/image.jpg",
+    ];
+    testPaths.forEach((path) => {
+      console.log(`normalizeImageSrc("${path}"):`, normalizeImageSrc(path));
+    });
+
+    console.groupEnd();
+  }
 }

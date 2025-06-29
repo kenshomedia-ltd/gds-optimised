@@ -146,8 +146,8 @@ export function Header({
                   <Image
                     src={logo.url}
                     alt={`${siteName} Logo`}
-                    width={logo.width || 200}
-                    height={logo.height || 56}
+                    width={122}
+                    height={50}
                     className={
                       siteId === "csi"
                         ? "w-[130px] md:w-auto h-[50px] object-contain"
@@ -222,8 +222,8 @@ export function Header({
                   <Image
                     src={logo.url}
                     alt={`${siteName} Logo`}
-                    width={logo.width || 200}
-                    height={logo.height || 56}
+                    width={122}
+                    height={50}
                     className={
                       siteId === "csi"
                         ? "w-[130px] md:w-auto h-[50px] object-contain"

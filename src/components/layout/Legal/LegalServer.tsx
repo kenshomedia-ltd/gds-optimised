@@ -1,5 +1,6 @@
 // src/components/layout/Legal/LegalServer.tsx
 import Image from "next/image";
+import { normalizeImageSrc } from "@/lib/utils/image";
 import type { LegalProps } from "./legal.types";
 
 /**
@@ -11,30 +12,43 @@ import type { LegalProps } from "./legal.types";
  * Features:
  * - No client-side JavaScript required
  * - Next.js Image optimization
- * - Preload hints for better performance
+ * - Preload hints for better performance with proper basePath
+ * - Proper basePath handling for all environments
  *
  * @param {LegalProps} props - Component props
  * @returns {JSX.Element} Legal bar component
  */
 export function LegalServer({ legalText, className }: LegalProps) {
+  // Pre-normalize all image paths to ensure consistent basePath handling
+  const iconPaths = {
+    timone: normalizeImageSrc("/icons/logo-timone.svg"),
+    adm: normalizeImageSrc("/icons/logo-adm.svg"),
+    plus18: normalizeImageSrc("/icons/plus-18.svg"),
+  };
+
+  // Debug in development
+  if (process.env.NODE_ENV === "development") {
+    console.log("🏛️ LegalServer component icon paths:", iconPaths);
+  }
+
   return (
     <>
-      {/* Preload SVG assets for faster loading */}
+      {/* Preload SVG assets for faster loading with proper basePath */}
       <link
         rel="preload"
-        href="/icons/logo-timone.svg"
+        href={iconPaths.timone}
         as="image"
         type="image/svg+xml"
       />
       <link
         rel="preload"
-        href="/icons/logo-adm.svg"
+        href={iconPaths.adm}
         as="image"
         type="image/svg+xml"
       />
       <link
         rel="preload"
-        href="/icons/plus-18.svg"
+        href={iconPaths.plus18}
         as="image"
         type="image/svg+xml"
       />
@@ -48,13 +62,13 @@ export function LegalServer({ legalText, className }: LegalProps) {
           {/* Legal text with proper spacing */}
           <span className="flex leading-tight justify-end">{legalText}</span>
 
-          {/* Compliance icons using Next.js Image */}
+          {/* Compliance icons using Next.js Image with proper basePath */}
           <div
             className="flex items-center justify-end gap-[2px] min-w-[120px]"
             aria-label="Compliance certifications"
           >
             <Image
-              src="/icons/logo-timone.svg"
+              src={iconPaths.timone}
               alt="Logo Timone - Regulatory compliance"
               width={40}
               height={25}
@@ -64,7 +78,7 @@ export function LegalServer({ legalText, className }: LegalProps) {
             />
 
             <Image
-              src="/icons/logo-adm.svg"
+              src={iconPaths.adm}
               alt="ADM - Agenzia delle Dogane e dei Monopoli certification"
               width={60}
               height={25}
@@ -74,7 +88,7 @@ export function LegalServer({ legalText, className }: LegalProps) {
             />
 
             <Image
-              src="/icons/plus-18.svg"
+              src={iconPaths.plus18}
               alt="18+ Age restriction - Gambling is prohibited for minors"
               width={25}
               height={25}
