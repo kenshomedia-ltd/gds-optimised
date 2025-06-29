@@ -210,7 +210,7 @@ export function StarRating({
         `Star rating: ${displayRating.toFixed(1)} out of ${maxRating}`
       }
     >
-      <div className="flex items-center gap-0.5">{stars}</div>
+      <div className="flex items-center">{stars}</div>
 
       {showValue && (
         <span

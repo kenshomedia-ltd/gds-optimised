@@ -90,13 +90,13 @@ export function StarRatingInteractive({
           });
 
           if (result.success && result.ratingAvg !== undefined) {
-            // Update the displayed rating and count
+            // Update the average rating and count from the server response
             setCurrentRating(result.ratingAvg);
             if (result.ratingCount !== undefined) {
               setCurrentCount(result.ratingCount);
             }
 
-            // Store user's rating in localStorage (separate storage for games and casinos)
+            // Store user's rating in localStorage
             const storageKey = `${ratingType}Ratings`;
             const storedRatings = localStorage.getItem(storageKey) || "{}";
             const ratings = JSON.parse(storedRatings);
@@ -135,11 +135,16 @@ export function StarRatingInteractive({
     ]
   );
 
+  // Determine which rating to display in the stars
+  const displayRating = userRating !== null ? userRating : currentRating;
+  const ratingKey = userRating !== null ? "user" : "average";
+
   return (
     <div className={`flex flex-col gap-2 items-center ${className}`}>
       <div className="flex items-center gap-3">
         <StarRating
-          initialRating={userRating !== null ? userRating : currentRating}
+          key={`${ratingKey}-${documentId}`} // Force re-render when switching between user/average rating
+          initialRating={displayRating}
           onRatingChange={handleRatingChange}
           size={size}
           readonly={isPending || userRating !== null}
@@ -166,7 +171,8 @@ export function StarRatingInteractive({
         )}
       </div>
 
-      <div className="flex items-center gap-2 text-xs">
+      <div className="flex items-center gap-2 text-xs h-4">
+        {/* Added fixed height to prevent layout shift */}
         <span className="font-medium text-gray-700">
           {currentRating.toFixed(1)}/5
         </span>
@@ -176,16 +182,6 @@ export function StarRatingInteractive({
             <span className="text-gray-600">
               {currentCount} {currentCount === 1 ? "rating" : "ratings"}
             </span>
-          </>
-        )}
-        {userRating !== null && userRating > 0 && (
-          <>
-            <span className="text-gray-400">•</span>
-            <span className="text-accent-100 font-medium">
-              Your rating: {userRating.toFixed(1)}
-            </span>
-            <span className="text-gray-400">•</span>
-            <span className="text-gray-500 text-xs">(locked)</span>
           </>
         )}
       </div>
