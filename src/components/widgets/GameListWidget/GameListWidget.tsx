@@ -415,7 +415,7 @@ export function GameListWidget({
               disabled={loading}
               className={cn(
                 "px-6 py-3 w-full sm:w-3/5 md:w-2/5 rounded-lg font-medium transition-all",
-                "bg-primary uppercase text-white hover:bg-primary-shade",
+                "bg-secondary uppercase text-white hover:bg-secondary-shade",
                 "disabled:opacity-50 disabled:cursor-not-allowed",
                 loading && "animate-pulse"
               )}
