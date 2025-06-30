@@ -2,10 +2,19 @@
 
 /**
  * Individual breadcrumb item structure
+ * Updated to handle optional URLs for current page items
  */
 export interface BreadcrumbItem {
   breadCrumbText: string;
-  breadCrumbUrl: string;
+  breadCrumbUrl?: string | null; // Made optional to handle current page items
+}
+
+/**
+ * Raw breadcrumb item from data sources (more flexible input)
+ */
+export interface RawBreadcrumbItem {
+  breadCrumbText: string;
+  breadCrumbUrl?: string | null | undefined;
 }
 
 /**

@@ -2,6 +2,13 @@
 import Link from "next/link";
 import type { BreadcrumbsProps, BreadcrumbsWithLayoutProps } from "@/types/breadcrumbs.types";
 import { cn } from "@/lib/utils/cn";
+import { 
+  normalizeInternalUrl, 
+  normalizeStructuredDataUrl, 
+  normalizeBreadcrumbItems,
+  sanitizeUrl,
+  debugUrlNormalization
+} from "@/lib/utils/url-normalization";
 
 /**
  * Breadcrumbs Component
@@ -10,6 +17,9 @@ import { cn } from "@/lib/utils/cn";
  * - Server-side rendering compatible
  * - SEO-optimized with structured data
  * - Accessibility compliant
+ * - Advanced URL normalization to prevent double paths
+ * - Sanitization of problematic URLs
+ * - Debug mode for development
  * - Tailwind V4 syntax
  * - Performance optimized with minimal client-side JavaScript
  */
@@ -18,8 +28,8 @@ export function Breadcrumbs({
   className,
   showHome = false,
 }: BreadcrumbsProps) {
-  // Filter out any empty items (but keep items with null URLs as they represent current page)
-  const validItems = items.filter((item) => item.breadCrumbText);
+  // Normalize and validate breadcrumb items
+  const validItems = normalizeBreadcrumbItems(items);
 
   // Don't render if we have no items and home is not shown
   if (!showHome && validItems.length === 0) {
@@ -41,9 +51,7 @@ export function Breadcrumbs({
       position: index + 1,
       name: item.breadCrumbText,
       ...(item.breadCrumbUrl && {
-        item: item.breadCrumbUrl.startsWith("http")
-          ? item.breadCrumbUrl
-          : `${siteUrl}${item.breadCrumbUrl}`,
+        item: normalizeStructuredDataUrl(item.breadCrumbUrl, siteUrl),
       }),
     })),
   };
@@ -66,6 +74,16 @@ export function Breadcrumbs({
           <ol className="flex flex-wrap items-center gap-x-1 text-xs uppercase leading-3 text-breadcrumb-text">
             {fullBreadcrumbs.map((item, index) => {
               const isLast = index === fullBreadcrumbs.length - 1;
+              
+              // Sanitize and normalize the URL for internal navigation
+              const rawUrl = item.breadCrumbUrl || "";
+              const sanitizedUrl = sanitizeUrl(rawUrl);
+              const normalizedHref = normalizeInternalUrl(sanitizedUrl);
+
+              // Debug URL normalization in development
+              if (process.env.NODE_ENV === "development" && item.breadCrumbUrl) {
+                debugUrlNormalization(item.breadCrumbUrl, `Breadcrumb: ${item.breadCrumbText}`);
+              }
 
               return (
                 <li
@@ -81,8 +99,9 @@ export function Breadcrumbs({
                     // Linked breadcrumb item
                     <>
                       <Link
-                        href={item.breadCrumbUrl}
+                        href={normalizedHref}
                         className="underline transition-opacity hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-breadcrumb-bkg"
+                        prefetch={false}
                       >
                         {item.breadCrumbText}
                       </Link>
@@ -113,10 +132,13 @@ export function BreadcrumbsWithLayout({
 }: BreadcrumbsWithLayoutProps) {
   let finalBreadcrumbs = [...items];
 
-  // Prepend layout breadcrumbs if available
+  // Prepend layout breadcrumbs if available and normalize them
   if (breadcrumbKey && layoutBreadcrumbs?.[breadcrumbKey]) {
+    const normalizedLayoutBreadcrumbs = normalizeBreadcrumbItems(
+      layoutBreadcrumbs[breadcrumbKey]
+    );
     finalBreadcrumbs = [
-      ...layoutBreadcrumbs[breadcrumbKey],
+      ...normalizedLayoutBreadcrumbs,
       ...finalBreadcrumbs,
     ];
   }
