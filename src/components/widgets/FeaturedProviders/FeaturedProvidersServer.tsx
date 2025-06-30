@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils/cn";
 
 export function FeaturedProvidersServer({
   data,
-  translations = {},
+  // translations = {},
   className,
 }: FeaturedProvidersProps) {
   const providersData = data?.homeFeaturedProviders?.providers || [];
@@ -119,7 +119,7 @@ export function FeaturedProvidersServer({
           );
         })}
       </div>
-      <Link
+      {/* <Link
         href="/slot-software"
         className={cn(
           "mt-6 inline-flex items-center gap-2",
@@ -147,7 +147,7 @@ export function FeaturedProvidersServer({
             d="M9 5l7 7-7 7"
           />
         </svg>
-      </Link>
+      </Link> */}
     </section>
   );
 }

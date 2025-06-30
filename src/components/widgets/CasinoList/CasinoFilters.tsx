@@ -122,7 +122,7 @@ export function CasinoFilters({
   const canApplyFilters = selectedFilters.bonusKey !== "";
 
   return (
-    <div className={cn("relative mx-auto", className)}>
+    <div className={cn("relative mx-auto mt-6", className)}>
       <section
         aria-labelledby="filter-heading"
         className="p-2.5 bg-white/30 backdrop-blur-sm relative z-10 rounded-lg border border-white/30"

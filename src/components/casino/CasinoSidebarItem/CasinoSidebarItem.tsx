@@ -33,14 +33,15 @@ export function CasinoSidebarItem({
 
   const bonusText = getBonusText();
 
+  const casinoPagePath =
+    process.env.NEXT_PUBLIC_CASINO_PAGE_PATH || "/casino/recensione/";
+
   return (
     <div className="flex items-center gap-4 border-b border-gray-300 pb-4 last:border-0 last:pb-0">
       {/* Casino Logo */}
       <Link
-        href={casino.casinoBonus.bonusUrl}
+        href={`${casinoPagePath}/${casino.slug}/`}
         className="shrink-0"
-        rel="sponsored"
-        target="_blank"
       >
         <Image
           src={casino.logoIcon.url}
@@ -61,9 +62,7 @@ export function CasinoSidebarItem({
       {/* CTA Button */}
       <Button
         variant="link"
-        href={casino.casinoBonus.bonusUrl}
-        rel="sponsored"
-        target="_blank"
+        href={`${casinoPagePath}/${casino.slug}/`}
         className="bg-btn-misc"
         size="sm"
       >

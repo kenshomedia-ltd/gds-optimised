@@ -21,7 +21,7 @@ import { cn } from "@/lib/utils/cn";
  */
 export function FeaturedProviders({
   data,
-  translations = {},
+  // translations = {},
   className,
 }: FeaturedProvidersProps) {
   // Extract and deduplicate providers
@@ -85,7 +85,7 @@ export function FeaturedProviders({
       </div>
 
       {/* View All Link */}
-      <Link
+      {/* <Link
         href={`${providerBaseUrl}/`}
         className={cn(
           "mt-6 inline-flex items-center gap-2",
@@ -114,7 +114,7 @@ export function FeaturedProviders({
             d="M9 5l7 7-7 7"
           />
         </svg>
-      </Link>
+      </Link> */}
     </section>
   );
 }

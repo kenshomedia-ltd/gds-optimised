@@ -186,7 +186,7 @@ export function Header({
                     "!h-6 !w-6 transition-colors",
                     favoritesCount > 0 ? "text-danger" : "text-navbar-text"
                   )}
-                  style={{ "--fa-secondary-opacity": 0 }}
+                  swapOpacity
                 />
                 {/* Favorites count badge */}
                 {favoritesCount > 0 && (
