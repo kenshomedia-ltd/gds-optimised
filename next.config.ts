@@ -7,6 +7,8 @@ const nextConfig: NextConfig = {
   basePath: "/it",
   // Enable standalone output for Docker deployment
   output: "standalone",
+  // trailing slash
+  trailingSlash: true,
   // Image optimization configuration
   images: {
     // Allow images from AWS CloudFront
