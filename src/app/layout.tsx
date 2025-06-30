@@ -9,6 +9,7 @@ import { FooterServer } from "@/components/layout/Footer";
 import { ClientProviders } from "@/components/providers/ClientProviders";
 import { BackToTop } from "@/components/common/BackToTop/BackToTop";
 import { Toaster } from "sonner";
+import { getFaviconPath, generateFaviconLinks } from "@/lib/utils/favicon";
 
 import "./globals.css";
 import { cn } from "@/lib/utils/cn";
@@ -44,28 +45,42 @@ export const viewport: Viewport = {
   ],
 };
 
-// Base metadata
-export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL || "https://example.com"
-  ),
-  title: {
-    default: "Casino Games & Reviews",
-    template: "%s | Casino Games",
-  },
-  description: "Play the best casino games and read expert reviews",
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
+// Dynamic metadata generation with site-specific favicon
+export async function generateMetadata(): Promise<Metadata> {
+  const siteId = process.env.NEXT_PUBLIC_SITE_ID || "default";
+  const siteName = process.env.NEXT_PUBLIC_SITE_NAME || "Casino Games";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://example.com";
+
+  // Generate favicon icons for the specific site
+  const faviconIcons = generateFaviconLinks(siteId);
+
+  return {
+    metadataBase: new URL(siteUrl),
+    title: {
+      default: siteName,
+      template: `%s | ${siteName}`,
+    },
+    description: "Play the best casino games and read expert reviews",
+    robots: {
       index: true,
       follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
     },
-  },
-};
+    // Dynamic favicon configuration
+    icons: faviconIcons,
+    // Additional meta tags
+    other: {
+      // Add cache control for static assets
+      "Cache-Control": "public, max-age=31536000, immutable",
+    },
+  };
+}
 
 export default async function RootLayout({
   children,
@@ -76,6 +91,8 @@ export default async function RootLayout({
   const layoutData = await getLayoutData();
 
   const siteId = process.env.NEXT_PUBLIC_SITE_ID || "default";
+  const siteName = process.env.NEXT_PUBLIC_SITE_NAME || "Casino Games";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://example.com";
 
   return (
     <html lang="en" className={`${lato.variable} ${roboto.variable}`}>
@@ -84,10 +101,52 @@ export default async function RootLayout({
         {/* This component imports the CSS but renders no HTML */}
         <DynamicTheme siteId={siteId} />
 
+        {/* Site-specific favicon fallback for older browsers */}
+        <link
+          rel="shortcut icon"
+          href={getFaviconPath(siteId, "favicon.ico")}
+          type="image/x-icon"
+        />
+
         {/* Preconnect to critical third-party origins */}
         <link rel="preconnect" href={process.env.NEXT_PUBLIC_API_URL || ""} />
         <link rel="dns-prefetch" href={process.env.NEXT_PUBLIC_API_URL || ""} />
-        
+
+        {/* Additional performance optimizations */}
+        <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+        <link rel="dns-prefetch" href="//fonts.gstatic.com" />
+
+        {/* Open Graph meta tags for better social sharing */}
+        <meta property="og:site_name" content={siteName} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={siteUrl} />
+
+        {/* Twitter Card meta tags */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content={siteName} />
+
+        {/* Additional SEO meta tags */}
+        <meta name="author" content={siteName} />
+        <meta name="publisher" content={siteName} />
+        <meta name="format-detection" content="telephone=no" />
+
+        {/* Structured data for site identity */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: siteName,
+              url: siteUrl,
+              logo: `${siteUrl}${getFaviconPath(
+                siteId,
+                "favicon-192x192.png"
+              )}`,
+              sameAs: [siteUrl],
+            }),
+          }}
+        />
       </head>
 
       <body
