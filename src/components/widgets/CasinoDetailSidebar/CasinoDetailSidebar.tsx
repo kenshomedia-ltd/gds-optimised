@@ -83,21 +83,28 @@ export function CasinoDetailSidebar({
 
   return (
     <div className="bg-white flex flex-col p-3 rounded sticky top-20">
-      {/* Casino Image */}
-      <div>
+      {/* Casino Image - Fixed responsive container */}
+      <div className="w-full max-w-full overflow-hidden rounded">
         <Link
           href={casino.casinoBonus?.bonusUrl || "#"}
-          className="block rounded border border-transparent"
+          className="block border border-transparent hover:border-gray-200 transition-colors duration-200 rounded"
           rel="sponsored"
           target="_blank"
         >
-          <Image
-            src={casino.images?.url || ""}
-            alt={casino.title}
-            width={330}
-            height={150}
-            className="w-full rounded"
-          />
+          <div className="relative w-full aspect-[22/10] overflow-hidden rounded">
+            <Image
+              src={casino.images?.url || ""}
+              alt={casino.title}
+              width={330}
+              height={150}
+              className="w-full h-full object-contain"
+              sizes="(max-width: 768px) 100vw, 330px"
+              quality={90}
+              priority={true}
+              placeholder="blur"
+              responsive={true}
+            />
+          </div>
         </Link>
       </div>
 
@@ -123,7 +130,7 @@ export function CasinoDetailSidebar({
         <div className="flex items-center mb-4">
           <FontAwesomeIcon
             icon={faCoins}
-            className="w-10 h-6 text-primary mr-5"
+            className="w-10 h-6 text-primary mr-5 flex-shrink-0"
           />
           <Link
             href={casino.casinoBonus?.bonusUrl || "#"}
@@ -144,7 +151,7 @@ export function CasinoDetailSidebar({
                 <div className="flex items-center">
                   <FontAwesomeIcon
                     icon={faSackDollar}
-                    className="w-10 h-6 text-gray-700 mr-5"
+                    className="w-10 h-6 text-gray-700 mr-5 flex-shrink-0"
                   />
                   <span className="text-xs uppercase">
                     {translations.reloadBonus || "Reload Bonus"}
@@ -164,7 +171,7 @@ export function CasinoDetailSidebar({
                 <div className="flex items-center">
                   <FontAwesomeIcon
                     icon={faGift}
-                    className="w-10 h-6 text-gray-700 mr-5"
+                    className="w-10 h-6 text-gray-700 mr-5 flex-shrink-0"
                   />
                   <span className="text-xs uppercase">
                     {translations.withoutDeposit || "Without Deposit"}
@@ -228,8 +235,8 @@ export function CasinoDetailMobileFooter({
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-40 md:hidden">
       <div className="flex items-center justify-between gap-4">
-        <div className="flex-1">
-          <p className="text-sm font-semibold text-gray-900">
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold text-gray-900 truncate">
             {casino.bonusSection?.bonusAmount
               ? `${casino.bonusSection.bonusAmount}€ ${
                   translations.bonus || "Bonus"
@@ -244,7 +251,7 @@ export function CasinoDetailMobileFooter({
           variant="default"
           href={casino.casinoBonus?.bonusUrl || "#"}
           size="sm"
-          className="uppercase bg-misc hover:bg-misc-hover"
+          className="uppercase bg-misc hover:bg-misc-hover flex-shrink-0"
           rel="sponsored"
           target="_blank"
         >
