@@ -62,7 +62,7 @@ export function Breadcrumbs({
         aria-label="Breadcrumb"
         className={cn("w-full bg-legal-bkg", className)}
       >
-        <div className="container py-2">
+        <div className="lg:container mx-auto px-5 py-2">
           <ol className="flex flex-wrap items-center gap-x-1 text-xs uppercase leading-3 text-breadcrumb-text">
             {fullBreadcrumbs.map((item, index) => {
               const isLast = index === fullBreadcrumbs.length - 1;

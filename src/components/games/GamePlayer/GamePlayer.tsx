@@ -353,10 +353,13 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
 
   return (
     <div className="flex flex-col justify-center rounded-t-lg -mx-3 md:mx-0">
+      {/* ====================================================================== */}
+      {/* Iframe Container -- MODIFICATIONS HERE                                 */}
+      {/* ====================================================================== */}
       <div
         ref={containerRef}
         className={cn(
-          "md:px-3 md:h-[700px] rounded-lg flex flex-col items-center justify-center bg-black aspect-video",
+          "w-full md:max-h-[700px] md:px-3 rounded-lg flex flex-col items-center justify-center bg-black aspect-video",
           isFullscreen &&
             !isIOS &&
             "fixed inset-0 z-[40] rounded-none h-full w-full",
@@ -509,165 +512,148 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
       </div>
 
       {/* Control Bar */}
-      <div className="rounded-b-lg md:p-1.5 flex flex-wrap items-center bg-gray-100 justify-between md:justify-center w-full">
-        {/* Game Title */}
-        <div className="p-2.5 md:p-0 flex order-1 grow md:grow-0">
-          <div className="flex items-center md:w-[105px] md:w-auto">
-            <h2 className="leading-tight text-base m-0">{game.title}</h2>
-          </div>
+      <div className="rounded-b-lg bg-gray-100 p-6 md:p-1.5 w-full flex flex-wrap md:flex-nowrap items-center justify-start md:justify-between md:relative gap-y-4">
+        {/* --- Left Section (Ratings) --- */}
+        <div className="flex items-center order-1">
+          {game.documentId && (
+            <StarRatingInteractive
+              documentId={game.documentId}
+              slug={game.slug}
+              initialRating={game.ratingAvg}
+              initialCount={game.ratingCount}
+              size="md"
+              ratingType="games"
+              itemTitle={game.title}
+            />
+          )}
         </div>
 
-        {/* Center Section - Rating and Play Button */}
-        <div className="px-2.5 shrink-0 justify-between basis-full flex items-center order-3 grow-0 md:basis-[300px] md:grow mt-4 md:mt-0 md:order-2 relative">
-          <div className="p-2.5 md:p-0 shrink-0 justify-between basis-full flex items-center order-3 grow-0 md:basis-[300px] md:grow rounded-lg md:rounded-none md:border-0 md:order-2">
-            <div className="ml-0 md:ml-4">
-              {game.documentId && (
-                <StarRatingInteractive
-                  documentId={game.documentId}
-                  slug={game.slug}
-                  initialRating={game.ratingAvg}
-                  initialCount={game.ratingCount}
-                  size="md"
-                  ratingType="games"
-                  itemTitle={game.title}
-                />
-              )}
-            </div>
-
-            {/* Play Again Button - Right-aligned on mobile, centered on desktop */}
-
-            <>
-              {/* Desktop: Centered with absolute positioning */}
-              <div className="hidden md:flex absolute inset-0 items-center justify-center pointer-events-none">
-                <Button
-                  href={`${providerPagePath}`}
-                  variant="default"
-                  size="lg"
-                  className="bg-misc pointer-events-auto"
-                >
-                  {translations.playRealBtn || "Play Again"}
-                </Button>
-              </div>
-
-              {/* Mobile: Right-aligned */}
-              <div className="md:hidden ml-auto">
-                <Button
-                  href={`${providerPagePath}`}
-                  variant="default"
-                  size="lg"
-                  className="bg-misc pointer-events-auto"
-                >
-                  {translations.playRealBtn || "Play Again"}
-                </Button>
-              </div>
-            </>
-          </div>
+        {/* --- Desktop-Only Centered Button --- */}
+        <div className="hidden md:flex absolute inset-x-0 top-0 h-full items-center justify-center pointer-events-none">
+          <Button
+            href={`${providerPagePath}`}
+            variant="default"
+            size="lg"
+            className="w-[200px] bg-misc pointer-events-auto"
+          >
+            {translations.playRealBtn || "Play Again"}
+          </Button>
         </div>
 
-        {/* Control Icons */}
-        <div className="p-2.5 md:p-0 flex order-2 md:order-3 grow md:grow-0">
-          <div className="flex items-center gap-2 ml-auto">
-            {/* Fullscreen button */}
-            <div className="relative">
-              <button
-                onClick={handleFullscreen}
-                onMouseEnter={() => setShowFullscreenTooltip(true)}
-                onMouseLeave={() => setShowFullscreenTooltip(false)}
-                className="w-8 h-8 rounded-[5px] bg-gray-300 border border-gray-400 flex items-center justify-center hover:bg-gray-400 transition-colors"
-                aria-label={translations.fullscreen || "Fullscreen"}
-              >
-                <FontAwesomeIcon
-                  icon={faExpand}
-                  className="w-4 h-4 text-gray-600"
-                  style={{ "--fa-secondary-opacity": 0 }}
-                />
-              </button>
-              {showFullscreenTooltip && (
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded whitespace-nowrap z-10">
-                  {translations.fullscreen || "Fullscreen"}
-                </div>
-              )}
-            </div>
-
-            {/* Reload button */}
-            <div className="relative">
-              <button
-                onClick={handleReload}
-                onMouseEnter={() => setShowReloadTooltip(true)}
-                onMouseLeave={() => setShowReloadTooltip(false)}
-                className="w-8 h-8 rounded-[5px] bg-gray-300 border border-gray-400 flex items-center justify-center hover:bg-gray-400 hover:*:text-white transition-colors"
-                aria-label={translations.reload || "Reload"}
-              >
-                <FontAwesomeIcon
-                  icon={faRotateRight}
-                  className="w-4 h-4 text-gray-600"
-                  style={{ "--fa-secondary-opacity": 0 }}
-                />
-              </button>
-              {showReloadTooltip && (
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded whitespace-nowrap z-10">
-                  {translations.reload || "Reload"}
-                </div>
-              )}
-            </div>
-
-            {/* Favorite button */}
-            <div
-              className="relative"
-              onMouseEnter={() => setShowFavoriteTooltip(true)}
-              onMouseLeave={() => setShowFavoriteTooltip(false)}
+        {/* --- Right Section (Controls) --- */}
+        <div className="flex items-center gap-2 order-2 ml-auto">
+          {/* Fullscreen button */}
+          <div className="relative">
+            <button
+              onClick={handleFullscreen}
+              onMouseEnter={() => setShowFullscreenTooltip(true)}
+              onMouseLeave={() => setShowFullscreenTooltip(false)}
+              className="w-8 h-8 rounded-[5px] bg-gray-300 border border-gray-400 flex items-center justify-center hover:bg-gray-400 transition-colors"
+              aria-label={translations.fullscreen || "Fullscreen"}
             >
-              <FavoriteButton
-                gameId={game.id}
-                gameTitle={game.title}
-                game={normalizedGame}
-                translations={translations}
-                size="sm"
-                className="!w-[33px] !h-[33px] bg-gray-300 hover:!bg-gray-400 !rounded-[5px] border !border-gray-400"
+              <FontAwesomeIcon
+                icon={faExpand}
+                className="w-4 h-4 text-gray-600"
+                style={{ "--fa-secondary-opacity": 0 }}
               />
-              {showFavoriteTooltip && (
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-5 py-2 bg-grey-100 text-black text-sm rounded shadow-lg z-20 w-fit whitespace-nowrap -ml-[180px]">
-                  {translations.favouriteAGame || "Favorite a game"}
-                </div>
-              )}
-            </div>
-
-            {/* Info button */}
-            <div className="relative">
-              <button
-                onClick={() => setShowInfo(!showInfo)}
-                className="w-8 h-8 rounded-[5px] border bg-gray-300 border-gray-400 flex items-center justify-center hover:bg-gray-400 hover:*:text-white transition-colors"
-                aria-label={translations.info || "Info"}
-              >
-                <FontAwesomeIcon
-                  icon={showInfo ? faXmark : faInfo}
-                  className="w-4 h-4 text-gray-600"
-                />
-              </button>
-            </div>
-
-            {/* Report button */}
-            <div className="relative">
-              <button
-                onClick={handleReportGame}
-                onMouseEnter={() => setShowReportTooltip(true)}
-                onMouseLeave={() => setShowReportTooltip(false)}
-                className="w-8 h-8 rounded-[5px] bg-danger border border-gray-300 flex items-center justify-center hover:bg-danger transition-colors"
-                aria-label={translations.report || "Report"}
-              >
-                <FontAwesomeIcon
-                  icon={faExclamationTriangle}
-                  className="w-4 h-4 text-white"
-                  style={{ "--fa-secondary-opacity": 0 }}
-                />
-              </button>
-              {showReportTooltip && (
-                <div className="absolute bottom-full right-0 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded whitespace-nowrap z-10">
-                  {translations.report || "Report game"}
-                </div>
-              )}
-            </div>
+            </button>
+            {showFullscreenTooltip && (
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded whitespace-nowrap z-10">
+                {translations.fullscreen || "Fullscreen"}
+              </div>
+            )}
           </div>
+
+          {/* Reload button */}
+          <div className="relative">
+            <button
+              onClick={handleReload}
+              onMouseEnter={() => setShowReloadTooltip(true)}
+              onMouseLeave={() => setShowReloadTooltip(false)}
+              className="w-8 h-8 rounded-[5px] bg-gray-300 border border-gray-400 flex items-center justify-center hover:bg-gray-400 hover:*:text-white transition-colors"
+              aria-label={translations.reload || "Reload"}
+            >
+              <FontAwesomeIcon
+                icon={faRotateRight}
+                className="w-4 h-4 text-gray-600"
+                style={{ "--fa-secondary-opacity": 0 }}
+              />
+            </button>
+            {showReloadTooltip && (
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded whitespace-nowrap z-10">
+                {translations.reload || "Reload"}
+              </div>
+            )}
+          </div>
+
+          {/* Favorite button */}
+          <div
+            className="relative"
+            onMouseEnter={() => setShowFavoriteTooltip(true)}
+            onMouseLeave={() => setShowFavoriteTooltip(false)}
+          >
+            <FavoriteButton
+              gameId={game.id}
+              gameTitle={game.title}
+              game={normalizedGame}
+              translations={translations}
+              size="sm"
+              className="!w-[33px] !h-[33px] bg-gray-300 hover:!bg-gray-400 !rounded-[5px] border !border-gray-400"
+            />
+            {showFavoriteTooltip && (
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-5 py-2 bg-grey-100 text-black text-sm rounded shadow-lg z-20 w-fit whitespace-nowrap -ml-[180px]">
+                {translations.favouriteAGame || "Favorite a game"}
+              </div>
+            )}
+          </div>
+
+          {/* Info button */}
+          <div className="relative">
+            <button
+              onClick={() => setShowInfo(!showInfo)}
+              className="w-8 h-8 rounded-[5px] border bg-gray-300 border-gray-400 flex items-center justify-center hover:bg-gray-400 hover:*:text-white transition-colors"
+              aria-label={translations.info || "Info"}
+            >
+              <FontAwesomeIcon
+                icon={showInfo ? faXmark : faInfo}
+                className="w-4 h-4 text-gray-600"
+              />
+            </button>
+          </div>
+
+          {/* Report button */}
+          <div className="relative mr-2 lg:mr-0">
+            <button
+              onClick={handleReportGame}
+              onMouseEnter={() => setShowReportTooltip(true)}
+              onMouseLeave={() => setShowReportTooltip(false)}
+              className="w-8 h-8 rounded-[5px] bg-danger border border-gray-300 flex items-center justify-center hover:bg-danger transition-colors"
+              aria-label={translations.report || "Report"}
+            >
+              <FontAwesomeIcon
+                icon={faExclamationTriangle}
+                className="w-4 h-4 text-white"
+                style={{ "--fa-secondary-opacity": 0 }}
+              />
+            </button>
+            {showReportTooltip && (
+              <div className="absolute bottom-full right-0 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded whitespace-nowrap z-10">
+                {translations.report || "Report game"}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* --- Mobile-Only Bottom Button --- */}
+        <div className="w-full order-3 md:hidden">
+          <Button
+            href={`${providerPagePath}`}
+            variant="default"
+            size="lg"
+            className="bg-misc pointer-events-auto w-full"
+          >
+            {translations.playRealBtn || "Play Again"}
+          </Button>
         </div>
       </div>
 

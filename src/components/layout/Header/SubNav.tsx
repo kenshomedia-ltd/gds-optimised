@@ -51,7 +51,7 @@ export function SubNav({ navigation }: SubNavProps) {
                 />
               </div>
             )}
-            <span className="text-[10px] leading-tight">{item.title}</span>
+            <span className="text-sm leading-tight">{item.title}</span>
           </Link>
         ))}
       </div>

@@ -140,7 +140,7 @@ export function StarRatingInteractive({
   const ratingKey = userRating !== null ? "user" : "average";
 
   return (
-    <div className={`flex flex-col gap-2 items-center ${className}`}>
+    <div className={`flex flex-col items-center ${className}`}>
       <div className="flex items-center gap-3">
         <StarRating
           key={`${ratingKey}-${documentId}`} // Force re-render when switching between user/average rating
