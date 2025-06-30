@@ -115,10 +115,7 @@ export function SearchBar({
   return (
     <div
       ref={containerRef}
-      className={cn(
-        "relative flex items-center justify-end h-10 w-10",
-        className
-      )}
+      className={cn("relative flex items-center justify-end h-10 w-10")}
     >
       <div
         className={cn(
@@ -137,7 +134,9 @@ export function SearchBar({
           aria-label={isExpanded ? "Close search" : "Open search"}
         >
           <div
-            className="w-5 h-5"
+            className={cn(
+              className
+            )}
             dangerouslySetInnerHTML={{
               __html: isExpanded ? icons.close : icons.search,
             }}

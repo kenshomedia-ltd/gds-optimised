@@ -8,7 +8,6 @@ import {
   faHeart,
   faUser,
   faBars,
-  faSearch,
 } from "@awesome.me/kit-0e07a43543/icons/duotone/light";
 import { faHeart as faHeartSolid } from "@awesome.me/kit-0e07a43543/icons/duotone/solid";
 import { Image } from "@/components/common/Image";
@@ -42,7 +41,7 @@ export function Header({
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
-  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+  // REMOVED: isSearchExpanded state is no longer needed
   const { favoritesCount } = useFavorites();
 
   const siteName = process.env.NEXT_PUBLIC_SITE_NAME || "GiochiDiSlots";
@@ -86,9 +85,7 @@ export function Header({
     setIsFavoritesOpen(!isFavoritesOpen);
   };
 
-  const toggleSearch = () => {
-    setIsSearchExpanded(!isSearchExpanded);
-  };
+  // REMOVED: toggleSearch function is no longer needed
 
   return (
     <>
@@ -199,19 +196,14 @@ export function Header({
                 )}
               </button>
 
-              {/* Search Button - Mobile */}
-              <button
-                type="button"
-                onClick={toggleSearch}
-                className="p-2 rounded-md text-navbar-text hover:bg-white/10 transition-colors"
-                aria-label={translations.search || "Search"}
-              >
-                <FontAwesomeIcon
-                  icon={faSearch}
-                  className="!h-6 !w-6"
-                  style={{ "--fa-secondary-opacity": 0 }}
-                />
-              </button>
+              {/* MODIFIED: Search Bar now directly in the mobile header */}
+              <SearchBar
+                position="header"
+                className="w-8 h-8"
+                placeholder={
+                  translations.searchPlaceholder || "Search games..."
+                }
+              />
             </div>
           </div>
 
@@ -303,6 +295,7 @@ export function Header({
               {/* Search Bar - Desktop (Last) */}
               <SearchBar
                 position="header"
+                className="w-5 h-5"
                 placeholder={
                   translations.searchPlaceholder || "Search games..."
                 }
@@ -314,33 +307,6 @@ export function Header({
         {/* Sub Navigation - Mobile only */}
         {subNavigation.length > 0 && <SubNav navigation={subNavigation} />}
       </header>
-
-      {/* Mobile Search Overlay */}
-      {isSearchExpanded && (
-        <div className="fixed inset-0 z-50 bg-black/50 lg:hidden">
-          <div className="absolute top-4 inset-x-4 bg-white rounded-lg shadow-xl p-4">
-            <div className="flex items-center gap-3 mb-4">
-              <SearchBar
-                position="page"
-                placeholder={
-                  translations.searchPlaceholder || "Search games..."
-                }
-                autoFocus
-              />
-              <button
-                type="button"
-                onClick={toggleSearch}
-                className="p-2 text-gray-500 hover:text-gray-700"
-                aria-label="Close search"
-              >
-                <span className="text-sm font-medium">
-                  {translations.cancel || "Cancel"}
-                </span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Mobile Menu */}
       <MobileMenu
