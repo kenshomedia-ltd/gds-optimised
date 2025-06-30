@@ -120,6 +120,7 @@ export function CasinoHero({ casino, translations }: CasinoHeroProps) {
                 ratingType="casinos"
                 itemTitle={casino.title}
                 showCount={true}
+                translations={translations}
               />
               <a
                 href="#casino-review"

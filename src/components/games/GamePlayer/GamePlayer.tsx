@@ -517,6 +517,7 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
               size="md"
               ratingType="games"
               itemTitle={game.title}
+              translations={translations}
             />
           )}
         </div>

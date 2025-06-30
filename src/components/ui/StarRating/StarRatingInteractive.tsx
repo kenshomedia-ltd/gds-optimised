@@ -18,6 +18,7 @@ interface StarRatingInteractiveProps {
   onRatingSuccess?: (newAvg: number, newCount: number) => void;
   onRatingError?: (error: string) => void;
   itemTitle?: string; // For better accessibility
+  translations?: Record<string, string>; // Optional translations
 }
 
 /**
@@ -25,6 +26,13 @@ interface StarRatingInteractiveProps {
  *
  * Wraps the base StarRating component with server action functionality
  * for updating ratings for both games and casinos
+ *
+ * Features:
+ * - Internationalization support via translations prop
+ * - Fallback to English defaults if translations not provided
+ * - Enhanced accessibility with proper ARIA labels
+ * - Optimistic UI updates
+ * - Error handling and user feedback
  */
 export function StarRatingInteractive({
   documentId,
@@ -38,12 +46,28 @@ export function StarRatingInteractive({
   onRatingSuccess,
   onRatingError,
   itemTitle,
+  translations = {},
 }: StarRatingInteractiveProps) {
   const [currentRating, setCurrentRating] = useState(initialRating);
   const [currentCount, setCurrentCount] = useState(initialCount);
   const [userRating, setUserRating] = useState<number | null>(null);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+
+  // Default translations with fallbacks
+  // const defaultTranslations: DefaultTranslations = {
+  //   updating: "Updating...",
+  //   rating: "rating",
+  //   ratings: "ratings",
+  //   rateThis: "Rate this",
+  //   casino: "casino",
+  //   game: "game",
+  //   currentAverage: "Current average:",
+  //   stars: "stars",
+  //   youHaveAlreadyRated: "You have already rated this item.",
+  //   failedToUpdateRating: "Failed to update rating",
+  //   anErrorOccurred: "An error occurred",
+  // };
 
   // Update current rating/count when props change
   useEffect(() => {
@@ -111,14 +135,18 @@ export function StarRatingInteractive({
           } else {
             // Revert on error
             setUserRating(null);
-            setError(result.error || "Failed to update rating");
-            onRatingError?.(result.error || "Failed to update rating");
+            const errorMessage =
+              result.error || translations.failedToUpdateRating || "Failed to update rating";
+            setError(errorMessage);
+            onRatingError?.(errorMessage);
           }
         } catch (err) {
           // Revert on error
           setUserRating(null);
           const errorMessage =
-            err instanceof Error ? err.message : "An error occurred";
+            err instanceof Error
+              ? err.message
+              : translations.anErrorOccurred || "An error occurred";
           setError(errorMessage);
           onRatingError?.(errorMessage);
         }
@@ -132,12 +160,28 @@ export function StarRatingInteractive({
       onRatingSuccess,
       onRatingError,
       userRating,
+      translations,
     ]
   );
 
   // Determine which rating to display in the stars
   const displayRating = userRating !== null ? userRating : currentRating;
   const ratingKey = userRating !== null ? "user" : "average";
+
+  // Build accessible aria label
+  const ratingTypeText =
+    ratingType === "casinos"
+      ? translations.casino || "casino"
+      : translations.game || "game";
+  const itemTitleText = itemTitle ? ` (${itemTitle})` : "";
+  const currentAverageText = `${translations.currentAverage || "Current average"} ${currentRating.toFixed(1)} ${
+    translations.stars || "stars"
+  }`;
+  const alreadyRatedText =
+    userRating !== null
+      ? `. ${translations.youHaveAlreadyRated || "You have already rated this item"}`
+      : "";
+  const ariaLabel = `${translations.rateThis || "Rate this"} ${ratingTypeText}${itemTitleText}. ${currentAverageText}${alreadyRatedText}`;
 
   return (
     <div className={`flex flex-col items-center ${className}`}>
@@ -155,18 +199,12 @@ export function StarRatingInteractive({
               userRating > 0 &&
               "ring-2 ring-accent-100/20 rounded-lg p-1"
           )}
-          ariaLabel={`Rate this ${
-            ratingType === "casinos" ? "casino" : "game"
-          }${
-            itemTitle ? ` (${itemTitle})` : ""
-          }. Current average: ${currentRating.toFixed(1)} stars${
-            userRating !== null ? ". You have already rated this item." : ""
-          }`}
+          ariaLabel={ariaLabel}
         />
 
         {isPending && (
           <span className="text-sm text-gray-500 animate-pulse">
-            Updating...
+            {translations.updating || "Updating..."}
           </span>
         )}
       </div>
@@ -180,7 +218,7 @@ export function StarRatingInteractive({
           <>
             <span className="text-gray-400">•</span>
             <span className="text-gray-600">
-              {currentCount} {currentCount === 1 ? "rating" : "ratings"}
+              {currentCount} {currentCount === 1 ? translations.rating || "rating" : translations.ratings || "ratings"}
             </span>
           </>
         )}

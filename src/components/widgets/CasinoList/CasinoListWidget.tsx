@@ -319,7 +319,12 @@ export function CasinoListWidget({
                   <button
                     onClick={handleLoadMore}
                     disabled={loading}
-                    className="btn btn-secondary min-w-[200px] inline-flex items-center justify-center disabled:opacity-50"
+                    className={cn(
+                      "px-6 py-3 mb-8 w-full sm:w-3/5 md:w-2/5 rounded-lg font-medium transition-all",
+                      "bg-secondary uppercase text-white hover:bg-secondary-shade",
+                      "disabled:opacity-50 disabled:cursor-not-allowed",
+                      loading && "animate-pulse"
+                    )}
                   >
                     {loading ? (
                       <span className="flex items-center gap-2">
