@@ -35,7 +35,7 @@ export function CasinoRow({
   const welcomeBonus = formatWelcomeBonus(casino, translations.reloadBonus);
 
   const casinoPagePath =
-    process.env.NEXT_PUBLIC_CASINO_PAGE_PATH || "/casino/recensione/";
+    process.env.NEXT_PUBLIC_CASINO_PAGE_PATH || "/casino/recensione";
 
   // Helper to get badge gradient based on position
   const getBadgeGradient = (position: number) => {

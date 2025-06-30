@@ -166,7 +166,7 @@ export function FavoritesDrawer({
                   <div className="flex items-start gap-4">
                     {/* Game Image */}
                     <Link
-                      href={`/slots/${game.slug}`}
+                      href={`/slot-machines/${game.slug}`}
                       className="flex-shrink-0 block rounded-lg overflow-hidden hover:opacity-80 transition-opacity"
                       onClick={onClose}
                     >
