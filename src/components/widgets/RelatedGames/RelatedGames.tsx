@@ -39,8 +39,8 @@ export function RelatedGames({
             <h2 className="text-white mb-4 font-bold text-xl leading-6 mt-0">
               {providerName
                 ? `${
-                    translations?.moreGamesFrom || "More games from"
-                  } ${providerName}`
+                    translations?.gamePageRelatedGamesH2 || "More games from"
+                  }`
                 : translations?.relatedGames || "Related Games"}
             </h2>
             <div className="bg-white/[0.36] border border-white/30 shadow-[0px_0px_12px_rgba(63,230,252,0.6)] backdrop-blur-[6px] rounded-xl grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 p-2">

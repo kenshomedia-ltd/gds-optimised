@@ -66,7 +66,7 @@ export function FAQWidget({
     >
       {/* Title */}
       {title && (
-        <h2 className="text-2xl md:text-3xl font-bold text-heading-text text-center mb-8">
+        <h2 className="text-2xl md:text-3xl font-bold text-heading-text mb-8">
           {title}
         </h2>
       )}

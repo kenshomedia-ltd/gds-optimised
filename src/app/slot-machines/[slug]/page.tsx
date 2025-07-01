@@ -210,7 +210,9 @@ async function GameContent({ game }: { game: GamePageData }) {
                     <dl className="grid md:grid-cols-2 gap-y-4 gap-x-8">
                       {game.gameInfoTable!.rtp && (
                         <div className="flex justify-between py-2 border-b border-gray-200">
-                          <dt className="font-semibold text-gray-700">RTP:</dt>
+                          <dt className="font-semibold capitalize text-gray-700">
+                            {translations.gameInfoHeaderRtp || "RTP"}:
+                          </dt>
                           <dd className="text-gray-900">
                             {game.gameInfoTable!.rtp}
                           </dd>
@@ -218,8 +220,10 @@ async function GameContent({ game }: { game: GamePageData }) {
                       )}
                       {game.gameInfoTable!.volatilita && (
                         <div className="flex justify-between py-2 border-b border-gray-200">
-                          <dt className="font-semibold text-gray-700">
-                            Volatility:
+                          <dt className="font-semibold capitalize text-gray-700">
+                            {translations.gameInfoHeaderVolatility ||
+                              "Volatility"}
+                            :
                           </dt>
                           <dd className="text-gray-900">
                             {game.gameInfoTable!.volatilita}
@@ -228,8 +232,8 @@ async function GameContent({ game }: { game: GamePageData }) {
                       )}
                       {game.gameInfoTable!.layout && (
                         <div className="flex justify-between py-2 border-b border-gray-200">
-                          <dt className="font-semibold text-gray-700">
-                            Layout:
+                          <dt className="font-semibold capitalize text-gray-700">
+                            {translations.gameInfoHeaderLayout || "Layout"}:
                           </dt>
                           <dd className="text-gray-900">
                             {game.gameInfoTable!.layout}
@@ -238,8 +242,10 @@ async function GameContent({ game }: { game: GamePageData }) {
                       )}
                       {game.gameInfoTable!.lineeDiPuntata && (
                         <div className="flex justify-between py-2 border-b border-gray-200">
-                          <dt className="font-semibold text-gray-700">
-                            Paylines:
+                          <dt className="font-semibold capitalize text-gray-700">
+                            {translations.gameInfoHeaderBettingLines ||
+                              "Paylines"}
+                            :
                           </dt>
                           <dd className="text-gray-900">
                             {game.gameInfoTable!.lineeDiPuntata}
@@ -248,8 +254,9 @@ async function GameContent({ game }: { game: GamePageData }) {
                       )}
                       {game.gameInfoTable!.puntataMinima && (
                         <div className="flex justify-between py-2 border-b border-gray-200">
-                          <dt className="font-semibold text-gray-700">
-                            Min Bet:
+                          <dt className="font-semibold capitalize text-gray-700">
+                            {translations.gameInfoHeaderMinimumBet || "Min Bet"}
+                            :
                           </dt>
                           <dd className="text-gray-900">
                             {game.gameInfoTable!.puntataMinima}
@@ -258,8 +265,9 @@ async function GameContent({ game }: { game: GamePageData }) {
                       )}
                       {game.gameInfoTable!.puntataMassima && (
                         <div className="flex justify-between py-2 border-b border-gray-200">
-                          <dt className="font-semibold text-gray-700">
-                            Max Bet:
+                          <dt className="font-semibold capitalize text-gray-700">
+                            {translations.gameInfoHeaderMaximumBet || "Max Bet"}
+                            :
                           </dt>
                           <dd className="text-gray-900">
                             {game.gameInfoTable!.puntataMassima}
@@ -268,8 +276,8 @@ async function GameContent({ game }: { game: GamePageData }) {
                       )}
                       {game.gameInfoTable!.jackpot && (
                         <div className="flex justify-between py-2 border-b border-gray-200">
-                          <dt className="font-semibold text-gray-700">
-                            Jackpot:
+                          <dt className="font-semibold capitalize text-gray-700">
+                            {translations.gameInfoHeaderJackpot || "Jackpot"}:
                           </dt>
                           <dd className="text-gray-900">
                             {game.gameInfoTable!.jackpot}
@@ -278,8 +286,10 @@ async function GameContent({ game }: { game: GamePageData }) {
                       )}
                       {game.gameInfoTable!.freeSpins && (
                         <div className="flex justify-between py-2 border-b border-gray-200">
-                          <dt className="font-semibold text-gray-700">
-                            Free Spins:
+                          <dt className="font-semibold capitalize text-gray-700">
+                            {translations.gameInfoHeaderFreespins ||
+                              "Free Spins"}
+                            :
                           </dt>
                           <dd className="text-gray-900">
                             {game.gameInfoTable!.freeSpins}
@@ -288,8 +298,10 @@ async function GameContent({ game }: { game: GamePageData }) {
                       )}
                       {game.gameInfoTable!.bonusGame && (
                         <div className="flex justify-between py-2 border-b border-gray-200">
-                          <dt className="font-semibold text-gray-700">
-                            Bonus Game:
+                          <dt className="font-semibold capitalize text-gray-700">
+                            {translations.gameInfoHeaderBonusGame ||
+                              "Bonus Game"}
+                            :
                           </dt>
                           <dd className="text-gray-900">
                             {game.gameInfoTable!.bonusGame}
@@ -371,7 +383,9 @@ async function GameContent({ game }: { game: GamePageData }) {
               {hasProscons && <ProsConsWidget proscons={game.proscons!} />}
 
               {/* FAQ Widget */}
-              {hasFaqs && <FAQWidget faqs={game.faqs!} title={translations.faq}/>}
+              {hasFaqs && (
+                <FAQWidget faqs={game.faqs!} title={translations.faq} />
+              )}
 
               {/* Author Box - At the bottom of left column */}
               {game.author && (

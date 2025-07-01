@@ -51,7 +51,7 @@ export function ProsConsWidget({ proscons, className }: ProsConsWidgetProps) {
       style={{ animationDelay: "500ms" }}
     >
       {proscons.heading && (
-        <h2 className="text-2xl md:text-3xl font-bold text-heading-text text-center mb-6">
+        <h2 className="text-2xl md:text-3xl font-bold text-heading-text mb-6">
           {proscons.heading}
         </h2>
       )}

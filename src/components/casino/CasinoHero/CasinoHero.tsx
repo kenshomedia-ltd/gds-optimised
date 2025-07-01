@@ -80,7 +80,7 @@ export function CasinoHero({ casino, translations }: CasinoHeroProps) {
       <div className="container mx-auto px-4">
         {/* Header with title and date */}
         <div className="py-8 text-white">
-          <h1 className="text-xl leading-[26px] md:text-3xl lg:text-4xl font-medium mb-2">
+          <h1 className="font-bold leading-tight tracking-tight text-white capitalize">
             {casino.heading || casino.title}
           </h1>
           <div className="md:flex items-center gap-2">

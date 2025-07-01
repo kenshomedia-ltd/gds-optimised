@@ -61,60 +61,139 @@ const nextConfig: NextConfig = {
   // PoweredBy header removal for security
   poweredByHeader: false,
 
-  // Headers for caching and security
+  // Enhanced headers for CDN optimization
   async headers() {
     return [
+      // Static assets - Long-term caching with immutable
       {
-        source: "/:path*",
+        source: "/_next/static/:path*",
         headers: [
           {
-            key: "X-DNS-Prefetch-Control",
-            value: "on",
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
           },
           {
-            key: "X-XSS-Protection",
-            value: "1; mode=block",
+            key: "Vary",
+            value: "Accept-Encoding",
           },
           {
-            key: "X-Frame-Options",
-            value: "SAMEORIGIN",
+            key: "X-Content-Type-Options",
+            value: "nosniff",
+          },
+        ],
+      },
+
+      // JavaScript chunks - Critical for fixing ChunkLoadError
+      {
+        source: "/_next/static/chunks/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+          {
+            key: "Vary",
+            value: "Accept-Encoding",
+          },
+          {
+            key: "X-CDN-Cache",
+            value: "static-chunks",
+          },
+        ],
+      },
+
+      // CSS files
+      {
+        source: "/_next/static/css/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+          {
+            key: "Vary",
+            value: "Accept-Encoding",
+          },
+        ],
+      },
+
+      // Images from CDN
+      {
+        source: "/images/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=86400, s-maxage=31536000",
+          },
+          {
+            key: "Vary",
+            value: "Accept-Encoding, Accept",
+          },
+          {
+            key: "X-CDN-Cache",
+            value: "images",
+          },
+        ],
+      },
+
+      // HTML pages - Short cache with revalidation
+      {
+        source: "/(.*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value:
+              "public, max-age=0, s-maxage=86400, stale-while-revalidate=604800",
+          },
+          {
+            key: "Vary",
+            value: "Accept-Encoding, Accept-Language, Cookie",
+          },
+          {
+            key: "X-CDN-Cache",
+            value: "pages",
           },
           {
             key: "X-Content-Type-Options",
             value: "nosniff",
           },
           {
+            key: "X-Frame-Options",
+            value: "DENY",
+          },
+          {
             key: "Referrer-Policy",
-            value: "origin-when-cross-origin",
+            value: "strict-origin-when-cross-origin",
           },
         ],
       },
+
+      // API routes - No caching
       {
         source: "/api/:path*",
         headers: [
           {
             key: "Cache-Control",
-            value: "no-store, no-cache, must-revalidate",
+            value: "no-cache, no-store, must-revalidate",
+          },
+          {
+            key: "Pragma",
+            value: "no-cache",
+          },
+          {
+            key: "Expires",
+            value: "0",
           },
         ],
       },
+
+      // Sitemap and robots.txt - Moderate caching
       {
-        // Static assets caching
-        source: "/static/:path*",
+        source: "/(sitemap.xml|robots.txt)",
         headers: [
           {
             key: "Cache-Control",
-            value: "public, max-age=31536000, immutable",
-          },
-        ],
-      },
-      {
-        // Image caching
-        source: "/_next/image(.*)",
-        headers: [
-          {
-            key: "Cache-Control",
-            value: "public, max-age=31536000, immutable",
+            value: "public, max-age=3600, s-maxage=86400",
           },
         ],
       },

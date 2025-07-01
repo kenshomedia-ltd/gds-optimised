@@ -61,7 +61,7 @@ export function CasinoRow({
 
         <div
           className={cn(
-            "h-full flex items-center bg-white rounded-tl-lg md:rounded-bl-lg relative max-w-[368px]",
+            "h-full flex items-center bg-white rounded-tl-lg md:rounded-bl-lg relative max-w-[368px]"
           )}
         >
           {/* Position badge */}
@@ -121,9 +121,7 @@ export function CasinoRow({
           {/* Review link */}
           <div className="flex items-center justify-center">
             <Link
-              href={`${casinoPagePath}/${
-                casino.slug
-              }/`}
+              href={`${casinoPagePath}/${casino.slug}/`}
               className="casino-name text-[14px] text-grey-900 mr-[11px] hover:text-primary transition-colors group"
             >
               <span className="hidden sm:inline-flex sm:pr-1">
@@ -150,7 +148,7 @@ export function CasinoRow({
 
           <Link
             href={casino.casinoBonus.bonusUrl}
-            className="flex underline text-center font-lato hover:text-primary transition-colors"
+            className="flex underline text-center font-lato font-bold hover:text-primary transition-colors"
             rel="sponsored"
             target="_blank"
           >
@@ -196,7 +194,7 @@ export function CasinoRow({
             <>
               <Link
                 href={casino.casinoBonus.bonusUrl}
-                className="flex underline text-center font-lato hover:text-primary transition-colors"
+                className="flex underline text-center font-lato font-bold hover:text-primary transition-colors"
                 rel="sponsored"
                 target="_blank"
               >
