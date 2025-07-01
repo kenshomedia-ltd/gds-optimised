@@ -121,7 +121,7 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  // Redirects from Strapi
+  // Redirects from Strapi + BasePath Auto-Redirects
   async redirects() {
     const STRAPI_API_URL =
       process.env.NEXT_PUBLIC_API_URL || process.env.PUBLIC_API_URL || "";
@@ -155,8 +155,32 @@ const nextConfig: NextConfig = {
       return url;
     }
 
+    // BasePath auto-redirects (always added first)
+    const basePathRedirects: Array<{
+      source: string;
+      destination: string;
+      permanent: boolean;
+      basePath?: false;
+    }> = [
+      // Redirect root to basePath
+      {
+        source: "/",
+        destination: BASE_PATH,
+        permanent: true,
+        basePath: false, // Important: disable basePath for this redirect
+      },
+      // Redirect any path without basePath to one with basePath
+      // Use negative lookahead to exclude paths that already have basePath
+      {
+        source: `/:path((?!${BASE_PATH.slice(1)}).*)*`,
+        destination: `${BASE_PATH}/:path*`,
+        permanent: true,
+        basePath: false, // Important: disable basePath for this redirect
+      },
+    ];
+
     try {
-      // Build query string
+      // Build query string for Strapi redirects
       const params = new URLSearchParams({
         "pagination[pageSize]": "1000",
         "pagination[page]": "1",
@@ -165,7 +189,7 @@ const nextConfig: NextConfig = {
 
       const url = `${STRAPI_API_URL}/api/redirects?${params}`;
 
-      // Fetch redirects
+      // Fetch redirects from Strapi
       const response = await fetch(url, {
         method: "GET",
         headers: {
@@ -183,12 +207,13 @@ const nextConfig: NextConfig = {
       const data = (await response.json()) as RedirectsResponse;
 
       if (!data?.data) {
-        console.warn("[Redirects] No redirects found");
-        return [];
+        console.warn("[Redirects] No redirects found in Strapi");
+        // Return basePath redirects even if no Strapi redirects
+        return basePathRedirects;
       }
 
-      // Transform redirects
-      const processedRedirects: Array<{
+      // Transform Strapi redirects
+      const strapiRedirects: Array<{
         source: string;
         destination: string;
         permanent: boolean;
@@ -222,7 +247,7 @@ const nextConfig: NextConfig = {
         }
 
         // Create single redirect rule
-        processedRedirects.push({
+        strapiRedirects.push({
           source,
           destination,
           permanent: redirect.redirectMethod === "permanent",
@@ -230,12 +255,18 @@ const nextConfig: NextConfig = {
         });
       });
 
-      console.log(`[Redirects] Processed ${data.data.length} redirects`);
+      console.log(`[Redirects] Processed ${data.data.length} Strapi redirects`);
+      console.log(
+        `[Redirects] Added ${basePathRedirects.length} basePath auto-redirects`
+      );
 
-      return processedRedirects;
+      // Combine basePath redirects with Strapi redirects
+      // BasePath redirects go first to ensure they have priority
+      return [...basePathRedirects, ...strapiRedirects];
     } catch (error) {
-      console.error("[Redirects] Failed to load redirects:", error);
-      return [];
+      console.error("[Redirects] Failed to load Strapi redirects:", error);
+      // Return basePath redirects even if Strapi fails
+      return basePathRedirects;
     }
   },
 
