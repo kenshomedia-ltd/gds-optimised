@@ -108,7 +108,7 @@ function buildCasinosQuery() {
 /**
  * Build query for category games
  */
-function buildGamesQuery(slug: string) {
+function buildGamesQuery(slug: string, sortBy: string = "views:desc") {
   return {
     fields: [
       "id",
@@ -141,7 +141,7 @@ function buildGamesQuery(slug: string) {
       pageSize: 24,
       page: 1,
     },
-    sort: ["createdAt:desc"],
+    sort: [sortBy],
   };
 }
 

@@ -2,21 +2,22 @@
 import { unstable_cache } from "next/cache";
 import { cache } from "react";
 import { strapiClient } from "./strapi-client";
+import {
+  fetchGamesByProviders,
+  extractGameSettingsFromBlocks,
+} from "./query-chunks/game-fetchers";
+import {
+  fetchCasinosForHomepage,
+  extractCasinoSettingsFromBlocks,
+} from "./query-chunks/casino-fetchers";
+import {
+  fetchBlogsForHomepage,
+  extractBlogSettingsFromBlocks,
+} from "./query-chunks/blog-fetchers";
 import type {
   Homepage,
-  HomepageBlock,
-  HomeGameListBlock,
-  HomeBlogListBlock,
-  // HomeCasinoListBlock,
   HomepageDataResponse,
-  ExtractedGameSettings,
 } from "@/types/homepage.types";
-import type {
-  GameData,
-  BlogData,
-  CasinoData
-} from "@/types/strapi.types";
-import { getStrapiSort } from "../utils/sort-mappings";
 
 // Revalidation times for different content types
 const REVALIDATE_TIMES = {
@@ -27,153 +28,7 @@ const REVALIDATE_TIMES = {
 };
 
 /**
- * Extract game settings from homepage blocks
- * Optimized to reduce iterations and improve type safety
- */
-function extractGameSettings(homepage: Homepage): ExtractedGameSettings {
-  const gameBlock = homepage.blocks.find(
-    (block): block is HomeGameListBlock =>
-      block.__component === "homepage.home-game-list"
-  );
-
-  if (!gameBlock) {
-    return {
-      providers: [],
-      totalGamesToDisplay: 18, // 6 * 3 default
-      gamesQuotaPerProvider: 6,
-      sortBy: "createdAt:desc",
-    };
-  }
-
-  // Extract provider slugs efficiently
-  const providers =
-    gameBlock.providers
-      ?.map((item) => item.slotProvider?.slug)
-      .filter((slug): slug is string => Boolean(slug)) || [];
-
-  const gamesQuotaPerProvider = gameBlock.numberOfGames || 6;
-  const numProviders = Math.max(providers.length, 1);
-  const totalGamesToDisplay = gamesQuotaPerProvider * numProviders;
-
-  // Use the sort mapping utility
-  const sortBy = getStrapiSort(gameBlock.sortBy, "createdAt:desc");
-
-  return {
-    providers,
-    totalGamesToDisplay,
-    gamesQuotaPerProvider,
-    sortBy,
-  };
-}
-
-/**
- * Extract blog settings from homepage blocks
- */
-function extractBlogSettings(homepage: Homepage): {
-  limit: number;
-  sort: string;
-} {
-  const blogBlock = homepage.blocks.find(
-    (block): block is HomeBlogListBlock =>
-      block.__component === "homepage.home-blog-list"
-  );
-
-  return {
-    limit: blogBlock?.numOfBlogs || 6,
-    sort: "createdAt:desc",
-  };
-}
-
-/**
- * Fetch games for specific providers with optimized queries
- * Uses batching and minimal field selection for performance
- */
-async function fetchGamesForProviders(
-  providers: string[],
-  totalGamesToDisplay: number,
-  sortBy: string,
-  gamesPerProvider: number
-): Promise<GameData[]> {
-  if (providers.length === 0) return [];
-
-  try {
-    // Optimized query with minimal fields and efficient filtering
-    const query = {
-      fields: [
-        "title",
-        "slug",
-        "ratingAvg",
-        "ratingCount",
-        "createdAt",
-        "views",
-        "publishedAt",
-      ],
-      populate: {
-        images: {
-          fields: ["url", "alternativeText", "width", "height"],
-        },
-        provider: {
-          fields: ["title", "slug"],
-        },
-        categories: {
-          fields: ["title", "slug"],
-        },
-      },
-      filters: {
-        provider: {
-          slug: { $in: providers },
-        },
-      },
-      sort: [sortBy],
-      pagination: {
-        pageSize: Math.min(totalGamesToDisplay * 2, 100), // Cap at 100 for performance
-        page: 1,
-      },
-    };
-
-    const response = await strapiClient.fetchWithCache<{
-      data: GameData[];
-      meta: { pagination: { total: number } };
-    }>(
-      "games",
-      query,
-      REVALIDATE_TIMES.games
-    );
-
-    if (!response.data || response.data.length === 0) return [];
-
-    // Efficient grouping using Map
-    const gamesByProvider = new Map<string, GameData[]>(
-      providers.map((p) => [p, []])
-    );
-
-    // Single pass through games
-    for (const game of response.data) {
-      const providerSlug = game.provider?.slug;
-      if (providerSlug && gamesByProvider.has(providerSlug)) {
-        const providerGames = gamesByProvider.get(providerSlug)!;
-        if (providerGames.length < gamesPerProvider) {
-          providerGames.push(game);
-        }
-      }
-    }
-
-    // Flatten and limit results
-    const allGames: GameData[] = [];
-    for (const providerGames of gamesByProvider.values()) {
-      allGames.push(...providerGames);
-      if (allGames.length >= totalGamesToDisplay) break;
-    }
-
-    return allGames.slice(0, totalGamesToDisplay);
-  } catch (error) {
-    console.error("Failed to fetch games for providers:", error);
-    return [];
-  }
-}
-
-/**
- * Build optimized homepage query
+ * Build optimized homepage query using shared chunks
  */
 function buildHomepageQuery() {
   const baseQuery = {
@@ -326,152 +181,94 @@ function buildHomepageQuery() {
 /**
  * React cache for deduplicating requests within a single render
  */
-const getHomepageDataCached = cache(
-  async (): Promise<HomepageDataResponse> => {
-    try {
-      // Fetch homepage structure first
-      const homepageQuery = buildHomepageQuery();
-      const homepageResponse = await strapiClient.fetchWithCache<{
-        data: Homepage;
-      }>(
-        "homepage",
-        homepageQuery,
-        REVALIDATE_TIMES.homepage
-      );
+const getHomepageDataCached = cache(async (): Promise<HomepageDataResponse> => {
+  try {
+    // Fetch homepage structure first
+    const homepageQuery = buildHomepageQuery();
+    const homepageResponse = await strapiClient.fetchWithCache<{
+      data: Homepage;
+    }>("homepage", homepageQuery, REVALIDATE_TIMES.homepage);
 
-      const homepage = homepageResponse.data;
+    const homepage = homepageResponse.data;
 
-      // Extract settings for parallel fetching
-      const gameSettings = extractGameSettings(homepage);
-      const blogSettings = extractBlogSettings(homepage);
-      const hasCasinoBlock = homepage.blocks.some(
-        (block: HomepageBlock) =>
-          block.__component === "homepage.home-casino-list"
-      );
+    // Extract settings for parallel fetching using centralized functions
+    const gameSettings = extractGameSettingsFromBlocks(
+      homepage.blocks as unknown as Array<{
+        __component: string;
+        [key: string]: unknown;
+      }>
+    );
+    const blogSettings = extractBlogSettingsFromBlocks(
+      homepage.blocks as unknown as Array<{
+        __component: string;
+        [key: string]: unknown;
+      }>
+    );
+    const casinoSettings = extractCasinoSettingsFromBlocks(
+      homepage.blocks as unknown as Array<{
+        __component: string;
+        [key: string]: unknown;
+      }>
+    );
 
-      // Parallel fetch all dynamic content
-      const [games, blogsResponse, casinos] = await Promise.all([
-        // Fetch games if providers are specified
-        gameSettings.providers.length > 0
-          ? fetchGamesForProviders(
-            gameSettings.providers,
-            gameSettings.totalGamesToDisplay,
-            gameSettings.sortBy,
-            gameSettings.gamesQuotaPerProvider
-          )
-          : Promise.resolve([]),
+    // Parallel fetch all dynamic content
+    const [games, blogs, casinos] = await Promise.all([
+      // Fetch games using centralized function
+      gameSettings.providers.length > 0
+        ? fetchGamesByProviders(gameSettings.providers, {
+            limit: gameSettings.totalGames,
+            sortBy: gameSettings.sortBy,
+            queryType: "homepage",
+            gamesPerProvider: gameSettings.gamesQuotaPerProvider,
+            cacheTime: REVALIDATE_TIMES.games,
+          })
+        : Promise.resolve([]),
 
-        // Fetch blogs
-        strapiClient.fetchWithCache<{
-          data: BlogData[];
-          meta: { pagination: { total: number } };
-        }>(
-          "blogs",
-          {
-            fields: [
-              "title",
-              "slug",
-              "blogBrief",
-              "createdAt",
-              "updatedAt",
-              "publishedAt",
-              "minutesRead",
-            ],
-            populate: {
-              images: {
-                fields: ["url", "alternativeText", "width", "height"],
-              },
-              author: {
-                fields: ["firstName", "lastName"],
-                populate: {
-                  photo: { fields: ["url", "width", "height"] },
-                },
-              },
-              blogCategory: { fields: ["blogCategory", "slug"] },
-            },
-            sort: [blogSettings.sort],
-            pagination: {
-              pageSize: blogSettings.limit,
-              page: 1,
-            },
-          },
-          REVALIDATE_TIMES.blogs
-        ),
+      // Fetch blogs using centralized function
+      blogSettings.hasBlogBlock
+        ? fetchBlogsForHomepage({
+            limit: blogSettings.limit,
+            sortBy: blogSettings.sortBy,
+            queryType: "homepage",
+            cacheTime: REVALIDATE_TIMES.blogs,
+          })
+        : Promise.resolve([]),
 
-        // Fetch casinos if needed
-        hasCasinoBlock
-          ? strapiClient.fetchWithCache<{
-              data: CasinoData[];
-              meta: { pagination: { total: number } };
-            }>(
-              "casinos",
-              {
-                fields: [
-                  "title",
-                  "slug",
-                  "ratingAvg",
-                  "ratingCount",
-                  "publishedAt",
-                  "Badges",
-                ],
-                populate: {
-                  images: {
-                    fields: ["url", "width", "height"],
-                  },
-                  casinoBonus: {
-                    fields: ["bonusUrl", "bonusLabel", "bonusCode"],
-                  },
-                  noDepositSection: {
-                    fields: ["bonusAmount", "termsConditions"],
-                  },
-                  freeSpinsSection: {
-                    fields: ["bonusAmount", "termsConditions"],
-                  },
-                  termsAndConditions: {
-                    fields: ["copy", "gambleResponsibly"],
-                  },
-                  bonusSection: {
-                    fields: [
-                      "bonusAmount",
-                      "termsConditions",
-                      "cashBack",
-                      "freeSpin",
-                    ],
-                  },
-                },
-                sort: ["ratingAvg:desc"],
-                pagination: { pageSize: 10, page: 1 },
-              },
-              REVALIDATE_TIMES.casinos
-            )
-          : Promise.resolve({ data: [] }),
-      ]);
+      // Fetch casinos using centralized function
+      casinoSettings.hasCasinoBlock
+        ? fetchCasinosForHomepage({
+            limit: casinoSettings.maxCasinos,
+            sortBy: casinoSettings.sortBy,
+            queryType: "standard",
+            cacheTime: REVALIDATE_TIMES.casinos,
+          })
+        : Promise.resolve([]),
+    ]);
 
-      return {
-        homepage,
-        games,
-        blogs: blogsResponse.data || [],
-        casinos: casinos.data || [],
-      };
-    } catch (error) {
-      console.error("Failed to fetch homepage data:", error);
+    return {
+      homepage,
+      games,
+      blogs: blogs || [],
+      casinos: casinos || [],
+    };
+  } catch (error) {
+    console.error("Failed to fetch homepage data:", error);
 
-      // Return minimal valid response on error
-      return {
-        homepage: {
-          id: 0,
-          documentId: "",
-          title: "Homepage",
-          updatedAt: new Date().toISOString(),
-          blocks: [],
-        },
-        games: [],
-        blogs: [],
-        casinos: [],
-      };
-    }
+    // Return minimal valid response on error
+    return {
+      homepage: {
+        id: 0,
+        documentId: "",
+        title: "Homepage",
+        updatedAt: new Date().toISOString(),
+        blocks: [],
+      },
+      games: [],
+      blogs: [],
+      casinos: [],
+    };
   }
-);
+});
 
 /**
  * Next.js unstable_cache for persistent caching with ISR

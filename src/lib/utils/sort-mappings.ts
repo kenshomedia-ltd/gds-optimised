@@ -53,7 +53,7 @@ export const GAME_SORT_OPTIONS = [
  */
 export function getStrapiSort(
   sortKey: string | undefined,
-  defaultSort: string = "createdAt:desc"
+  defaultSort: string = "views:desc"
 ): string {
   if (!sortKey) return defaultSort;
 
@@ -68,7 +68,7 @@ export function getStrapiSort(
  */
 export function getMultipleSorts(
   sortKeys: string | string[] | undefined,
-  defaultSort: string = "createdAt:desc"
+  defaultSort: string = "views:desc"
 ): string[] {
   if (!sortKeys) return [defaultSort];
 

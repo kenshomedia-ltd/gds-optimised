@@ -101,7 +101,7 @@ export default async function CategoryPage({
       __component: "games.games-carousel",
       id: 1,
       numberOfGames: 24,
-      sortBy: "createdAt:desc",
+      sortBy: "views:desc",
       showGameFilterPanel: true,
       showGameMoreButton: true,
       gameCategories: [

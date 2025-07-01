@@ -105,7 +105,7 @@ function buildStructureQuery(slug: string) {
 /**
  * Build query for provider games
  */
-function buildGamesQuery(slug: string) {
+function buildGamesQuery(slug: string, sortBy: string = "views:desc") {
   return {
     fields: [
       "id",
@@ -134,7 +134,7 @@ function buildGamesQuery(slug: string) {
         },
       },
     },
-    sort: ["ratingAvg:desc"],
+    sort: [sortBy],
     // No pagination to get all games
   };
 }
@@ -341,7 +341,8 @@ export async function getProviderPageDataSplitWithPagination(
   slug: string,
   page: number = 1,
   pageSize: number = 24,
-  filters?: SelectedFilters
+  filters?: SelectedFilters,
+  sortBy: string = "views:desc"
 ) {
   try {
     // Fetch the provider page structure (without games)
@@ -386,13 +387,13 @@ export async function getProviderPageDataSplitWithPagination(
     // Fetch games with pagination
     const gamesPromise = strapiClient.fetchWithCache<{
       data: GameData[];
-      meta: { 
-        pagination: { 
+      meta: {
+        pagination: {
           page: number;
           pageSize: number;
           pageCount: number;
           total: number;
-        } 
+        };
       };
     }>(
       "games",
@@ -418,7 +419,7 @@ export async function getProviderPageDataSplitWithPagination(
           },
         },
         filters: gameFilters,
-        sort: ["ratingAvg:desc"],
+        sort: [sortBy],
         pagination: {
           page,
           pageSize,
@@ -451,7 +452,7 @@ export async function getProviderPageDataSplitWithPagination(
 
     // Transform categories to filter options (matching the expected type)
     const categoryOptions: FilterOption[] = categoriesResponse.data
-      .map(cat => ({
+      .map((cat) => ({
         id: cat.id,
         title: cat.title,
         slug: cat.slug,

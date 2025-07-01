@@ -84,29 +84,96 @@ export const casinoTableQueryChunk = (
   },
 });
 
+/**
+ * Enhanced game query chunks that match actual usage patterns
+ * across homepage-data-loader.ts and custom-page-loader.ts
+ */
 export const gameQueryChunk = {
-  basic: {
-    fields: ["title", "slug", "ratingAvg", "ratingCount"],
+  // Minimal for basic displays (cards, lists)
+  minimal: {
+    fields: ["title", "slug", "ratingAvg"],
     populate: {
       images: { fields: ["url", "width", "height"] },
-      provider: providerQueryChunk,
+      provider: { fields: ["title", "slug"] },
     },
   },
-  full: {
+  
+  // Standard for most carousel and listing use cases
+  // This matches the pattern used in both homepage and custom page loaders
+  standard: {
+    fields: [
+      "title",
+      "slug", 
+      "ratingAvg",
+      "ratingCount",
+      "createdAt",
+      "publishedAt" // Added this - it's used in both loaders
+    ],
+    populate: {
+      images: {
+        fields: ["url", "alternativeText", "width", "height"]
+      },
+      provider: providerQueryChunk, // Reuse existing chunk
+      categories: categoryQueryChunk, // Reuse existing chunk
+    },
+  },
+  
+  // Detailed for full game pages and rich displays
+  detailed: {
     fields: [
       "title",
       "slug",
-      "ratingAvg",
+      "ratingAvg", 
       "ratingCount",
-      "views",
+      "views", // Used in homepage loader
       "createdAt",
+      "publishedAt",
       "isGameDisabled",
       "gameDisableText",
     ],
     populate: {
-      images: imageQueryChunk,
+      images: imageQueryChunk, // Use full image chunk
       provider: providerQueryChunk,
       categories: categoryQueryChunk,
+      embedCode: {
+        fields: ["desktopEmbedCode", "mobileEmbedCode"]
+      },
+    },
+  },
+  
+  // For homepage specifically (matches current fetchGamesForProviders)
+  homepage: {
+    fields: [
+      "title",
+      "slug",
+      "ratingAvg",
+      "ratingCount", 
+      "createdAt",
+      "views", // Homepage uses this
+      "publishedAt",
+    ],
+    populate: {
+      images: {
+        fields: ["url", "alternativeText", "width", "height"],
+      },
+      provider: {
+        fields: ["title", "slug"],
+      },
+      categories: {
+        fields: ["title", "slug"],
+      },
+    },
+  },
+  
+  // For custom page carousels (matches current enrichGameCarousels)
+  carousel: {
+    fields: ["title", "slug", "ratingAvg", "createdAt", "publishedAt"],
+    populate: {
+      images: {
+        fields: ["url", "alternativeText", "width", "height"],
+      },
+      provider: { fields: ["title", "slug"] },
+      categories: { fields: ["title", "slug"] },
     },
   },
 };

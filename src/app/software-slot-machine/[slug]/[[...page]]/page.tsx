@@ -168,7 +168,7 @@ export default async function ProviderPage({
       __component: "games.games-carousel",
       id: 1,
       numberOfGames: gamesPerPage,
-      sortBy: "ratingAvg:desc",
+      sortBy: "views:desc",
       showGameFilterPanel: true,
       showGameMoreButton: false, // Using pagination instead
       gameProviders: [

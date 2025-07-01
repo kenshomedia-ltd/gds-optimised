@@ -3,6 +3,7 @@
 import { strapiClient } from "./strapi-client";
 import { unstable_cache } from "next/cache";
 import { cacheManager } from "@/lib/cache/cache-manager";
+import { getStrapiSort } from "@/lib/utils/sort-mappings";
 import type {
   CustomPageData,
   GameData,
@@ -171,7 +172,6 @@ async function fetchNewAndLovedSlotsGames(
 async function fetchGamesCarouselGames(
   block: GamesCarouselBlock
 ): Promise<GameData[]> {
-
   // Extract provider and category slugs
   const providerSlugs =
     block.gameProviders?.map((p) => p.slotProvider?.slug).filter(Boolean) || [];
@@ -188,6 +188,9 @@ async function fetchGamesCarouselGames(
     filters.categories = { slug: { $in: categorySlugs } };
   }
 
+  // FIXED: Use centralized sort mapping instead of hardcoded logic
+  const sortBy = getStrapiSort(block.sortBy, "createdAt:desc");
+
   const query = {
     fields: ["title", "slug", "ratingAvg", "createdAt", "views"],
     populate: {
@@ -196,8 +199,7 @@ async function fetchGamesCarouselGames(
       categories: { fields: ["title", "slug"] },
     },
     filters,
-    sort:
-      block.sortBy === "mostPlayed" ? ["ratingAvg:desc"] : ["createdAt:desc"],
+    sort: [sortBy],
     pagination: {
       pageSize: block.numberOfGames || 24,
       page: 1,

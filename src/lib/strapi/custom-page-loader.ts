@@ -9,6 +9,7 @@ import {
   blockQueryChunks,
   getBlockQueryChunk,
 } from "./query-chunks/shared-chunks";
+import { fetchGamesForCarousel } from "./query-chunks/game-fetchers";
 import type { BlockComponent } from "@/types/strapi.types";
 import type {
   CustomPageData,
@@ -17,7 +18,6 @@ import type {
   GamesCarouselBlock,
 } from "@/types/custom-page.types";
 import type { GameData } from "@/types/game.types";
-import type { CasinoData } from "@/types/casino.types";
 
 // Cache configuration
 const CACHE_CONFIG = {
@@ -137,7 +137,8 @@ function buildFullPageQuery(
 }
 
 /**
- * Fetch games for carousel blocks (post-processing)
+ * Fetch games for carousel blocks using centralized function
+ * REPLACES the old enrichGameCarousels function with centralized game fetchers
  */
 async function enrichGameCarousels(
   blocks: BlockComponent[]
@@ -146,50 +147,18 @@ async function enrichGameCarousels(
 
   if (gameCarouselBlocks.length === 0) return blocks;
 
-  // Fetch games for each carousel
+  // Use centralized game fetching for each carousel
   await Promise.all(
     gameCarouselBlocks.map(async (block) => {
-      const providers =
-        block.gameProviders
-          ?.map((p) => p.slotProvider?.slug)
-          .filter((slug): slug is string => Boolean(slug)) || [];
-
-      const categories =
-        block.gameCategories
-          ?.map((c) => c.slotCategory?.slug)
-          .filter((slug): slug is string => Boolean(slug)) || [];
-
-      const query = {
-        fields: ["title", "slug", "ratingAvg", "createdAt", "publishedAt"],
-        populate: {
-          images: {
-            fields: ["url", "alternativeText", "width", "height"],
-          },
-          provider: { fields: ["title", "slug"] },
-          categories: { fields: ["title", "slug"] },
-        },
-        filters: {
-          ...(providers.length > 0 && {
-            provider: { slug: { $in: providers } },
-          }),
-          ...(categories.length > 0 && {
-            categories: { slug: { $in: categories } },
-          }),
-        },
-        sort: [block.sortBy || "createdAt:desc"],
-        pagination: {
-          pageSize: block.numberOfGames || 24,
-          page: 1,
-        },
-      };
-
       try {
-        const response = await strapiClient.fetchWithCache<{
-          data: GameData[];
-        }>("games", query, 60); // 1 minute cache for games
+        // Use the centralized fetchGamesForCarousel function
+        const games = await fetchGamesForCarousel(block, {
+          queryType: "carousel",
+          cacheTime: 60, // 1 minute cache for games
+        });
 
         // Inject games directly into the block
-        block.games = response.data || [];
+        block.games = games;
       } catch (error) {
         console.error(`Failed to fetch games for carousel:`, error);
         block.games = [];
@@ -246,7 +215,7 @@ export const getCustomPageData = unstable_cache(
         return null;
       }
 
-      // Enrich game carousel blocks with actual games
+      // Enrich game carousel blocks with actual games using centralized function
       if (pageData.blocks && pageData.blocks.length > 0) {
         // Cast to BlockComponent[] for enrichment, then cast back
         const enrichedBlocks = await enrichGameCarousels(
@@ -289,7 +258,7 @@ export const getCustomPageDataSplit = unstable_cache(
             populate: {
               // Only get block structure, not full data
               "games.games-carousel": {
-                fields: ["numberOfGames", "sortBy"],
+                fields: ["numberOfGames", "sortBy", "showGameFilterPanel"],
                 populate: {
                   gameProviders: {
                     populate: {
@@ -316,203 +285,119 @@ export const getCustomPageDataSplit = unstable_cache(
       }>("custom-pages", structureQuery, CACHE_CONFIG.page.ttl);
 
       const pageData = response.data?.[0];
-      if (!pageData) return { pageData: null, games: [], casinos: [] };
 
-      // Analyze blocks to determine what data is needed
-      const needsGames = pageData.blocks?.some(
-        (block) => block.__component === "games.games-carousel"
-      );
-      const needsCasinos = pageData.blocks?.some(
-        (block) => block.__component === "casinos.casino-list"
-      );
+      if (!pageData) {
+        return {
+          pageData: null,
+          games: [],
+          casinos: [],
+          dynamicGamesData: {},
+          dynamicCasinosData: {},
+        };
+      }
 
-      // Fetch dynamic content in parallel
-      const [games, casinos] = await Promise.all([
-        needsGames ? fetchGamesForPage(pageData.blocks) : [],
-        needsCasinos ? fetchCasinosForPage(pageData.blocks, casinoCountry) : [],
-      ]);
+      // Extract game carousel blocks for dynamic data fetching
+      const gameCarouselBlocks =
+        pageData.blocks?.filter(
+          (block): block is GamesCarouselBlock =>
+            block.__component === "games.games-carousel"
+        ) || [];
 
-      return { pageData, games, casinos };
+      // Fetch games for each carousel using centralized function
+      const dynamicGamesData: Record<string, { games: GameData[] }> = {};
+
+      if (gameCarouselBlocks.length > 0) {
+        await Promise.all(
+          gameCarouselBlocks.map(async (block) => {
+            try {
+              const games = await fetchGamesForCarousel(block, {
+                queryType: "carousel",
+                cacheTime: 60,
+              });
+              dynamicGamesData[`block-${block.id}`] = { games };
+            } catch (error) {
+              console.error(
+                `Failed to fetch games for block ${block.id}:`,
+                error
+              );
+              dynamicGamesData[`block-${block.id}`] = { games: [] };
+            }
+          })
+        );
+      }
+
+      return {
+        pageData,
+        games: [], // Deprecated - for backward compatibility
+        casinos: [], // Deprecated - for backward compatibility
+        dynamicGamesData,
+        dynamicCasinosData: {}, // TODO: Implement casino data fetching
+      };
     } catch (error) {
-      console.error(
-        "Failed to fetch custom page data with split queries:",
-        error
-      );
-      return { pageData: null, games: [], casinos: [] };
+      console.error("Failed to fetch custom page data:", error);
+      return {
+        pageData: null,
+        games: [],
+        casinos: [],
+        dynamicGamesData: {},
+        dynamicCasinosData: {},
+      };
     }
   },
   ["custom-page-data-split"],
   {
     revalidate: CACHE_CONFIG.page.ttl,
-    tags: ["custom-page", "custom-page-split"],
+    tags: CACHE_CONFIG.page.tags,
   }
 );
 
 /**
- * Helper to fetch games for page blocks
+ * Get all custom page paths for static generation
+ * Used in generateStaticParams or getStaticPaths
  */
-async function fetchGamesForPage(
-  blocks: CustomPageBlock[]
-): Promise<GameData[]> {
-  const gameCarouselBlocks = blocks.filter(
-    (block): block is GamesCarouselBlock =>
-      block.__component === "games.games-carousel"
-  );
-
-  if (gameCarouselBlocks.length === 0) return [];
-
-  const allGames: GameData[] = [];
-
-  await Promise.all(
-    gameCarouselBlocks.map(async (block) => {
-      const providers =
-        block.gameProviders
-          ?.map((p) => p.slotProvider?.slug)
-          .filter((slug): slug is string => Boolean(slug)) || [];
-
-      const categories =
-        block.gameCategories
-          ?.map((c) => c.slotCategory?.slug)
-          .filter((slug): slug is string => Boolean(slug)) || [];
-
-      const query = {
-        fields: ["title", "slug", "ratingAvg", "createdAt", "publishedAt"],
-        populate: {
-          images: { fields: ["url", "alternativeText", "width", "height"] },
-          provider: { fields: ["title", "slug"] },
-          categories: { fields: ["title", "slug"] },
-        },
-        filters: {
-          ...(providers.length > 0 && {
-            provider: { slug: { $in: providers } },
-          }),
-          ...(categories.length > 0 && {
-            categories: { slug: { $in: categories } },
-          }),
-        },
-        sort: [block.sortBy || "createdAt:desc"],
-        pagination: {
-          pageSize: block.numberOfGames || 24,
-          page: 1,
-        },
-      };
-
-      try {
-        const response = await strapiClient.fetchWithCache<{
-          data: GameData[];
-        }>("games", query, 60);
-
-        if (response.data) {
-          allGames.push(...response.data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch games for page:", error);
-      }
-    })
-  );
-
-  return allGames;
-}
-
-/**
- * Helper to fetch casinos for page blocks
- */
-async function fetchCasinosForPage(
-  blocks: CustomPageBlock[],
-  casinoCountry?: string
-): Promise<CasinoData[]> {
-  const casinoListBlocks = blocks.filter(
-    (block) => block.__component === "casinos.casino-list"
-  );
-
-  if (casinoListBlocks.length === 0) return [];
-
+export async function getAllCustomPagePaths(): Promise<string[]> {
   try {
     const query = {
-      fields: [
-        "title",
-        "slug",
-        "ratingAvg",
-        "ratingCount",
-        "publishedAt",
-        "Badges",
-      ],
-      populate: {
-        images: { fields: ["url", "width", "height"] },
-        casinoBonus: { fields: ["bonusUrl", "bonusLabel", "bonusCode"] },
-        noDepositSection: { fields: ["bonusAmount", "termsConditions"] },
-        freeSpinsSection: { fields: ["bonusAmount", "termsConditions"] },
-        termsAndConditions: { fields: ["copy", "gambleResponsibly"] },
-        bonusSection: {
-          fields: ["bonusAmount", "termsConditions", "cashBack", "freeSpin"],
-        },
+      fields: ["urlPath"],
+      pagination: {
+        page: 1,
+        pageSize: 1000, // Adjust based on your needs
       },
-      filters: casinoCountry
-        ? { countries: { $containsi: casinoCountry } }
-        : undefined,
-      sort: ["ratingAvg:desc"],
-      pagination: { pageSize: 20, page: 1 },
     };
 
     const response = await strapiClient.fetchWithCache<{
-      data: CasinoData[];
-    }>("casinos", query, 300); // 5 minute cache
+      data: Array<{ urlPath: string }>;
+    }>("custom-pages", query, CACHE_CONFIG.metadata.ttl);
 
-    return response.data || [];
+    if (!response.data) {
+      return [];
+    }
+
+    // Return normalized paths (remove leading/trailing slashes)
+    return response.data
+      .map((page) => normalizePath(page.urlPath))
+      .filter((path) => path.length > 0); // Filter out empty paths
   } catch (error) {
-    console.error("Failed to fetch casinos for page:", error);
+    console.error("Failed to fetch custom page paths:", error);
     return [];
   }
 }
 
 /**
- * Fetch all custom page paths (for static generation)
+ * Generate static params for Next.js 13+ app router
+ * Alternative to getAllCustomPagePaths for newer Next.js versions
  */
-export const getAllCustomPagePaths = unstable_cache(
-  async (): Promise<string[]> => {
-    try {
-      const query = {
-        fields: ["urlPath"],
-        pagination: {
-          page: 1,
-          pageSize: 10000,
-        },
-      };
+export async function generateCustomPageParams(): Promise<
+  Array<{ slug: string[] }>
+> {
+  try {
+    const paths = await getAllCustomPagePaths();
 
-      const response = await strapiClient.fetchWithCache<{
-        data: Array<{ urlPath: string }>;
-      }>("custom-pages", query, 3600); // 1 hour cache
-
-      return response.data?.map((page) => page.urlPath) || [];
-    } catch (error) {
-      console.error("Failed to fetch custom page paths:", error);
-      return [];
-    }
-  },
-  ["custom-page-paths"],
-  {
-    revalidate: 3600,
-    tags: ["custom-page-paths"],
+    return paths.map((path) => ({
+      slug: path.split("/").filter((segment) => segment.length > 0),
+    }));
+  } catch (error) {
+    console.error("Failed to generate custom page params:", error);
+    return [];
   }
-);
-
-/**
- * Revalidate custom page cache
- */
-export async function revalidateCustomPageCache(path?: string) {
-  const { revalidateTag, revalidatePath } = await import("next/cache");
-
-  // Revalidate tags
-  revalidateTag("custom-page");
-  revalidateTag("custom-page-meta");
-
-  // Revalidate specific path if provided
-  if (path) {
-    revalidatePath(path);
-  }
-
-  // Clear Redis cache
-  await strapiClient.invalidateCache(
-    path ? `custom-pages:${path}*` : "custom-pages:*"
-  );
 }

@@ -1,23 +1,10 @@
 // src/lib/strapi/custom-page-games-fetcher.ts
 
 import { strapiClient } from "./strapi-client";
+import { getStrapiSort } from "@/lib/utils/sort-mappings";
 import type { GamesCarouselBlock } from "@/types/dynamic-block.types";
 import type { GameData } from "@/types/game.types";
 import type { CustomPageBlock } from "@/types/custom-page.types";
-
-// Map sortBy values to Strapi sort parameters
-const SORT_BY_MAP: Record<string, string> = {
-  "Most Popular": "views:desc,ratingAvg:desc",
-  Newest: "createdAt:desc",
-  Rating: "ratingAvg:desc",
-  Alphabetical: "title:asc",
-  // Italian mappings
-  nuove: "createdAt:desc",
-  az: "title:asc",
-  za: "title:desc",
-  giocati: "views:desc",
-  votate: "ratingAvg:desc",
-} as const;
 
 /**
  * Fetch games for a games carousel block
@@ -29,7 +16,7 @@ async function fetchGamesForCarousel(
   block: GamesCarouselBlock
 ): Promise<GameData[]> {
   const numberOfGames = block.numberOfGames || 24;
-  const sortBy = SORT_BY_MAP[block.sortBy || "Newest"] || "createdAt:desc";
+  const sortBy = getStrapiSort(block.sortBy, "views:desc");
 
   // Build filters based on block configuration
   const filters: Record<string, unknown> = {};

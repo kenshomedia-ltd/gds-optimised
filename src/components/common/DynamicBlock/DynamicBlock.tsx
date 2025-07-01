@@ -22,6 +22,7 @@ import type { FeaturedProvider } from "@/types/featured-providers.types";
 import { Skeleton } from "@/components/ui";
 import { Testimonials } from "@/components/widgets/Testimonials";
 import { Suspense } from "react";
+import { getStrapiSort } from "@/lib/utils/sort-mappings";
 
 // Lazy load all widget components
 const IntroWithImage = dynamic(
@@ -201,6 +202,15 @@ export function DynamicBlock({
       return <SingleContent block={blockData as SingleContentBlock} />;
 
     case "games.games-carousel":
+      // Convert sortBy from CMS format to Strapi format before passing to GameListWidget
+      const originalBlock = blockData as GamesCarouselBlock;
+
+      // Create a modified block with converted sortBy
+      const convertedBlock: GamesCarouselBlock = {
+        ...originalBlock,
+        sortBy: getStrapiSort(originalBlock.sortBy, "views:desc"),
+      };
+
       // For custom pages, games are stored in dynamicGamesData[blockId]
       const blockGames =
         additionalData.dynamicGamesData?.[`block-${blockData.id}`]?.games ||
@@ -209,7 +219,7 @@ export function DynamicBlock({
 
       return (
         <GameListWidget
-          block={blockData as GamesCarouselBlock}
+          block={convertedBlock}
           games={blockGames}
           translations={translations}
         />
