@@ -120,3 +120,34 @@ export interface GameListResponse {
   pageSize: number;
   pageCount: number;
 }
+
+export type TDashboardGame = {
+  id: number;
+  publishedAt: string;
+  createdAt: string;
+  updatedAt: string;
+  game: TUserGame;
+};
+
+export type TUserGame = {
+  id: number;
+  title: string;
+  slug: string;
+  ratingAvg: number;
+  createdAt: string;
+  publishedAt: string;
+  images: TUserGameImage;
+  provider: TUserGameProvider;
+  categories?: {
+    title: string;
+  }[];
+};
+
+export type TUserGameImage = {
+  url: string;
+};
+
+export type TUserGameProvider = {
+  slug: string;
+  title: string;
+};

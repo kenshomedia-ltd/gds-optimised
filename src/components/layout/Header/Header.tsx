@@ -121,7 +121,9 @@ export function Header({
 
               {/* Authentication Button - Mobile */}
               <Link
-                href={user?.isAuthenticated ? "/account" : "/login"}
+                href={
+                  user?.isAuthenticated ? "/account" : "/authentication/login"
+                }
                 className="p-2 rounded-md text-navbar-text hover:bg-white/10 transition-colors"
                 aria-label={
                   user?.isAuthenticated
@@ -289,7 +291,9 @@ export function Header({
 
               {/* User Account - Desktop (Second) */}
               <Link
-                href={user?.isAuthenticated ? "/account" : "/login"}
+                href={
+                  user?.isAuthenticated ? "/account" : "/authentication/login"
+                }
                 className="p-2 rounded-md text-navbar-text hover:bg-white/10 transition-colors"
                 aria-label={
                   user?.isAuthenticated

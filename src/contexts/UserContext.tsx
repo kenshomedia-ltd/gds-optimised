@@ -1,0 +1,83 @@
+"use client";
+import React, { createContext, ReactNode, useContext, useReducer } from "react";
+
+import { TDashboardGame } from "@/types/game.types";
+import { TUser, TUserMessage } from "@/types/user.types";
+
+interface State {
+  user: TUser | null;
+  favouriteGames: TDashboardGame[];
+  weeklyPicks: TDashboardGame[];
+  mostPlayed: TDashboardGame[];
+  messages: TUserMessage[];
+  readMessages: number[];
+  slotMachineUrl: string;
+}
+
+const initialState: State = {
+  user: null,
+  favouriteGames: [],
+  weeklyPicks: [],
+  mostPlayed: [],
+  messages: [],
+  readMessages: [],
+  slotMachineUrl: "",
+};
+
+type Action =
+  | { type: "SET_USER"; payload: TUser | null }
+  | { type: "SET_FAVOURITE_GAMES"; payload: TDashboardGame[] }
+  | { type: "SET_WEEKLY_PICKS"; payload: TDashboardGame[] }
+  | { type: "SET_MOST_PLAYED"; payload: TDashboardGame[] }
+  | { type: "SET_MESSAGES"; payload: TUserMessage[] }
+  | { type: "SET_READ_MESSAGES"; payload: number[] }
+  | { type: "SET_SLOT_URL"; payload: string };
+
+const reducer = (state: State, action: Action): State => {
+  switch (action.type) {
+    case "SET_USER":
+      localStorage.setItem("_user:", JSON.stringify(action.payload));
+      return { ...state, user: action.payload };
+    case "SET_FAVOURITE_GAMES":
+      return { ...state, favouriteGames: action.payload };
+    case "SET_WEEKLY_PICKS":
+      return { ...state, weeklyPicks: action.payload };
+    case "SET_MOST_PLAYED":
+      return { ...state, mostPlayed: action.payload };
+    case "SET_MESSAGES":
+      return { ...state, messages: action.payload };
+    case "SET_READ_MESSAGES":
+      return { ...state, readMessages: action.payload };
+    case "SET_SLOT_URL":
+      return { ...state, slotMachineUrl: action.payload };
+    default:
+      return state;
+  }
+};
+
+const UserContext = createContext<{
+  state: State;
+  dispatch: React.Dispatch<Action>;
+}>({
+  state: initialState,
+  dispatch: () => null,
+});
+
+export const UserProvider = ({ children }: { children: ReactNode }) => {
+  const [state, dispatch] = useReducer(reducer, initialState, (init) => {
+    const savedUser =
+      typeof window !== "undefined" ? localStorage.getItem("_user:") : null;
+    return {
+      ...init,
+      user: savedUser ? JSON.parse(savedUser) : null,
+    };
+  });
+
+  return (
+    <UserContext.Provider value={{ state, dispatch }}>
+      {children}
+    </UserContext.Provider>
+  );
+};
+
+export const useUser = () => useContext(UserContext);
