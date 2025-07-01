@@ -81,6 +81,7 @@ export {
   WAGERING_OPTIONS,
   getStrapiSort,
   getMultipleSorts,
+  normalizeGameSort,
 } from "./sort-mappings";
 
 // Re-export types

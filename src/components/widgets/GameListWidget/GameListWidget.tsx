@@ -14,6 +14,7 @@ import type {
 } from "@/types/game-list-widget.types";
 import type { GameData } from "@/types/game.types";
 import { cn } from "@/lib/utils/cn";
+import { normalizeGameSort } from "@/lib/utils/sort-mappings";
 import {
   getGames,
   getFilterProviders,
@@ -57,6 +58,11 @@ export function GameListWidget({
   const showFilters = block.showGameFilterPanel || false;
   const showLoadMore = block.showGameMoreButton || false;
 
+  // Normalize the initial sort value from CMS to GameFilters format
+  const normalizedInitialSort = useMemo(() => {
+    return normalizeGameSort(block.sortBy, "Most Popular");
+  }, [block.sortBy]);
+
   // State
   const [games, setGames] = useState<GameData[]>(initialGames);
   const [loading, setLoading] = useState(false);
@@ -78,7 +84,10 @@ export function GameListWidget({
   >(initialCategories || []);
   const [selectedProviders, setSelectedProviders] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedSort, setSelectedSort] = useState<string>(block.sortBy || "");
+  // Use normalized sort value for consistency with GameFilters
+  const [selectedSort, setSelectedSort] = useState<string>(
+    normalizedInitialSort
+  );
   const [searchQuery, setSearchQuery] = useState<string>("");
 
   // Calculate total pages (for client-side pagination)
@@ -203,7 +212,7 @@ export function GameListWidget({
         const result = await getGames({
           page: pageNum,
           pageSize: numberOfGames,
-          sortBy: selectedSort,
+          sortBy: selectedSort, // This will be normalized format, which getGames can handle
           filters,
         });
 
@@ -258,7 +267,9 @@ export function GameListWidget({
   }, []);
 
   const handleSortChange = useCallback((sort: string) => {
-    setSelectedSort(sort);
+    // Ensure the sort value is normalized before setting it
+    const normalizedSort = normalizeGameSort(sort, "Most Popular");
+    setSelectedSort(normalizedSort);
     setPage(1);
     setHasMore(true);
   }, []);
@@ -358,7 +369,7 @@ export function GameListWidget({
                 categories={availableCategories}
                 selectedProviders={selectedProviders}
                 selectedCategories={selectedCategories}
-                selectedSort={selectedSort}
+                selectedSort={selectedSort} // Now guaranteed to be normalized
                 searchQuery={searchQuery}
                 onProviderChange={handleProviderChange}
                 onCategoryChange={handleCategoryChange}
