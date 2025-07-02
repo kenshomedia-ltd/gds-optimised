@@ -1,13 +1,13 @@
 // src/components/widgets/GameListWidget/GameListWidget.tsx
 "use client";
 
-import dynamic from "next/dynamic";
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { GameCard } from "@/components/games/GameCard/GameCard";
 import { GameCardSkeleton } from "@/components/games/GameCard/GameCardSkeleton";
 import { GameFilters } from "./GameFilters";
-// import { MobileGameFilters } from "./MobileGameFilters";
+import { MobileGameFilters } from "./MobileGameFilters";
 import { GameFiltersSkeleton } from "./GameFiltersSkeleton";
+import { MobileGameFiltersSkeleton } from "./MobileGameFiltersSkeleton";
 import { Pagination } from "@/components/ui/Pagination/Pagination";
 import { PaginationServer } from "@/components/ui/Pagination/PaginationServer";
 import type {
@@ -22,34 +22,6 @@ import {
   getFilterProviders,
   getGameCategories,
 } from "@/app/actions/games";
-import { MobileGameFiltersSkeleton } from "./MobileGameFiltersSkeleton";
-
-// Dynamically import mobile component with loading
-const MobileGameFilters = dynamic(
-  () => import('./MobileGameFilters').then(mod => ({ default: mod.MobileGameFilters })),
-  { 
-    ssr: false, // Mobile filters don't need SSR
-    loading: () => <MobileGameFiltersSkeleton />
-  }
-);
-
-// Use a hook to detect screen size
-function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(false);
-  
-  useEffect(() => {
-    const checkIsMobile = () => {
-      setIsMobile(window.innerWidth < 768); // md breakpoint
-    };
-    
-    checkIsMobile();
-    window.addEventListener('resize', checkIsMobile);
-    
-    return () => window.removeEventListener('resize', checkIsMobile);
-  }, []);
-  
-  return isMobile;
-}
 
 /**
  * GameListWidget Component
@@ -63,6 +35,7 @@ function useIsMobile() {
  * - Load more functionality OR Pagination (configurable)
  * - Responsive grid layout
  * - Loading states
+ * - Mobile and desktop filter support
  */
 export function GameListWidget({
   block,
@@ -84,7 +57,6 @@ export function GameListWidget({
   baseUrl?: string;
 }) {
   // Constants
-  const isMobile = useIsMobile();
   const numberOfGames = block.numberOfGames || 24;
   const showFilters = block.showGameFilterPanel || false;
   const showLoadMore = block.showGameMoreButton || false;
@@ -101,8 +73,9 @@ export function GameListWidget({
   const [hasMore, setHasMore] = useState(true);
   const [localTotalGames, setLocalTotalGames] = useState(totalGames);
   const [isClientLoaded, setIsClientLoaded] = useState(false);
-  // Initialize skeleton state based on whether we need to load filters
-  const [showFiltersSkeleton, setShowFiltersSkeleton] = useState(
+
+  // Simplified loading state (similar to casino filters)
+  const [filtersLoading, setFiltersLoading] = useState(
     showFilters && (!initialProviders || !initialCategories)
   );
 
@@ -115,7 +88,6 @@ export function GameListWidget({
   >(initialCategories || []);
   const [selectedProviders, setSelectedProviders] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  // Use normalized sort value for consistency with GameFilters
   const [selectedSort, setSelectedSort] = useState<string>(
     normalizedInitialSort
   );
@@ -130,7 +102,7 @@ export function GameListWidget({
     return Math.ceil(localTotalGames / numberOfGames);
   }, [localTotalGames, numberOfGames, isClientLoaded, totalPages]);
 
-  // Mark component as client-loaded and handle initial skeleton state
+  // Mark component as client-loaded
   useEffect(() => {
     setIsClientLoaded(true);
   }, []);
@@ -150,22 +122,19 @@ export function GameListWidget({
     );
   }, [block.gameCategories]);
 
-  // Load filter options
+  // Simplified filter loading (casino-style pattern)
   useEffect(() => {
-    // If filters are not needed, don't show skeleton
     if (!showFilters) {
-      setShowFiltersSkeleton(false);
+      setFiltersLoading(false);
       return;
     }
 
-    // If we already have the data, don't show skeleton
     if (initialProviders && initialCategories) {
-      setShowFiltersSkeleton(false);
+      setFiltersLoading(false);
       return;
     }
 
-    // Show skeleton while loading
-    setShowFiltersSkeleton(true);
+    setFiltersLoading(true);
 
     let cancelled = false;
 
@@ -183,11 +152,11 @@ export function GameListWidget({
         if (!cancelled) {
           setAvailableProviders(providersData || []);
           setAvailableCategories(categoriesData || []);
-          setShowFiltersSkeleton(false);
+          setFiltersLoading(false); // Simple boolean toggle
         }
       } catch (error) {
         console.error("Failed to load filter options:", error);
-        setShowFiltersSkeleton(false);
+        setFiltersLoading(false); // Always stop loading on error
       }
     };
 
@@ -233,40 +202,28 @@ export function GameListWidget({
           };
         }
 
-        // Add search filter if query exists
-        if (searchQuery && searchQuery.trim().length > 0) {
-          filters.title = {
-            $containsi: searchQuery.trim(),
-          };
-        }
-
-        const result = await getGames({
+        // Get games with filters and pagination
+        const gamesData = await getGames({
           page: pageNum,
           pageSize: numberOfGames,
-          sortBy: selectedSort, // This will be normalized format, which getGames can handle
           filters,
+          sortBy: selectedSort, // Use 'sortBy' instead of 'sort'
         });
 
-        if (result.games && result.games.length > 0) {
-          if (append && !usePagination) {
-            // Load more mode: append to existing
-            setGames((prev) => [...prev, ...result.games]);
-          } else {
-            // Pagination mode or initial load: replace
-            setGames(result.games);
-          }
-          setLocalTotalGames(result.total);
-          setHasMore(result.games.length === numberOfGames);
+        // Update games
+        if (append) {
+          setGames((prev) => [...prev, ...gamesData.games]);
         } else {
-          setHasMore(false);
-          if (!append || usePagination) {
-            setGames([]);
-            setLocalTotalGames(0);
-          }
+          setGames(gamesData.games);
         }
+
+        // Update pagination state
+        setLocalTotalGames(gamesData.total);
+        // Calculate pageCount since it's not in the response
+        const calculatedPageCount = Math.ceil(gamesData.total / numberOfGames);
+        setHasMore(pageNum < calculatedPageCount);
       } catch (error) {
         console.error("Failed to load games:", error);
-        setHasMore(false);
       } finally {
         setLoading(false);
       }
@@ -275,16 +232,15 @@ export function GameListWidget({
       loading,
       selectedProviders,
       selectedCategories,
-      initialProviderFilters,
-      initialCategoryFilters,
-      numberOfGames,
       selectedSort,
       searchQuery,
-      usePagination,
+      numberOfGames,
+      initialProviderFilters,
+      initialCategoryFilters,
     ]
   );
 
-  // Handle filter changes
+  // Filter change handlers
   const handleProviderChange = useCallback((providers: string[]) => {
     setSelectedProviders(providers);
     setPage(1);
@@ -298,7 +254,6 @@ export function GameListWidget({
   }, []);
 
   const handleSortChange = useCallback((sort: string) => {
-    // Ensure the sort value is normalized before setting it
     const normalizedSort = normalizeGameSort(sort, "Most Popular");
     setSelectedSort(normalizedSort);
     setPage(1);
@@ -382,37 +337,16 @@ export function GameListWidget({
     );
   };
 
-  // Determine whether to show filters, skeleton, or nothing
-  const shouldShowFilterArea = showFilters;
-
   return (
     <section className={cn("pb-8 px-2", className)} data-game-list-top>
-      <div className="xl:container mx-auto">
-        {/* Filter Panel - Show skeleton during loading */}
-        {shouldShowFilterArea &&
-          (showFiltersSkeleton ? (
-            <GameFiltersSkeleton className="mb-8" />
-          ) : (
-            (availableProviders.length > 0 ||
-              availableCategories.length > 0) && (
+      <div className="xl:container mx-auto px-4">
+        {/* Filters - Use same reliable pattern as casino filters */}
+        {showFilters && (
+          <div className="mb-6">
+            {!filtersLoading ? (
               <>
-                {/* Only render the appropriate filter component based on screen size */}
-                {isMobile ? (
-                  <MobileGameFilters
-                    providers={availableProviders}
-                    categories={availableCategories}
-                    selectedProviders={selectedProviders}
-                    selectedCategories={selectedCategories}
-                    selectedSort={selectedSort}
-                    searchQuery={searchQuery}
-                    onProviderChange={handleProviderChange}
-                    onCategoryChange={handleCategoryChange}
-                    onSortChange={handleSortChange}
-                    onSearchChange={handleSearchChange}
-                    translations={translations}
-                    className="mb-4"
-                  />
-                ) : (
+                {/* Desktop Filters - Hidden on mobile */}
+                <div className="hidden md:block">
                   <GameFilters
                     providers={availableProviders}
                     categories={availableCategories}
@@ -427,12 +361,41 @@ export function GameListWidget({
                     translations={translations}
                     className="mb-8"
                   />
-                )}
-              </>
-            )
-          ))}
+                </div>
 
-        {/* Games Grid - Always rendered with initial games */}
+                {/* Mobile Filters - Hidden on desktop */}
+                <div className="block md:hidden">
+                  <MobileGameFilters
+                    providers={availableProviders}
+                    categories={availableCategories}
+                    selectedProviders={selectedProviders}
+                    selectedCategories={selectedCategories}
+                    selectedSort={selectedSort}
+                    searchQuery={searchQuery}
+                    onProviderChange={handleProviderChange}
+                    onCategoryChange={handleCategoryChange}
+                    onSortChange={handleSortChange}
+                    onSearchChange={handleSearchChange}
+                    translations={translations}
+                    className="mb-4"
+                  />
+                </div>
+              </>
+            ) : (
+              <>
+                {/* Skeleton Loading */}
+                <div className="hidden md:block">
+                  <GameFiltersSkeleton className="mb-8" />
+                </div>
+                <div className="block md:hidden">
+                  <MobileGameFiltersSkeleton className="mb-4" />
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* Games Grid */}
         <div
           className={cn(
             "grid gap-3",
@@ -484,18 +447,17 @@ export function GameListWidget({
             >
               {loading
                 ? translations.loading || "Loading..."
-                : translations.loadMore || "Load More Games"}
+                : translations.loadMore || "Load More"}
             </button>
           </div>
         )}
 
-        {/* Client-side Pagination */}
-        {usePagination && isClientLoaded && calculatedTotalPages > 1 && (
+        {/* Client-side Pagination (only when JS is loaded) */}
+        {isClientLoaded && usePagination && calculatedTotalPages > 1 && (
           <Pagination
             currentPage={page}
             totalPages={calculatedTotalPages}
             onPageChange={handlePageChange}
-            disabled={loading}
             showInfo={true}
             totalItems={localTotalGames}
             itemsPerPage={numberOfGames}
@@ -505,7 +467,7 @@ export function GameListWidget({
           />
         )}
 
-        {/* Server-side Pagination (shown when JS is disabled) */}
+        {/* Server-side Pagination Fallback (SSR/no-JS) */}
         {!isClientLoaded && renderServerPagination()}
       </div>
     </section>

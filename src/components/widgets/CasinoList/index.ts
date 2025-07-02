@@ -5,6 +5,8 @@ export { CasinoListWidget } from "./CasinoListWidget";
 export { CasinoFilters } from "./CasinoFilters";
 export { CasinoListServer } from "./CasinoListServer";
 export { CasinoFiltersSkeleton } from "./CasinoFiltersSkeleton";
+export { MobileCasinoFilters } from "./MobileCasinoFilters";
+export { MobileCasinoFiltersSkeleton } from "./MobileCasinoFiltersSkeleton";
 
 // Export types
 export type {

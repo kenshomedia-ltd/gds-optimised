@@ -16,6 +16,8 @@ import type {
 import type { CasinoData } from "@/types/casino.types";
 import { cn } from "@/lib/utils/cn";
 import { getCasinos, getCasinoProviders } from "@/app/actions/casinos";
+import { MobileCasinoFiltersSkeleton } from "./MobileCasinoFiltersSkeleton";
+import { MobileCasinoFilters } from "./MobileCasinoFilters";
 
 // Initial filter state
 const initialFilters: CasinoFiltersState = {
@@ -254,17 +256,41 @@ export function CasinoListWidget({
         {/* Filters */}
         {shouldShowFilters && (
           <div className="mb-6">
-            {providersLoading ? (
-              <CasinoFiltersSkeleton />
+            {!providersLoading ? (
+              <>
+                {/* Desktop Filters - Hidden on mobile */}
+                <div className="hidden md:block">
+                  <CasinoFilters
+                    providers={providers}
+                    selectedFilters={filters}
+                    onFilterChange={handleFilterChange}
+                    onClearFilters={handleClearFilters}
+                    translations={translations}
+                    loading={loading}
+                  />
+                </div>
+
+                {/* Mobile Filters - Hidden on desktop */}
+                <div className="block md:hidden">
+                  <MobileCasinoFilters
+                    providers={providers}
+                    selectedFilters={filters}
+                    onFilterChange={handleFilterChange}
+                    onClearFilters={handleClearFilters}
+                    translations={translations}
+                    loading={loading}
+                  />
+                </div>
+              </>
             ) : (
-              <CasinoFilters
-                providers={providers}
-                selectedFilters={filters}
-                onFilterChange={handleFilterChange}
-                onClearFilters={handleClearFilters}
-                translations={translations}
-                loading={loading}
-              />
+              <>
+                <div className="hidden md:block">
+                  <CasinoFiltersSkeleton />
+                </div>
+                <div className="block md:hidden">
+                  <MobileCasinoFiltersSkeleton />
+                </div>
+              </>
             )}
           </div>
         )}

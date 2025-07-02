@@ -63,6 +63,7 @@ export function MobileGameFilters({
       }
     };
 
+    // Handle body scroll locking for filter panel only
     if (isFilterOpen) {
       document.addEventListener("keydown", handleEscape);
       document.body.style.overflow = "hidden";
@@ -70,6 +71,7 @@ export function MobileGameFilters({
       document.body.style.overflow = "unset";
     }
 
+    // Handle sort dropdown listeners (no body scroll lock for dropdown)
     if (isSortOpen) {
       document.addEventListener("keydown", handleEscape);
       document.addEventListener("click", handleClickOutside);
@@ -78,6 +80,7 @@ export function MobileGameFilters({
     return () => {
       document.removeEventListener("keydown", handleEscape);
       document.removeEventListener("click", handleClickOutside);
+      // Always restore body scroll when component unmounts or effect cleans up
       document.body.style.overflow = "unset";
     };
   }, [isFilterOpen, isSortOpen]);
@@ -117,9 +120,9 @@ export function MobileGameFilters({
     "Most Popular";
 
   return (
-    <div className={cn("mobile-filter-menu", className)}>
-      {/* Top Menu Bar - matches your screenshot */}
-      <div className="flex gap-2 p-3 bg-white/30 rounded-lg backdrop-blur-sm ">
+    <div className={cn("mobile-game-filters", className)}>
+      {/* Top Menu Bar */}
+      <div className="flex gap-2 p-4 bg-white/30 rounded-lg backdrop-blur-sm">
         {/* Filter Button - 50% width */}
         <button
           onClick={() => setIsFilterOpen(true)}
@@ -158,7 +161,7 @@ export function MobileGameFilters({
 
           {/* Sort Dropdown - positioned relative to this container */}
           {isSortOpen && (
-            <div className="absolute top-full left-0 mt-1 z-50 w-full bg-white rounded-lg shadow-xl border border-gray-200">
+            <div className="absolute top-full left-0 mt-1 z-[9999] w-full bg-white rounded-lg shadow-xl border border-gray-200">
               {sortOptions.map((option, index) => (
                 <button
                   key={option.value}
@@ -183,14 +186,14 @@ export function MobileGameFilters({
       {/* Filter Panel - slides up from bottom */}
       {isFilterOpen && (
         <>
-          {/* Backdrop */}
+          {/* Backdrop with higher z-index */}
           <div
-            className="fixed inset-0 z-40 bg-black bg-opacity-50"
+            className="fixed inset-0 z-[9999] bg-black bg-opacity-50"
             onClick={() => setIsFilterOpen(false)}
           />
 
-          {/* Filter Panel */}
-          <div className="fixed inset-x-0 bottom-0 z-50 bg-white max-h-[80vh] overflow-hidden rounded-t-2xl flex flex-col">
+          {/* Filter Panel with even higher z-index */}
+          <div className="fixed inset-x-0 bottom-0 z-[10000] bg-white max-h-[80vh] overflow-hidden rounded-t-2xl flex flex-col">
             {/* Panel Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-200 flex-shrink-0">
               <h2 className="text-lg font-semibold text-gray-900">FILTRI</h2>
