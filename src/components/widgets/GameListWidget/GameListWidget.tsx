@@ -233,7 +233,6 @@ export function GameListWidget({
       selectedProviders,
       selectedCategories,
       selectedSort,
-      searchQuery,
       numberOfGames,
       initialProviderFilters,
       initialCategoryFilters,

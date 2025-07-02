@@ -5,9 +5,11 @@ import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faXmark,
   faHeart,
   faTrash,
+} from "@awesome.me/kit-0e07a43543/icons/duotone/light";
+import {
+  faXmark,
 } from "@awesome.me/kit-0e07a43543/icons/duotone/light";
 import { Image } from "@/components/common/Image";
 import { StarRatingDisplay } from "@/components/ui/StarRating/StarRatingDisplay";
@@ -111,7 +113,7 @@ export function FavoritesDrawer({
       <div
         ref={drawerRef}
         className={cn(
-          "fixed inset-y-0 right-0 w-full max-w-md bg-white shadow-xl transition-transform duration-300 z-[100]",
+          "fixed inset-y-0 right-0 w-[80vw] max-w-[450px] bg-white shadow-xl transition-transform duration-300 z-[100]",
           "flex flex-col",
           isOpen ? "translate-x-0" : "translate-x-full"
         )}
@@ -137,7 +139,7 @@ export function FavoritesDrawer({
               onClick={onClose}
               aria-label="Close favorites drawer"
             >
-              <FontAwesomeIcon icon={faXmark} className="h-6 w-6" swapOpacity />
+              <FontAwesomeIcon icon={faXmark} className="text-black h-6 w-6" />
             </button>
           </div>
         </div>
