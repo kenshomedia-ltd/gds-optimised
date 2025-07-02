@@ -1,10 +1,12 @@
 // src/components/widgets/GameListWidget/GameListWidget.tsx
 "use client";
 
+import dynamic from "next/dynamic";
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { GameCard } from "@/components/games/GameCard/GameCard";
 import { GameCardSkeleton } from "@/components/games/GameCard/GameCardSkeleton";
 import { GameFilters } from "./GameFilters";
+// import { MobileGameFilters } from "./MobileGameFilters";
 import { GameFiltersSkeleton } from "./GameFiltersSkeleton";
 import { Pagination } from "@/components/ui/Pagination/Pagination";
 import { PaginationServer } from "@/components/ui/Pagination/PaginationServer";
@@ -20,6 +22,34 @@ import {
   getFilterProviders,
   getGameCategories,
 } from "@/app/actions/games";
+import { MobileGameFiltersSkeleton } from "./MobileGameFiltersSkeleton";
+
+// Dynamically import mobile component with loading
+const MobileGameFilters = dynamic(
+  () => import('./MobileGameFilters').then(mod => ({ default: mod.MobileGameFilters })),
+  { 
+    ssr: false, // Mobile filters don't need SSR
+    loading: () => <MobileGameFiltersSkeleton />
+  }
+);
+
+// Use a hook to detect screen size
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 768); // md breakpoint
+    };
+    
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile);
+    
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
+  
+  return isMobile;
+}
 
 /**
  * GameListWidget Component
@@ -54,6 +84,7 @@ export function GameListWidget({
   baseUrl?: string;
 }) {
   // Constants
+  const isMobile = useIsMobile();
   const numberOfGames = block.numberOfGames || 24;
   const showFilters = block.showGameFilterPanel || false;
   const showLoadMore = block.showGameMoreButton || false;
@@ -364,20 +395,40 @@ export function GameListWidget({
           ) : (
             (availableProviders.length > 0 ||
               availableCategories.length > 0) && (
-              <GameFilters
-                providers={availableProviders}
-                categories={availableCategories}
-                selectedProviders={selectedProviders}
-                selectedCategories={selectedCategories}
-                selectedSort={selectedSort} // Now guaranteed to be normalized
-                searchQuery={searchQuery}
-                onProviderChange={handleProviderChange}
-                onCategoryChange={handleCategoryChange}
-                onSortChange={handleSortChange}
-                onSearchChange={handleSearchChange}
-                translations={translations}
-                className="mb-8"
-              />
+              <>
+                {/* Only render the appropriate filter component based on screen size */}
+                {isMobile ? (
+                  <MobileGameFilters
+                    providers={availableProviders}
+                    categories={availableCategories}
+                    selectedProviders={selectedProviders}
+                    selectedCategories={selectedCategories}
+                    selectedSort={selectedSort}
+                    searchQuery={searchQuery}
+                    onProviderChange={handleProviderChange}
+                    onCategoryChange={handleCategoryChange}
+                    onSortChange={handleSortChange}
+                    onSearchChange={handleSearchChange}
+                    translations={translations}
+                    className="mb-4"
+                  />
+                ) : (
+                  <GameFilters
+                    providers={availableProviders}
+                    categories={availableCategories}
+                    selectedProviders={selectedProviders}
+                    selectedCategories={selectedCategories}
+                    selectedSort={selectedSort}
+                    searchQuery={searchQuery}
+                    onProviderChange={handleProviderChange}
+                    onCategoryChange={handleCategoryChange}
+                    onSortChange={handleSortChange}
+                    onSearchChange={handleSearchChange}
+                    translations={translations}
+                    className="mb-8"
+                  />
+                )}
+              </>
             )
           ))}
 
