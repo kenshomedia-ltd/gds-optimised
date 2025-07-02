@@ -10,7 +10,6 @@ import {
   faRotateRight,
   faInfo,
   faExclamationTriangle,
-  faXmark,
 } from "@awesome.me/kit-0e07a43543/icons/duotone/light";
 import { Image } from "@/components/common/Image";
 import { Button } from "@/components/ui/Button";
@@ -376,7 +375,9 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
             onMouseEnter={() => !isMobile && setIsDropdownExpanded(true)}
             onMouseLeave={() => !isMobile && setIsDropdownExpanded(false)}
           >
-            <div className="flex flex-col p-2.5 gap-2"> {/* Increased gap */}
+            <div className="flex flex-col p-2.5 gap-2">
+              {" "}
+              {/* Increased gap */}
               <button
                 className="w-8 h-8 rounded-full border bg-gray-300 border-gray-400 flex items-center justify-center hover:bg-gray-400 transition-colors touch-manipulation"
                 onClick={toggleDropdown} // Use onClick for universal support
@@ -524,14 +525,37 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
 
         {/* --- Desktop-Only Centered Button --- */}
         <div className="hidden md:flex absolute inset-x-0 top-0 h-full items-center justify-center pointer-events-none">
-          <Button
-            href={`${providerPagePath}`}
-            variant="default"
-            size="lg"
-            className="w-[200px] bg-misc pointer-events-auto"
-          >
-            {translations.playRealBtn || "Play Again"}
-          </Button>
+          <div className="flex items-center gap-2 pointer-events-auto">
+            <Button
+              href={`${providerPagePath}`}
+              variant="default"
+              size="lg"
+              className="w-[200px] bg-misc"
+            >
+              {translations.playRealBtn || "Play Again"}
+            </Button>
+
+            {/* Game Info button */}
+            <div className="relative">
+              <button
+                onMouseEnter={() => setShowInfo(true)}
+                onMouseLeave={() => setShowInfo(false)}
+                className="w-8 h-8 rounded-[5px] bg-gray-300 border border-gray-400 flex items-center justify-center hover:bg-gray-400 transition-colors"
+                aria-label={translations.gameInfoText || "Game Info"}
+              >
+                <FontAwesomeIcon
+                  icon={faInfo}
+                  className="w-4 h-4 text-gray-600"
+                  style={{ "--fa-secondary-opacity": 0 }}
+                />
+              </button>
+              {showInfo && (
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded whitespace-nowrap z-10">
+                  {translations.gameInfoText || "Game Information"}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* --- Right Section (Controls) --- */}
@@ -601,20 +625,6 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
             )}
           </div>
 
-          {/* Info button */}
-          <div className="relative">
-            <button
-              onClick={() => setShowInfo(!showInfo)}
-              className="w-8 h-8 rounded-[5px] border bg-gray-300 border-gray-400 flex items-center justify-center hover:bg-gray-400 hover:*:text-white transition-colors"
-              aria-label={translations.info || "Info"}
-            >
-              <FontAwesomeIcon
-                icon={showInfo ? faXmark : faInfo}
-                className="w-4 h-4 text-gray-600"
-              />
-            </button>
-          </div>
-
           {/* Report button */}
           <div className="relative mr-2 lg:mr-0">
             <button
@@ -640,51 +650,39 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
 
         {/* --- Mobile-Only Bottom Button --- */}
         <div className="w-full order-3 md:hidden">
-          <Button
-            href={`${providerPagePath}`}
-            variant="default"
-            size="lg"
-            className="bg-misc pointer-events-auto w-full"
-          >
-            {translations.playRealBtn || "Play Again"}
-          </Button>
-        </div>
-      </div>
+          <div className="flex items-center gap-2">
+            <Button
+              href={`${providerPagePath}`}
+              variant="default"
+              size="lg"
+              className="bg-misc pointer-events-auto flex-1"
+            >
+              {translations.playRealBtn || "Play Again"}
+            </Button>
 
-      {/* Info Panel */}
-      {showInfo && (
-        <div className="mt-4 p-4 bg-gray-100 rounded-lg">
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="font-semibold">
-                {translations.provider || "Provider"}:
-              </span>
-              <Link
-                href={providerPagePath}
-                className="text-primary hover:underline"
+            {/* Game Info button */}
+            <div className="relative">
+              <button
+                onMouseEnter={() => setShowInfo(true)}
+                onMouseLeave={() => setShowInfo(false)}
+                className="w-8 h-8 rounded-[5px] bg-gray-300 border border-gray-400 flex items-center justify-center hover:bg-gray-400 transition-colors"
+                aria-label={translations.gameInfoText || "Game Info"}
               >
-                {game.provider?.title}
-              </Link>
-            </div>
-            {game.categories && game.categories.length > 0 && (
-              <div className="flex justify-between">
-                <span className="font-semibold">
-                  {translations.categories || "Categories"}:
-                </span>
-                <span>
-                  {game.categories.map((cat) => cat.title).join(", ")}
-                </span>
-              </div>
-            )}
-            <div className="flex justify-between">
-              <span className="font-semibold">
-                {translations.rating || "Rating"}:
-              </span>
-              <span>{game.ratingAvg.toFixed(1)} / 5.0</span>
+                <FontAwesomeIcon
+                  icon={faInfo}
+                  className="w-4 h-4 text-gray-600"
+                  style={{ "--fa-secondary-opacity": 0 }}
+                />
+              </button>
+              {showInfo && (
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded whitespace-nowrap z-10">
+                  {translations.gameInfoText || "Game Information"}
+                </div>
+              )}
             </div>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
