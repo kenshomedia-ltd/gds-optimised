@@ -21,8 +21,9 @@ import { cn } from "@/lib/utils/cn";
  */
 export function FeaturedProviders({
   data,
-  // translations = {},
+  translations = {},
   className,
+  isHomepage = false, 
 }: FeaturedProvidersProps) {
   // Extract and deduplicate providers
   const providers = useMemo(() => {
@@ -40,7 +41,7 @@ export function FeaturedProviders({
   }, [data?.homeFeaturedProviders]);
 
   const providerBaseUrl =
-    process.env.NEXT_PUBLIC_PROVIDER_PAGE_PATH || "/software-slot-machine";
+    process.env.NEXT_PUBLIC_PROVIDER_PAGE_PATH || "/slot-software";
 
   if (!providers.length) {
     return null;
@@ -84,37 +85,39 @@ export function FeaturedProviders({
         ))}
       </div>
 
-      {/* View All Link */}
-      {/* <Link
-        href={`${providerBaseUrl}/`}
-        className={cn(
-          "mt-6 inline-flex items-center gap-2",
-          "px-6 py-3",
-          "bg-white/10 backdrop-blur-sm",
-          "border border-white/20",
-          "text-white rounded-full",
-          "hover:bg-white/20 transition-all duration-300",
-          "opacity-0 animate-[fadeIn_0.6s_ease-out_400ms_forwards]",
-          "focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
-        )}
-      >
-        <span className="text-sm font-medium">
-          {translations.viewAllProviders || "Scopri tutti i Provider"}
-        </span>
-        <svg
-          className="w-4 h-4"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
+      {/* View All Link - NEW: Only show on homepage */}
+      {isHomepage && (
+        <Link
+          href={`${providerBaseUrl}/`}
+          className={cn(
+            "mt-6 inline-flex items-center gap-2",
+            "px-6 py-3",
+            "bg-white/10 backdrop-blur-sm",
+            "border border-white/20",
+            "text-white rounded-full",
+            "hover:bg-white/20 transition-all duration-300",
+            "opacity-0 animate-[fadeIn_0.6s_ease-out_400ms_forwards]",
+            "focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+          )}
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M9 5l7 7-7 7"
-          />
-        </svg>
-      </Link> */}
+          <span className="text-sm font-medium">
+            {translations.viewAllProviders || "Scopri tutti i Provider"}
+          </span>
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M9 5l7 7-7 7"
+            />
+          </svg>
+        </Link>
+      )}
     </section>
   );
 }
@@ -158,11 +161,11 @@ function ProviderCard({ provider, providerBaseUrl, index }: ProviderCardProps) {
         animation: `fadeIn 0.6s ease-out ${animationDelay}ms forwards`,
       }}
     >
-      {/* 1. Container now only handles layout, not size or background */}
+      {/* Container */}
       <div
         className={cn(
           "relative",
-          "flex items-center justify-center", // No more bg-white, px, py, or h-10
+          "flex items-center justify-center",
           "shadow-[0_0_12px_0_rgba(0,0,0,0.1)]",
           "transition-all duration-300 ease-in-out",
           "group-hover:shadow-none group-hover:scale-105",
@@ -179,7 +182,7 @@ function ProviderCard({ provider, providerBaseUrl, index }: ProviderCardProps) {
           aria-hidden="true"
         />
 
-        {/* 2. Inner container also simplified */}
+        {/* Inner container */}
         <div className="relative z-10 flex items-center justify-center">
           {imageUrl ? (
             <Image
@@ -189,10 +192,10 @@ function ProviderCard({ provider, providerBaseUrl, index }: ProviderCardProps) {
               height={50}
               priority={index < 10}
               loading={index < 10 ? "eager" : "lazy"}
-              className="bg-white rounded-lg object-contain max-h-[50px] overflow-hidden "
+              className="bg-white rounded-lg object-contain max-h-[50px] overflow-hidden"
+              unoptimized={false}
               quality={85}
               sizes="(max-width: 640px) 40px, 80px"
-              unoptimized={imageUrl.endsWith(".svg")}
             />
           ) : (
             <span className="text-gray-400 text-xs text-center px-1 truncate">
@@ -202,7 +205,7 @@ function ProviderCard({ provider, providerBaseUrl, index }: ProviderCardProps) {
         </div>
       </div>
 
-      {/* Provider name tooltip on hover */}
+      {/* Tooltip */}
       <div
         className={cn(
           "absolute left-1/2 -translate-x-1/2 -bottom-7",

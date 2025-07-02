@@ -7,8 +7,9 @@ import { cn } from "@/lib/utils/cn";
 
 export function FeaturedProvidersServer({
   data,
-  // translations = {},
+  translations = {},
   className,
+  isHomepage = false, // NEW: Default to false
 }: FeaturedProvidersProps) {
   const providersData = data?.homeFeaturedProviders?.providers || [];
   const seen = new Set<string>();
@@ -21,7 +22,7 @@ export function FeaturedProvidersServer({
   });
 
   const providerBaseUrl =
-    process.env.NEXT_PUBLIC_PROVIDER_PAGE_PATH || "/providers";
+    process.env.NEXT_PUBLIC_PROVIDER_PAGE_PATH || "/slot-software";
 
   if (!providers.length) {
     return null;
@@ -60,7 +61,6 @@ export function FeaturedProvidersServer({
               data-provider={providerSlug}
               aria-label={`View ${providerTitle} games`}
             >
-              {/* 1. Container updated to only handle layout */}
               <div
                 className={cn(
                   "relative flex items-center justify-center",
@@ -84,11 +84,10 @@ export function FeaturedProvidersServer({
                     <Image
                       src={imageUrl}
                       alt={`${providerTitle} logo`}
-                      width={120} // Matched from client component
-                      height={50} // Matched from client component
+                      width={120}
+                      height={50}
                       priority={index < 10}
                       loading={index < 10 ? "eager" : "lazy"}
-                      // 2. Styles applied directly to Image component
                       className="bg-white rounded-lg object-contain max-h-[50px] overflow-hidden"
                       unoptimized={false}
                       quality={85}
@@ -119,35 +118,39 @@ export function FeaturedProvidersServer({
           );
         })}
       </div>
-      {/* <Link
-        href="/slot-software"
-        className={cn(
-          "mt-6 inline-flex items-center gap-2",
-          "px-6 py-3",
-          "bg-white/10 backdrop-blur-sm",
-          "border border-white/20",
-          "text-white rounded-full",
-          "hover:bg-white/20 transition-all duration-300",
-          "focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
-        )}
-      >
-        <span className="text-sm font-medium">
-          {translations.viewAllProviders || "Scopri tutti i Provider"}
-        </span>
-        <svg
-          className="w-4 h-4"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
+
+      {/* View All Link - NEW: Only show on homepage */}
+      {isHomepage && (
+        <Link
+          href="/slot-software"
+          className={cn(
+            "mt-6 inline-flex items-center gap-2",
+            "px-6 py-3",
+            "bg-white/10 backdrop-blur-sm",
+            "border border-white/20",
+            "text-white rounded-full",
+            "hover:bg-white/20 transition-all duration-300",
+            "focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+          )}
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M9 5l7 7-7 7"
-          />
-        </svg>
-      </Link> */}
+          <span className="text-sm font-medium">
+            {translations.viewAllProviders || "Scopri tutti i Provider"}
+          </span>
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M9 5l7 7-7 7"
+            />
+          </svg>
+        </Link>
+      )}
     </section>
   );
 }

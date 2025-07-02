@@ -37,4 +37,5 @@ export interface FeaturedProvidersProps {
   data: HomeFeaturedProvidersBlockData;
   translations?: Record<string, string>;
   className?: string;
+  isHomepage?: boolean;
 }

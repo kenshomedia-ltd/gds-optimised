@@ -1,5 +1,4 @@
 // src/components/common/FaviconMeta/FaviconMeta.tsx
-
 import { getFaviconPath } from "@/lib/utils/favicon";
 
 interface FaviconMetaProps {
@@ -11,9 +10,8 @@ interface FaviconMetaProps {
 /**
  * FaviconMeta Component
  *
+ * Updated to work with your favicon format: /favicon/favicon-{siteId}.png
  * Renders favicon meta tags for a specific site.
- * Useful for pages that need to override the default favicon
- * or for client-side favicon updates.
  */
 export function FaviconMeta({
   siteId,
@@ -24,44 +22,34 @@ export function FaviconMeta({
   const currentSiteName =
     siteName || process.env.NEXT_PUBLIC_SITE_NAME || "Casino Games";
 
+  const faviconUrl = getFaviconPath(currentSiteId);
+
   return (
     <>
       {/* Primary favicon */}
-      <link
-        rel="icon"
-        type="image/png"
-        sizes="32x32"
-        href={getFaviconPath(currentSiteId, "favicon-32x32.png")}
-      />
-      <link
-        rel="icon"
-        type="image/png"
-        sizes="16x16"
-        href={getFaviconPath(currentSiteId, "favicon.png")}
-      />
+      <link rel="icon" type="image/png" href={faviconUrl} />
 
-      {/* Apple Touch Icon */}
-      <link
-        rel="apple-touch-icon"
-        sizes="180x180"
-        href={getFaviconPath(currentSiteId, "apple-touch-icon.png")}
-      />
+      {/* Different sizes - all point to same file, browser will scale */}
+      <link rel="icon" type="image/png" sizes="16x16" href={faviconUrl} />
+      <link rel="icon" type="image/png" sizes="32x32" href={faviconUrl} />
+      <link rel="icon" type="image/png" sizes="192x192" href={faviconUrl} />
 
-      {/* Safari Pinned Tab */}
-      <link
-        rel="mask-icon"
-        href={getFaviconPath(currentSiteId, "safari-pinned-tab.svg")}
-        color={themeColor}
-      />
+      {/* Apple Touch Icon - use same favicon */}
+      <link rel="apple-touch-icon" href={faviconUrl} />
+      <link rel="apple-touch-icon" sizes="180x180" href={faviconUrl} />
 
-      {/* Web App Manifest */}
+      {/* Shortcut icon for older browsers */}
+      <link rel="shortcut icon" href={faviconUrl} type="image/png" />
+
+      {/* Web App Manifest - you may want to create these files */}
       <link
         rel="manifest"
-        href={getFaviconPath(currentSiteId, "site.webmanifest")}
+        href={`/favicon/site-${currentSiteId}.webmanifest`}
       />
 
       {/* Browser Configuration */}
       <meta name="msapplication-TileColor" content={themeColor} />
+      <meta name="msapplication-TileImage" content={faviconUrl} />
       <meta name="theme-color" content={themeColor} />
 
       {/* Additional Apple meta tags */}
@@ -74,35 +62,25 @@ export function FaviconMeta({
 
 /**
  * Hook for dynamically updating favicons on the client side
- * Useful for scenarios where the favicon needs to change based on user interaction
+ * Updated to work with your favicon format
  */
 export function useDynamicFavicon() {
   const updateFavicon = (siteId: string) => {
     if (typeof window === "undefined") return;
 
-    // Update the main favicon
-    const faviconLink = document.querySelector(
-      "link[rel='icon']"
-    ) as HTMLLinkElement;
-    if (faviconLink) {
-      faviconLink.href = getFaviconPath(siteId, "favicon-32x32.png");
-    }
+    const faviconUrl = getFaviconPath(siteId);
 
-    // Update apple touch icon
-    const appleTouchIcon = document.querySelector(
-      "link[rel='apple-touch-icon']"
-    ) as HTMLLinkElement;
-    if (appleTouchIcon) {
-      appleTouchIcon.href = getFaviconPath(siteId, "apple-touch-icon.png");
-    }
+    // Update all favicon links
+    const faviconLinks = document.querySelectorAll(
+      "link[rel='icon'], link[rel='shortcut icon'], link[rel='apple-touch-icon']"
+    );
 
-    // Update shortcut icon for older browsers
-    const shortcutIcon = document.querySelector(
-      "link[rel='shortcut icon']"
-    ) as HTMLLinkElement;
-    if (shortcutIcon) {
-      shortcutIcon.href = getFaviconPath(siteId, "favicon.ico");
-    }
+    faviconLinks.forEach((link) => {
+      (link as HTMLLinkElement).href = faviconUrl;
+    });
+
+    // Update page title to reflect the change (optional)
+    console.log(`Updated favicon to: ${faviconUrl}`);
   };
 
   const resetFavicon = () => {

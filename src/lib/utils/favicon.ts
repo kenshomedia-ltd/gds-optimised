@@ -1,60 +1,36 @@
 // src/lib/utils/favicon.ts
-
 import { existsSync } from "fs";
 import { join } from "path";
 
 /**
- * Favicon size configurations for different devices and platforms
+ * Updated favicon utility to work with format: /favicon/favicon-{siteId}.png
+ * This replaces the previous complex multi-size system with a simpler approach
  */
-const FAVICON_SIZES = [
-  { size: "16x16", type: "image/png" },
-  { size: "32x32", type: "image/png" },
-  { size: "48x48", type: "image/png" },
-  { size: "96x96", type: "image/png" },
-  { size: "192x192", type: "image/png" },
-  { size: "512x512", type: "image/png" },
-] as const;
-
-/**
- * Apple-specific icon sizes
- */
-const APPLE_ICON_SIZES = [
-  "57x57",
-  "60x60",
-  "72x72",
-  "76x76",
-  "114x114",
-  "120x120",
-  "144x144",
-  "152x152",
-  "180x180",
-] as const;
 
 /**
  * Get the favicon file path for a specific site
+ * Now works with your format: /favicon/favicon-{siteId}.png
  * @param siteId - The site identifier (e.g., 'gds', 'csi')
- * @param filename - The favicon filename (e.g., 'favicon.ico', 'favicon-32x32.png')
+ * @param size - Optional size for different favicon types (defaults to main favicon)
  * @returns The path to the favicon file
  */
-export function getFaviconPath(siteId: string, filename: string): string {
-  const faviconPath = `/favicon/favicon-${siteId}-${filename}`;
-
-  // In development or server-side, we can't check file existence
-  // Return the expected path and let the browser handle 404s gracefully
-  if (typeof window === "undefined") {
-    return faviconPath;
+export function getFaviconPath(siteId: string, size?: string): string {
+  // For your format: /favicon/favicon-{siteId}.png
+  if (!size || size === "default") {
+    return `/favicon/favicon-${siteId}.png`;
   }
 
-  return faviconPath;
+  // For specific sizes, we'll try your format first, then fall back to standard format
+  const yourFormat = `/favicon/favicon-${siteId}.png`;
+  return yourFormat;
 }
 
 /**
  * Check if a favicon file exists (server-side only)
  * @param siteId - The site identifier
- * @param filename - The favicon filename
  * @returns True if the file exists, false otherwise
  */
-export function faviconExists(siteId: string, filename: string): boolean {
+export function faviconExists(siteId: string): boolean {
   if (typeof window !== "undefined") {
     // Can't check file existence on client-side
     return true;
@@ -62,11 +38,7 @@ export function faviconExists(siteId: string, filename: string): boolean {
 
   try {
     const publicDir = join(process.cwd(), "public");
-    const faviconPath = join(
-      publicDir,
-      "favicon",
-      `favicon-${siteId}-${filename}`
-    );
+    const faviconPath = join(publicDir, "favicon", `favicon-${siteId}.png`);
     return existsSync(faviconPath);
   } catch {
     return false;
@@ -75,10 +47,13 @@ export function faviconExists(siteId: string, filename: string): boolean {
 
 /**
  * Generate favicon link objects for Next.js metadata
+ * Simplified to work with your single favicon format
  * @param siteId - The site identifier
  * @returns Array of favicon link objects for Next.js metadata
  */
 export function generateFaviconLinks(siteId: string) {
+  const faviconUrl = getFaviconPath(siteId);
+
   const icons: Array<{
     rel?: string;
     url: string;
@@ -86,39 +61,66 @@ export function generateFaviconLinks(siteId: string) {
     type?: string;
   }> = [];
 
-  // Standard favicon sizes
-  FAVICON_SIZES.forEach(({ size, type }) => {
-    const filename = size === "16x16" ? "favicon.png" : `favicon-${size}.png`;
-    icons.push({
-      rel: "icon",
-      url: getFaviconPath(siteId, filename),
-      sizes: size,
-      type,
-    });
+  // Primary favicon - your format
+  icons.push({
+    rel: "icon",
+    url: faviconUrl,
+    type: "image/png",
   });
 
-  // Apple Touch Icons
-  APPLE_ICON_SIZES.forEach((size) => {
-    icons.push({
-      rel: "apple-touch-icon",
-      url: getFaviconPath(siteId, `apple-touch-icon-${size}.png`),
-      sizes: size,
-    });
+  // Shortcut icon for older browsers
+  icons.push({
+    rel: "shortcut icon",
+    url: faviconUrl,
+    type: "image/png",
   });
 
-  // Default apple-touch-icon (180x180)
+  // Apple Touch Icon - use same favicon
   icons.push({
     rel: "apple-touch-icon",
-    url: getFaviconPath(siteId, "apple-touch-icon.png"),
+    url: faviconUrl,
   });
 
-  // Mask icon for Safari
+  // Different sizes referencing the same file
+  // Browsers will scale as needed
   icons.push({
-    rel: "mask-icon",
-    url: getFaviconPath(siteId, "safari-pinned-tab.svg"),
+    rel: "icon",
+    url: faviconUrl,
+    sizes: "16x16",
+    type: "image/png",
+  });
+
+  icons.push({
+    rel: "icon",
+    url: faviconUrl,
+    sizes: "32x32",
+    type: "image/png",
+  });
+
+  icons.push({
+    rel: "icon",
+    url: faviconUrl,
+    sizes: "192x192",
+    type: "image/png",
   });
 
   return icons;
+}
+
+/**
+ * Validate that the favicon exists for a site
+ * @param siteId - The site identifier
+ * @returns Object with validation results
+ */
+export function validateSiteFavicons(siteId: string) {
+  const results = {
+    siteId,
+    valid: faviconExists(siteId),
+    expectedFile: `favicon-${siteId}.png`,
+    path: getFaviconPath(siteId),
+  };
+
+  return results;
 }
 
 /**
@@ -133,6 +135,8 @@ export function generateWebAppManifest(
   siteName: string,
   themeColor: string = "#000000"
 ) {
+  const faviconUrl = getFaviconPath(siteId);
+
   return {
     name: siteName,
     short_name: siteName,
@@ -143,18 +147,18 @@ export function generateWebAppManifest(
     theme_color: themeColor,
     icons: [
       {
-        src: getFaviconPath(siteId, "favicon-192x192.png"),
+        src: faviconUrl,
         sizes: "192x192",
         type: "image/png",
       },
       {
-        src: getFaviconPath(siteId, "favicon-512x512.png"),
+        src: faviconUrl,
         sizes: "512x512",
         type: "image/png",
       },
       {
-        src: getFaviconPath(siteId, "favicon-512x512.png"),
-        sizes: "512x512",
+        src: faviconUrl,
+        sizes: "any",
         type: "image/png",
         purpose: "maskable",
       },
@@ -163,92 +167,38 @@ export function generateWebAppManifest(
 }
 
 /**
- * Expected favicon file structure for each site:
- *
- * public/
- * └── favicon/
- *     ├── favicon-{SITE_ID}-favicon.ico
- *     ├── favicon-{SITE_ID}-favicon.png (16x16)
- *     ├── favicon-{SITE_ID}-favicon-32x32.png
- *     ├── favicon-{SITE_ID}-favicon-48x48.png
- *     ├── favicon-{SITE_ID}-favicon-96x96.png
- *     ├── favicon-{SITE_ID}-favicon-192x192.png
- *     ├── favicon-{SITE_ID}-favicon-512x512.png
- *     ├── favicon-{SITE_ID}-apple-touch-icon.png (180x180)
- *     ├── favicon-{SITE_ID}-apple-touch-icon-57x57.png
- *     ├── favicon-{SITE_ID}-apple-touch-icon-60x60.png
- *     ├── favicon-{SITE_ID}-apple-touch-icon-72x72.png
- *     ├── favicon-{SITE_ID}-apple-touch-icon-76x76.png
- *     ├── favicon-{SITE_ID}-apple-touch-icon-114x114.png
- *     ├── favicon-{SITE_ID}-apple-touch-icon-120x120.png
- *     ├── favicon-{SITE_ID}-apple-touch-icon-144x144.png
- *     ├── favicon-{SITE_ID}-apple-touch-icon-152x152.png
- *     ├── favicon-{SITE_ID}-apple-touch-icon-180x180.png
- *     ├── favicon-{SITE_ID}-safari-pinned-tab.svg
- *     └── favicon-{SITE_ID}-site.webmanifest
- *
- * Examples:
- * - favicon-gds-favicon.ico
- * - favicon-csi-favicon-32x32.png
- * - favicon-default-apple-touch-icon.png (fallback)
+ * Get all available site favicons (async version)
+ * Scans the favicon directory for files matching your format
+ * @returns Promise<Array of available site IDs>
  */
+export async function getAvailableSites(): Promise<string[]> {
+  if (typeof window !== "undefined") {
+    // Can't scan directory on client-side
+    return [];
+  }
 
-/**
- * Utility to validate required favicon files for a site
- * @param siteId - The site identifier
- * @returns Object with validation results
- */
-export function validateSiteFavicons(siteId: string) {
-  const requiredFiles = [
-    "favicon.ico",
-    "favicon.png",
-    "favicon-32x32.png",
-    "apple-touch-icon.png",
-  ];
+  try {
+    const fs = await import("fs");
+    const publicDir = join(process.cwd(), "public");
+    const faviconDir = join(publicDir, "favicon");
 
-  const results = {
-    siteId,
-    valid: true,
-    missing: [] as string[],
-    existing: [] as string[],
-  };
-
-  requiredFiles.forEach((filename) => {
-    if (faviconExists(siteId, filename)) {
-      results.existing.push(filename);
-    } else {
-      results.missing.push(filename);
-      results.valid = false;
+    if (!existsSync(faviconDir)) {
+      return [];
     }
-  });
 
-  return results;
-}
+    const files = fs.readdirSync(faviconDir);
+    const siteIds: string[] = [];
 
-/**
- * Development helper to generate the required favicon file list
- * @param siteId - The site identifier
- * @returns Array of expected favicon filenames
- */
-export function getExpectedFaviconFiles(siteId: string): string[] {
-  const files: string[] = [];
+    files.forEach((file: string) => {
+      // Match your format: favicon-{siteId}.png
+      const match = file.match(/^favicon-(.+)\.png$/);
+      if (match) {
+        siteIds.push(match[1]);
+      }
+    });
 
-  // Standard favicons
-  files.push(`favicon-${siteId}-favicon.ico`);
-  FAVICON_SIZES.forEach(({ size }) => {
-    const filename = size === "16x16" ? "favicon.png" : `favicon-${size}.png`;
-    files.push(`favicon-${siteId}-${filename}`);
-  });
-
-  // Apple icons
-  files.push(`favicon-${siteId}-apple-touch-icon.png`);
-  APPLE_ICON_SIZES.forEach((size) => {
-    files.push(`favicon-${siteId}-apple-touch-icon-${size}.png`);
-  });
-
-  // Additional files
-  files.push(`favicon-${siteId}-safari-pinned-tab.svg`);
-  files.push(`favicon-${siteId}-site.webmanifest`);
-
-  return files.sort();
+    return siteIds.sort();
+  } catch {
+    return [];
+  }
 }

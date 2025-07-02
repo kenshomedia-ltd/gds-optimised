@@ -54,6 +54,7 @@ export default async function HomePage() {
     blogs,
     casinos,
     translations,
+    isHomepage: true,
   };
 
   // Separate blocks by section

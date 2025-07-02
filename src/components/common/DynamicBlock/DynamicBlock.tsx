@@ -303,6 +303,7 @@ export function DynamicBlock({
         <FeaturedProviders
           data={featuredProvidersData}
           translations={translations}
+          isHomepage={additionalData.isHomepage || false}
         />
       );
     // Add other custom page block cases as needed...

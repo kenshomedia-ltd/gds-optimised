@@ -352,7 +352,7 @@ export function GameFilters({
                   showProviders && "!rounded-b-none border-b-0"
                 )}
               >
-                <span className="text-sm md:text-base">
+                <span className="text-sm md:text-base capitalize">
                   {selectedProviders.length > 0
                     ? `${translations.providers || "Providers"} (${
                         selectedProviders.length
