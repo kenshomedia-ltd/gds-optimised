@@ -8,15 +8,13 @@
 
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChevronDown,
   faSliders,
 } from "@awesome.me/kit-0e07a43543/icons/duotone/light";
-import {
-  faTimes,
-} from "@awesome.me/kit-0e07a43543/icons/duotone/light";
+import { faTimes } from "@awesome.me/kit-0e07a43543/icons/duotone/solid";
 import type {
   CasinoFiltersProps,
   CasinoFiltersState,
@@ -29,6 +27,9 @@ import {
   WAGERING_OPTIONS,
 } from "@/lib/utils/sort-mappings";
 import { cn } from "@/lib/utils/cn";
+// ADD PORTAL IMPORTS
+import { DropdownPortal } from "@/components/common/Portal/DropdownPortal";
+import { ModalPortal } from "@/components/common/Portal/ModalPortal";
 
 export function MobileCasinoFilters({
   selectedFilters,
@@ -40,6 +41,9 @@ export function MobileCasinoFilters({
 }: CasinoFiltersProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isSortOpen, setIsSortOpen] = useState(false);
+
+  // ADD REF FOR DROPDOWN POSITIONING
+  const sortButtonRef = useRef<HTMLButtonElement>(null);
 
   // Use casino-specific sort options from centralized location
   const sortOptions = CASINO_SORT_OPTIONS.map((option) => ({
@@ -84,12 +88,9 @@ export function MobileCasinoFilters({
       }
     };
 
-    // Handle body scroll locking for filter panel only
+    // UPDATED: No longer need manual body scroll handling - ModalPortal handles it
     if (isFilterOpen) {
       document.addEventListener("keydown", handleEscape);
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
     }
 
     // Handle sort dropdown listeners (no body scroll lock for dropdown)
@@ -101,8 +102,6 @@ export function MobileCasinoFilters({
     return () => {
       document.removeEventListener("keydown", handleEscape);
       document.removeEventListener("click", handleClickOutside);
-      // Always restore body scroll when component unmounts or effect cleans up
-      document.body.style.overflow = "unset";
     };
   }, [isFilterOpen, isSortOpen]);
 
@@ -152,7 +151,7 @@ export function MobileCasinoFilters({
   return (
     <div className={cn("mobile-casino-filters", className)}>
       {/* Top Menu Bar */}
-      <div className="flex gap-2 mt-6 p-4 bg-white/30 rounded-lg backdrop-blur-sm">
+      <div className="flex gap-2 mt-6 p-3 bg-white/30 rounded-lg backdrop-blur-sm">
         {/* Filter Button - 50% width */}
         <button
           onClick={() => setIsFilterOpen(true)}
@@ -178,6 +177,7 @@ export function MobileCasinoFilters({
         {/* Sort Button - 50% width */}
         <div className="w-1/2 relative sort-dropdown-container">
           <button
+            ref={sortButtonRef} // ADD REF
             onClick={() => setIsSortOpen(!isSortOpen)}
             disabled={loading}
             className="w-full flex items-center justify-center gap-2 px-2 py-2 bg-blue-100 border border-blue-200 text-gray-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -192,203 +192,198 @@ export function MobileCasinoFilters({
             />
           </button>
 
-          {/* Sort Dropdown - positioned relative to this container */}
-          {isSortOpen && (
-            <div className="absolute top-full left-0 mt-1 z-[100] w-full bg-white rounded-lg shadow-xl border border-gray-200">
-              {sortOptions.map((option, index) => (
-                <button
-                  key={option.value}
-                  onClick={() => handleSortChange(option.value)}
-                  className={cn(
-                    "w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors",
-                    selectedFilters.sort?.startsWith(option.value.split(":")[0])
-                      ? "bg-blue-50 text-blue-700 font-medium"
-                      : "text-gray-700",
-                    index === 0 ? "rounded-t-lg" : "",
-                    index === sortOptions.length - 1 ? "rounded-b-lg" : ""
-                  )}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-          )}
+          {/* REPLACE ORIGINAL DROPDOWN WITH PORTAL */}
+          <DropdownPortal
+            isOpen={isSortOpen}
+            onClose={() => setIsSortOpen(false)}
+            triggerRef={sortButtonRef}
+            className="bg-white rounded-lg shadow-xl border border-gray-200"
+          >
+            {sortOptions.map((option, index) => (
+              <button
+                key={option.value}
+                onClick={() => handleSortChange(option.value)}
+                className={cn(
+                  "w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors",
+                  selectedFilters.sort?.startsWith(option.value.split(":")[0])
+                    ? "bg-blue-50 text-blue-700 font-medium"
+                    : "text-gray-700",
+                  index === 0 ? "rounded-t-lg" : "",
+                  index === sortOptions.length - 1 ? "rounded-b-lg" : ""
+                )}
+              >
+                {option.label}
+              </button>
+            ))}
+          </DropdownPortal>
         </div>
       </div>
 
-      {/* Filter Panel - slides up from bottom */}
-      {isFilterOpen && (
-        <>
-          {/* Backdrop with higher z-index */}
-          <div
-            className="fixed inset-0 z-[9999] bg-black/60"
-            onClick={() => setIsFilterOpen(false)}
-          />
+      {/* REPLACE FILTER PANEL WITH MODAL PORTAL */}
+      <ModalPortal
+        isOpen={isFilterOpen}
+        onClose={() => setIsFilterOpen(false)}
+        closeOnBackdropClick={true}
+        closeOnEscape={true}
+      >
+        {/* Filter Panel with even higher z-index */}
+        <div className="w-full max-h-[80vh] bg-white overflow-hidden rounded-t-2xl flex flex-col">
+          {/* Panel Header */}
+          <div className="flex items-center justify-between p-4 border-b border-gray-200 flex-shrink-0">
+            <h2 className="text-lg font-semibold text-gray-900">FILTRI</h2>
+            <button
+              onClick={() => setIsFilterOpen(false)}
+              className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
+            >
+              <FontAwesomeIcon icon={faTimes} className="text-black w-6 h-6" swapOpacity />
+            </button>
+          </div>
 
-          {/* Filter Panel with even higher z-index */}
-          <div className="fixed inset-x-0 bottom-0 z-[10000] bg-white max-h-[80vh] overflow-hidden rounded-t-2xl flex flex-col">
-            {/* Panel Header */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-200 flex-shrink-0">
-              <h2 className="text-lg font-semibold text-gray-900">FILTRI</h2>
-              <button
-                onClick={() => setIsFilterOpen(false)}
-                className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
-              >
-                <FontAwesomeIcon
-                  icon={faTimes}
-                  className="text-black w-6 h-6"
-                />
-              </button>
-            </div>
-
-            {/* Panel Content */}
-            <div className="flex-1 overflow-y-auto">
-              {/* Bonus Type Section */}
-              <div className="p-4">
-                <h3 className="text-base font-semibold text-gray-700 mb-4">
-                  Tipo Di Bonus
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {BONUS_TYPE_OPTIONS.map((option) => (
-                    <button
-                      key={option.value}
-                      onClick={() =>
-                        handleFilterChange("bonusKey", option.value)
-                      }
-                      className={cn(
-                        "px-3 py-2 text-sm rounded-full border transition-colors whitespace-nowrap",
-                        selectedFilters.bonusKey === option.value
-                          ? "bg-blue-600 text-white border-blue-600"
-                          : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-                      )}
-                    >
-                      {getLabelByValue(BONUS_TYPE_OPTIONS, option.value) ||
-                        option.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Condition Section */}
-              <div className="p-4 border-t border-gray-200">
-                <h3 className="text-base font-semibold text-gray-700 mb-4">
-                  Condizione
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {CONDITION_OPTIONS.map((option) => (
-                    <button
-                      key={option.value}
-                      onClick={() =>
-                        handleFilterChange("condition", option.value)
-                      }
-                      className={cn(
-                        "px-3 py-2 text-sm rounded-full border transition-colors whitespace-nowrap",
-                        selectedFilters.condition === option.value
-                          ? "bg-blue-600 text-white border-blue-600"
-                          : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-                      )}
-                    >
-                      {getLabelByValue(CONDITION_OPTIONS, option.value) ||
-                        option.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Bonus Amount Section */}
-              <div className="p-4 border-t border-gray-200">
-                <h3 className="text-base font-semibold text-gray-700 mb-4">
-                  Importo Bonus
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {BONUS_AMOUNT_OPTIONS.map((amount) => (
-                    <button
-                      key={amount}
-                      onClick={() =>
-                        handleFilterChange("amount", amount.toString())
-                      }
-                      className={cn(
-                        "px-3 py-2 text-sm rounded-full border transition-colors whitespace-nowrap",
-                        selectedFilters.amount === amount.toString()
-                          ? "bg-blue-600 text-white border-blue-600"
-                          : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-                      )}
-                    >
-                      {amount}€
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Wagering Requirements Section */}
-              <div className="p-4 border-t border-gray-200">
-                <h3 className="text-base font-semibold text-gray-700 mb-4">
-                  Requisiti
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {WAGERING_OPTIONS.map((wagering) => (
-                    <button
-                      key={wagering}
-                      onClick={() => handleFilterChange("wagering", wagering)}
-                      className={cn(
-                        "px-3 py-2 text-sm rounded-full border transition-colors whitespace-nowrap",
-                        selectedFilters.wagering === wagering
-                          ? "bg-blue-600 text-white border-blue-600"
-                          : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-                      )}
-                    >
-                      {wagering}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Speed Section */}
-              <div className="p-4 border-t border-gray-200">
-                <h3 className="text-base font-semibold text-gray-700 mb-4">
-                  Immediato
-                </h3>
-                <div className="flex gap-2">
+          {/* Panel Content - EXACT ORIGINAL CONTENT */}
+          <div className="flex-1 overflow-y-auto">
+            {/* Bonus Type Section */}
+            <div className="p-4">
+              <h3 className="text-base font-semibold text-gray-700 mb-4">
+                Tipo Di Bonus
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {BONUS_TYPE_OPTIONS.map((option) => (
                   <button
-                    onClick={() =>
-                      handleFilterChange(
-                        "speed",
-                        selectedFilters.speed === "immediate" ? "" : "immediate"
-                      )
-                    }
+                    key={option.value}
+                    onClick={() => handleFilterChange("bonusKey", option.value)}
                     className={cn(
                       "px-3 py-2 text-sm rounded-full border transition-colors whitespace-nowrap",
-                      selectedFilters.speed === "immediate"
+                      selectedFilters.bonusKey === option.value
                         ? "bg-blue-600 text-white border-blue-600"
                         : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
                     )}
                   >
-                    IMMEDIATO
+                    {getLabelByValue(BONUS_TYPE_OPTIONS, option.value) ||
+                      option.label}
                   </button>
-                </div>
+                ))}
               </div>
             </div>
 
-            {/* Panel Footer */}
-            <div className="p-4 border-t border-gray-200 bg-gray-50 flex-shrink-0">
-              <div className="flex gap-3">
+            {/* Condition Section */}
+            <div className="p-4 border-t border-gray-200">
+              <h3 className="text-base font-semibold text-gray-700 mb-4">
+                Condizione
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {CONDITION_OPTIONS.map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() =>
+                      handleFilterChange("condition", option.value)
+                    }
+                    className={cn(
+                      "px-3 py-2 text-sm rounded-full border transition-colors whitespace-nowrap",
+                      selectedFilters.condition === option.value
+                        ? "bg-blue-600 text-white border-blue-600"
+                        : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                    )}
+                  >
+                    {getLabelByValue(CONDITION_OPTIONS, option.value) ||
+                      option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Bonus Amount Section */}
+            <div className="p-4 border-t border-gray-200">
+              <h3 className="text-base font-semibold text-gray-700 mb-4">
+                Importo Bonus
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {BONUS_AMOUNT_OPTIONS.map((amount) => (
+                  <button
+                    key={amount}
+                    onClick={() =>
+                      handleFilterChange("amount", amount.toString())
+                    }
+                    className={cn(
+                      "px-3 py-2 text-sm rounded-full border transition-colors whitespace-nowrap",
+                      selectedFilters.amount === amount.toString()
+                        ? "bg-blue-600 text-white border-blue-600"
+                        : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                    )}
+                  >
+                    {amount}€
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Wagering Requirements Section */}
+            <div className="p-4 border-t border-gray-200">
+              <h3 className="text-base font-semibold text-gray-700 mb-4">
+                Requisiti
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {WAGERING_OPTIONS.map((wagering) => (
+                  <button
+                    key={wagering}
+                    onClick={() => handleFilterChange("wagering", wagering)}
+                    className={cn(
+                      "px-3 py-2 text-sm rounded-full border transition-colors whitespace-nowrap",
+                      selectedFilters.wagering === wagering
+                        ? "bg-blue-600 text-white border-blue-600"
+                        : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                    )}
+                  >
+                    {wagering}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Speed Section */}
+            <div className="p-4 border-t border-gray-200">
+              <h3 className="text-base font-semibold text-gray-700 mb-4">
+                Immediato
+              </h3>
+              <div className="flex gap-2">
                 <button
-                  onClick={handleClearFilters}
-                  className="flex-1 px-4 py-3 bg-danger hover:bg-danger text-black font-medium rounded-lg transition-colors"
+                  onClick={() =>
+                    handleFilterChange(
+                      "speed",
+                      selectedFilters.speed === "immediate" ? "" : "immediate"
+                    )
+                  }
+                  className={cn(
+                    "px-3 py-2 text-sm rounded-full border transition-colors whitespace-nowrap",
+                    selectedFilters.speed === "immediate"
+                      ? "bg-blue-600 text-white border-blue-600"
+                      : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                  )}
                 >
-                  Cancella
-                </button>
-                <button
-                  onClick={() => setIsFilterOpen(false)}
-                  className="flex-1 px-4 py-3 bg-misc hover:bg-misc text-white font-medium rounded-lg transition-colors"
-                >
-                  Cerca
+                  IMMEDIATO
                 </button>
               </div>
             </div>
           </div>
-        </>
-      )}
+
+          {/* Panel Footer */}
+          <div className="p-4 border-t border-gray-200 bg-gray-50 flex-shrink-0">
+            <div className="flex gap-3">
+              <button
+                onClick={handleClearFilters}
+                className="flex-1 px-4 py-3 bg-danger hover:bg-danger text-black font-medium rounded-lg transition-colors"
+              >
+                Cancella
+              </button>
+              <button
+                onClick={() => setIsFilterOpen(false)}
+                className="flex-1 px-4 py-3 bg-misc hover:bg-misc text-white font-medium rounded-lg transition-colors"
+              >
+                Cerca
+              </button>
+            </div>
+          </div>
+        </div>
+      </ModalPortal>
     </div>
   );
 }

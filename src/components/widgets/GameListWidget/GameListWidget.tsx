@@ -337,8 +337,8 @@ export function GameListWidget({
   };
 
   return (
-    <section className={cn("pb-8 px-2", className)} data-game-list-top>
-      <div className="xl:container mx-auto px-4">
+    <section className={cn("pb-8", className)} data-game-list-top>
+      <div className="xl:container mx-auto px-2">
         {/* Filters - Use same reliable pattern as casino filters */}
         {showFilters && (
           <div className="mb-6">
@@ -376,7 +376,7 @@ export function GameListWidget({
                     onSortChange={handleSortChange}
                     onSearchChange={handleSearchChange}
                     translations={translations}
-                    className="mb-4"
+                    className="m-2"
                   />
                 </div>
               </>

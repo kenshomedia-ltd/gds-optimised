@@ -63,7 +63,7 @@ export function MobileMenu({
       {/* Backdrop */}
       <div
         className={`
-          fixed inset-0 z-40 bg-black transition-opacity duration-300 lg:hidden
+          fixed inset-0 z-60 bg-black transition-opacity duration-300 lg:hidden
           ${isOpen ? "opacity-50" : "pointer-events-none opacity-0"}
         `}
         onClick={onClose}
@@ -73,7 +73,7 @@ export function MobileMenu({
       {/* Menu Panel */}
       <div
         className={`
-          fixed inset-y-0 left-0 z-50 w-full max-w-sm bg-white shadow-xl
+          fixed inset-y-0 left-0 z-70 w-full max-w-sm bg-white shadow-xl
           transition-transform duration-300 ease-in-out lg:hidden
           ${isOpen ? "translate-x-0" : "-translate-x-full"}
         `}

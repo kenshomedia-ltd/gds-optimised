@@ -1,23 +1,22 @@
 // src/components/widgets/GameListWidget/MobileGameFilters.tsx
-// Mobile-specific filter component for GameListWidget
-// This component provides a mobile-optimized filter interface with:
-// - Slide-up bottom sheet panel for filters
-// - Combined categories and providers in one filter button
-// - Separate sort dropdown button
-// - Touch-optimized interactions
+// Complete file with Portal implementation
 
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChevronDown,
-  faTimes,
   faSliders,
 } from "@awesome.me/kit-0e07a43543/icons/duotone/light";
+import {
+  faTimes,
+} from "@awesome.me/kit-0e07a43543/icons/duotone/solid";
 import type { GameFiltersProps } from "@/types/game-list-widget.types";
 import { GAME_SORT_OPTIONS } from "@/lib/utils/sort-mappings";
 import { cn } from "@/lib/utils/cn";
+import { DropdownPortal } from "@/components/common/Portal/DropdownPortal";
+import { ModalPortal } from "@/components/common/Portal/ModalPortal";
 
 export function MobileGameFilters({
   providers = [],
@@ -34,6 +33,9 @@ export function MobileGameFilters({
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isSortOpen, setIsSortOpen] = useState(false);
 
+  // Ref for the sort button to position the dropdown
+  const sortButtonRef = useRef<HTMLButtonElement>(null);
+
   // Use game-specific sort options from centralized location
   const sortOptions = GAME_SORT_OPTIONS.map((option) => ({
     value: option.value,
@@ -46,7 +48,7 @@ export function MobileGameFilters({
   const activeFiltersCount =
     selectedProviders.length + selectedCategories.length;
 
-  // Close filter panel when clicking outside
+  // Close filter panel when clicking outside (for the slide-up panel only)
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -55,37 +57,15 @@ export function MobileGameFilters({
       }
     };
 
-    const handleClickOutside = (e: MouseEvent) => {
-      // Close sort dropdown when clicking outside
-      if (
-        isSortOpen &&
-        !(e.target as Element).closest(".sort-dropdown-container")
-      ) {
-        setIsSortOpen(false);
-      }
-    };
-
-    // Handle body scroll locking for filter panel only
+    // Handle body scroll locking for filter panel only - ModalPortal handles this now
     if (isFilterOpen) {
       document.addEventListener("keydown", handleEscape);
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
-
-    // Handle sort dropdown listeners (no body scroll lock for dropdown)
-    if (isSortOpen) {
-      document.addEventListener("keydown", handleEscape);
-      document.addEventListener("click", handleClickOutside);
     }
 
     return () => {
       document.removeEventListener("keydown", handleEscape);
-      document.removeEventListener("click", handleClickOutside);
-      // Always restore body scroll when component unmounts or effect cleans up
-      document.body.style.overflow = "unset";
     };
-  }, [isFilterOpen, isSortOpen]);
+  }, [isFilterOpen]);
 
   // Handle provider toggle
   const handleProviderToggle = (providerSlug: string) => {
@@ -124,7 +104,7 @@ export function MobileGameFilters({
   return (
     <div className={cn("mobile-game-filters", className)}>
       {/* Top Menu Bar */}
-      <div className="flex gap-2 p-4 bg-white/30 rounded-lg backdrop-blur-sm">
+      <div className="flex gap-2 p-3 bg-white/30 rounded-lg backdrop-blur-sm">
         {/* Filter Button - 50% width */}
         <button
           onClick={() => setIsFilterOpen(true)}
@@ -145,10 +125,23 @@ export function MobileGameFilters({
           )}
         </button>
 
-        {/* Sort Button - 50% width */}
-        <div className="w-1/2 relative sort-dropdown-container">
+        {/* Sort Button - 50% width - DEBUG VERSION */}
+        <div className="w-1/2 relative">
           <button
-            onClick={() => setIsSortOpen(!isSortOpen)}
+            ref={sortButtonRef}
+            onClick={() => {
+              console.log("🔘 Sort button clicked");
+              console.log("📍 Button ref:", sortButtonRef.current);
+              console.log(
+                "📐 Button rect:",
+                sortButtonRef.current?.getBoundingClientRect()
+              );
+              console.log("📜 Scroll position:", {
+                x: window.scrollX,
+                y: window.scrollY,
+              });
+              setIsSortOpen(!isSortOpen);
+            }}
             className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-100 border border-blue-200 text-gray-700 rounded-lg transition-colors"
           >
             <span className="font-medium">{currentSortLabel}</span>
@@ -161,123 +154,161 @@ export function MobileGameFilters({
             />
           </button>
 
-          {/* Sort Dropdown - positioned relative to this container */}
-          {isSortOpen && (
-            <div className="absolute top-full left-0 mt-1 z-[9999] w-full bg-white rounded-lg shadow-xl border border-gray-200">
-              {sortOptions.map((option, index) => (
-                <button
-                  key={option.value}
-                  onClick={() => handleSortChange(option.value)}
-                  className={cn(
-                    "w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors",
-                    selectedSort === option.value
-                      ? "bg-blue-50 text-blue-700 font-medium"
-                      : "text-gray-700",
-                    index === 0 ? "rounded-t-lg" : "",
-                    index === sortOptions.length - 1 ? "rounded-b-lg" : ""
-                  )}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-          )}
+          {/* Sort Dropdown - Using Portal */}
+          <DropdownPortal
+            isOpen={isSortOpen}
+            onClose={() => setIsSortOpen(false)}
+            triggerRef={sortButtonRef}
+            className="bg-white rounded-lg shadow-xl border border-gray-200"
+          >
+            {sortOptions.map((option, index) => (
+              <button
+                key={option.value}
+                onClick={() => handleSortChange(option.value)}
+                className={cn(
+                  "w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors",
+                  selectedSort === option.value
+                    ? "bg-blue-50 text-blue-700 font-medium"
+                    : "text-gray-700",
+                  index === 0 ? "rounded-t-lg" : "",
+                  index === sortOptions.length - 1 ? "rounded-b-lg" : ""
+                )}
+              >
+                {option.label}
+              </button>
+            ))}
+          </DropdownPortal>
         </div>
       </div>
 
-      {/* Filter Panel - slides up from bottom */}
-      {isFilterOpen && (
-        <>
-          {/* Backdrop with higher z-index */}
-          <div
-            className="fixed inset-0 z-[9999] bg-black bg-opacity-50"
-            onClick={() => setIsFilterOpen(false)}
-          />
+      {/* Filter Panel - Now using Modal Portal */}
+      <ModalPortal
+        isOpen={isFilterOpen}
+        onClose={() => setIsFilterOpen(false)}
+        closeOnBackdropClick={true}
+        closeOnEscape={true}
+      >
+        {/* Filter Panel Content - Exact copy of original structure */}
+        <div className="w-full max-h-[80vh] bg-white overflow-hidden rounded-t-2xl flex flex-col animate-slideUp">
+          {/* Panel Header */}
+          <div className="flex items-center justify-between p-4 border-b border-gray-200 flex-shrink-0">
+            <h2 className="text-lg font-semibold text-gray-900">FILTRI</h2>
+            <button
+              onClick={() => setIsFilterOpen(false)}
+              className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
+            >
+              <FontAwesomeIcon icon={faTimes} className="w-6 h-6 text-black" swapOpacity />
+            </button>
+          </div>
 
-          {/* Filter Panel with even higher z-index */}
-          <div className="fixed inset-x-0 bottom-0 z-[10000] bg-white max-h-[80vh] overflow-hidden rounded-t-2xl flex flex-col">
-            {/* Panel Header */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-200 flex-shrink-0">
-              <h2 className="text-lg font-semibold text-gray-900">FILTRI</h2>
+          {/* Panel Content */}
+          <div className="flex-1 overflow-y-auto">
+            {/* Categories Section - Using ORIGINAL layout */}
+            <div className="p-4">
+              <h3 className="text-base font-semibold text-gray-700 mb-4">
+                Categorie
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {categories.map((category) => (
+                  <button
+                    key={category.slug}
+                    onClick={() => handleCategoryToggle(category.slug)}
+                    className={cn(
+                      "px-3 py-2 text-sm rounded-full border transition-colors whitespace-nowrap",
+                      selectedCategories.includes(category.slug)
+                        ? "bg-blue-600 text-white border-blue-600"
+                        : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                    )}
+                  >
+                    {category.title}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Providers Section - Using ORIGINAL alphabetical list format */}
+            {providers.length > 0 && (
+              <div className="p-4 border-t border-gray-200">
+                <h3 className="text-base font-semibold text-gray-700 mb-4">
+                  Software
+                </h3>
+                <div className="space-y-4">
+                  {(() => {
+                    // Group providers by first letter alphabetically
+                    const sortedProviders = [...providers].sort((a, b) =>
+                      a.title.localeCompare(b.title)
+                    );
+
+                    const groupedProviders = sortedProviders.reduce(
+                      (acc, provider) => {
+                        const firstLetter = provider.title[0].toUpperCase();
+                        if (!acc[firstLetter]) {
+                          acc[firstLetter] = [];
+                        }
+                        acc[firstLetter].push(provider);
+                        return acc;
+                      },
+                      {} as Record<string, typeof providers>
+                    );
+
+                    return Object.entries(groupedProviders).map(
+                      ([letter, letterProviders]) => (
+                        <div key={letter}>
+                          {/* Letter Header */}
+                          <div className="flex items-center mb-3">
+                            <h4 className="text-lg font-bold text-gray-800 mr-4">
+                              {letter}
+                            </h4>
+                            <div className="flex-1 h-px bg-gray-300"></div>
+                          </div>
+
+                          {/* Two-column grid for providers */}
+                          <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+                            {letterProviders.map((provider) => (
+                              <button
+                                key={provider.slug}
+                                onClick={() =>
+                                  handleProviderToggle(provider.slug)
+                                }
+                                className={cn(
+                                  "text-left py-2 px-1 text-sm transition-colors rounded",
+                                  selectedProviders.includes(provider.slug)
+                                    ? "text-blue-600 font-medium bg-blue-50"
+                                    : "text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                                )}
+                              >
+                                {provider.title}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )
+                    );
+                  })()}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Panel Footer - Using ORIGINAL layout */}
+          <div className="p-4 border-t border-gray-200 bg-gray-50 flex-shrink-0">
+            <div className="flex gap-3">
+              <button
+                onClick={handleClearFilters}
+                className="flex-1 px-4 py-3 bg-yellow-400 hover:bg-yellow-500 text-black font-medium rounded-lg transition-colors"
+              >
+                Cancella
+              </button>
               <button
                 onClick={() => setIsFilterOpen(false)}
-                className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
+                className="flex-1 px-4 py-3 bg-pink-500 hover:bg-pink-600 text-white font-medium rounded-lg transition-colors"
               >
-                <FontAwesomeIcon icon={faTimes} className="w-6 h-6" />
+                Cerca
               </button>
             </div>
-
-            {/* Panel Content */}
-            <div className="flex-1 overflow-y-auto">
-              {/* Categories Section */}
-              <div className="p-4">
-                <h3 className="text-base font-semibold text-gray-700 mb-4">
-                  Categorie
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {categories.map((category) => (
-                    <button
-                      key={category.slug}
-                      onClick={() => handleCategoryToggle(category.slug)}
-                      className={cn(
-                        "px-3 py-2 text-sm rounded-full border transition-colors whitespace-nowrap",
-                        selectedCategories.includes(category.slug)
-                          ? "bg-blue-600 text-white border-blue-600"
-                          : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-                      )}
-                    >
-                      {category.title}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Software/Providers Section */}
-              {providers.length > 0 && (
-                <div className="p-4 border-t border-gray-200">
-                  <h3 className="text-base font-semibold text-gray-700 mb-4">
-                    Software
-                  </h3>
-                  <div className="space-y-1">
-                    {providers.map((provider) => (
-                      <label
-                        key={provider.slug}
-                        className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={selectedProviders.includes(provider.slug)}
-                          onChange={() => handleProviderToggle(provider.slug)}
-                          className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                        />
-                        <span className="text-gray-700">{provider.title}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Panel Footer */}
-            <div className="p-4 border-t border-gray-200 bg-gray-50 flex-shrink-0">
-              <div className="flex gap-3">
-                <button
-                  onClick={handleClearFilters}
-                  className="flex-1 px-4 py-3 bg-yellow-400 hover:bg-yellow-500 text-black font-medium rounded-lg transition-colors"
-                >
-                  Cancella
-                </button>
-                <button
-                  onClick={() => setIsFilterOpen(false)}
-                  className="flex-1 px-4 py-3 bg-pink-500 hover:bg-pink-600 text-white font-medium rounded-lg transition-colors"
-                >
-                  Cerca
-                </button>
-              </div>
-            </div>
           </div>
-        </>
-      )}
+        </div>
+      </ModalPortal>
     </div>
   );
 }

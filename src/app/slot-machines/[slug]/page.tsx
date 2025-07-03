@@ -150,7 +150,7 @@ async function GameContent({ game }: { game: GamePageData }) {
       </section>
 
       {/* Main Content Section */}
-      <main className="lg:container mx-auto px-2 py-8">
+      <div className="lg:container mx-auto px-2 py-8">
         <div className="space-y-12">
           {/* Related Casinos Widget - Full width */}
           {game.provider && (
@@ -404,7 +404,7 @@ async function GameContent({ game }: { game: GamePageData }) {
             </aside>
           </div>
         </div>
-      </main>
+      </div>
     </>
   );
 }

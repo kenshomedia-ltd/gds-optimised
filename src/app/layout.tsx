@@ -172,7 +172,7 @@ export default async function RootLayout({
             />
 
             {/* Main content */}
-            <main className="flex-1">{children}</main>
+            <main className="flex-1 z-50">{children}</main>
 
             <FooterServer
               footerContent={layoutData.layout.footerContent}
@@ -197,6 +197,9 @@ export default async function RootLayout({
             },
           }}
         />
+
+        {/* Portal root for rendering outside the main component tree */}
+        <div id="portal-root"></div>
       </body>
     </html>
   );
