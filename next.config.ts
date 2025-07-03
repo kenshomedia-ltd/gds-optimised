@@ -116,6 +116,15 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      {
+        source: "/dashboard/:path*",
+        headers: [
+          {
+            key: "X-Robots-Tag",
+            value: "noindex, nofollow",
+          },
+        ],
+      },
     ];
   },
 

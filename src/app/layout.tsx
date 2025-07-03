@@ -1,17 +1,17 @@
 // src/app/layout.tsx
+import { BackToTop } from "@/components/common/BackToTop/BackToTop";
+import DynamicTheme from "@/components/layout/DynamicTheme/DynamicTheme";
+import { FooterWrapper } from "@/components/layout/Footer";
+import { Header } from "@/components/layout/Header";
+import { LegalServer } from "@/components/layout/Legal";
+import { ClientProviders } from "@/components/providers/ClientProviders";
+import { getLayoutData } from "@/lib/strapi/data-loader";
 import type { Metadata, Viewport } from "next";
 import { Lato, Roboto } from "next/font/google";
-import { getLayoutData } from "@/lib/strapi/data-loader";
-import { LegalServer } from "@/components/layout/Legal";
-import DynamicTheme from "@/components/layout/DynamicTheme/DynamicTheme";
-import { Header } from "@/components/layout/Header";
-import { FooterServer } from "@/components/layout/Footer";
-import { ClientProviders } from "@/components/providers/ClientProviders";
-import { BackToTop } from "@/components/common/BackToTop/BackToTop";
 import { Toaster } from "sonner";
 
-import "./globals.css";
 import { cn } from "@/lib/utils/cn";
+import "./globals.css";
 
 // Configure Lato for headings with font metrics for reduced CLS
 const lato = Lato({
@@ -87,7 +87,6 @@ export default async function RootLayout({
         {/* Preconnect to critical third-party origins */}
         <link rel="preconnect" href={process.env.NEXT_PUBLIC_API_URL || ""} />
         <link rel="dns-prefetch" href={process.env.NEXT_PUBLIC_API_URL || ""} />
-        
       </head>
 
       <body
@@ -115,13 +114,14 @@ export default async function RootLayout({
             {/* Main content */}
             <main className="flex-1">{children}</main>
 
-            <FooterServer
+            <FooterWrapper layoutData={layoutData} />
+            {/* <FooterServer
               footerContent={layoutData.layout.footerContent}
               footerImages={layoutData.layout.footerImages}
               footerNavigation={layoutData.navigation.footerNavigation}
               footerNavigations={layoutData.navigation.footerNavigations}
               translations={layoutData.translations}
-            />
+            /> */}
           </div>
 
           {/* Back to Top Button - Also needs to be inside providers if it uses any context */}
