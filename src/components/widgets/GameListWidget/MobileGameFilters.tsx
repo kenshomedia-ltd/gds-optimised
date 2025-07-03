@@ -130,16 +130,6 @@ export function MobileGameFilters({
           <button
             ref={sortButtonRef}
             onClick={() => {
-              console.log("🔘 Sort button clicked");
-              console.log("📍 Button ref:", sortButtonRef.current);
-              console.log(
-                "📐 Button rect:",
-                sortButtonRef.current?.getBoundingClientRect()
-              );
-              console.log("📜 Scroll position:", {
-                x: window.scrollX,
-                y: window.scrollY,
-              });
               setIsSortOpen(!isSortOpen);
             }}
             className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-100 border border-blue-200 text-gray-700 rounded-lg transition-colors"

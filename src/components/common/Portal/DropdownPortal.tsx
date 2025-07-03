@@ -1,5 +1,4 @@
-// src/components/common/Portal/DropdownPortal.tsx
-// Fixed version without infinite re-render loop
+// Fixed DropdownPortal - Uses viewport positioning instead of document positioning
 
 "use client";
 
@@ -28,39 +27,36 @@ export function DropdownPortal({
   const [position, setPosition] = useState({ top: 0, left: 0, width: 0 });
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Memoize the update function to prevent infinite loops
-  const updatePosition = useCallback(() => {
-    if (!isOpen || !triggerRef.current) return;
+  const latestTriggerRef = useRef(triggerRef);
+  latestTriggerRef.current = triggerRef;
 
-    const triggerElement = triggerRef.current;
+  const updatePosition = useCallback(() => {
+    if (!isOpen || !latestTriggerRef.current?.current) {
+      return;
+    }
+
+    const triggerElement = latestTriggerRef.current.current;
     const rect = triggerElement.getBoundingClientRect();
 
-    // Ensure we have valid rect values
     if (rect.width === 0 || rect.height === 0) {
       console.warn("⚠️ Button has zero dimensions");
       return;
     }
 
-    // Simple bottom-left positioning
-    const scrollTop =
-      window.pageYOffset || document.documentElement.scrollTop || 0;
-    const scrollLeft =
-      window.pageXOffset || document.documentElement.scrollLeft || 0;
-
+    // SOLUTION: Use viewport positioning (don't add scroll offset)
+    // This makes the dropdown move with the button as user scrolls
     const newPosition = {
-      top: rect.bottom + scrollTop + offset,
-      left: rect.left + scrollLeft,
+      top: rect.bottom + offset, // No scroll offset added!
+      left: rect.left, // No scroll offset added!
       width: rect.width,
     };
 
-    console.log("✅ Setting position:", newPosition);
     setPosition(newPosition);
-  }, [isOpen, offset]); // Removed triggerRef from dependencies to prevent loops
+  }, [isOpen, offset]);
 
   // Update position when dropdown opens
   useEffect(() => {
     if (isOpen) {
-      // Small delay to ensure button is rendered
       const timer = setTimeout(() => {
         updatePosition();
       }, 0);
@@ -92,7 +88,7 @@ export function DropdownPortal({
       const target = event.target as Element;
 
       if (
-        !triggerRef.current?.contains(target) &&
+        !latestTriggerRef.current?.current?.contains(target) &&
         !dropdownRef.current?.contains(target)
       ) {
         onClose();
@@ -112,7 +108,7 @@ export function DropdownPortal({
       document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("keydown", handleEscape);
     };
-  }, [isOpen, onClose, triggerRef]);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -132,5 +128,3 @@ export function DropdownPortal({
     </Portal>
   );
 }
-
-export default DropdownPortal;
