@@ -358,7 +358,7 @@ export function CasinoListWidget({
                         {translations.loading || "Loading..."}
                       </span>
                     ) : (
-                      translations.loadMore || "Load More"
+                      translations.expandList || "Expand List"
                     )}
                   </button>
                 )
