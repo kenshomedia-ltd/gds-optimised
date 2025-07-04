@@ -2,10 +2,35 @@
 
 import { NextRequest, NextResponse } from "next/server";
 
+// Helper function to get client IP address
+function getClientIP(request: NextRequest): string {
+  // Check various headers for the real IP
+  const xForwardedFor = request.headers.get("X-Forwarded-For");
+  const xRealIP = request.headers.get("X-Real-IP");
+  const cfConnectingIP = request.headers.get("CF-Connecting-IP");
+
+  // X-Forwarded-For can contain multiple IPs, take the first one
+  if (xForwardedFor) {
+    return xForwardedFor.split(",")[0].trim();
+  }
+
+  if (xRealIP) {
+    return xRealIP;
+  }
+
+  if (cfConnectingIP) {
+    return cfConnectingIP;
+  }
+
+  // Fallback to unknown if no IP can be determined
+  return "unknown";
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.text();
     const searchParams = request.nextUrl.searchParams;
+    const clientIP = getClientIP(request);
 
     // Forward the request to Swetrix
     const swetrixUrl = new URL("https://api.swetrix.com/log");
@@ -21,11 +46,7 @@ export async function POST(request: NextRequest) {
         "Content-Type":
           request.headers.get("Content-Type") || "application/json",
         "User-Agent": request.headers.get("User-Agent") || "NextJS-Proxy/1.0",
-        "X-Forwarded-For":
-          request.headers.get("X-Forwarded-For") ||
-          request.headers.get("CF-Connecting-IP") ||
-          request.ip ||
-          "unknown",
+        "X-Forwarded-For": clientIP,
         "CF-IPCountry": request.headers.get("CF-IPCountry") || "unknown",
       },
       body: body || undefined,
@@ -58,6 +79,7 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
+    const clientIP = getClientIP(request);
 
     // Forward GET requests (for noscript tracking)
     const swetrixUrl = new URL("https://api.swetrix.com/log/noscript");
@@ -70,11 +92,7 @@ export async function GET(request: NextRequest) {
       method: "GET",
       headers: {
         "User-Agent": request.headers.get("User-Agent") || "NextJS-Proxy/1.0",
-        "X-Forwarded-For":
-          request.headers.get("X-Forwarded-For") ||
-          request.headers.get("CF-Connecting-IP") ||
-          request.ip ||
-          "unknown",
+        "X-Forwarded-For": clientIP,
         "CF-IPCountry": request.headers.get("CF-IPCountry") || "unknown",
       },
     });
