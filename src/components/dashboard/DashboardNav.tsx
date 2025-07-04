@@ -30,7 +30,10 @@ export default function DashboardNav({
   const unreadCount = state.messages.length - state.readMessages.length;
 
   const logoutHandler = async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
+    await fetch(`${process.env.NEXT_PUBLIC_FULL_URL}/api/auth/logout/`, {
+      method: "POST",
+      body: JSON.stringify({}),
+    });
     dispatch({ type: "SET_USER", payload: null });
     dispatch({ type: "SET_MESSAGES", payload: [] });
     dispatch({ type: "SET_READ_MESSAGES", payload: [] });

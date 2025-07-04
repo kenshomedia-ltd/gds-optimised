@@ -13,7 +13,7 @@ interface DashboardProps {
 }
 
 const Dashboard = ({ translations }: DashboardProps) => {
-  const { state } = useUser();
+  const { state, getUserProfile } = useUser();
   const { setUser, setFavouriteGames, setMostPlayed, setWeeklyPicks } =
     useUserActions();
 
@@ -47,10 +47,14 @@ const Dashboard = ({ translations }: DashboardProps) => {
   }, []);
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_FULL_URL}/api/dashboard/user/`)
-      .then((res) => res.json())
-      .then(setUser)
-      .catch(() => setUser(null));
+    const fetchUser = async () => {
+      await getUserProfile();
+    };
+    fetchUser();
+    // fetch(`${process.env.NEXT_PUBLIC_FULL_URL}/api/dashboard/user/`)
+    //   .then((res) => res.json())
+    //   .then(setUser)
+    //   .catch(() => setUser(null));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

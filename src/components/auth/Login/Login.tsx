@@ -136,7 +136,7 @@ export function Login({ translations }: LoginProps) {
         } else if (tournamentId) {
           router.push(`${process.env.NEXT_PUBLIC_BASE_URL}/tournaments/`);
         } else {
-          router.push(`${process.env.NEXT_PUBLIC_BASE_URL}/dashboard/`);
+          router.push(`/dashboard/`);
         }
       } else {
         toast.error(res?.error?.message || "Login failed");

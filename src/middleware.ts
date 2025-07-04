@@ -12,7 +12,7 @@ export function middleware(req: NextRequest) {
 
   // If logged in and trying to access authentication pages → redirect to dashboard
   if (authCookie && (authenticationIndex === 0 || authenticationIndex === 1)) {
-    return NextResponse.redirect(new URL(`${baseUrl}dashboard/`, req.url));
+    return NextResponse.redirect(new URL(`${baseUrl}/dashboard/`, req.url));
   }
 
   // If NOT logged in and trying to access dashboard → redirect to login
@@ -22,7 +22,11 @@ export function middleware(req: NextRequest) {
     );
   }
 
-  return NextResponse.next();
+  // Add pathname header for server components
+  const response = NextResponse.next();
+  response.headers.set("x-pathname", pathname);
+  return response;
+  // return NextResponse.next();
 }
 
 export const config = {

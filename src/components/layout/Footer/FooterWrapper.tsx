@@ -1,17 +1,18 @@
-"use client";
-
-import { usePathname } from "next/navigation";
 import { FooterServer } from "./FooterServer";
 import { LayoutDataResponse } from "@/types/strapi.types";
 import DashboardFooter from "@/components/dashboard/DashboardFooter";
+import { headers } from "next/headers";
 
-export function FooterWrapper({
+export async function FooterWrapper({
   layoutData,
 }: {
   layoutData: LayoutDataResponse;
 }) {
-  const pathname = usePathname();
+  const headersList = await headers();
+  const pathname = (await headersList.get("x-pathname")) || "";
   const isDashboard = pathname.startsWith("/dashboard");
+  // const pathname = usePathname();
+  // const isDashboard = pathname.startsWith("/dashboard");
 
   if (isDashboard)
     return <DashboardFooter translations={layoutData.translations} />;

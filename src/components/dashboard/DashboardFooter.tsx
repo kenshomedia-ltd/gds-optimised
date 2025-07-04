@@ -2,7 +2,7 @@
 
 import { useUser } from "@/contexts/UserContext";
 import { TranslationData } from "@/types/strapi.types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Image } from "../common";
 import DashboardNav from "./DashboardNav";
 import { ArrowDownIcon } from "../icons";
@@ -13,6 +13,7 @@ export default function DashboardFooter({
   translations: TranslationData;
 }) {
   const [isMenuVisible, setMenuVisible] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const { state } = useUser();
   const user = state.user;
 
@@ -20,10 +21,19 @@ export default function DashboardFooter({
     setMenuVisible((prev) => !prev);
   };
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Don't render until mounted on client
+  if (!mounted) {
+    return null; // or a loading skeleton
+  }
+
   return (
     <footer className="fixed w-full bottom-0 z-30 md:hidden">
       <div
-        className={`bg-dash-menu-nav-bg overflow-hidden overflow-y-auto group ${
+        className={`bg-primary overflow-hidden overflow-y-auto group ${
           isMenuVisible ? "menu-open" : ""
         }`}
       >
@@ -34,7 +44,7 @@ export default function DashboardFooter({
                 <Image
                   width={40}
                   height={40}
-                  src="/images/user-placeholder.png"
+                  src="/images/dashboard/user-placeholder.svg"
                   alt="User placeholder"
                 />
               ) : (

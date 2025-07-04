@@ -9,7 +9,7 @@ export default async function DashboardLayout({
 }) {
   const { translations } = await getLayoutData({ cached: true });
   return (
-    <div className="dashboard-bg -mb-5 mx-auto flex w-full items-start py-10 h-[calc(100vh_-_135px)] md:h-[calc(100vh_-_99px)]">
+    <div className="dashboard-bg -mb-5 mx-auto flex w-full items-start py-5 h-[calc(100vh_-_135px)] md:h-[calc(100vh_-_99px)]">
       <DashboardSideNav slotMachineURL={""} translations={translations} />
       <div className="w-full px-4 h-full pb-[50px] overflow-hidden overflow-y-auto">
         {children}

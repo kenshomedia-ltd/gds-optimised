@@ -63,30 +63,44 @@ const reducer = (state: State, action: Action): State => {
 const UserContext = createContext<{
   state: State;
   dispatch: React.Dispatch<Action>;
+  getUserProfile: () => Promise<TUser | null>;
 }>({
   state: initialState,
   dispatch: () => null,
+  getUserProfile: () => Promise.resolve(null),
 });
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [state, dispatch] = useReducer(reducer, initialState, (init) => {
     const savedUser =
-      typeof window !== "undefined" ? localStorage.getItem("_user:") : null;
+      typeof window !== "undefined" ? localStorage.getItem("_user") : null;
     return {
       ...init,
       user: savedUser ? JSON.parse(savedUser) : null,
     };
   });
 
+  const getUserProfile = async (): Promise<TUser | null> => {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_FULL_URL}/api/dashboard/user/`
+    );
+    if (res.ok) {
+      const userProfile = await res.json();
+      dispatch({ type: "SET_USER", payload: userProfile });
+      return userProfile;
+    }
+    return null;
+  };
+
   // Persist user to localStorage
   useEffect(() => {
     if (state.user) {
-      localStorage.setItem("_user:", JSON.stringify(state.user));
+      localStorage.setItem("_user", JSON.stringify(state.user));
     }
   }, [state.user]);
 
   return (
-    <UserContext.Provider value={{ state, dispatch }}>
+    <UserContext.Provider value={{ state, getUserProfile, dispatch }}>
       {children}
     </UserContext.Provider>
   );
