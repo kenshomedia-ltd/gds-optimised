@@ -89,15 +89,8 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: "Cache-Control",
-            value: "public, max-age=31536000, immutable",
-          },
-          {
-            key: "Vary",
-            value: "Accept-Encoding",
-          },
-          {
-            key: "X-CDN-Cache",
-            value: "static-chunks",
+            // Use stale-while-revalidate
+            value: "public, max-age=31536000, stale-while-revalidate=604800",
           },
         ],
       },

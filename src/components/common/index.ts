@@ -26,6 +26,9 @@ export { AuthorBox } from "./AuthorBox/AuthorBox";
 // Error handling
 export { ErrorBoundary, GlobalErrorBoundary } from "./ErrorBoundary/ErrorBoundary";
 
+// ChunkLoadErrorHandler
+export { ChunkLoadErrorHandler } from "./ChunkLoadErrorHandler/ChunkLoadErrorHandler";
+
 // Add other common components as they are created:
 // export { Icon } from "./Icon";
 // export { SEO } from "./SEO";

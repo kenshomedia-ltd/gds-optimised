@@ -1,6 +1,7 @@
-// src/app/layout.tsx
-import type { Metadata, Viewport } from "next";
+// src/app/layout.tsx - Corrected version
 import { Lato, Roboto } from "next/font/google";
+import { ClientErrorBoundary } from "@/components/common/ErrorBoundary/ErrorBoundary";
+import { ChunkLoadErrorHandler } from "@/components/common/ChunkLoadErrorHandler";
 import { getLayoutData } from "@/lib/strapi/data-loader";
 import { LegalServer } from "@/components/layout/Legal";
 import DynamicTheme from "@/components/layout/DynamicTheme/DynamicTheme";
@@ -10,6 +11,7 @@ import { ClientProviders } from "@/components/providers/ClientProviders";
 import { BackToTop } from "@/components/common/BackToTop/BackToTop";
 import { Toaster } from "sonner";
 import { getFaviconPath, generateFaviconLinks } from "@/lib/utils/favicon";
+import type { Metadata, Viewport } from "next";
 
 import "./globals.css";
 import { cn } from "@/lib/utils/cn";
@@ -97,6 +99,8 @@ export default async function RootLayout({
   return (
     <html lang="en" className={`${lato.variable} ${roboto.variable}`}>
       <head>
+        {/* The ChunkLoadErrorHandler */}
+        <ChunkLoadErrorHandler />
         {/* RENDER THE THEME COMPONENT */}
         {/* This component imports the CSS but renders no HTML */}
         <DynamicTheme siteId={siteId} />
@@ -156,50 +160,53 @@ export default async function RootLayout({
         )}
         suppressHydrationWarning={true}
       >
-        {/* Legal bar at the very top */}
-        <LegalServer legalText={layoutData.layout.legalText} />
+        {/* Change this line: */}
+        <ClientErrorBoundary>
+          {/* Legal bar at the very top */}
+          <LegalServer legalText={layoutData.layout.legalText} />
 
-        {/* Wrap everything that needs client providers */}
-        <ClientProviders>
-          {/* Main layout structure */}
-          <div className="flex flex-col min-h-[calc(100vh-35px)]">
-            {/* Header Component - Now inside ClientProviders */}
-            <Header
-              logo={layoutData.layout.Logo}
-              mainNavigation={layoutData.navigation.mainNavigation}
-              subNavigation={layoutData.navigation.subNavigation}
-              translations={layoutData.translations}
-            />
+          {/* Wrap everything that needs client providers */}
+          <ClientProviders>
+            {/* Main layout structure */}
+            <div className="flex flex-col min-h-[calc(100vh-35px)]">
+              {/* Header Component - Now inside ClientProviders */}
+              <Header
+                logo={layoutData.layout.Logo}
+                mainNavigation={layoutData.navigation.mainNavigation}
+                subNavigation={layoutData.navigation.subNavigation}
+                translations={layoutData.translations}
+              />
 
-            {/* Main content */}
-            <main className="flex-1 z-50">{children}</main>
+              {/* Main content */}
+              <main className="flex-1 z-50">{children}</main>
 
-            <FooterServer
-              footerContent={layoutData.layout.footerContent}
-              footerImages={layoutData.layout.footerImages}
-              footerNavigation={layoutData.navigation.footerNavigation}
-              footerNavigations={layoutData.navigation.footerNavigations}
-              translations={layoutData.translations}
-            />
-          </div>
+              <FooterServer
+                footerContent={layoutData.layout.footerContent}
+                footerImages={layoutData.layout.footerImages}
+                footerNavigation={layoutData.navigation.footerNavigation}
+                footerNavigations={layoutData.navigation.footerNavigations}
+                translations={layoutData.translations}
+              />
+            </div>
 
-          {/* Back to Top Button - Also needs to be inside providers if it uses any context */}
-          <BackToTop />
-        </ClientProviders>
+            {/* Back to Top Button - Also needs to be inside providers if it uses any context */}
+            <BackToTop />
+          </ClientProviders>
 
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            style: {
-              background: "var(--color-background-900)",
-              color: "var(--color-white)",
-              border: "1px solid var(--color-border)",
-            },
-          }}
-        />
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              style: {
+                background: "var(--color-background-900)",
+                color: "var(--color-white)",
+                border: "1px solid var(--color-border)",
+              },
+            }}
+          />
 
-        {/* Portal root for rendering outside the main component tree */}
-        <div id="portal-root"></div>
+          {/* Portal root for rendering outside the main component tree */}
+          <div id="portal-root"></div>
+        </ClientErrorBoundary>
       </body>
     </html>
   );
