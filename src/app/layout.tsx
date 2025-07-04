@@ -15,6 +15,7 @@ import type { Metadata, Viewport } from "next";
 
 import "./globals.css";
 import { cn } from "@/lib/utils/cn";
+import Script from "next/script";
 
 // Configure Lato for headings with font metrics for reduced CLS
 const lato = Lato({
@@ -160,6 +161,40 @@ export default async function RootLayout({
         )}
         suppressHydrationWarning={true}
       >
+        {/* Swetrix Analytics Script */}
+        <Script
+          src="https://swetrix.org/swetrix.js"
+          strategy="afterInteractive"
+          defer
+        />
+
+        {/* Swetrix Initialization Script */}
+        <Script
+          id="swetrix-init"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              document.addEventListener('DOMContentLoaded', function() {
+                if (typeof swetrix !== 'undefined') {
+                  swetrix.init('${process.env.NEXT_PUBLIC_SWETRIX_PROJECT_ID}');
+                  swetrix.trackViews();
+                }
+              });
+            `,
+          }}
+        />
+
+        {/* No-script fallback */}
+        <noscript>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={`https://api.swetrix.com/log/noscript?pid=${process.env.NEXT_PUBLIC_SWETRIX_PROJECT_ID}`}
+            alt=""
+            referrerPolicy="no-referrer-when-downgrade"
+            style={{ display: "none" }}
+          />
+        </noscript>
+
         {/* Change this line: */}
         <ClientErrorBoundary>
           {/* Legal bar at the very top */}

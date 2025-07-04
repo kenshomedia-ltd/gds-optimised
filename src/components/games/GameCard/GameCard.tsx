@@ -3,6 +3,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { analytics } from "@/lib/analytics/analytics";
 import { Image } from "@/components/common/Image";
 import { FavoriteButton } from "@/components/features/Favorites/FavoriteButton";
 import type { GameCardProps } from "@/types/game.types";
@@ -29,6 +30,12 @@ export function GameCard({
   className,
 }: GameCardProps) {
   const [imageError, setImageError] = useState(false);
+
+  // Track the game click with Swetrix
+  const handleGameClick = () => {
+    // Track the game click
+    analytics.trackGameInteraction(game.id, game.title, "card_click");
+  };
 
   // Get the first image from the array
   const gameImage = Array.isArray(game.images) ? game.images[0] : game.images;
@@ -89,6 +96,7 @@ export function GameCard({
         className="absolute inset-0 z-10 md:hidden"
         aria-label={`Play ${game.title}`}
         prefetch={false}
+        onClick={handleGameClick}
       />
 
       {/* Game image container */}
@@ -174,6 +182,7 @@ export function GameCard({
               "[@container_(min-width:201px)]:px-6 [@container_(min-width:201px)]:py-2 [@container_(min-width:201px)]:text-sm"
             )}
             prefetch={false}
+            onClick={handleGameClick}
           >
             {translations.playFunBtn || "Play Free"}
           </Link>
