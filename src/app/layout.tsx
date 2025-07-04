@@ -161,12 +161,8 @@ export default async function RootLayout({
         )}
         suppressHydrationWarning={true}
       >
-        {/* Swetrix Analytics Script */}
-        <Script
-          src="https://swetrix.org/swetrix.js"
-          strategy="afterInteractive"
-          defer
-        />
+        {/* Swetrix Analytics Script - Proxied */}
+        <Script src="/api/analytics/script" strategy="afterInteractive" defer />
 
         {/* Swetrix Initialization Script */}
         <Script
@@ -184,11 +180,11 @@ export default async function RootLayout({
           }}
         />
 
-        {/* No-script fallback */}
+        {/* No-script fallback - Updated to use proxy */}
         <noscript>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={`https://api.swetrix.com/log/noscript?pid=${process.env.NEXT_PUBLIC_SWETRIX_PROJECT_ID}`}
+            src={`/api/analytics/log?pid=${process.env.NEXT_PUBLIC_SWETRIX_PROJECT_ID}`}
             alt=""
             referrerPolicy="no-referrer-when-downgrade"
             style={{ display: "none" }}
