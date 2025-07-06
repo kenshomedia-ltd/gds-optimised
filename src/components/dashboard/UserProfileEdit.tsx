@@ -22,7 +22,6 @@ type UserProfilePayload = {
 };
 
 export default function UserProfileEdit({ translations }: Props) {
-  console.log("UserProfileEdit");
   const { state, getUserProfile } = useUser();
   const [userFirstName, setUserFirstName] = useState("");
   const [userLastName, setUserLastName] = useState("");
@@ -129,7 +128,6 @@ export default function UserProfileEdit({ translations }: Props) {
   }, []);
 
   useEffect(() => {
-    console.log("EDIT_PROFILE:state.user", state.user);
     if (state.user) {
       setUserFirstName(state.user.firstName);
       setUserLastName(state.user.lastName);
