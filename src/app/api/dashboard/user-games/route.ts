@@ -53,6 +53,7 @@ export async function POST(req: NextRequest) {
         games,
       },
     };
+    console.log("body", body);
 
     const token = req.cookies.get("_token")?.value;
 
@@ -112,6 +113,10 @@ export async function DELETE(req: NextRequest) {
       }
     );
 
+    console.log("delete data", res);
+    if (res.status === 204) {
+      return new NextResponse(null, { status: 204 }); // ✅ no body
+    }
     const data = await res.json();
 
     return NextResponse.json(data, { status: res.status });

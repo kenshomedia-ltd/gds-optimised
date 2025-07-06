@@ -6,7 +6,8 @@ import { toast } from "sonner";
 
 import { useUser } from "@/contexts/UserContext";
 import { TranslationData } from "@/types/strapi.types";
-import { Image } from "../common";
+import { Image as CommonImage } from "../common";
+import Image from "next/image";
 import AvatarModal from "./AvatarModal";
 
 interface Props {
@@ -21,11 +22,11 @@ type UserProfilePayload = {
 };
 
 export default function UserProfileEdit({ translations }: Props) {
+  console.log("UserProfileEdit");
   const { state, getUserProfile } = useUser();
   const [userFirstName, setUserFirstName] = useState("");
   const [userLastName, setUserLastName] = useState("");
   const [userBio, setUserBio] = useState("");
-  const [userPhoto, setUserPhoto] = useState<string | null>(null);
   const [userCoverImage, setUserCoverImage] = useState<string | null>(null);
 
   const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
@@ -35,7 +36,6 @@ export default function UserProfileEdit({ translations }: Props) {
   );
   const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
 
-  const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -110,40 +110,34 @@ export default function UserProfileEdit({ translations }: Props) {
 
       toast.success(translations.profileUpdateSuccessToast);
     } catch (error) {
+      console.log("PROFILE_UPDATE_ERROR", error);
       toast.error("Something went wrong updating your profile.");
     } finally {
       setIsSubmitting(false);
     }
   };
-  const user = state.user;
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   useEffect(() => {
-    if (state.user) {
-      setUserFirstName(state.user.firstName);
-      setUserLastName(state.user.lastName);
-      setUserBio(state.user.bio ?? "");
-      setUserPhoto(state.user.photo?.url ?? null);
-      setUserCoverImage(state.user.cover_image?.url ?? null);
-    } else {
-      // If not loaded yet, fetch
-      const fetchUser = async () => {
-        await getUserProfile();
-        setIsLoading(false);
-      };
-      fetchUser();
+    if (!state.user) {
+      getUserProfile();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // const handleAvatarDrop = (acceptedFiles: File[]) => {
-  //   const file = acceptedFiles[0];
-  //   setAvatarFile(file);
-  //   setAvatarPreview(URL.createObjectURL(file));
-  // };
+  useEffect(() => {
+    console.log("EDIT_PROFILE:state.user", state.user);
+    if (state.user) {
+      setUserFirstName(state.user.firstName);
+      setUserLastName(state.user.lastName);
+      setUserBio(state.user.bio ?? "");
+      setUserCoverImage(state.user.cover_image?.url ?? null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleCoverDrop = (acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
@@ -151,9 +145,7 @@ export default function UserProfileEdit({ translations }: Props) {
     setCoverImagePreview(URL.createObjectURL(file));
   };
 
-  if (!mounted) {
-    return null;
-  }
+  const avatarUrl = state?.user?.photo?.url;
 
   return (
     <div className="p-4">
@@ -204,16 +196,16 @@ export default function UserProfileEdit({ translations }: Props) {
                 {/* Avatar */}
                 <div className="w-full md:w-1/2 space-y-3 text-center">
                   <div className="w-[128px] h-[128px] mx-auto bg-purple-700 rounded-full overflow-hidden">
-                    {user?.photo?.url ? (
+                    {avatarUrl ? (
                       <Image
-                        src={user?.photo?.url}
+                        src={avatarUrl}
                         alt="Avatar"
                         className="w-full h-full object-cover"
                         width={128}
                         height={128}
                       />
                     ) : (
-                      <Image
+                      <CommonImage
                         width={128}
                         height={128}
                         src="/images/dashboard/user-placeholder.svg"
@@ -221,7 +213,6 @@ export default function UserProfileEdit({ translations }: Props) {
                       />
                     )}
                   </div>
-
                   <button
                     onClick={() => setIsAvatarModalOpen(true)}
                     className="bg-gray-100 px-4 py-2 rounded text-sm"
@@ -258,7 +249,7 @@ export default function UserProfileEdit({ translations }: Props) {
                       >
                         <input {...getInputProps()} />
                         <div className="flex justify-center items-center w-10 h-10 mx-auto bg-[#F2F4F7] rounded-full border-4 border-white">
-                          <Image
+                          <CommonImage
                             width={20}
                             height={20}
                             src="/icons/upload-cloud.svg"

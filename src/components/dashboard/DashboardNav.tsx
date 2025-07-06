@@ -99,11 +99,11 @@ export default function DashboardNav({
             >
               {item.icon}
               <span>{item.label}</span>
-              {item.badge && item.badge > 0 && (
+              {item.badge && item.badge > 0 ? (
                 <div className="flex px-2 py-[1px] h-6 min-h-6 !rounded-full btn-secondary justify-center items-center">
                   <span>{item.badge}</span>
                 </div>
-              )}
+              ) : null}
             </Link>
           </li>
         );

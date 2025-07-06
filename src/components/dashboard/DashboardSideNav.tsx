@@ -1,15 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 
-import { SignoutSvg } from "../icons";
-import { TranslationData } from "@/types/strapi.types";
 import { useUser, useUserActions } from "@/contexts/UserContext";
-import DashboardNav from "./DashboardNav";
+import { TranslationData } from "@/types/strapi.types";
+import { SignoutSvg } from "../icons";
 import AvatarModal from "./AvatarModal";
-import { getLayoutData } from "@/lib/strapi/data-loader";
-// import AvatarModal from "./AvatarModal";
+import DashboardNav from "./DashboardNav";
+import { Image as CommonImage } from "../common";
 
 interface Props {
   translations: TranslationData;
@@ -21,11 +20,9 @@ export default function DashboardSidebar({
   slotMachineURL,
 }: Props) {
   const { state } = useUser();
-  const { setUser, setMessages, setReadMessages, setSlotUrl } =
-    useUserActions();
+  const { setBatchUpdate } = useUserActions();
 
   const [requestLoader, setRequestLoader] = useState(true);
-  const [dashboardUser, setDashboardUser] = useState(state.user || null);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -40,8 +37,8 @@ export default function DashboardSidebar({
     };
 
     const fetchAuthData = async () => {
-      setRequestLoader(true);
-      setSlotUrl(slotMachineURL);
+      // setRequestLoader(true);
+      // setSlotUrl(slotMachineURL);
 
       const [userProfile, userMessages, userMessageActions] = await Promise.all(
         [
@@ -64,10 +61,12 @@ export default function DashboardSidebar({
         ? JSON.parse(userMessageActions.read_messages)
         : [];
 
-      setDashboardUser(userProfile);
-      setUser(userProfile);
-      setMessages(userMessages || []);
-      setReadMessages(readMessageList || []);
+      setBatchUpdate({
+        user: userProfile,
+        messages: userMessages || [],
+        readMessages: readMessageList || [],
+        slotMachineUrl: slotMachineURL,
+      });
       setRequestLoader(false);
     };
 
@@ -81,13 +80,11 @@ export default function DashboardSidebar({
       body: JSON.stringify({}),
     });
 
-    setUser(null);
-    setMessages([]);
-    setReadMessages([]);
+    localStorage.removeItem("_user");
     window.location.reload();
   };
 
-  const user = state.user || dashboardUser;
+  const user = state.user;
 
   return (
     <>
@@ -109,12 +106,12 @@ export default function DashboardSidebar({
                         className="w-full h-full object-cover rounded-full"
                       />
                     ) : (
-                      <Image
+                      <CommonImage
                         src="/images/dashboard/user-placeholder.svg"
                         alt="user placeholder"
                         width={40}
                         height={40}
-                        className="w-[80%] h-[80%] object-cover"
+                        className="w-full h-full rounded-full object-cover"
                       />
                     )}
                   </div>

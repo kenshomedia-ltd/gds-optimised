@@ -6,8 +6,10 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useUser, useUserActions } from "@/contexts/UserContext";
 import { TranslationData } from "@/types/strapi.types";
-import { Image } from "../common";
+import { Image as CommonImage } from "../common";
+import Image from "next/image";
 import { TUser } from "@/types/user.types";
+import Dropzone from "react-dropzone";
 
 export interface AvatarModalProps {
   open: boolean;
@@ -41,8 +43,11 @@ export default function AvatarModal({
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_FULL_URL}/api/dashboard/user-avatars/`
       );
-      const json = await res.json();
-      setPreloadedAvatars(json.data);
+      const data = await res.json();
+      const filteredAvatars = [...data.data].filter(
+        (avatar: Avatar) => avatar.avatar
+      );
+      setPreloadedAvatars(filteredAvatars);
     };
 
     if (open) {
@@ -50,11 +55,10 @@ export default function AvatarModal({
     }
   }, [open]);
 
-  const handleAvatarFileSelect = (file: File) => {
+  const handleAvatarFileSelect = (files: File[]) => {
+    const file = files[0];
     setAvatarFile(file);
-    const reader = new FileReader();
-    reader.onload = (e) => setAvatar(e.target?.result as string);
-    reader.readAsDataURL(file);
+    setAvatar(URL.createObjectURL(file));
   };
 
   const updateAvatar = async () => {
@@ -70,7 +74,6 @@ export default function AvatarModal({
     }
 
     if (mode === "NEW_IMAGE" && avatarFile) {
-
       if (state?.user?.photo) {
         fetch(
           `${process.env.NEXT_PUBLIC_FULL_URL}/api/dashboard/delete-user-image/?` +
@@ -148,7 +151,7 @@ export default function AvatarModal({
                     setSelectedAvatarId(avatar.id);
                   }}
                 >
-                  <Image
+                  <CommonImage
                     src={avatar.url}
                     width={60}
                     height={60}
@@ -166,28 +169,34 @@ export default function AvatarModal({
 
           {mode === "NEW_IMAGE" && (
             <label className="relative block px-6 py-4 rounded-xl border border-[#EAECF0] cursor-pointer text-center">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) =>
-                  e.target.files && handleAvatarFileSelect(e.target.files[0])
-                }
-                className="absolute inset-0 opacity-0 w-full h-full cursor-pointer z-10"
-              />
-              <div className="flex justify-center">
-                <Image
-                  width={20}
-                  height={20}
-                  src="/icons/upload-cloud.svg"
-                  alt=""
-                />
-              </div>
-              <div className="text-sm mt-2">
-                <span className="text-purple-500 font-bold">
-                  {translations.clickToUpload}
-                </span>{" "}
-                {translations.dragAndDrop}
-              </div>
+              <Dropzone
+                onDrop={handleAvatarFileSelect}
+                accept={{ "image/*": [] }}
+                multiple={false}
+              >
+                {({ getRootProps, getInputProps }) => (
+                  <div
+                    {...getRootProps()}
+                    className="border border-[#EAECF0] p-4 rounded-xl cursor-pointer text-center"
+                  >
+                    <input {...getInputProps()} />
+                    <div className="flex justify-center">
+                      <CommonImage
+                        width={20}
+                        height={20}
+                        src="/icons/upload-cloud.svg"
+                        alt=""
+                      />
+                    </div>
+                    <div className="text-sm mt-2">
+                      <span className="text-purple-500 font-bold">
+                        {translations.clickToUpload}
+                      </span>{" "}
+                      {translations.dragAndDrop}
+                    </div>
+                  </div>
+                )}
+              </Dropzone>
             </label>
           )}
 
@@ -203,7 +212,7 @@ export default function AvatarModal({
               />
             ) : (
               <div className="w-20 h-20 mx-auto bg-purple-700 rounded-full flex justify-center items-center">
-                <Image
+                <CommonImage
                   width={32}
                   height={32}
                   src="/images/dashboard/user-placeholder.svg"

@@ -37,7 +37,8 @@ type Action =
   | { type: "SET_MOST_PLAYED"; payload: TDashboardGame[] }
   | { type: "SET_MESSAGES"; payload: TUserMessage[] }
   | { type: "SET_READ_MESSAGES"; payload: number[] }
-  | { type: "SET_SLOT_URL"; payload: string };
+  | { type: "SET_SLOT_URL"; payload: string }
+  | { type: "BATCH_UPDATE"; payload: Partial<State> };
 
 const reducer = (state: State, action: Action): State => {
   switch (action.type) {
@@ -55,6 +56,27 @@ const reducer = (state: State, action: Action): State => {
       return { ...state, readMessages: action.payload };
     case "SET_SLOT_URL":
       return { ...state, slotMachineUrl: action.payload };
+    case "BATCH_UPDATE":
+      return {
+        ...state,
+        ...(action.payload.user !== undefined && { user: action.payload.user }),
+        ...(action.payload.favouriteGames && {
+          favouriteGames: action.payload.favouriteGames,
+        }),
+        ...(action.payload.weeklyPicks && {
+          weeklyPicks: action.payload.weeklyPicks,
+        }),
+        ...(action.payload.mostPlayed && {
+          mostPlayed: action.payload.mostPlayed,
+        }),
+        ...(action.payload.messages && { messages: action.payload.messages }),
+        ...(action.payload.readMessages && {
+          readMessages: action.payload.readMessages,
+        }),
+        ...(action.payload.slotMachineUrl && {
+          slotMachineUrl: action.payload.slotMachineUrl,
+        }),
+      };
     default:
       return state;
   }
@@ -64,10 +86,12 @@ const UserContext = createContext<{
   state: State;
   dispatch: React.Dispatch<Action>;
   getUserProfile: () => Promise<TUser | null>;
+  getUserFavouriteGames: () => Promise<TDashboardGame[]>;
 }>({
   state: initialState,
   dispatch: () => null,
   getUserProfile: () => Promise.resolve(null),
+  getUserFavouriteGames: () => Promise.resolve([]),
 });
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
@@ -86,10 +110,26 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     );
     if (res.ok) {
       const userProfile = await res.json();
-      dispatch({ type: "SET_USER", payload: userProfile });
+      dispatch({
+        type: "SET_USER",
+        payload: { ...userProfile, photo: userProfile.photo },
+      });
       return userProfile;
     }
     return null;
+  };
+
+  // Fetch User Favourite Games
+  const getUserFavouriteGames = async (): Promise<TDashboardGame[]> => {
+    const userFavGamesRes = await fetch(
+      `${process.env.NEXT_PUBLIC_FULL_URL}/api/dashboard/user-games/`,
+      {
+        method: "GET",
+      }
+    );
+    const userGames = await userFavGamesRes.json();
+    dispatch({ type: "SET_FAVOURITE_GAMES", payload: userGames });
+    return userGames;
   };
 
   // Persist user to localStorage
@@ -100,7 +140,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   }, [state.user]);
 
   return (
-    <UserContext.Provider value={{ state, getUserProfile, dispatch }}>
+    <UserContext.Provider
+      value={{ state, getUserProfile, getUserFavouriteGames, dispatch }}
+    >
       {children}
     </UserContext.Provider>
   );
@@ -127,5 +169,7 @@ export const useUserActions = () => {
       dispatch({ type: "SET_READ_MESSAGES", payload: ids }),
     setSlotUrl: (url: string) =>
       dispatch({ type: "SET_SLOT_URL", payload: url }),
+    setBatchUpdate: (payload: Partial<State>) =>
+      dispatch({ type: "BATCH_UPDATE", payload }),
   };
 };
