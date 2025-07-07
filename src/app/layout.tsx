@@ -113,11 +113,27 @@ export default async function RootLayout({
           type="image/x-icon"
         />
 
-        {/* Preconnect to critical third-party origins */}
-        <link rel="preconnect" href={process.env.NEXT_PUBLIC_API_URL || ""} />
+        {/* Preconnect to critical origins */}
+        <link
+          rel="preconnect"
+          href={process.env.NEXT_PUBLIC_API_URL || ""}
+          crossOrigin="anonymous"
+        />
         <link rel="dns-prefetch" href={process.env.NEXT_PUBLIC_API_URL || ""} />
+        <link
+          rel="preconnect"
+          href={process.env.NEXT_PUBLIC_SITE_URL || ""}
+          crossOrigin="anonymous"
+        />
+        <link rel="dns-prefetch" href={process.env.NEXT_PUBLIC_SITE_URL || ""} />
 
         {/* Additional performance optimizations */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
         <link rel="dns-prefetch" href="//fonts.googleapis.com" />
         <link rel="dns-prefetch" href="//fonts.gstatic.com" />
 
