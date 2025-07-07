@@ -173,7 +173,7 @@ class StrapiClient {
    * Invalidate cache by pattern
    */
   async invalidateCache(pattern: string): Promise<void> {
-    await cacheManager.delete(`strapi:${pattern}*`);
+    await cacheManager.invalidate([`strapi:${pattern}*`]);
   }
 
   /**
