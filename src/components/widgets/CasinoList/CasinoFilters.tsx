@@ -20,9 +20,7 @@ import {
   CONDITION_OPTIONS,
   BONUS_AMOUNT_OPTIONS,
   WAGERING_OPTIONS,
-  CASINO_FILTER_TO_SORT,
 } from "@/lib/utils/sort-mappings";
-import { normalizeCasinoFilter } from "@/lib/utils/casino";
 
 /**
  * CasinoFilters Component
@@ -43,20 +41,10 @@ export function CasinoFilters({
   translations = {},
   className,
   loading = false,
-  defaultFilter,
 }: CasinoFiltersProps) {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const dropdownRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
-  // Apply default filter from block on mount
-  useEffect(() => {
-    if (!defaultFilter) return;
-    const bonusKey = normalizeCasinoFilter(defaultFilter);
-    if (bonusKey !== selectedFilters.bonusKey) {
-      onFilterChange({ bonusKey, sort: CASINO_FILTER_TO_SORT[bonusKey] });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   // Get label by value helper
   const getLabelByValue = (

@@ -280,7 +280,6 @@ export function CasinoListWidget({
                     onClearFilters={handleClearFilters}
                     translations={translations}
                     loading={loading}
-                    defaultFilter={block.casinoFilters}
                   />
                 </div>
 
@@ -293,7 +292,6 @@ export function CasinoListWidget({
                     onClearFilters={handleClearFilters}
                     translations={translations}
                     loading={loading}
-                    defaultFilter={block.casinoFilters}
                   />
                 </div>
               </>
