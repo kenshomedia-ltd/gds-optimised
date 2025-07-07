@@ -1,4 +1,4 @@
-import ContactUsForm from "@/components/ContactUsForm/ContactUsForm";
+import { ContactUsForm } from "@/components/ContactUsForm";
 import { getLayoutData } from "@/lib/strapi/data-loader";
 
 export default async function FavouriteGamesPage() {
