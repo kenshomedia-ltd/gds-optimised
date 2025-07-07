@@ -1,21 +1,21 @@
 // src/app/layout.tsx - Corrected version
-import { Lato, Roboto } from "next/font/google";
-import { ClientErrorBoundary } from "@/components/common/ErrorBoundary/ErrorBoundary";
-import { ChunkLoadErrorHandler } from "@/components/common/ChunkLoadErrorHandler";
-import { getLayoutData } from "@/lib/strapi/data-loader";
-import { LegalServer } from "@/components/layout/Legal";
-import DynamicTheme from "@/components/layout/DynamicTheme/DynamicTheme";
-import { Header } from "@/components/layout/Header";
-import { FooterServer } from "@/components/layout/Footer";
-import { ClientProviders } from "@/components/providers/ClientProviders";
 import { BackToTop } from "@/components/common/BackToTop/BackToTop";
-import { Toaster } from "sonner";
-import { getFaviconPath, generateFaviconLinks } from "@/lib/utils/favicon";
+import { ChunkLoadErrorHandler } from "@/components/common/ChunkLoadErrorHandler";
+import { ClientErrorBoundary } from "@/components/common/ErrorBoundary/ErrorBoundary";
+import DynamicTheme from "@/components/layout/DynamicTheme/DynamicTheme";
+import { FooterWrapper } from "@/components/layout/Footer";
+import { Header } from "@/components/layout/Header";
+import { LegalServer } from "@/components/layout/Legal";
+import { ClientProviders } from "@/components/providers/ClientProviders";
+import { getLayoutData } from "@/lib/strapi/data-loader";
+import { generateFaviconLinks, getFaviconPath } from "@/lib/utils/favicon";
 import type { Metadata, Viewport } from "next";
+import { Lato, Roboto } from "next/font/google";
+import { Toaster } from "sonner";
 
-import "./globals.css";
 import { cn } from "@/lib/utils/cn";
 import Script from "next/script";
+import "./globals.css";
 
 // Configure Lato for headings with font metrics for reduced CLS
 const lato = Lato({
@@ -211,13 +211,7 @@ export default async function RootLayout({
               {/* Main content */}
               <main className="flex-1 z-50">{children}</main>
 
-              <FooterServer
-                footerContent={layoutData.layout.footerContent}
-                footerImages={layoutData.layout.footerImages}
-                footerNavigation={layoutData.navigation.footerNavigation}
-                footerNavigations={layoutData.navigation.footerNavigations}
-                translations={layoutData.translations}
-              />
+              <FooterWrapper layoutData={layoutData} />
             </div>
 
             {/* Back to Top Button - Also needs to be inside providers if it uses any context */}

@@ -13,6 +13,7 @@ import type {
   FavoritesContextValue,
 } from "@/types/favorite.types";
 import type { GameData } from "@/types/game.types";
+import { useUser } from "./UserContext";
 
 const FavoritesContext = createContext<FavoritesContextValue | undefined>(
   undefined
@@ -36,6 +37,7 @@ const FAVORITES_STORAGE_KEY = "_favourites";
 export function FavoritesProvider({ children }: FavoritesProviderProps) {
   const [favorites, setFavorites] = useState<FavoriteGame[]>([]);
   const [isLoading] = useState(false);
+  const { state, getUserFavouriteGames } = useUser();
 
   // Load favorites from localStorage on mount
   useEffect(() => {
@@ -99,21 +101,64 @@ export function FavoritesProvider({ children }: FavoritesProviderProps) {
         }
         return [...prev, newFavorite];
       });
+
+      // If logged in, make API request
+      if (state.user) {
+        try {
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_FULL_URL}/api/dashboard/user-games/`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ games: [game.id] }),
+            }
+          );
+          if (response.ok) {
+            await getUserFavouriteGames();
+          }
+        } catch (error) {
+          console.error("Failed to sync favorite with server:", error);
+          // Optionally rollback optimistic update here
+        }
+      }
     },
-    [gameToFavorite]
+    [gameToFavorite, state.user]
   );
 
   // Remove favorite
-  const removeFavorite = useCallback(async (gameId: number) => {
-    setFavorites((prev) => prev.filter((fav) => fav.id !== gameId));
-  }, []);
+  const removeFavorite = useCallback(
+    async (gameId: number) => {
+      setFavorites((prev) => prev.filter((fav) => fav.id !== gameId));
+      const userFavouritedGame = state.favouriteGames.find(
+        ({ game }) => game.id === gameId
+      );
+      if (userFavouritedGame) {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_FULL_URL}/api/dashboard/user-games/?` +
+            new URLSearchParams(`favoriteId=${userFavouritedGame?.id}`),
+          {
+            method: "DELETE",
+          }
+        );
+        if (response.ok) {
+          await getUserFavouriteGames();
+        }
+      }
+    },
+    [state.favouriteGames, getUserFavouriteGames]
+  );
 
   // Check if game is favorited
   const isFavorited = useCallback(
     (gameId: number): boolean => {
-      return favorites.some((fav) => fav.id === gameId);
+      return (
+        favorites.some((fav) => fav.id === gameId) ||
+        state.favouriteGames.some((fav) => fav.game.id === gameId)
+      );
     },
-    [favorites]
+    [favorites, state.favouriteGames]
   );
 
   // Get total favorites count

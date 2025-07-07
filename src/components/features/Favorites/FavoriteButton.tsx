@@ -1,13 +1,13 @@
 // src/components/features/Favorites/FavoriteButton.tsx
 "use client";
 
-import { useState, useTransition } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useFavorites } from "@/contexts/FavoritesContext";
+import { cn } from "@/lib/utils/cn";
+import type { FavoriteButtonProps } from "@/types/favorite.types";
 import { faHeart } from "@awesome.me/kit-0e07a43543/icons/duotone/light";
 import { faHeart as faHeartSolid } from "@awesome.me/kit-0e07a43543/icons/duotone/solid";
-import { useFavorites } from "@/contexts/FavoritesContext";
-import type { FavoriteButtonProps } from "@/types/favorite.types";
-import { cn } from "@/lib/utils/cn";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
 /**
@@ -45,6 +45,7 @@ export function FavoriteButton({
 
     startTransition(async () => {
       try {
+        console.log("favorited", favorited);
         if (favorited) {
           await removeFavorite(gameId);
           toast.success(`${gameTitle} ${translations.removeToFav}`);
