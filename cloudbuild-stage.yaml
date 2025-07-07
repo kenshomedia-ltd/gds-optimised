@@ -1,0 +1,134 @@
+# cloudbuild-stage.yaml
+# Stage deployment without Redis/VPC connector
+
+steps:
+  # Step 1: Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'Build Docker Image'
+    env: ['DOCKER_BUILDKIT=1']
+    args:
+      - 'build'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${_SERVICE_NAME}:$COMMIT_SHA'
+      - '.'
+      - '-f'
+      - 'Dockerfile'
+      # Pass ONLY PUBLIC substitutions as build arguments
+      - '--build-arg'
+      - 'NEXT_PUBLIC_API_URL=${_NEXT_PUBLIC_API_URL}'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_API_TOKEN=${_NEXT_PUBLIC_API_TOKEN}'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_SITE_ID=${_NEXT_PUBLIC_SITE_ID}'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_SITE_NAME=${_NEXT_PUBLIC_SITE_NAME}'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_HOSTNAME=${_NEXT_PUBLIC_HOSTNAME}'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_SITE_URL=${_NEXT_PUBLIC_SITE_URL}'
+      - '--build-arg'
+      - 'NEXT_LANG=${_NEXT_LANG}'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_MEILISEARCH_HOST=${_NEXT_PUBLIC_MEILISEARCH_HOST}'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_MEILISEARCH_SEARCH_KEY=${_NEXT_PUBLIC_MEILISEARCH_SEARCH_KEY}'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_MEILISEARCH_INDEX_NAME=${_NEXT_PUBLIC_MEILISEARCH_INDEX_NAME}'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_IMAGE_URL=${_NEXT_PUBLIC_IMAGE_URL}'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_IMAGE_BUCKET=${_NEXT_PUBLIC_IMAGE_BUCKET}'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_GAMES_API_URL=${_NEXT_PUBLIC_GAMES_API_URL}'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_GAMES_API_TOKEN=${_NEXT_PUBLIC_GAMES_API_TOKEN}'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_BASE_PATH=${_NEXT_PUBLIC_BASE_PATH}'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_SWETRIX_PROJECT_ID=${_NEXT_PUBLIC_SWETRIX_PROJECT_ID}'
+  
+  # Step 2: Push the Docker image to Google Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'Push Docker Image'
+    args:
+      - 'push'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${_SERVICE_NAME}:$COMMIT_SHA'
+
+  # Step 3: Deploy to Cloud Run WITHOUT VPC connector
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'Deploy to Cloud Run'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - '${_SERVICE_NAME}'
+      - '--image'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${_SERVICE_NAME}:$COMMIT_SHA'
+      - '--region'
+      - '${_REGION}'
+      - '--platform'
+      - 'managed'
+      - '--port'
+      - '3000'
+      - '--allow-unauthenticated'
+      # --- VPC Connector for Cloud SQL (keep this for database connectivity) ---
+      - '--vpc-connector'
+      - '${_VPC_CONNECTOR}'
+      - '--vpc-egress'
+      - 'private-ranges-only'
+      # --- Environment Variables WITHOUT Redis (Redis will be disabled automatically) ---
+      - '--set-env-vars'
+      - |- 
+        NODE_ENV=production,
+        NEXT_PUBLIC_API_URL=${_NEXT_PUBLIC_API_URL},
+        NEXT_PUBLIC_API_TOKEN=${_NEXT_PUBLIC_API_TOKEN},
+        NEXT_PUBLIC_SITE_ID=${_NEXT_PUBLIC_SITE_ID},
+        NEXT_PUBLIC_SITE_NAME=${_NEXT_PUBLIC_SITE_NAME},
+        NEXT_PUBLIC_HOSTNAME=${_NEXT_PUBLIC_HOSTNAME},
+        NEXT_PUBLIC_SITE_URL=${_NEXT_PUBLIC_SITE_URL},
+        NEXT_LANG=${_NEXT_LANG},
+        NEXT_PUBLIC_MEILISEARCH_HOST=${_NEXT_PUBLIC_MEILISEARCH_HOST},
+        NEXT_PUBLIC_MEILISEARCH_SEARCH_KEY=${_NEXT_PUBLIC_MEILISEARCH_SEARCH_KEY},
+        NEXT_PUBLIC_MEILISEARCH_INDEX_NAME=${_NEXT_PUBLIC_MEILISEARCH_INDEX_NAME},
+        NEXT_PUBLIC_IMAGE_URL=${_NEXT_PUBLIC_IMAGE_URL},
+        NEXT_PUBLIC_IMAGE_BUCKET=${_NEXT_PUBLIC_IMAGE_BUCKET},
+        NEXT_PUBLIC_GAMES_API_URL=${_NEXT_PUBLIC_GAMES_API_URL},
+        NEXT_PUBLIC_GAMES_API_TOKEN=${_NEXT_PUBLIC_GAMES_API_TOKEN},
+        NEXT_PUBLIC_BASE_PATH=${_NEXT_PUBLIC_BASE_PATH},
+        NEXT_PUBLIC_SWETRIX_PROJECT_ID=${_NEXT_PUBLIC_SWETRIX_PROJECT_ID}
+
+# List of images built by this pipeline
+images:
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${_SERVICE_NAME}:$COMMIT_SHA'
+
+# Default substitution values for stage
+substitutions:
+  _SERVICE_NAME: 'gds-svelte-stage'
+  _REGION: 'europe-west8'
+  _ARTIFACT_REGISTRY_REPO: 'nextjs-apps'
+  _VPC_CONNECTOR: 'projects/${PROJECT_ID}/locations/${_REGION}/connectors/redis-connector'
+  
+  # --- Stage Environment Variables (no Redis variables) ---
+  _NEXT_PUBLIC_API_URL: 'http://your-stage-api.example.com'
+  _NEXT_PUBLIC_API_TOKEN: 'your_stage_api_token'
+  _NEXT_PUBLIC_SITE_ID: 'gds-stage'
+  _NEXT_PUBLIC_SITE_NAME: 'Stage Site'
+  _NEXT_PUBLIC_HOSTNAME: 'stage.example.com'
+  _NEXT_LANG: 'en'
+  _NEXT_PUBLIC_MEILISEARCH_HOST: 'http://your-stage-meili.example.com'
+  _NEXT_PUBLIC_MEILISEARCH_SEARCH_KEY: 'your_stage_meili_search_key'
+  _NEXT_PUBLIC_MEILISEARCH_INDEX_NAME: 'your_stage_meili_index'
+  _NEXT_PUBLIC_IMAGE_URL: 'http://stage-images.example.com'
+  _NEXT_PUBLIC_IMAGE_BUCKET: 'your-stage-image-bucket-name'
+  _NEXT_PUBLIC_GAMES_API_URL: 'https://stage-games.example.com'
+  _NEXT_PUBLIC_GAMES_API_TOKEN: 'your_stage_games_api_token'
+  _NEXT_PUBLIC_SITE_URL: 'https://stage.example.com'
+  _NEXT_PUBLIC_BASE_PATH: '/it'
+  _NEXT_PUBLIC_SWETRIX_PROJECT_ID: 'your_stage_swetrix_project_id'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: 'E2_HIGHCPU_8'
+  dynamicSubstitutions: true
+
+timeout: '1200s'
