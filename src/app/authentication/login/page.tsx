@@ -1,6 +1,7 @@
 import { Login } from "@/components/auth/Login";
 import { getLayoutData } from "@/lib/strapi/data-loader";
 import Link from "next/link";
+import { Suspense } from "react";
 
 export default async function LoginPage() {
   const { translations } = await getLayoutData({ cached: true });
@@ -17,7 +18,9 @@ export default async function LoginPage() {
           </p>
         </div>
 
-        <Login translations={translations ?? {}} />
+        <Suspense fallback={<div>Loading...</div>}>
+          <Login translations={translations ?? {}} />
+        </Suspense>
         <p className="text-center text-base text-blue-500 !mb-0">
           {translations?.noAccount}{" "}
           <Link
