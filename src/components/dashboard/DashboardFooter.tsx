@@ -31,7 +31,7 @@ export default function DashboardFooter({
   }
 
   return (
-    <footer className="fixed w-full bottom-0 z-30 md:hidden">
+    <footer className="fixed w-full bottom-0 z-50 md:hidden">
       <div
         className={`bg-primary overflow-hidden overflow-y-auto group ${
           isMenuVisible ? "menu-open" : ""
