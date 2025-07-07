@@ -68,6 +68,7 @@ export {
   formatNoDepositBonus,
   isNewCasino,
   getCasinoBadge,
+  normalizeCasinoFilter,
 } from "./casino";
 
 // Sort mapping utilities
@@ -82,6 +83,7 @@ export {
   getStrapiSort,
   getMultipleSorts,
   normalizeGameSort,
+  normalizeCasinoSort,
 } from "./sort-mappings";
 
 // Re-export types

@@ -51,6 +51,7 @@ export function MobileCasinoFilters({
     label: translations?.[option.label] || option.label,
   }));
 
+
   // Calculate if there are active filters
   const hasActiveFilters =
     selectedFilters.bonusKey !== "bonusSection" ||

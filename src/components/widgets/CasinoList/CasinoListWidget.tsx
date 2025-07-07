@@ -18,6 +18,8 @@ import { cn } from "@/lib/utils/cn";
 import { getCasinos, getCasinoProviders } from "@/app/actions/casinos";
 import { MobileCasinoFiltersSkeleton } from "./MobileCasinoFiltersSkeleton";
 import { MobileCasinoFilters } from "./MobileCasinoFilters";
+import { normalizeCasinoFilter } from "@/lib/utils/casino";
+import { normalizeCasinoSort } from "@/lib/utils";
 
 // Initial filter state
 const initialFilters: CasinoFiltersState = {
@@ -58,6 +60,16 @@ export function CasinoListWidget({
   const itemsPerPage = block.numberPerLoadMore || 10;
   const usePagination = block.usePagination || false;
 
+  // Determine initial bonus filter based on block settings
+  const initialBonusKey = normalizeCasinoFilter(block.casinoFilters);
+  const initialSort = normalizeCasinoSort(block.casinoSort, initialFilters.sort);
+
+  const blockInitialFilters: CasinoFiltersState = {
+    ...initialFilters,
+    bonusKey: initialBonusKey,
+    sort: initialSort,
+  };
+
   // Calculate initial displayed casinos to prevent layout shift
   const getInitialDisplayedCasinos = () => {
     if (!initialCasinos.length) return [];
@@ -81,7 +93,7 @@ export function CasinoListWidget({
     initialProviders || []
   );
   const [providersLoading, setProvidersLoading] = useState(false);
-  const [filters, setFilters] = useState<CasinoFiltersState>(initialFilters);
+  const [filters, setFilters] = useState<CasinoFiltersState>(blockInitialFilters);
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [hasAppliedFilters, setHasAppliedFilters] = useState(false);
 

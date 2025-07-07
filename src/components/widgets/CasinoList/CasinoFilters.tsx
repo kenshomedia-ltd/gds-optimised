@@ -45,6 +45,7 @@ export function CasinoFilters({
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const dropdownRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
+
   // Get label by value helper
   const getLabelByValue = (
     options: ReadonlyArray<{ readonly value: string; readonly label: string }>,
