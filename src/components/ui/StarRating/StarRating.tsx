@@ -1,7 +1,7 @@
 // src/components/ui/StarRating/StarRating.tsx
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar } from "@awesome.me/kit-0e07a43543/icons/duotone/solid";
 import { cn } from "@/lib/utils/cn";
@@ -52,14 +52,38 @@ export function StarRating({
   // Get size class
   const sizeClass = STAR_SIZE_CLASSES[size];
 
+  // Cache star DOM nodes and their metrics to avoid repeated layout thrashing
+  const starRefs = useRef<HTMLDivElement[]>([]);
+  const starMetricsRef = useRef<{ left: number; width: number }[]>([]);
+
+  useEffect(() => {
+    // Ensure refs array matches current number of stars
+    starRefs.current = starRefs.current.slice(0, maxRating);
+
+    const updateMetrics = () => {
+      starMetricsRef.current = starRefs.current.map((el) => {
+        if (!el) return { left: 0, width: 0 };
+        const rect = el.getBoundingClientRect();
+        return { left: rect.left, width: rect.width - 4 };
+      });
+    };
+
+    updateMetrics();
+    window.addEventListener("resize", updateMetrics, { passive: true });
+
+    return () => {
+      window.removeEventListener("resize", updateMetrics);
+    };
+  }, [maxRating]);
+
   // Handle mouse move for fractional ratings
   const handleMouseMove = useCallback(
     (event: React.MouseEvent<HTMLDivElement>, starIndex: number) => {
       if (readonly) return;
 
-      const rect = event.currentTarget.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const width = rect.width - 4; // Account for padding
+      const metrics = starMetricsRef.current[starIndex];
+      const x = event.clientX - metrics.left;
+      const width = metrics.width; // Account for padding
       const percentage = x / width;
 
       // Make it easier to get full stars - anything above 85% counts as 100%
@@ -80,9 +104,9 @@ export function StarRating({
     (event: React.MouseEvent<HTMLDivElement>, starIndex: number) => {
       if (readonly) return;
 
-      const rect = event.currentTarget.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const width = rect.width - 4;
+      const metrics = starMetricsRef.current[starIndex];
+      const x = event.clientX - metrics.left;
+      const width = metrics.width;
       const percentage = x / width;
       const adjustedPercentage =
         percentage > 0.85 ? 1 : Math.max(0.1, Math.min(1, percentage));
@@ -100,9 +124,9 @@ export function StarRating({
       if (readonly) return;
 
       const touch = event.touches[0];
-      const rect = event.currentTarget.getBoundingClientRect();
-      const x = touch.clientX - rect.left;
-      const width = rect.width - 4;
+      const metrics = starMetricsRef.current[starIndex];
+      const x = touch.clientX - metrics.left;
+      const width = metrics.width;
       const percentage = x / width;
       const adjustedPercentage =
         percentage > 0.85 ? 1 : Math.max(0.1, Math.min(1, percentage));
@@ -135,6 +159,9 @@ export function StarRating({
       return (
         <div
           key={index}
+          ref={(el) => {
+            starRefs.current[index] = el as HTMLDivElement;
+          }}
           className={cn(
             "relative cursor-pointer transition-transform hover:scale-110 pr-1",
             readonly && "cursor-default hover:scale-100",
