@@ -111,13 +111,24 @@ const nextConfig: NextConfig = {
         ],
       },
 
+      // Optimized image handler - long-term caching
+      {
+        source: "/_next/image",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+
       // Images from CDN
       {
         source: "/images/:path*",
         headers: [
           {
             key: "Cache-Control",
-            value: "public, max-age=86400, s-maxage=31536000",
+            value: "public, max-age=31536000, s-maxage=31536000, immutable",
           },
           {
             key: "Vary",
