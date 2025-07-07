@@ -83,6 +83,7 @@ export {
   getStrapiSort,
   getMultipleSorts,
   normalizeGameSort,
+  normalizeCasinoSort,
 } from "./sort-mappings";
 
 // Re-export types

@@ -201,6 +201,52 @@ export const CASINO_SORT_OPTIONS = [
   { value: "createdAt:desc", label: "casinoPostDate" },
 ] as const;
 
+/** Mapping of CMS casino sort names to internal values */
+const CASINO_SORT_ALIASES: Record<string, string> = {
+  "top rated": "ratingAvg:desc",
+  "top rated users": "ratingAvg:desc",
+  "più votati utenti": "ratingAvg:desc",
+  "piu votati utenti": "ratingAvg:desc",
+  "author rating": "authorRatings:desc",
+  "top rated author": "authorRatings:desc",
+  "bonus benvenuto": "bonusSection.bonusAmount:desc",
+  "welcome bonus": "bonusSection.bonusAmount:desc",
+  alphabetic: "title:asc",
+  "a-z": "title:asc",
+  alfabetico: "title:asc",
+  newest: "createdAt:desc",
+  "data di pubblicazione": "createdAt:desc",
+};
+
+/**
+ * Normalize casino sort value from CMS to internal format
+ */
+export function normalizeCasinoSort(
+  sortValue: string | undefined,
+  defaultSort: string = "ratingAvg:desc"
+): string {
+  if (!sortValue) return defaultSort;
+
+  const normalized = sortValue.trim().toLowerCase();
+
+  // Direct match with our option values
+  if (CASINO_SORT_OPTIONS.some((opt) => opt.value === sortValue)) {
+    return sortValue;
+  }
+
+  if (CASINO_SORT_ALIASES[normalized]) {
+    return CASINO_SORT_ALIASES[normalized];
+  }
+
+  for (const [alias, value] of Object.entries(CASINO_SORT_ALIASES)) {
+    if (normalized.includes(alias)) {
+      return value;
+    }
+  }
+
+  return defaultSort;
+}
+
 /**
  * Bonus type options
  */

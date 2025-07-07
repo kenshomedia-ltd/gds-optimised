@@ -19,6 +19,7 @@ import { getCasinos, getCasinoProviders } from "@/app/actions/casinos";
 import { MobileCasinoFiltersSkeleton } from "./MobileCasinoFiltersSkeleton";
 import { MobileCasinoFilters } from "./MobileCasinoFilters";
 import { normalizeCasinoFilter } from "@/lib/utils/casino";
+import { normalizeCasinoSort } from "@/lib/utils";
 
 // Initial filter state
 const initialFilters: CasinoFiltersState = {
@@ -61,10 +62,12 @@ export function CasinoListWidget({
 
   // Determine initial bonus filter based on block settings
   const initialBonusKey = normalizeCasinoFilter(block.casinoFilters);
+  const initialSort = normalizeCasinoSort(block.casinoSort, initialFilters.sort);
 
   const blockInitialFilters: CasinoFiltersState = {
     ...initialFilters,
     bonusKey: initialBonusKey,
+    sort: initialSort,
   };
 
   // Calculate initial displayed casinos to prevent layout shift
