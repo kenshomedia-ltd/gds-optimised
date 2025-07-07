@@ -46,7 +46,7 @@ steps:
       - '--build-arg'
       - 'NEXT_PUBLIC_BASE_PATH=${_NEXT_PUBLIC_BASE_PATH}'
       - '--build-arg'
-      - 'NEXT_PUBLIC_SWETRIX_PROJECT_ID=${_NEXT_PUBLIC_SWETRIX_PROJECT_ID}'
+      - 'NEXT_PUBLIC_GA_MEASUREMENT_ID=${_NEXT_PUBLIC_GA_MEASUREMENT_ID}'
   
   # Step 2: Push the Docker image to Google Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
@@ -99,7 +99,7 @@ steps:
         REDIS_PORT=${_REDIS_PORT},
         REDIS_PASSWORD=${_REDIS_PASSWORD},
         NEXT_PUBLIC_BASE_PATH=${_NEXT_PUBLIC_BASE_PATH},
-        NEXT_PUBLIC_SWETRIX_PROJECT_ID=${_NEXT_PUBLIC_SWETRIX_PROJECT_ID}
+        NEXT_PUBLIC_GA_MEASUREMENT_ID=${_NEXT_PUBLIC_GA_MEASUREMENT_ID}
 
 # List of images built by this pipeline
 images:
@@ -129,7 +129,7 @@ substitutions:
   _NEXT_PUBLIC_GAMES_API_TOKEN: 'your_games_api_token'
   _NEXT_PUBLIC_SITE_URL: 'https://www.example.com'
   _NEXT_PUBLIC_BASE_PATH: '/it'
-  _NEXT_PUBLIC_SWETRIX_PROJECT_ID: 'your_swetrix_project_id'
+  _NEXT_PUBLIC_GA_MEASUREMENT_ID: 'your_ga_measurement_id'
   
   # --- Secret/VPC substitutions (Best to configure in trigger) ---
   _REDIS_HOST: '10.0.0.3'

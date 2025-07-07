@@ -15,7 +15,7 @@ import type { Metadata, Viewport } from "next";
 
 import "./globals.css";
 import { cn } from "@/lib/utils/cn";
-import Script from "next/script";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 // Configure Lato for headings with font metrics for reduced CLS
 const lato = Lato({
@@ -161,37 +161,9 @@ export default async function RootLayout({
         )}
         suppressHydrationWarning={true}
       >
-        {/* Swetrix Analytics Script - Proxied */}
-        <Script src="/api/analytics/script" strategy="afterInteractive" defer />
+        {/* Google Analytics */}
+        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || ""} />
 
-        {/* Swetrix Initialization Script */}
-        <Script
-          id="swetrix-init"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-              document.addEventListener('DOMContentLoaded', function() {
-                if (typeof swetrix !== 'undefined') {
-                  swetrix.init('${process.env.NEXT_PUBLIC_SWETRIX_PROJECT_ID}');
-                  swetrix.trackViews();
-                }
-              });
-            `,
-          }}
-        />
-
-        {/* No-script fallback - Updated to use proxy */}
-        <noscript>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={`/api/analytics/log?pid=${process.env.NEXT_PUBLIC_SWETRIX_PROJECT_ID}`}
-            alt=""
-            referrerPolicy="no-referrer-when-downgrade"
-            style={{ display: "none" }}
-          />
-        </noscript>
-
-        {/* Change this line: */}
         <ClientErrorBoundary>
           {/* Legal bar at the very top */}
           <LegalServer legalText={layoutData.layout.legalText} />
