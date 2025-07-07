@@ -202,6 +202,7 @@ export function IntroWithImage({
               width={525}
               height={200}
               priority={true}
+              fetchPriority="high"
               className="w-full h-full object-cover"
               sizes="(max-width: 1024px) 100vw, 50vw"
               quality={90}

@@ -21,6 +21,11 @@ export interface ImageProps {
   // Next.js Image properties
   loading?: "lazy" | "eager";
   priority?: boolean;
+  /**
+   * Hint to the browser about the image's fetch priority.
+   * Maps to the HTML `fetchpriority` attribute.
+   */
+  fetchPriority?: "high" | "low" | "auto";
   quality?: number;
   sizes?: string;
   placeholder?: "blur" | "empty" | "none";

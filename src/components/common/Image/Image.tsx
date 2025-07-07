@@ -66,6 +66,7 @@ export function Image({
   className,
   loading = "lazy",
   priority = false,
+  fetchPriority,
   quality = 85,
   sizes,
   placeholder = "blur",
@@ -414,6 +415,7 @@ export function Image({
         sizes={imageSizes}
         quality={quality}
         priority={priority}
+        fetchPriority={fetchPriority || (priority ? "high" : undefined)}
         placeholder={placeholder === "blur" && blurUrl ? "blur" : "empty"}
         blurDataURL={blurUrl}
         loading={priority ? "eager" : loading}
@@ -438,6 +440,7 @@ export function Image({
           sizes={imageSizes}
           quality={quality}
           priority
+          fetchPriority={fetchPriority}
           className="absolute inset-0 z-10"
           style={imageStyles}
           onLoad={() => setCurrentSrc(src)}
