@@ -63,7 +63,9 @@ export function CasinoListWidget({
   // Determine initial filters based on block settings
   const initialBonusKey = normalizeCasinoFilter(block.casinoFilters);
   const initialSort =
-    CASINO_FILTER_TO_SORT[initialBonusKey] || initialFilters.sort;
+    block.casinoSort ||
+    CASINO_FILTER_TO_SORT[initialBonusKey] ||
+    initialFilters.sort;
 
   const blockInitialFilters: CasinoFiltersState = {
     ...initialFilters,
