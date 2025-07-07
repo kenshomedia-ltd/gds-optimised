@@ -18,7 +18,6 @@ import { cn } from "@/lib/utils/cn";
 import { getCasinos, getCasinoProviders } from "@/app/actions/casinos";
 import { MobileCasinoFiltersSkeleton } from "./MobileCasinoFiltersSkeleton";
 import { MobileCasinoFilters } from "./MobileCasinoFilters";
-import { CASINO_FILTER_TO_SORT } from "@/lib/utils/sort-mappings";
 import { normalizeCasinoFilter } from "@/lib/utils/casino";
 
 // Initial filter state
@@ -60,17 +59,12 @@ export function CasinoListWidget({
   const itemsPerPage = block.numberPerLoadMore || 10;
   const usePagination = block.usePagination || false;
 
-  // Determine initial filters based on block settings
+  // Determine initial bonus filter based on block settings
   const initialBonusKey = normalizeCasinoFilter(block.casinoFilters);
-  const initialSort =
-    block.casinoSort ||
-    CASINO_FILTER_TO_SORT[initialBonusKey] ||
-    initialFilters.sort;
 
   const blockInitialFilters: CasinoFiltersState = {
     ...initialFilters,
     bonusKey: initialBonusKey,
-    sort: initialSort,
   };
 
   // Calculate initial displayed casinos to prevent layout shift
