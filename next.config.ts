@@ -1,6 +1,7 @@
 // next.config.ts
 import type { NextConfig } from "next";
 import type { RedirectsResponse } from "@/types/redirect.types";
+import Critters from "critters-webpack-plugin";
 
 const nextConfig: NextConfig = {
   // Configure base path to serve from /it/
@@ -368,6 +369,15 @@ const nextConfig: NextConfig = {
       ],
       fallback: [],
     };
+  },
+
+  webpack(config, { dev, isServer }) {
+    if (!dev && !isServer) {
+      config.plugins.push(
+        new Critters({ preload: "swap", compress: true })
+      );
+    }
+    return config;
   },
 };
 
