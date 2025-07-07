@@ -72,7 +72,7 @@ export function GameCard({
   const gamePagePath =
     process.env.NEXT_PUBLIC_GAME_PAGE_PATH || "/slot-machines";
   const providerPagePath =
-    process.env.NEXT_PUBLIC_PROVIDER_PAGE_PATH || "/providers";
+    process.env.NEXT_PUBLIC_PROVIDER_PAGE_PATH || "/software-slot-machine";
   const gameUrl = `${gamePagePath}/${game.slug}`;
   const providerUrl = game.provider
     ? `${providerPagePath}/${game.provider.slug}`
