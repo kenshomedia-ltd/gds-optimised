@@ -1,5 +1,4 @@
 /* src/styles/themes/gds-theme.css */
-@import "./base-theme.css";
 
 :root {
   /* Essential colors that Tailwind expects */
