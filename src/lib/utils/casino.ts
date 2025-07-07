@@ -120,3 +120,39 @@ export function getCasinoBadge(
 
   return null;
 }
+
+/** Mapping of CMS casino filter slugs to internal bonusKey values */
+const CASINO_FILTER_ALIASES: Record<string, string> = {
+  "bonus di benvenuto": "bonusSection",
+  "welcome bonus": "bonusSection",
+  welcome: "bonusSection",
+  "senza deposito": "noDepositSection",
+  "no deposit": "noDepositSection",
+  "giri gratis": "freeSpinsSection",
+  "free spins": "freeSpinsSection",
+};
+
+/**
+ * Normalize casino filter slug from CMS to a bonusKey value
+ */
+export function normalizeCasinoFilter(
+  filter: string | undefined,
+  defaultFilter: string = "bonusSection"
+): string {
+  if (!filter) return defaultFilter;
+
+  const normalized = filter.trim().toLowerCase();
+
+  if (CASINO_FILTER_ALIASES[normalized]) {
+    return CASINO_FILTER_ALIASES[normalized];
+  }
+
+  // Partial match support
+  for (const [alias, value] of Object.entries(CASINO_FILTER_ALIASES)) {
+    if (normalized.includes(alias.toLowerCase())) {
+      return value;
+    }
+  }
+
+  return defaultFilter;
+}

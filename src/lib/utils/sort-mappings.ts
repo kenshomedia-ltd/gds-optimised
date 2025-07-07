@@ -238,3 +238,11 @@ export const WAGERING_OPTIONS = [
   "50x",
   "60x",
 ];
+
+/** Mapping of bonus type keys to their default sort value */
+export const CASINO_FILTER_TO_SORT: Record<string, string> = {
+  bonusSection: "bonusSection.bonusAmount:desc",
+  noDepositSection: "noDepositSection.bonusAmount:desc",
+  freeSpinsSection: "freeSpinsSection.bonusAmount:desc",
+};
+

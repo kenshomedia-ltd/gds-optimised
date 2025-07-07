@@ -25,7 +25,9 @@ import {
   CONDITION_OPTIONS,
   BONUS_AMOUNT_OPTIONS,
   WAGERING_OPTIONS,
+  CASINO_FILTER_TO_SORT,
 } from "@/lib/utils/sort-mappings";
+import { normalizeCasinoFilter } from "@/lib/utils/casino";
 import { cn } from "@/lib/utils/cn";
 // ADD PORTAL IMPORTS
 import { DropdownPortal } from "@/components/common/Portal/DropdownPortal";
@@ -38,6 +40,7 @@ export function MobileCasinoFilters({
   translations = {},
   className = "",
   loading = false,
+  defaultFilter,
 }: CasinoFiltersProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isSortOpen, setIsSortOpen] = useState(false);
@@ -50,6 +53,16 @@ export function MobileCasinoFilters({
     value: option.value,
     label: translations?.[option.label] || option.label,
   }));
+
+  // Apply default filter on mount
+  useEffect(() => {
+    if (!defaultFilter) return;
+    const bonusKey = normalizeCasinoFilter(defaultFilter);
+    if (bonusKey !== selectedFilters.bonusKey) {
+      onFilterChange({ bonusKey, sort: CASINO_FILTER_TO_SORT[bonusKey] });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Calculate if there are active filters
   const hasActiveFilters =

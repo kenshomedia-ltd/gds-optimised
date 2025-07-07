@@ -47,6 +47,8 @@ export interface CasinoFiltersProps {
   translations?: Record<string, string>;
   className?: string;
   loading?: boolean;
+  /** Optional default filter slug from the page block */
+  defaultFilter?: string;
 }
 
 /**

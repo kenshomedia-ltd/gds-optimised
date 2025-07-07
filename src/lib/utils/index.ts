@@ -68,6 +68,7 @@ export {
   formatNoDepositBonus,
   isNewCasino,
   getCasinoBadge,
+  normalizeCasinoFilter,
 } from "./casino";
 
 // Sort mapping utilities
