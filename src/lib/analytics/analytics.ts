@@ -1,52 +1,44 @@
-// src/lib/analytics.ts
+// src/lib/analytics/analytics.ts
 
-// Inline type declarations for Swetrix
+// Type declarations for the global gtag function
 declare global {
   interface Window {
-    swetrix?: {
-      init(projectId: string, options?: Record<string, unknown>): void;
-      trackViews(): void;
-      pageview(options?: { payload?: Record<string, unknown> }): void;
-      track(
-        event: string,
-        options?: { payload?: Record<string, unknown> }
-      ): void;
-      trackErrors(options?: Record<string, unknown>): void;
-    };
+    gtag?: (...args: unknown[]) => void;
   }
 }
 
+// Google Analytics measurement ID exposed at build time
+const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || '';
+
 /**
- * Analytics utility for Swetrix integration
+ * Analytics utility for Google Analytics integration
  */
 export class Analytics {
-  private isClient = typeof window !== "undefined";
+  private isClient = typeof window !== 'undefined';
 
   /**
-   * Check if Swetrix is loaded and available
+   * Check if gtag is loaded and available
    */
-  private isSwetrixAvailable(): boolean {
-    return this.isClient && typeof window.swetrix !== "undefined";
+  private isGtagAvailable(): boolean {
+    return this.isClient && typeof window.gtag !== 'undefined';
   }
 
   /**
-   * Track a custom page view
+   * Track a page view
    */
   trackPageView(
     path?: string,
     metadata?: Record<string, string | number | boolean | null>
   ) {
-    if (!this.isSwetrixAvailable()) return;
+    if (!this.isGtagAvailable() || !GA_MEASUREMENT_ID) return;
 
     try {
-      window.swetrix?.pageview({
-        payload: {
-          pg: path,
-          meta: metadata,
-        },
+      window.gtag?.('config', GA_MEASUREMENT_ID, {
+        page_path: path,
+        ...metadata,
       });
     } catch (error) {
-      console.warn("Failed to track page view:", error);
+      console.warn('Failed to track page view:', error);
     }
   }
 
@@ -57,17 +49,12 @@ export class Analytics {
     eventName: string,
     metadata?: Record<string, string | number | boolean | null>
   ) {
-    if (!this.isSwetrixAvailable()) return;
+    if (!this.isGtagAvailable()) return;
 
     try {
-      window.swetrix?.track(eventName, {
-        payload: {
-          ev: eventName,
-          meta: metadata,
-        },
-      });
+      window.gtag?.('event', eventName, metadata || {});
     } catch (error) {
-      console.warn("Failed to track event:", error);
+      console.warn('Failed to track event:', error);
     }
   }
 
@@ -75,7 +62,7 @@ export class Analytics {
    * Track casino review view
    */
   trackCasinoReview(casinoName: string, casinoId: string | number) {
-    this.trackEvent("casino_review_view", {
+    this.trackEvent('casino_review_view', {
       casino_name: casinoName,
       casino_id: casinoId.toString(),
     });
@@ -89,7 +76,7 @@ export class Analytics {
     gameName: string,
     action: string
   ) {
-    this.trackEvent("game_interaction", {
+    this.trackEvent('game_interaction', {
       game_id: gameId.toString(),
       game_name: gameName,
       action,
@@ -100,7 +87,7 @@ export class Analytics {
    * Track search usage
    */
   trackSearch(query: string, resultsCount: number) {
-    this.trackEvent("search", {
+    this.trackEvent('search', {
       query,
       results_count: resultsCount,
     });
@@ -110,7 +97,7 @@ export class Analytics {
    * Track bonus claim
    */
   trackBonusClaim(casinoName: string, bonusType: string) {
-    this.trackEvent("bonus_claim", {
+    this.trackEvent('bonus_claim', {
       casino_name: casinoName,
       bonus_type: bonusType,
     });

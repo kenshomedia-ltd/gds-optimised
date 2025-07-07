@@ -31,7 +31,7 @@ export function GameCard({
 }: GameCardProps) {
   const [imageError, setImageError] = useState(false);
 
-  // Track the game click with Swetrix
+  // Track the game click with Google Analytics
   const handleGameClick = () => {
     // Track the game click
     analytics.trackGameInteraction(game.id, game.title, "card_click");

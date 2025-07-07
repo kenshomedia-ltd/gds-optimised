@@ -45,7 +45,7 @@ steps:
       - '--build-arg'
       - 'NEXT_PUBLIC_BASE_PATH=${_NEXT_PUBLIC_BASE_PATH}'
       - '--build-arg'
-      - 'NEXT_PUBLIC_SWETRIX_PROJECT_ID=${_NEXT_PUBLIC_SWETRIX_PROJECT_ID}'
+      - 'NEXT_PUBLIC_GA_MEASUREMENT_ID=${_NEXT_PUBLIC_GA_MEASUREMENT_ID}'
   
   # Step 2: Push the Docker image to Google Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
@@ -95,7 +95,7 @@ steps:
         NEXT_PUBLIC_GAMES_API_URL=${_NEXT_PUBLIC_GAMES_API_URL},
         NEXT_PUBLIC_GAMES_API_TOKEN=${_NEXT_PUBLIC_GAMES_API_TOKEN},
         NEXT_PUBLIC_BASE_PATH=${_NEXT_PUBLIC_BASE_PATH},
-        NEXT_PUBLIC_SWETRIX_PROJECT_ID=${_NEXT_PUBLIC_SWETRIX_PROJECT_ID}
+        NEXT_PUBLIC_GA_MEASUREMENT_ID=${_NEXT_PUBLIC_GA_MEASUREMENT_ID}
 
 # List of images built by this pipeline
 images:
@@ -124,7 +124,7 @@ substitutions:
   _NEXT_PUBLIC_GAMES_API_TOKEN: 'your_stage_games_api_token'
   _NEXT_PUBLIC_SITE_URL: 'https://stage.example.com'
   _NEXT_PUBLIC_BASE_PATH: '/it'
-  _NEXT_PUBLIC_SWETRIX_PROJECT_ID: 'your_stage_swetrix_project_id'
+  _NEXT_PUBLIC_GA_MEASUREMENT_ID: 'your_stage_ga_measurement_id'
 
 options:
   logging: CLOUD_LOGGING_ONLY
