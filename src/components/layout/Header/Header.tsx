@@ -18,6 +18,7 @@ import { MainNav } from "./MainNav";
 import { MobileMenu } from "./MobileMenu";
 import type { HeaderProps } from "@/types/header.types";
 import { cn } from "@/lib/utils/cn";
+import { getBasePath } from "@/lib/utils/url-normalization";
 import { SubNav } from "./SubNav";
 
 /**
@@ -76,8 +77,9 @@ export function Header({
 
   useEffect(() => {
     const fetchIsAuthenticated = async () => {
+      const basePath = getBasePath();
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_FULL_URL}/api/is-authenticated`
+        `${process.env.NEXT_PUBLIC_FULL_URL}${basePath}/api/is-authenticated`
       );
       const data = await res.json();
       setIsAuthenticated(data.isAuthenticated);
