@@ -1,9 +1,10 @@
 import { unstable_cache } from "next/cache";
 import { strapiClient } from "./strapi-client";
 
-interface SitemapItem {
+export interface SitemapItem {
   url: string;
   title: string;
+  group: keyof typeof sitemapEndpointMap;
 }
 
 const sitemapEndpointMap = {
@@ -92,16 +93,19 @@ async function fetchAllItems(): Promise<SitemapItem[]> {
           items.push({
             url: `${config.path}/${item.firstName.toLowerCase()}.${item.lastName.toLowerCase()}/`,
             title: `${item.firstName} ${item.lastName}`,
+            group: key,
           });
         } else if (config.endpoint === "custom-pages") {
           items.push({
             url: `${config.path}${item.urlPath}/`,
             title: item.title,
+            group: key,
           });
         } else {
           items.push({
             url: `${config.path}/${item.slug}/`,
             title: item.title,
+            group: key,
           });
         }
       }
@@ -121,7 +125,11 @@ const getAllSitemapItems = unstable_cache(
   }
 );
 
-export async function getSitemapPage(page: number, pageSize: number) {
+export async function getSitemapPage(page: number, pageSize: number): Promise<{
+  data: SitemapItem[];
+  totalItems: number;
+  totalPages: number;
+}> {
   const allItems = await getAllSitemapItems();
   const totalItems = allItems.length;
   const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));

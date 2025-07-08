@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { PaginationServer } from "@/components/ui/Pagination/PaginationServer";
 import { getLayoutData } from "@/lib/strapi/data-loader";
-import { getSitemapPage } from "@/lib/strapi/sitemap-data-loader";
+import { getSitemapPage, SitemapItem } from "@/lib/strapi/sitemap-data-loader";
 import { generateMetadata as generateSEOMetadata } from "@/lib/utils/seo";
 
 export const dynamic = "force-static";
@@ -59,6 +59,16 @@ export default async function HtmlSitemapPage({ params }: SitemapPageProps) {
       : []),
   ];
 
+  const groups: Record<string, SitemapItem[]> = {};
+  const order: string[] = [];
+  for (const item of sitemap.data) {
+    if (!groups[item.group]) {
+      groups[item.group] = [];
+      order.push(item.group);
+    }
+    groups[item.group].push(item);
+  }
+
   return (
     <>
       <Breadcrumbs items={breadcrumbs} showHome={false} />
@@ -67,15 +77,22 @@ export default async function HtmlSitemapPage({ params }: SitemapPageProps) {
           {translations?.sitemap || "Sitemap"}
           {currentPage > 1 && ` - Page ${currentPage}`}
         </h1>
-        <ul className="space-y-2">
-          {sitemap.data.map((item) => (
-            <li key={item.url}>
-              <a href={item.url} className="text-primary hover:underline">
-                {item.title}
-              </a>
-            </li>
-          ))}
-        </ul>
+        {order.map((group) => (
+          <div key={group} className="mb-8">
+            <h2 className="text-2xl font-semibold mb-4">
+              {translations?.[group] || group}
+            </h2>
+            <ul className="space-y-2 ml-4 list-disc">
+              {groups[group].map((item) => (
+                <li key={item.url}>
+                  <a href={item.url} className="text-primary hover:underline">
+                    {item.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
         {sitemap.totalPages > 1 && (
           <PaginationServer
             currentPage={currentPage}
