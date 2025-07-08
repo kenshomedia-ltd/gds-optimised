@@ -77,8 +77,8 @@ export default async function SitemapPage({ searchParams }: SitemapPageProps) {
     <>
       <Breadcrumbs items={breadcrumbItems} showHome={false} />
 
-      <section className="featured-background curve pb-[50px]">
-        <div className="container">
+      <section className="featured-header relative overflow-hidden bg-gradient-to-b from-background-900 from-30% via-background-700 via-80% to-background-500 rounded-b-3xl">
+        <div className="lg:container relative mx-auto lg:px-4 z-10 py-12">
           {introductionBlock && (
             <IntroWithImage
               heading={introductionBlock.heading}
@@ -90,9 +90,15 @@ export default async function SitemapPage({ searchParams }: SitemapPageProps) {
             />
           )}
         </div>
+
+        {/* Starry Sky Background Effect */}
+        <div className="absolute top-0 left-0 w-full pointer-events-none">
+          <div className="h-[80vh] bg-[#0e1a2f]" />
+          <div className="h-[300px] bg-[#0e1a2f] rounded-b-[50%_300px]" />
+        </div>
       </section>
 
-      <section className="xl:container content-auto px-2 pt-5">
+      <section className="main lg:container mx-auto px-2 py-8">
         <div className="md:flex gap-x-4">
           {columns.map((column, colIndex) => (
             <div key={colIndex} className="md:w-1/3">
