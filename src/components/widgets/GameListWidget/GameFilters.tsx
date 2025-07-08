@@ -325,7 +325,7 @@ export function GameFilters({
                       "w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors",
                       "text-sm md:text-base",
                       selectedSort === option.value &&
-                        "bg-gray-100 dark:bg-gray-700 font-medium"
+                        "bg-gray-100 font-medium"
                     )}
                   >
                     {option.label}
