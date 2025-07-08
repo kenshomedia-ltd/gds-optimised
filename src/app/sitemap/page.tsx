@@ -9,7 +9,6 @@ import { IntroWithImage } from "@/components/common/IntroWithImage";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { PaginationServer } from "@/components/ui/Pagination/PaginationServer";
 import type { BreadcrumbItem } from "@/types/breadcrumbs.types";
-import type { SitemapItem } from "@/types/sitemap.types";
 import type { IntroductionWithImageBlock } from "@/types/custom-page.types";
 
 export const dynamic = "force-static";
@@ -19,7 +18,11 @@ interface SitemapPageProps {
   searchParams?: Promise<{ page?: string }>;
 }
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams?: { page?: string };
+}): Promise<Metadata> {
   const [layoutData, meta] = await Promise.all([
     getLayoutData({ cached: true }),
     getCustomPageMetadata("/sitemap"),
@@ -32,7 +35,11 @@ export async function generateMetadata(): Promise<Metadata> {
       meta?.seo?.metaTitle || meta?.title || translations?.sitemapPageTitle || "Sitemap",
     description:
       meta?.seo?.metaDescription || translations?.sitemapPageDescription || "HTML sitemap",
-    canonicalUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/sitemap`,
+    canonicalUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/sitemap${
+      searchParams && searchParams.page && Number(searchParams.page) > 1
+        ? `?page=${searchParams.page}`
+        : ""
+    }`,
   });
 }
 
@@ -57,16 +64,7 @@ export default async function SitemapPage({ searchParams }: SitemapPageProps) {
     notFound();
   }
 
-  const columns: SitemapItem[][] = [[], [], []];
-  const headerMap: Record<string, { col: number; index: number }> = {};
-
-  items.forEach((item, idx) => {
-    const col = Math.min(2, Math.floor(idx / 50));
-    const pos = columns[col].push(item) - 1;
-    if (!headerMap[item.endpoint]) {
-      headerMap[item.endpoint] = { col, index: pos };
-    }
-  });
+  const filteredItems = items.filter((item) => item.endpoint !== "users");
 
   const breadcrumbItems: BreadcrumbItem[] = [
     { breadCrumbText: translations?.home || "HOME", breadCrumbUrl: "/" },
@@ -99,24 +97,23 @@ export default async function SitemapPage({ searchParams }: SitemapPageProps) {
       </section>
 
       <section className="main lg:container mx-auto px-2 py-8">
-        <div className="md:flex gap-x-4">
-          {columns.map((column, colIndex) => (
-            <div key={colIndex} className="md:w-1/3">
-              {column.map((item, itemIndex) => (
-                <div key={item.id}>
-                  {headerMap[item.endpoint]?.col === colIndex &&
-                    headerMap[item.endpoint]?.index === itemIndex && (
-                      <h2 className="text-2xl my-3">
-                        {translations?.[item.endpoint] || item.endpoint}
-                      </h2>
-                    )}
-                  <a href={item.url} className="hover:underline">
-                    {item.title}
-                  </a>
-                </div>
-              ))}
-            </div>
-          ))}
+        <div>
+          {filteredItems.map((item, idx) => {
+            const showHeader =
+              idx === 0 || filteredItems[idx - 1].endpoint !== item.endpoint;
+            return (
+              <div key={item.id}>
+                {showHeader && (
+                  <h2 className="text-2xl my-3">
+                    {translations?.[item.endpoint] || item.endpoint}
+                  </h2>
+                )}
+                <a href={item.url} className="hover:underline">
+                  {item.title}
+                </a>
+              </div>
+            );
+          })}
         </div>
 
         {pagination.pageCount > 1 && (
@@ -125,6 +122,7 @@ export default async function SitemapPage({ searchParams }: SitemapPageProps) {
               currentPage={pagination.page}
               totalPages={pagination.pageCount}
               baseUrl="/sitemap"
+              buildUrl={(p) => (p === 1 ? "/sitemap" : `/sitemap?page=${p}`)}
               translations={translations}
             />
           </div>

@@ -20,12 +20,6 @@ const slotProviderPath = process.env.NEXT_PUBLIC_PROVIDER_PAGE_PATH || "/softwar
 const gamePath = "/slot-machine";
 
 const sitemapEndpointMap: Record<string, SitemapEndpointConfig> = {
-  users: {
-    fields: ["firstName", "lastName"],
-    filters: { isAnAuthor: { $eq: true } },
-    endpoint: "users",
-    path: "/author",
-  },
   casinos: {
     fields: ["slug", "title"],
     filters: {},
@@ -171,14 +165,6 @@ async function fetchSitemapData(
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const mapped: SitemapItem[] = data.map((item: any) => {
             const baseUrl = `${process.env.NEXT_PUBLIC_SITE_URL}${path}`;
-            if (endpoint === "users") {
-              return {
-                id: item.id,
-                url: `${baseUrl}/${item.firstName.toLowerCase()}.${item.lastName.toLowerCase()}/`,
-                title: `${item.firstName} ${item.lastName}`,
-                endpoint,
-              };
-            }
             if (endpoint === "custom-pages") {
               return {
                 id: item.id,
@@ -228,11 +214,9 @@ const fetchHtmlSitemapDataCached = cache(async (page = 1, pageSize = 150): Promi
       slotCategories: number;
       slotProviders: number;
       games: number;
-      author: number;
     }>("total-records", {}, CACHE_TIME);
 
     const totals = [
-      totalsResponse.author || 0,
       totalsResponse.casinos || 0,
       totalsResponse.casinoProviders || 0,
       totalsResponse.casinoLive || 0,
