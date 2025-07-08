@@ -3,16 +3,30 @@
 
 import { useEffect } from "react";
 
+// Utility to detect if an error relates to failing to load a chunk
+function isChunkLoadError(error: unknown): boolean {
+  if (!error) return false;
+  const err = error as { name?: string; message?: string };
+  return (
+    err.name === "ChunkLoadError" ||
+    (typeof err.message === "string" &&
+      /Loading chunk [\w-]+ failed/.test(err.message))
+  );
+}
+
 export function ChunkLoadErrorHandler() {
   useEffect(() => {
     const handleChunkLoadError = (event: PromiseRejectionEvent) => {
-      // The 'reason' property is often an Error object
       const error = event.reason;
 
-      // Check if it's a ChunkLoadError
-      if (error && error.name === "ChunkLoadError") {
-        // Reload the page to get the latest version
-        window.location.reload();
+      if (isChunkLoadError(error)) {
+        const retried = sessionStorage.getItem("chunk-load-error-retried");
+        if (!retried) {
+          sessionStorage.setItem("chunk-load-error-retried", "true");
+          window.location.reload();
+        } else {
+          sessionStorage.removeItem("chunk-load-error-retried");
+        }
       }
     };
 
