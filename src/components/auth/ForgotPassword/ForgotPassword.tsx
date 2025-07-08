@@ -19,7 +19,7 @@ export function ForgotPassword({ translations }: ForgotPasswordProps) {
     setLoader(true);
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_FULL_URL}/api/auth/forgot-password/`,
+        `${process.env.NEXT_PUBLIC_SITE_URL}/api/auth/forgot-password/`,
         {
           method: "POST",
           body: JSON.stringify({ email }),

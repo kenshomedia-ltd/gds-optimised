@@ -37,13 +37,13 @@ const Dashboard = ({ translations }: DashboardProps) => {
     const fetchAll = async () => {
       const [favourites, mostPlayed, weeklyPicks] = await Promise.all([
         fetchData(
-          `${process.env.NEXT_PUBLIC_FULL_URL}/api/dashboard/user-games/`
+          `${process.env.NEXT_PUBLIC_SITE_URL}/api/dashboard/user-games/`
         ),
         fetchData(
-          `${process.env.NEXT_PUBLIC_FULL_URL}/api/dashboard/most-played-games/`
+          `${process.env.NEXT_PUBLIC_SITE_URL}/api/dashboard/most-played-games/`
         ),
         fetchData(
-          `${process.env.NEXT_PUBLIC_FULL_URL}/api/dashboard/weekly-picked-games/`
+          `${process.env.NEXT_PUBLIC_SITE_URL}/api/dashboard/weekly-picked-games/`
         ),
       ]);
 

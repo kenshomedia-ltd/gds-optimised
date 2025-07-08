@@ -23,7 +23,7 @@ export default function MostPlayedGames({
       setLoading(true);
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_FULL_URL}/api/dashboard/most-played-games/`
+          `${process.env.NEXT_PUBLIC_SITE_URL}/api/dashboard/most-played-games/`
         );
         if (res.ok) {
           const data = await res.json();

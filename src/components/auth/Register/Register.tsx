@@ -82,7 +82,7 @@ export function Register({ translations }: RegisterProps) {
       };
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_FULL_URL}/api/auth/register/`,
+        `${process.env.NEXT_PUBLIC_SITE_URL}/api/auth/register/`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

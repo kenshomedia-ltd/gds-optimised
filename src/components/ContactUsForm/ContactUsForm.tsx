@@ -18,10 +18,13 @@ export function ContactUsForm({ translations }: Props) {
     e.preventDefault();
     setIsSubmitting(true);
     const formData = new FormData(e.currentTarget);
-    const response = await fetch(`${process.env.NEXT_PUBLIC_FULL_URL}/api/contact-us`, {
-      method: "POST",
-      body: formData,
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SITE_URL}/api/contact-us`,
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
     const data = await response.json();
     console.log("data", data);
     toast.success("Successfully submitted.");

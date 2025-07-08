@@ -70,7 +70,7 @@ export function Login({ translations }: LoginProps) {
       const identifier = emailRef.current?.value;
       const password = passwordRef.current?.value;
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_FULL_URL}/api/auth/login/`,
+        `${process.env.NEXT_PUBLIC_SITE_URL}/api/auth/login/`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

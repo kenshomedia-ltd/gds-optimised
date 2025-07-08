@@ -40,7 +40,7 @@ export default function UserProfileEdit({ translations }: Props) {
 
   async function updateUserProfile(payload: Partial<UserProfilePayload>) {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_FULL_URL}/api/dashboard/user/`,
+      `${process.env.NEXT_PUBLIC_SITE_URL}/api/dashboard/user/`,
       {
         method: "PATCH",
         headers: {
@@ -60,7 +60,7 @@ export default function UserProfileEdit({ translations }: Props) {
   const handleImageUpload = async (file: File) => {
     if (state?.user?.cover_image) {
       fetch(
-        `${process.env.NEXT_PUBLIC_FULL_URL}/api/dashboard/delete-user-image/?` +
+        `${process.env.NEXT_PUBLIC_SITE_URL}/api/dashboard/delete-user-image/?` +
           new URLSearchParams(`id=${state?.user?.cover_image.id}`),
         {
           method: "DELETE",
@@ -75,7 +75,7 @@ export default function UserProfileEdit({ translations }: Props) {
     formData.append("field", "cover_image");
 
     await fetch(
-      `${process.env.NEXT_PUBLIC_FULL_URL}/api/dashboard/update-user-image`,
+      `${process.env.NEXT_PUBLIC_SITE_URL}/api/dashboard/update-user-image`,
       {
         method: "POST",
         body: formData,

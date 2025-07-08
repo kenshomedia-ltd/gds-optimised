@@ -106,7 +106,7 @@ export function FavoritesProvider({ children }: FavoritesProviderProps) {
       if (state.user) {
         try {
           const response = await fetch(
-            `${process.env.NEXT_PUBLIC_FULL_URL}/api/dashboard/user-games/`,
+            `${process.env.NEXT_PUBLIC_SITE_URL}/api/dashboard/user-games/`,
             {
               method: "POST",
               headers: {
@@ -136,7 +136,7 @@ export function FavoritesProvider({ children }: FavoritesProviderProps) {
       );
       if (userFavouritedGame) {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_FULL_URL}/api/dashboard/user-games/?` +
+          `${process.env.NEXT_PUBLIC_SITE_URL}/api/dashboard/user-games/?` +
             new URLSearchParams(`favoriteId=${userFavouritedGame?.id}`),
           {
             method: "DELETE",

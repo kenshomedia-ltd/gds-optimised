@@ -41,7 +41,7 @@ export default function AvatarModal({
   useEffect(() => {
     const fetchAvatars = async () => {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_FULL_URL}/api/dashboard/user-avatars/`
+        `${process.env.NEXT_PUBLIC_SITE_URL}/api/dashboard/user-avatars/`
       );
       const data = await res.json();
       const filteredAvatars = [...data.data].filter(
@@ -65,7 +65,7 @@ export default function AvatarModal({
     setLoading(true);
 
     if (mode === "AVATAR" && selectedAvatarId) {
-      await fetch(`${process.env.NEXT_PUBLIC_FULL_URL}/api/dashboard/user/`, {
+      await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/dashboard/user/`, {
         method: "PATCH",
         body: JSON.stringify({ photo: selectedAvatarId }),
       });
@@ -76,7 +76,7 @@ export default function AvatarModal({
     if (mode === "NEW_IMAGE" && avatarFile) {
       if (state?.user?.photo) {
         fetch(
-          `${process.env.NEXT_PUBLIC_FULL_URL}/api/dashboard/delete-user-image/?` +
+          `${process.env.NEXT_PUBLIC_SITE_URL}/api/dashboard/delete-user-image/?` +
             new URLSearchParams(`id=${state?.user?.photo.id}`),
           {
             method: "DELETE",
@@ -91,7 +91,7 @@ export default function AvatarModal({
       formData.append("field", "photo");
 
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_FULL_URL}/api/dashboard/update-user-image/`,
+        `${process.env.NEXT_PUBLIC_SITE_URL}/api/dashboard/update-user-image/`,
         {
           method: "POST",
           body: formData,
