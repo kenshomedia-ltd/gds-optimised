@@ -106,7 +106,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   const getUserProfile = async (): Promise<TUser | null> => {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_FULL_URL}/api/dashboard/user/`
+      `${process.env.NEXT_PUBLIC_SITE_URL}/api/dashboard/user/`
     );
     if (res.ok) {
       const userProfile = await res.json();
@@ -122,7 +122,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   // Fetch User Favourite Games
   const getUserFavouriteGames = async (): Promise<TDashboardGame[]> => {
     const userFavGamesRes = await fetch(
-      `${process.env.NEXT_PUBLIC_FULL_URL}/api/dashboard/user-games/`,
+      `${process.env.NEXT_PUBLIC_SITE_URL}/api/dashboard/user-games/`,
       {
         method: "GET",
       }

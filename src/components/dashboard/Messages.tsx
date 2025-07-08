@@ -29,7 +29,7 @@ export default function Messages({
       setLoading(true);
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_FULL_URL}/api/dashboard/messages/`
+          `${process.env.NEXT_PUBLIC_SITE_URL}/api/dashboard/messages/`
         );
         const data = await res.json();
         setMessages(data);
@@ -45,7 +45,7 @@ export default function Messages({
   const handleRead = async (id: number) => {
     if (!state.readMessages.includes(id)) {
       await fetch(
-        `${process.env.NEXT_PUBLIC_FULL_URL}/api/dashboard/message-action/`,
+        `${process.env.NEXT_PUBLIC_SITE_URL}/api/dashboard/message-action/`,
         {
           method: "POST",
           body: JSON.stringify({ message_id: id, action: "READ" }),
@@ -59,7 +59,7 @@ export default function Messages({
     setDeleteLoader((prev) => ({ ...prev, [message.id]: true }));
 
     await fetch(
-      `${process.env.NEXT_PUBLIC_FULL_URL}/api/dashboard/message-action/`,
+      `${process.env.NEXT_PUBLIC_SITE_URL}/api/dashboard/message-action/`,
       {
         method: "POST",
         body: JSON.stringify({ message_id: message.id, action: "DELETE" }),

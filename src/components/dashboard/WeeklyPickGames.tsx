@@ -18,7 +18,7 @@ export default function WeeklyPickedGames({
       setLoading(true);
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_FULL_URL}/api/dashboard/weekly-picked-games/`
+          `${process.env.NEXT_PUBLIC_SITE_URL}/api/dashboard/weekly-picked-games/`
         );
         if (res.ok) {
           const data = await res.json();

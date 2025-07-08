@@ -28,7 +28,7 @@ export default function FavouriteGames({
     setIsSyncing(true);
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_FULL_URL}/api/dashboard/user-games/`,
+        `${process.env.NEXT_PUBLIC_SITE_URL}/api/dashboard/user-games/`,
         {
           method: "POST",
           body: JSON.stringify({
@@ -40,7 +40,7 @@ export default function FavouriteGames({
       if (res.ok) {
         // Refresh user favourites
         const updated = await fetch(
-          `${process.env.NEXT_PUBLIC_FULL_URL}/api/dashboard/user-games/`
+          `${process.env.NEXT_PUBLIC_SITE_URL}/api/dashboard/user-games/`
         );
         const updatedGames = await updated.json();
         setFavouriteGames(updatedGames);
@@ -58,7 +58,7 @@ export default function FavouriteGames({
       setLoading(true);
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_FULL_URL}/api/dashboard/user-games/`
+          `${process.env.NEXT_PUBLIC_SITE_URL}/api/dashboard/user-games/`
         );
         const data: TDashboardGame[] = await res.json();
         setFavouriteGames(data);

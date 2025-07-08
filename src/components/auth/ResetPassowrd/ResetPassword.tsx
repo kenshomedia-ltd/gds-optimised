@@ -37,7 +37,7 @@ export const ResetPassword = ({ translations }: ResetPasswordProps) => {
     setLoader(true);
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_FULL_URL}/api/auth/reset-password/`,
+        `${process.env.NEXT_PUBLIC_SITE_URL}/api/auth/reset-password/`,
         {
           method: "POST",
           body: JSON.stringify({ code, password, passwordConfirmation }),

@@ -42,12 +42,12 @@ export default function DashboardSidebar({
 
       const [userProfile, userMessages, userMessageActions] = await Promise.all(
         [
-          fetchData(`${process.env.NEXT_PUBLIC_FULL_URL}/api/dashboard/user/`),
+          fetchData(`${process.env.NEXT_PUBLIC_SITE_URL}/api/dashboard/user/`),
           fetchData(
-            `${process.env.NEXT_PUBLIC_FULL_URL}/api/dashboard/messages/`
+            `${process.env.NEXT_PUBLIC_SITE_URL}/api/dashboard/messages/`
           ),
           fetchData(
-            `${process.env.NEXT_PUBLIC_FULL_URL}/api/dashboard/message-action/`
+            `${process.env.NEXT_PUBLIC_SITE_URL}/api/dashboard/message-action/`
           ),
         ]
       );
@@ -75,7 +75,7 @@ export default function DashboardSidebar({
   }, []);
 
   const handleLogout = async () => {
-    await fetch(`${process.env.NEXT_PUBLIC_FULL_URL}/api/auth/logout/`, {
+    await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/auth/logout/`, {
       method: "POST",
       body: JSON.stringify({}),
     });
