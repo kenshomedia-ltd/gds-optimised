@@ -6,6 +6,17 @@ import Link from "next/link";
 import { cn } from "@/lib/utils/cn";
 import { ErrorBoundary as ReactErrorBoundary } from "react-error-boundary";
 
+// Helper to detect ChunkLoadError cases
+function isChunkLoadError(error: unknown): boolean {
+  if (!error) return false;
+  const err = error as { name?: string; message?: string };
+  return (
+    err.name === "ChunkLoadError" ||
+    (typeof err.message === "string" &&
+      /Loading chunk [\w-]+ failed/.test(err.message))
+  );
+}
+
 // Define the interface that react-error-boundary expects
 interface FallbackProps {
   error: Error;
@@ -255,9 +266,18 @@ export function ClientErrorBoundary({
   children: React.ReactNode;
 }) {
   const handleError = (error: Error, errorInfo: React.ErrorInfo) => {
-    // Log error to your error reporting service
-    console.error("Error boundary caught error:", error, errorInfo);
+    if (isChunkLoadError(error)) {
+      const retried = sessionStorage.getItem("chunk-load-error-retried");
+      if (!retried) {
+        sessionStorage.setItem("chunk-load-error-retried", "true");
+        window.location.reload();
+        return;
+      } else {
+        sessionStorage.removeItem("chunk-load-error-retried");
+      }
+    }
 
+    console.error("Error boundary caught error:", error, errorInfo);
     // Optional: Send to error reporting service
     // Example: Sentry.captureException(error, { contexts: { errorInfo } });
   };
