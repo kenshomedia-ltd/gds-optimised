@@ -9,23 +9,22 @@
 
 /* Define custom utilities that Tailwind doesn't recognize */
 @theme {
-
   /* Font families */
   --font-family-heading: var(--font-lato), system-ui, sans-serif;
   --font-family-body: var(--font-roboto), system-ui, sans-serif;
 
   /* Container */
   --container-md: 100%;
-  
+
   /* Extend default Tailwind theme */
   --font-family-sans: var(--font-roboto), system-ui, sans-serif;
-  
+
   /* Add white and other basic colors if not in theme */
   --color-white: var(--site-white);
   --color-black: var(--site-black);
   --color-transparent: var(--site-transparent);
   --color-current: var(--site-current);
-  
+
   /* Gray scale */
   --color-gray-50: var(--site-gray-50);
   --color-gray-100: var(--site-gray-100);
@@ -37,7 +36,7 @@
   --color-gray-700: var(--site-gray-700);
   --color-gray-800: var(--site-gray-800);
   --color-gray-900: var(--site-gray-900);
-  
+
   /* GDS Site Specific Colors */
   --color-body-bg: var(--site-body-bg);
   --color-body-text: var(--site-body-text);
@@ -50,14 +49,14 @@
   --color-facebook: var(--site-facebook);
   --color-twitter: var(--site-twitter);
   --color-linkedin: var(--site-linkedin);
-  
+
   /* Custom gray scale */
   --color-grey-100: var(--site-grey-100);
   --color-grey-300: var(--site-grey-300);
   --color-grey-500: var(--site-grey-500);
   --color-grey-600: var(--site-grey-600);
   --color-grey-700: var(--site-grey-700);
-  
+
   /* Blue scale */
   --color-blue-100: var(--site-blue-100);
   --color-blue-300: var(--site-blue-300);
@@ -66,7 +65,7 @@
   --color-blue-500: var(--site-blue-500);
   --color-blue-700: var(--site-blue-700);
   --color-blue-900: var(--site-blue-900);
-  
+
   /* Purple scale */
   --color-purple-100: var(--site-purple-100);
   --color-purple-300: var(--site-purple-300);
@@ -74,14 +73,14 @@
   --color-purple-700: var(--site-purple-700);
   --color-purple-800: var(--site-purple-800);
   --color-purple-900: var(--site-purple-900);
-  
+
   /* Background colors */
   --color-background-1: var(--site-background-1);
   --color-background-100: var(--site-background-100);
   --color-background-500: var(--site-background-500);
   --color-background-700: var(--site-background-700);
   --color-background-900: var(--site-background-900);
-  
+
   /* Accent colors */
   --color-accent-1: var(--site-accent-1);
   --color-accent-50: var(--site-accent-50);
@@ -91,7 +90,7 @@
   --color-accent-700: var(--site-accent-700);
   --color-accent-800: var(--site-accent-800);
   --color-accent-900: var(--site-accent-900);
-  
+
   /* Component-specific colors */
   --color-navbar-bkg: var(--site-navbar-bkg);
   --color-navbar-text: var(--site-navbar-text);
@@ -125,7 +124,7 @@
   --color-btn-danger: var(--site-button-danger);
   --color-btn-danger-hover: var(--site-button-danger-hover);
   --color-btn-danger-text: var(--site-button-danger-text);
-  
+
   /* filters colors */
   --color-filter-bkg: var(--site-blue-100);
   --color-filter-text: var(--site-gray-700);
@@ -149,7 +148,7 @@
   .font-heading {
     font-family: var(--font-family-heading);
   }
-  
+
   .font-body {
     font-family: var(--font-family-body);
   }
@@ -162,42 +161,58 @@
   }
 
   /* Apply Lato to all headings */
-  h1, h2, h3, h4, h5, h6,
-  .h1, .h2, .h3, .h4, .h5, .h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  .h1,
+  .h2,
+  .h3,
+  .h4,
+  .h5,
+  .h6 {
     font-family: var(--font-family-heading);
     font-weight: 700;
     line-height: 1.2;
   }
 
   /* Heading size scale with responsive sizing */
-  h1, .h1 {
+  h1,
+  .h1 {
     font-size: clamp(1.5rem, 5vw, 2.5rem);
     color: var(--color-white);
     text-shadow: 0px 0px 12px rgba(63, 230, 252, 0.6);
     backdrop-filter: blur(6px);
   }
 
-  h2, .h2 {
+  h2,
+  .h2 {
     font-size: clamp(1.75rem, 4vw, 3rem);
   }
 
-  h3, .h3 {
+  h3,
+  .h3 {
     font-size: clamp(1.5rem, 3vw, 2.25rem);
   }
 
-  h4, .h4 {
+  h4,
+  .h4 {
     font-size: clamp(1.25rem, 2.5vw, 1.875rem);
   }
 
-  h5, .h5 {
+  h5,
+  .h5 {
     font-size: clamp(1.125rem, 2vw, 1.5rem);
   }
 
-  h6, .h6 {
+  h6,
+  .h6 {
     font-size: clamp(1rem, 1.5vw, 1.25rem);
   }
 
-  .featured-header .text-heading-text{
+  .featured-header .text-heading-text {
     color: var(--color-featured-heading-text) !important;
   }
 
@@ -228,38 +243,88 @@
   html {
     scroll-behavior: smooth;
   }
-  
+
   /* Background utilities */
-  .bg-body-bg { background-color: var(--site-body-bg); }
-  .bg-navbar-bkg { background-color: var(--site-navbar-bkg); }
-  .bg-footer-bkg { background-color: var(--site-footer-bkg); }
-  .bg-legal-bkg { background-color: var(--site-legal-bkg); }
-  .bg-subnavbar-bkg { background-color: var(--site-subnavbar-bkg); }
-  .bg-nav-hover-bkg { background-color: var(--site-nav-hover-bkg); }
-  .bg-table-heading { background-color: var(--site-heading-text); }
-  
+  .bg-body-bg {
+    background-color: var(--site-body-bg);
+  }
+  .bg-navbar-bkg {
+    background-color: var(--site-navbar-bkg);
+  }
+  .bg-footer-bkg {
+    background-color: var(--site-footer-bkg);
+  }
+  .bg-legal-bkg {
+    background-color: var(--site-legal-bkg);
+  }
+  .bg-subnavbar-bkg {
+    background-color: var(--site-subnavbar-bkg);
+  }
+  .bg-nav-hover-bkg {
+    background-color: var(--site-nav-hover-bkg);
+  }
+  .bg-table-heading {
+    background-color: var(--site-heading-text);
+  }
+
   /* Text color utilities */
-  .text-body-text { color: var(--site-body-text); }
-  .text-navbar-text { color: var(--site-navbar-text); }
-  .text-footer-text { color: var(--site-footer-text); }
-  .text-footer-quicklink-text { color: var(--site-footer-quicklink-text); }
-  .text-legal-text { color: var(--site-legal-text); }
-  .text-heading-text { color: var(--site-heading-text); }
-  
+  .text-body-text {
+    color: var(--site-body-text);
+  }
+  .text-navbar-text {
+    color: var(--site-navbar-text);
+  }
+  .text-footer-text {
+    color: var(--site-footer-text);
+  }
+  .text-footer-quicklink-text {
+    color: var(--site-footer-quicklink-text);
+  }
+  .text-legal-text {
+    color: var(--site-legal-text);
+  }
+  .text-heading-text {
+    color: var(--site-heading-text);
+  }
+
   /* Single color utilities */
-  .bg-primary { background-color: var(--site-primary); }
-  .bg-secondary { background-color: var(--site-secondary); }
-  .bg-misc { background-color: var(--site-misc); }
-  .bg-success { background-color: var(--site-success); }
-  .bg-warning { background-color: var(--site-warning); }
-  .bg-danger { background-color: var(--site-danger); }
-  
-  .text-primary { color: var(--site-primary); }
-  .text-secondary { color: var(--site-secondary); }
-  .text-misc { color: var(--site-misc); }
-  .text-success { color: var(--site-success); }
-  .text-warning { color: var(--site-warning); }
-  .text-danger { color: var(--site-danger); }
+  .bg-primary {
+    background-color: var(--site-primary);
+  }
+  .bg-secondary {
+    background-color: var(--site-secondary);
+  }
+  .bg-misc {
+    background-color: var(--site-misc);
+  }
+  .bg-success {
+    background-color: var(--site-success);
+  }
+  .bg-warning {
+    background-color: var(--site-warning);
+  }
+  .bg-danger {
+    background-color: var(--site-danger);
+  }
+
+  .text-primary {
+    color: var(--site-primary);
+  }
+  .text-secondary {
+    color: var(--site-secondary);
+  }
+  .text-misc {
+    color: var(--site-misc);
+  }
+  .text-success {
+    color: var(--site-success);
+  }
+  .text-warning {
+    color: var(--site-warning);
+  }
+  .text-danger {
+    color: var(--site-danger);
+  }
 
   /* buttons */
   .btn-primary {
@@ -287,7 +352,7 @@
   .btn-misc:hover {
     background-color: var(--color-btn-misc-hover);
   }
-  
+
   .btn-success {
     background-color: var(--color-btn-success);
     color: var(--color-btn-success-text);
@@ -305,7 +370,7 @@
   .btn-warning:hover {
     background-color: var(--color-btn-warning-hover);
   }
-  
+
   .btn-danger {
     background-color: var(--color-btn-danger);
     color: var(--color-btn-danger-text);
@@ -331,7 +396,7 @@
     content: "" !important;
     position: absolute !important;
     left: 0 !important;
-    top: 0.50rem !important;
+    top: 0.5rem !important;
     width: 1rem !important;
     height: 1rem !important;
     /* Your coin SVG as a data URI - using your theme's warning color */
@@ -434,16 +499,28 @@
   .prose ul.list-coin-simple > li::before {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='10' fill='%23f59e0b' stroke='%23d97706' stroke-width='2'/%3E%3Ccircle cx='12' cy='12' r='7' fill='none' stroke='%23d97706' stroke-width='1'/%3E%3C/svg%3E");
   }
-  
+
   /* Border utilities */
-  .border-primary { border-color: var(--site-primary); }
-  .border-secondary { border-color: var(--site-secondary); }
-  .border-footer-bkg { border-color: var(--site-footer-bkg); }
-  
+  .border-primary {
+    border-color: var(--site-primary);
+  }
+  .border-secondary {
+    border-color: var(--site-secondary);
+  }
+  .border-footer-bkg {
+    border-color: var(--site-footer-bkg);
+  }
+
   /* Social media colors */
-  .bg-facebook { background-color: var(--site-facebook); }
-  .bg-twitter { background-color: var(--site-twitter); }
-  .bg-linkedin { background-color: var(--site-linkedin); }
+  .bg-facebook {
+    background-color: var(--site-facebook);
+  }
+  .bg-twitter {
+    background-color: var(--site-twitter);
+  }
+  .bg-linkedin {
+    background-color: var(--site-linkedin);
+  }
 
   /* Reduced motion preferences */
   @media (prefers-reduced-motion: reduce) {
@@ -468,11 +545,11 @@
     height: 100vh !important;
     z-index: 9999 !important;
     border-radius: 0 !important;
-    
+
     /* Ensure it covers everything including iOS Safari UI */
     -webkit-transform: translate3d(0, 0, 0);
     transform: translate3d(0, 0, 0);
-    
+
     /* Hide iOS Safari bars when possible */
     -webkit-overflow-scrolling: touch;
   }
@@ -501,9 +578,9 @@
     .ios-fullscreen {
       /* Try to use available viewport units that work better on mobile */
       height: 100dvh !important; /* Dynamic viewport height */
-      width: 100dvw !important;  /* Dynamic viewport width */
+      width: 100dvw !important; /* Dynamic viewport width */
     }
-    
+
     .ios-fullscreen iframe {
       height: 100dvh !important;
       width: 100dvw !important;
@@ -517,7 +594,7 @@
         height: 100vh !important;
         width: 100vw !important;
       }
-      
+
       .ios-fullscreen iframe {
         height: 100vh !important;
         width: 100vw !important;
@@ -530,14 +607,15 @@
 @layer components {
   /* Table wrapper */
   .table-wrapper {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06);
   }
 
   /* Position badges */
   .casino-logo__first a {
     background: linear-gradient(to bottom, #ffd976, #ffbb38);
   }
-  
+
   .casino-logo__first .casino-logo__tag {
     background: linear-gradient(to bottom, #ffd976, #ffbb38);
     box-shadow: 0px 0px 4px #ffbd3b, 0px 1px 6px rgba(16, 24, 40, 0.1);
@@ -546,7 +624,7 @@
   .casino-logo__second a {
     background: linear-gradient(to bottom, #dbe5ef, #b1bbc6);
   }
-  
+
   .casino-logo__second .casino-logo__tag {
     background: linear-gradient(to bottom, #dbe5ef, #b1bbc6);
     box-shadow: 0px 0px 4px #d7e1eb, 0px 1px 6px rgba(16, 24, 40, 0.1);
@@ -555,7 +633,7 @@
   .casino-logo__third a {
     background: linear-gradient(to bottom, #de7d45, #9b4e22);
   }
-  
+
   .casino-logo__third .casino-logo__tag {
     background: linear-gradient(to bottom, #de7d45, #9b4e22);
     box-shadow: 0px 0px 4px #d77842, 0px 1px 6px rgba(16, 24, 40, 0.1);
@@ -563,11 +641,11 @@
 
   /* Badge styles */
   .exclusive-badge {
-    background: linear-gradient(to bottom, #FF5B14, #de7d45);
+    background: linear-gradient(to bottom, #ff5b14, #de7d45);
   }
 
   .new-casino-badge {
-    background: linear-gradient(to bottom, #00BCD4, #01579B);
+    background: linear-gradient(to bottom, #00bcd4, #01579b);
   }
 
   /* Casino list title */
@@ -593,7 +671,8 @@
 
   /* Pulse animation for skeletons */
   @keyframes pulse {
-    0%, 100% {
+    0%,
+    100% {
       opacity: 1;
     }
     50% {
@@ -624,22 +703,24 @@
     }
   }
 
-
-
   @keyframes slideDown {
-    from { transform: translateY(-100%); }
-    to { transform: translateY(0); }
+    from {
+      transform: translateY(-100%);
+    }
+    to {
+      transform: translateY(0);
+    }
   }
 
   /* Search expand animation */
   @keyframes searchExpand {
-    from { 
-      width: 2.5rem; 
-      opacity: 0; 
+    from {
+      width: 2.5rem;
+      opacity: 0;
     }
-    to { 
-      width: 20rem; 
-      opacity: 1; 
+    to {
+      width: 20rem;
+      opacity: 1;
     }
   }
 
@@ -655,7 +736,8 @@
 
   /* Bounce animation for interactive elements */
   @keyframes bounce {
-    0%, 100% {
+    0%,
+    100% {
       transform: translateY(0);
     }
     50% {
@@ -776,14 +858,10 @@
   }
 
   .gradient-overlay::before {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(
-      to bottom,
-      transparent,
-      rgba(0, 0, 0, 0.5)
-    );
+    background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.5));
     pointer-events: none;
   }
 
@@ -913,7 +991,7 @@
     border-radius: var(--radius-xl);
   }
 
-    /* Border utilities */
+  /* Border utilities */
   .border-default {
     border-color: var(--color-border);
   }
@@ -936,29 +1014,69 @@
     border-radius: var(--radius-xl);
   }
 
+  /* Auth page styles */
+  .auth-bg {
+    background: url(data:image/svg+xml;base64,PHN2ZwoJeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgoJeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzIiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgMjQwIDI0MCIgZW5hYmxlLWJhY2tncm91bmQ9Im5ldyAwIDAgMjQwIDI0MCIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+Cgk8cmVjdCB4PSIxMDYiIHk9IjkwIiBmaWxsPSIjRkZGRkZGIiB3aWR0aD0iMiIgaGVpZ2h0PSIyIiBvcGFjaXR5PSIwLjMiLz4KCTxyZWN0IHg9Ijc0IiB5PSI2MyIgZmlsbD0iI0ZGRkZGRiIgd2lkdGg9IjEiIGhlaWdodD0iMSIgb3BhY2l0eT0iMC4zIi8+Cgk8cmVjdCB4PSIyMyIgeT0iNjYiIGZpbGw9IiNGRkZGRkYiIHdpZHRoPSIxIiBoZWlnaHQ9IjEiIG9wYWNpdHk9IjAuMyIvPgoJPHJlY3QgeD0iNTAiIHk9IjExMCIgZmlsbD0iI0ZGRkZGRiIgd2lkdGg9IjEiIGhlaWdodD0iMSIgb3BhY2l0eT0iMC4zIi8+Cgk8cmVjdCB4PSI2MyIgeT0iMTI4IiBmaWxsPSIjRkZGRkZGIiB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBvcGFjaXR5PSIwLjMiLz4KCTxyZWN0IHg9IjQ1IiB5PSIxNDkiIGZpbGw9IiNGRkZGRkYiIHdpZHRoPSIxIiBoZWlnaHQ9IjEiIG9wYWNpdHk9IjAuMyIvPgoJPHJlY3QgeD0iOTIiIHk9IjE1MSIgZmlsbD0iI0ZGRkZGRiIgd2lkdGg9IjEiIGhlaWdodD0iMSIgb3BhY2l0eT0iMC4zIi8+Cgk8cmVjdCB4PSI1OCIgeT0iOCIgZmlsbD0iI0ZGRkZGRiIgd2lkdGg9IjEiIGhlaWdodD0iMSIgb3BhY2l0eT0iMC4zIi8+Cgk8cmVjdCB4PSIxNDciIHk9IjMzIiBmaWxsPSIjRkZGRkZGIiB3aWR0aD0iMiIgaGVpZ2h0PSIyIiBvcGFjaXR5PSIwLjMiLz4KCTxyZWN0IHg9IjkxIiB5PSI0MyIgZmlsbD0iI0ZGRkZGRiIgd2lkdGg9IjEiIGhlaWdodD0iMSIgb3BhY2l0eT0iMC4zIi8+Cgk8cmVjdCB4PSIxNjkiIHk9IjI5IiBmaWxsPSIjRkZGRkZGIiB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBvcGFjaXR5PSIwLjMiLz4KCTxyZWN0IHg9IjE4MiIgeT0iMTkiIGZpbGw9IiNGRkZGRkYiIHdpZHRoPSIxIiBoZWlnaHQ9IjEiIG9wYWNpdHk9IjAuMyIvPgoJPHJlY3QgeD0iMTYxIiB5PSI1OSIgZmlsbD0iI0ZGRkZGRiIgd2lkdGg9IjEiIGhlaWdodD0iMSIgb3BhY2l0eT0iMC4zIi8+Cgk8cmVjdCB4PSIxMzgiIHk9Ijk1IiBmaWxsPSIjRkZGRkZGIiB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBvcGFjaXR5PSIwLjMiLz4KCTxyZWN0IHg9IjE5OSIgeT0iNzEiIGZpbGw9IiNGRkZGRkYiIHdpZHRoPSIzIiBoZWlnaHQ9IjMiIG9wYWNpdHk9IjAuMyIvPgoJPHJlY3QgeD0iMjEzIiB5PSIxNTMiIGZpbGw9IiNGRkZGRkYiIHdpZHRoPSIyIiBoZWlnaHQ9IjIiIG9wYWNpdHk9IjAuMyIvPgoJPHJlY3QgeD0iMTI4IiB5PSIxNjMiIGZpbGw9IiNGRkZGRkYiIHdpZHRoPSIxIiBoZWlnaHQ9IjEiIG9wYWNpdHk9IjAuMyIvPgoJPHJlY3QgeD0iMjA1IiB5PSIxNzQiIGZpbGw9IiNGRkZGRkYiIHdpZHRoPSIxIiBoZWlnaHQ9IjEiIG9wYWNpdHk9IjAuMyIvPgoJPHJlY3QgeD0iMTUyIiB5PSIyMDAiIGZpbGw9IiNGRkZGRkYiIHdpZHRoPSIxIiBoZWlnaHQ9IjEiIG9wYWNpdHk9IjAuMyIvPgoJPHJlY3QgeD0iNTIiIHk9IjIxMSIgZmlsbD0iI0ZGRkZGRiIgd2lkdGg9IjIiIGhlaWdodD0iMiIgb3BhY2l0eT0iMC4zIi8+Cgk8cmVjdCB5PSIxOTEiIGZpbGw9IiNGRkZGRkYiIHdpZHRoPSIxIiBoZWlnaHQ9IjEiIG9wYWNpdHk9IjAuMyIvPgoJPHJlY3QgeD0iMTEwIiB5PSIxODQiIGZpbGw9IiNGRkZGRkYiIHdpZHRoPSIxIiBoZWlnaHQ9IjEiIG9wYWNpdHk9IjAuMyIvPgo8L3N2Zz4=),
+      linear-gradient(
+        180deg,
+        theme("colors.background.700") 0%,
+        theme("colors.background.500") 100%
+      ),
+      #fff 50% / cover no-repeat;
+    @apply -mb-5;
+    .auth-form-container {
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      background: #dce9f3;
+      box-shadow: 0px 0px 12px 0px rgba(63, 230, 252, 0.6);
+    }
+  }
+
+  .dashboard-glass-wrapper {
+    @apply rounded-xl;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.36);
+    box-shadow: 0px 0px 12px 0px rgba(63, 230, 252, 0.6);
+    backdrop-filter: blur(6px);
+  }
+  .dashboard-bg {
+    background: linear-gradient(
+      180deg,
+      theme("colors.background.700") 0%,
+      theme("colors.background.500") 100%
+    );
+  }
+
   /* Footer content specific styles */
   .about-site {
     h4 {
       color: white;
       margin-bottom: 0.5rem;
     }
-    
+
     p {
       margin-bottom: 1rem;
     }
-    
+
     p:last-child {
       margin-bottom: 0;
     }
-    
+
     a {
       text-decoration: underline;
     }
   }
 
   /* Add color utilities for casino table */
-  .bg-casino-table-bkg { background-color: #e5e7eb; }
-  .text-casino-table-text { color: var(--site-body-text); }
-  .border-casino-table-tr-border { border-color: #e5e7eb; }
-  .bg-no-deposit-gradient { background-color: #10b981; }
+  .bg-casino-table-bkg {
+    background-color: #e5e7eb;
+  }
+  .text-casino-table-text {
+    color: var(--site-body-text);
+  }
+  .border-casino-table-tr-border {
+    border-color: #e5e7eb;
+  }
+  .bg-no-deposit-gradient {
+    background-color: #10b981;
+  }
 }

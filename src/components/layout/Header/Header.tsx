@@ -1,23 +1,23 @@
 // src/components/layout/Header/Header.tsx
 "use client";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Image } from "@/components/common/Image";
+import { FavoritesDrawer } from "@/components/features/Favorites/FavoritesDrawer";
+import { SearchBar } from "@/components/features/Search/SearchBar";
+import { useFavorites } from "@/contexts/FavoritesContext";
+import { cn } from "@/lib/utils/cn";
+import type { HeaderProps } from "@/types/header.types";
 import {
+  faBars,
   faHeart,
   faUser,
-  faBars,
 } from "@awesome.me/kit-0e07a43543/icons/duotone/light";
 import { faHeart as faHeartSolid } from "@awesome.me/kit-0e07a43543/icons/duotone/solid";
-import { Image } from "@/components/common/Image";
-import { SearchBar } from "@/components/features/Search/SearchBar";
-import { FavoritesDrawer } from "@/components/features/Favorites/FavoritesDrawer";
-import { useFavorites } from "@/contexts/FavoritesContext";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 import { MainNav } from "./MainNav";
 import { MobileMenu } from "./MobileMenu";
-import type { HeaderProps } from "@/types/header.types";
-import { cn } from "@/lib/utils/cn";
 import { SubNav } from "./SubNav";
 
 /**
@@ -43,6 +43,7 @@ export function Header({
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
   // REMOVED: isSearchExpanded state is no longer needed
   const { favoritesCount } = useFavorites();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const siteName = process.env.NEXT_PUBLIC_SITE_NAME || "GiochiDiSlots";
   const siteId = process.env.NEXT_PUBLIC_SITE_ID || "gds";
@@ -72,6 +73,17 @@ export function Header({
       document.body.style.overflow = "unset";
     };
   }, [isMobileMenuOpen]);
+
+  useEffect(() => {
+    const fetchIsAuthenticated = async () => {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_SITE_URL}/api/is-authenticated`
+      );
+      const data = await res.json();
+      setIsAuthenticated(data.isAuthenticated);
+    };
+    fetchIsAuthenticated();
+  }, []);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -118,7 +130,7 @@ export function Header({
 
               {/* Authentication Button - Mobile */}
               <Link
-                href={user?.isAuthenticated ? "/account" : "/login"}
+                href={isAuthenticated ? "/dashboard" : "/authentication/login"}
                 className="p-2 rounded-md text-navbar-text hover:bg-white/10 transition-colors"
                 aria-label={
                   user?.isAuthenticated
@@ -281,7 +293,7 @@ export function Header({
 
               {/* User Account - Desktop (Second) */}
               <Link
-                href={user?.isAuthenticated ? "/account" : "/login"}
+                href={isAuthenticated ? "/dashboard" : "/authentication/login"}
                 className="p-2 rounded-md text-navbar-text hover:bg-white/10 transition-colors"
                 aria-label={
                   user?.isAuthenticated

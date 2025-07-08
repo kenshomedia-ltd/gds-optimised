@@ -2,6 +2,7 @@
 "use client";
 
 import { FavoritesProvider } from "@/contexts/FavoritesContext";
+import { UserProvider } from "@/contexts/UserContext";
 
 interface ClientProvidersProps {
   children: React.ReactNode;
@@ -15,5 +16,9 @@ interface ClientProvidersProps {
  * - FavoritesProvider for managing favorite games
  */
 export function ClientProviders({ children }: ClientProvidersProps) {
-  return <FavoritesProvider>{children}</FavoritesProvider>;
+  return (
+    <UserProvider>
+      <FavoritesProvider>{children}</FavoritesProvider>
+    </UserProvider>
+  );
 }
