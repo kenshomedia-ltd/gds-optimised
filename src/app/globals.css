@@ -839,15 +839,6 @@
     animation: shimmer 1.5s infinite;
   }
 
-  /* Dark mode image loading */
-  .dark .image-loading {
-    background: linear-gradient(
-      90deg,
-      var(--color-gray-700),
-      var(--color-gray-600),
-      var(--color-gray-700)
-    );
-  }
 }
 
 /* Utility classes for font weights */

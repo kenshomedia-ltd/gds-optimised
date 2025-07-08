@@ -253,7 +253,7 @@ export default async function CategoryPage({
                       {casinos.map((casino) => (
                         <div
                           key={casino.id}
-                          className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6"
+                          className="bg-white rounded-lg shadow-sm p-6"
                         >
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-4">
