@@ -8,7 +8,7 @@ export interface SitemapItem {
 }
 
 const sitemapEndpointMap = {
-  customPages: {
+  "custom-pages": {
     endpoint: "custom-pages",
     fields: ["urlPath", "title"],
     filters: {
@@ -22,19 +22,19 @@ const sitemapEndpointMap = {
     filters: {},
     path: process.env.NEXT_PUBLIC_CASINO_PAGE_PATH || "/casino/recensione",
   },
-  casinoProviders: {
+  "casino-providers": {
     endpoint: "casino-providers",
     fields: ["slug", "title"],
     filters: {},
     path: "/casino-online",
   },
-  slotProviders: {
+  "slot-providers": {
     endpoint: "slot-providers",
     fields: ["slug", "title"],
     filters: {},
     path: process.env.NEXT_PUBLIC_PROVIDER_PAGE_PATH || "/software-slot-machine",
   },
-  categories: {
+  "slot-categories": {
     endpoint: "slot-categories",
     fields: ["slug", "title"],
     filters: {},
@@ -52,7 +52,7 @@ const sitemapEndpointMap = {
     filters: {},
     path: "/blog",
   },
-  authors: {
+  users: {
     endpoint: "users",
     fields: ["firstName", "lastName"],
     filters: { isAnAuthor: { $eq: true } },
