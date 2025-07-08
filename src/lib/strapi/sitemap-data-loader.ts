@@ -116,14 +116,10 @@ async function fetchAllItems(): Promise<SitemapItem[]> {
   return items;
 }
 
-const getAllSitemapItems = unstable_cache(
-  fetchAllItems,
-  ["sitemap-all-items"],
-  {
-    revalidate: 3600,
-    tags: ["sitemap"],
-  }
-);
+const getAllSitemapItems = unstable_cache(fetchAllItems, ["sitemap-all-items"], {
+  revalidate: 3600,
+  tags: ["sitemap"],
+});
 
 export async function getSitemapPage(page: number, pageSize: number): Promise<{
   data: SitemapItem[];
@@ -137,3 +133,4 @@ export async function getSitemapPage(page: number, pageSize: number): Promise<{
   const data = allItems.slice(start, start + pageSize);
   return { data, totalItems, totalPages };
 }
+

@@ -3,6 +3,7 @@ import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { PaginationServer } from "@/components/ui/Pagination/PaginationServer";
 import { getLayoutData } from "@/lib/strapi/data-loader";
 import { getSitemapPage, SitemapItem } from "@/lib/strapi/sitemap-data-loader";
+import { addBasePath } from "@/lib/utils/url-normalization";
 import { generateMetadata as generateSEOMetadata } from "@/lib/utils/seo";
 
 export const dynamic = "force-static";
@@ -131,7 +132,7 @@ export default async function HtmlSitemapPage({ params }: SitemapPageProps) {
                           {translations?.[item.group] || item.group}
                         </h2>
                       )}
-                    <a href={item.url} className="hover:underline block">
+                    <a href={addBasePath(item.url)} className="hover:underline block">
                       {item.title}
                     </a>
                   </div>
@@ -158,3 +159,4 @@ export default async function HtmlSitemapPage({ params }: SitemapPageProps) {
     </>
   );
 }
+
