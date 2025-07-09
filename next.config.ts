@@ -263,9 +263,9 @@ const nextConfig: NextConfig = {
         basePath: false, // Important: disable basePath for this redirect
       },
       // Redirect any path without basePath to one with basePath
-      // Use negative lookahead to exclude paths that already have basePath
+      // Exclude sitemap.xml, robots.txt and favicon files
       {
-        source: `/:path((?!${BASE_PATH.slice(1)}).*)*`,
+        source: `/:path((?!${BASE_PATH.slice(1)})(?!sitemap\\.xml$)(?!robots\\.txt$)(?!favicon(?:-\\w+)?\\.png$)(?!favicon\\.ico$).*)*`,
         destination: `${BASE_PATH}/:path*`,
         permanent: true,
         basePath: false, // Important: disable basePath for this redirect
@@ -365,8 +365,30 @@ const nextConfig: NextConfig = {
 
   // Rewrites for image optimization
   async rewrites() {
+    const BASE_PATH = "/it";
+    // When using basePath rewrites require an absolute destination. However the
+    // configured NEXT_PUBLIC_SITE_URL might already include the base path
+    // (e.g. "https://localhost:3000/it"). Remove a trailing "/it" so we don't
+    // end up rewriting to "/it/it/..." in development.
+    const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "")
+      .replace(/\/it\/?$/, "")
+      // Ensure we use HTTP during development to avoid SSL issues
+      .replace(/^https:\/\//, "http://");
     return {
-      beforeFiles: [],
+      beforeFiles: [
+        // Serve favicons without basePath
+        {
+          source: "/favicon-:siteId.png",
+          destination: `${SITE_URL}${BASE_PATH}/favicon-:siteId.png`,
+          basePath: false,
+        },
+        // Serve site webmanifest without basePath
+        {
+          source: "/site-:siteId.webmanifest",
+          destination: `${SITE_URL}${BASE_PATH}/site-:siteId.webmanifest`,
+          basePath: false,
+        },
+      ],
       afterFiles: [
         // Rewrite for slot-machine page
         // {
