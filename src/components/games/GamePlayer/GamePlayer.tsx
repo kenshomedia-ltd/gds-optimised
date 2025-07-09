@@ -82,7 +82,6 @@ function extractIframeAttributes(iframeHtml: string): Record<string, string> {
  * - Smart iframe handling to prevent nesting
  */
 export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
-  console.log("translations", translations);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
