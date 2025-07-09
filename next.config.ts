@@ -366,7 +366,14 @@ const nextConfig: NextConfig = {
   // Rewrites for image optimization
   async rewrites() {
     const BASE_PATH = "/it";
-    const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "";
+    // When using basePath rewrites require an absolute destination. However the
+    // configured NEXT_PUBLIC_SITE_URL might already include the base path
+    // (e.g. "https://localhost:3000/it"). Remove a trailing "/it" so we don't
+    // end up rewriting to "/it/it/..." in development.
+    const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "")
+      .replace(/\/it\/?$/, "")
+      // Ensure we use HTTP during development to avoid SSL issues
+      .replace(/^https:\/\//, "http://");
     return {
       beforeFiles: [
         // Serve favicons without basePath
