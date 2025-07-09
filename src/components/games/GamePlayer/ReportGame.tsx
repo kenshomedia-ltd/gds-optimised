@@ -4,9 +4,10 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { Image as CommonImage } from "../../common";
+import { faXmark } from "@awesome.me/kit-0e07a43543/icons/duotone/light";
 import { TranslationData } from "@/types/strapi.types";
 import * as Dialog from "@radix-ui/react-dialog";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 interface Props {
   open: boolean;
@@ -78,7 +79,7 @@ export function ReportGameModal({
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50" />
-        <Dialog.Content className="fixed top-1/2 left-1/2 w-[95vw] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-xl bg-white p-4 z-50 space-y-5">
+        <Dialog.Content className="fixed top-1/2 left-1/2 w-[95vw] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-xl bg-white p-4 z-[100] space-y-5">
           <div className="bg-white">
             <div className="border-b border-black p-5 flex justify-between items-center">
               <Dialog.Title className="text-lg font-bold text-blue-700">
@@ -88,11 +89,9 @@ export function ReportGameModal({
                 onClick={() => onOpenChange(false)}
                 className="cursor-pointer"
               >
-                <CommonImage
-                  width={30}
-                  height={30}
-                  src="/icons/xmark.svg"
-                  alt=""
+                <FontAwesomeIcon
+                  icon={faXmark}
+                  className="text-black h-6 w-6"
                 />
               </button>
             </div>
