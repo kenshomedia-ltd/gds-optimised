@@ -1,7 +1,7 @@
 // src/components/widgets/CasinoList/CasinoListWidget.tsx
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { CasinoTable } from "@/components/casino/CasinoTable/CasinoTable";
 import { CasinoFilters } from "./CasinoFilters";
@@ -64,11 +64,14 @@ export function CasinoListWidget({
   const initialBonusKey = normalizeCasinoFilter(block.casinoFilters);
   const initialSort = normalizeCasinoSort(block.casinoSort, initialFilters.sort);
 
-  const blockInitialFilters: CasinoFiltersState = {
-    ...initialFilters,
-    bonusKey: initialBonusKey,
-    sort: initialSort,
-  };
+  const blockInitialFilters: CasinoFiltersState = useMemo(
+    () => ({
+      ...initialFilters,
+      bonusKey: initialBonusKey,
+      sort: initialSort,
+    }),
+    [initialBonusKey, initialSort]
+  );
 
   // Calculate initial displayed casinos to prevent layout shift
   const getInitialDisplayedCasinos = () => {
@@ -204,14 +207,14 @@ export function CasinoListWidget({
 
   // Fetch casinos when filters change
   useEffect(() => {
-    // Only fetch if filters have actually changed from initial state
+    // Only fetch if filters have actually changed from their initial block state
     const filtersChanged =
-      JSON.stringify(filters) !== JSON.stringify(initialFilters);
+      JSON.stringify(filters) !== JSON.stringify(blockInitialFilters);
 
     if (shouldShowFilters && filtersChanged) {
       fetchFilteredCasinos();
     }
-  }, [filters, shouldShowFilters, fetchFilteredCasinos]);
+  }, [filters, shouldShowFilters, fetchFilteredCasinos, blockInitialFilters]);
 
   // Handle load more
   const handleLoadMore = useCallback(() => {
