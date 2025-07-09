@@ -383,7 +383,7 @@ export function Image({
       : normalizedCurrentSrc;
 
   const imageClasses = cn(
-    "transition-all duration-300",
+    "transition-all duration-300 object-cover",
     progressive && !isLoaded ? "blur-lg scale-110" : "blur-0 scale-100",
     error ? "opacity-50" : "",
     !isLoaded && placeholder === "blur" && !progressive ? "opacity-0" : "",
