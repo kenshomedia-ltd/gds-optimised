@@ -365,8 +365,22 @@ const nextConfig: NextConfig = {
 
   // Rewrites for image optimization
   async rewrites() {
+    const BASE_PATH = "/it";
     return {
-      beforeFiles: [],
+      beforeFiles: [
+        // Serve favicons without basePath
+        {
+          source: "/favicon-:siteId.png",
+          destination: `${BASE_PATH}/favicon-:siteId.png`,
+          basePath: false,
+        },
+        // Serve site webmanifest without basePath
+        {
+          source: "/site-:siteId.webmanifest",
+          destination: `${BASE_PATH}/site-:siteId.webmanifest`,
+          basePath: false,
+        },
+      ],
       afterFiles: [
         // Rewrite for slot-machine page
         // {
