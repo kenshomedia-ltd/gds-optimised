@@ -1,7 +1,7 @@
 // src/components/widgets/CasinoList/CasinoListWidget.tsx
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { CasinoTable } from "@/components/casino/CasinoTable/CasinoTable";
 import { CasinoFilters } from "./CasinoFilters";
