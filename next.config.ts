@@ -263,9 +263,9 @@ const nextConfig: NextConfig = {
         basePath: false, // Important: disable basePath for this redirect
       },
       // Redirect any path without basePath to one with basePath
-      // Use negative lookahead to exclude paths that already have basePath
+      // Exclude sitemap.xml, robots.txt and favicon files
       {
-        source: `/:path((?!${BASE_PATH.slice(1)}).*)*`,
+        source: `/:path((?!${BASE_PATH.slice(1)})(?!sitemap\\.xml$)(?!robots\\.txt$)(?!favicon(?:-\\w+)?\\.png$)(?!favicon\\.ico$).*)*`,
         destination: `${BASE_PATH}/:path*`,
         permanent: true,
         basePath: false, // Important: disable basePath for this redirect
