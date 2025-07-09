@@ -366,18 +366,19 @@ const nextConfig: NextConfig = {
   // Rewrites for image optimization
   async rewrites() {
     const BASE_PATH = "/it";
+    const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "";
     return {
       beforeFiles: [
         // Serve favicons without basePath
         {
           source: "/favicon-:siteId.png",
-          destination: `${BASE_PATH}/favicon-:siteId.png`,
+          destination: `${SITE_URL}${BASE_PATH}/favicon-:siteId.png`,
           basePath: false,
         },
         // Serve site webmanifest without basePath
         {
           source: "/site-:siteId.webmanifest",
-          destination: `${BASE_PATH}/site-:siteId.webmanifest`,
+          destination: `${SITE_URL}${BASE_PATH}/site-:siteId.webmanifest`,
           basePath: false,
         },
       ],
