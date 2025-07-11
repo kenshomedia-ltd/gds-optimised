@@ -117,6 +117,30 @@ export async function updateRating({
       };
     }
 
+    // Publish the updated entry using the document service API
+    const publishUrl = `${apiUrl}/api/document-service/status`;
+
+    const uid = ratingType === "games" ? "api::game.game" : "api::casino.casino";
+    const publishBody = {
+      context: { uid, id: parseInt(documentId, 10) },
+      status: "PUBLISHED",
+    };
+
+    const publishRes = await fetch(publishUrl, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiToken}`,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify(publishBody),
+    });
+
+    if (!publishRes.ok) {
+      const publishError = await publishRes.text();
+      console.error(`[updateRating] Publish failed: ${publishRes.status}`, publishError);
+    }
+
     const responseData = await res.json();
     const updatedItem = responseData.data || responseData;
 
