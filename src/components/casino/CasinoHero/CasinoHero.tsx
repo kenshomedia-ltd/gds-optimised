@@ -112,7 +112,7 @@ export function CasinoHero({ casino, translations }: CasinoHeroProps) {
             {/* Rating */}
             <div className="mt-4 flex flex-col items-center justify-center">
               <StarRatingInteractive
-                documentId={casino.documentId}
+                documentId={String(casino.id)}
                 slug={casino.slug}
                 initialRating={casino.ratingAvg}
                 initialCount={casino.ratingCount}

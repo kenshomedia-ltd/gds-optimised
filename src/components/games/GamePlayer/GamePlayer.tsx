@@ -336,9 +336,9 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
         <div className="rounded-b-lg bg-gray-100 p-6 md:p-1.5 w-full flex flex-wrap md:flex-nowrap items-center justify-start md:justify-between md:relative gap-y-4">
           {/* --- Left Section (Ratings) --- */}
           <div className="flex items-center order-1">
-            {game.documentId && (
+            {game.id && (
               <StarRatingInteractive
-                documentId={game.documentId}
+                documentId={String(game.id)}
                 slug={game.slug}
                 initialRating={game.ratingAvg}
                 initialCount={game.ratingCount}
