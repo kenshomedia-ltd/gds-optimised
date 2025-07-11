@@ -202,6 +202,11 @@ export function GameListWidget({
           };
         }
 
+        // Apply search query filter
+        if (searchQuery.trim()) {
+          filters.title = { $containsi: searchQuery.trim() };
+        }
+
         // Get games with filters and pagination
         const gamesData = await getGames({
           page: pageNum,
@@ -236,6 +241,7 @@ export function GameListWidget({
       numberOfGames,
       initialProviderFilters,
       initialCategoryFilters,
+      searchQuery,
     ]
   );
 
