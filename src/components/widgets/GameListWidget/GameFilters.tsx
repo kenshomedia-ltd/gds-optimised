@@ -136,7 +136,6 @@ export function GameFilters({
 
   // Handle search input changes
   const handleSearchChange = (value: string) => {
-    console.log("search value", value);
     setLocalSearchQuery(value);
     if (onSearchChange) {
       setIsSearching(true);
@@ -148,6 +147,7 @@ export function GameFilters({
   const clearSearch = () => {
     setLocalSearchQuery("");
     setIsSearching(false);
+    setQuery("");
     if (onSearchChange) {
       onSearchChange("");
     }
@@ -159,6 +159,7 @@ export function GameFilters({
   useEffect(() => {
     if (searchQuery !== undefined && searchQuery !== localSearchQuery) {
       setLocalSearchQuery(searchQuery);
+      setQuery(searchQuery);
     }
   }, [searchQuery]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -362,10 +363,12 @@ export function GameFilters({
               <input
                 type="text"
                 ref={gameInputRef}
-                // value={localSearchQuery}
                 value={query}
-                // onChange={(e) => handleSearchChange(e.target.value)}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setQuery(value);
+                  handleSearchChange(value);
+                }}
                 placeholder={translations.search || "Search games..."}
                 className={cn(
                   "w-full pl-10 pr-10 py-2 rounded-lg border",
