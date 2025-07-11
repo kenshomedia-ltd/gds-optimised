@@ -86,10 +86,12 @@ export async function updateRating({
     const newAvg = (currentAvg * currentCount + ratingValue) / newCount;
 
     // Match Astro's request structure exactly, but with correct values
+    // Also set publishedAt to publish the entry immediately
     const body = {
       data: {
         ratingAvg: newAvg,
         ratingCount: newCount,
+        publishedAt: new Date().toISOString(),
       },
     };
 
@@ -117,24 +119,7 @@ export async function updateRating({
       };
     }
 
-    // Publish the updated entry using Strapi's document service
-    const uid = ratingType === "games" ? "api::game.game" : "api::casino.casino";
-    const statusUrl = `${apiUrl}/api/document-service/collection-types/${uid}/${documentId}/status`;
-
-    const publishRes = await fetch(statusUrl, {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${apiToken}`,
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ status: "PUBLISHED" }),
-    });
-
-    if (!publishRes.ok) {
-      const publishError = await publishRes.text();
-      console.error(`[updateRating] Publish failed: ${publishRes.status}`, publishError);
-    }
+    // Removing separate publish request as publishing is handled via "publishedAt"
 
     const responseData = await res.json();
     const updatedItem = responseData.data || responseData;
