@@ -177,9 +177,18 @@ const getGameDynamicDataCached = cache(
         return null;
       }
 
+      const rawRatingAvg = response.data[0].ratingAvg;
+      const rawRatingCount = response.data[0].ratingCount;
+
       const dynamicData: GamePageSplitData["dynamicData"] = {
-        ratingAvg: response.data[0].ratingAvg,
-        ratingCount: response.data[0].ratingCount,
+        ratingAvg:
+          typeof rawRatingAvg === "string"
+            ? parseFloat(rawRatingAvg)
+            : rawRatingAvg || 0,
+        ratingCount:
+          typeof rawRatingCount === "string"
+            ? parseInt(rawRatingCount, 10)
+            : rawRatingCount || 0,
         views: response.data[0].views,
         isGameDisabled: response.data[0].isGameDisabled,
         gameDisableText: response.data[0].gameDisableText,

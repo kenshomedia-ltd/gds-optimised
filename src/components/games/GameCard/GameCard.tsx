@@ -1,7 +1,7 @@
 // src/components/games/GameCard/GameCard.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { analytics } from "@/lib/analytics/analytics";
 import { Image } from "@/components/common/Image";
@@ -40,6 +40,15 @@ export function GameCard({
   // Get the first image from the array
   const gameImage = Array.isArray(game.images) ? game.images[0] : game.images;
   const hasImage = gameImage && gameImage.url;
+
+  // Log rating data for debugging
+  useEffect(() => {
+    console.log("[GameCard] rating data", {
+      slug: game.slug,
+      ratingAvg: game.ratingAvg,
+      ratingCount: game.ratingCount,
+    });
+  }, [game.slug, game.ratingAvg, game.ratingCount]);
 
   // Calculate if game is new (within 14 days)
   const isNewGame = () => {
