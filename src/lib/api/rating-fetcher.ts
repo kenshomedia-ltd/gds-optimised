@@ -15,9 +15,10 @@ export async function fetchRatingData(
   type: "games" | "casinos" = "games"
 ): Promise<RatingData | null> {
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_STRAPI_URL || process.env.STRAPI_URL;
+    // Reuse the same env vars as other rating utilities
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL;
     const apiToken =
-      process.env.NEXT_PUBLIC_STRAPI_API_TOKEN || process.env.STRAPI_API_TOKEN;
+      process.env.NEXT_PUBLIC_API_TOKEN || process.env.API_TOKEN;
 
     if (!apiUrl || !apiToken) {
       console.error("[fetchRatingData] Missing API configuration");
