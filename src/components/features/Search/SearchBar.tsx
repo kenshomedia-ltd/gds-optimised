@@ -116,7 +116,7 @@ export function SearchBar({
     <div
       ref={containerRef}
       className={cn("relative flex items-center justify-end h-10 w-10")}
-    >
+>
       <div
         className={cn(
           "absolute top-0 right-0 h-10",
