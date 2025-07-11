@@ -117,8 +117,15 @@ export async function updateRating({
       };
     }
 
-    // Automatically publish the updated entry if draft & publish is enabled
-    const publishUrl = `${apiUrl}/api/${ratingType}/${documentId}/actions/publish`;
+    // Publish the updated entry using the document service API
+    const publishUrl = `${apiUrl}/api/document-service/status`;
+
+    const uid = ratingType === "games" ? "api::game.game" : "api::casino.casino";
+    const publishBody = {
+      context: { uid, id: parseInt(documentId, 10) },
+      status: "PUBLISHED",
+    };
+
     const publishRes = await fetch(publishUrl, {
       method: "POST",
       headers: {
@@ -126,6 +133,7 @@ export async function updateRating({
         "Content-Type": "application/json",
         Accept: "application/json",
       },
+      body: JSON.stringify(publishBody),
     });
 
     if (!publishRes.ok) {
