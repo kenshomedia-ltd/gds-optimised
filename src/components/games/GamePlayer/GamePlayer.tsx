@@ -19,6 +19,7 @@ import { FullscreenPortal } from "@/components/common/Portal/FullscreenPortal"; 
 import type { GamePlayerProps } from "@/types/game-page.types";
 import { cn } from "@/lib/utils/cn";
 import { ReportGameModal } from "./ReportGame";
+import { useRatingData } from "@/lib/hooks/useRatingData";
 
 /**
  * Utility function to check if a string contains an iframe tag
@@ -157,14 +158,22 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
   const gameImage = Array.isArray(game.images) ? game.images[0] : game.images;
   const hasImage = gameImage && gameImage.url;
 
+  // Fetch latest rating data for accurate display
+  const { ratingAvg, ratingCount } = useRatingData(
+    game.documentId || game.id,
+    "games",
+    game.ratingAvg,
+    game.ratingCount
+  );
+
   // Create a normalized game object with default values for optional date fields - KEEP ORIGINAL
   const normalizedGame = {
     id: game.id,
     documentId: game.documentId,
     title: game.title,
     slug: game.slug,
-    ratingAvg: game.ratingAvg,
-    ratingCount: game.ratingCount,
+    ratingAvg,
+    ratingCount,
     publishedAt: game.publishedAt,
     provider: game.provider,
     images: gameImage,
@@ -340,8 +349,8 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
               <StarRatingInteractive
                 documentId={game.documentId}
                 slug={game.slug}
-                initialRating={game.ratingAvg}
-                initialCount={game.ratingCount}
+                initialRating={ratingAvg}
+                initialCount={ratingCount}
                 size="md"
                 ratingType="games"
                 itemTitle={game.title}

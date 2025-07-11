@@ -12,7 +12,6 @@ import type { GameFiltersProps } from "@/types/game-list-widget.types";
 import { cn } from "@/lib/utils/cn";
 import { GAME_SORT_OPTIONS } from "@/lib/utils/sort-mappings";
 import debounce from "lodash.debounce";
-import { log } from "console";
 import { SearchResult } from "@/types/search.types";
 import { MeiliSearch } from "meilisearch";
 import Link from "next/link";
@@ -134,15 +133,12 @@ export function GameFilters({
     [onSearchChange]
   );
 
-  // Handle search input changes
+  // Update local search state and trigger debounced search
   const handleSearchChange = (value: string) => {
-    console.log("search value", value);
     setLocalSearchQuery(value);
-    if (onSearchChange) {
-      setIsSearching(true);
-      debouncedSearch(value);
-    }
+    debouncedSearch(value);
   };
+
 
   // Clear search
   const clearSearch = () => {
@@ -362,10 +358,11 @@ export function GameFilters({
               <input
                 type="text"
                 ref={gameInputRef}
-                // value={localSearchQuery}
-                value={query}
-                // onChange={(e) => handleSearchChange(e.target.value)}
-                onChange={(e) => setQuery(e.target.value)}
+                value={localSearchQuery}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  handleSearchChange(e.target.value);
+                }}
                 placeholder={translations.search || "Search games..."}
                 className={cn(
                   "w-full pl-10 pr-10 py-2 rounded-lg border",

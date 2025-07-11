@@ -8,6 +8,7 @@ import { Image } from "@/components/common/Image";
 import { FavoriteButton } from "@/components/features/Favorites/FavoriteButton";
 import type { GameCardProps } from "@/types/game.types";
 import { cn } from "@/lib/utils/cn";
+import { useRatingData } from "@/lib/hooks/useRatingData";
 
 /**
  * GameCard Component
@@ -41,6 +42,14 @@ export function GameCard({
   const gameImage = Array.isArray(game.images) ? game.images[0] : game.images;
   const hasImage = gameImage && gameImage.url;
 
+  // Fetch latest rating data in case the provided values are stale
+  const { ratingAvg } = useRatingData(
+    game.documentId || game.id,
+    "games",
+    game.ratingAvg,
+    game.ratingCount || 0
+  );
+
   // Calculate if game is new (within 14 days)
   const isNewGame = () => {
     if (!game.createdAt) return false;
@@ -51,7 +60,7 @@ export function GameCard({
     return daysDiff <= 14;
   };
 
-  const isHotGame = game.ratingAvg > 4.5;
+  const isHotGame = ratingAvg > 4.5;
 
   // Badge configuration
   const badgeConfig = isHotGame
@@ -245,7 +254,7 @@ export function GameCard({
               <div
                 className="flex items-center gap-0.5"
                 role="img"
-                aria-label={`Rating: ${game.ratingAvg.toFixed(1)} out of 5`}
+                aria-label={`Rating: ${ratingAvg.toFixed(1)} out of 5`}
               >
                 <svg
                   className="w-2.5 h-2.5 text-warning flex-shrink-0"
@@ -256,7 +265,7 @@ export function GameCard({
                   <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
                 </svg>
                 <span className="text-[10px] text-grey-300">
-                  {game.ratingAvg.toFixed(1)}/5
+                  {ratingAvg.toFixed(1)}/5
                 </span>
               </div>
             </div>
