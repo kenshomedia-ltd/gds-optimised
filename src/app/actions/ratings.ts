@@ -117,6 +117,22 @@ export async function updateRating({
       };
     }
 
+    // Automatically publish the updated entry if draft & publish is enabled
+    const publishUrl = `${apiUrl}/api/${ratingType}/${documentId}/actions/publish`;
+    const publishRes = await fetch(publishUrl, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiToken}`,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    });
+
+    if (!publishRes.ok) {
+      const publishError = await publishRes.text();
+      console.error(`[updateRating] Publish failed: ${publishRes.status}`, publishError);
+    }
+
     const responseData = await res.json();
     const updatedItem = responseData.data || responseData;
 
