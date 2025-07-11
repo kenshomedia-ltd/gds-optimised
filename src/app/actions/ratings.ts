@@ -117,23 +117,16 @@ export async function updateRating({
       };
     }
 
-    // Publish the updated entry using the document service API
-    const publishUrl = `${apiUrl}/api/document-service/status`;
-
+    // Publish the updated entry using the Content Manager API
     const uid = ratingType === "games" ? "api::game.game" : "api::casino.casino";
-    const publishBody = {
-      context: { uid, id: parseInt(documentId, 10) },
-      status: "PUBLISHED",
-    };
+    const publishUrl = `${apiUrl}/api/content-manager/collection-types/${uid}/${documentId}/actions/publish`;
 
     const publishRes = await fetch(publishUrl, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiToken}`,
-        "Content-Type": "application/json",
         Accept: "application/json",
       },
-      body: JSON.stringify(publishBody),
     });
 
     if (!publishRes.ok) {

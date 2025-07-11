@@ -1,7 +1,7 @@
 // src/components/widgets/GameListWidget/GameFilters.tsx
 "use client";
 
-import { useState, useMemo, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChevronDown,
@@ -11,8 +11,6 @@ import {
 import type { GameFiltersProps } from "@/types/game-list-widget.types";
 import { cn } from "@/lib/utils/cn";
 import { GAME_SORT_OPTIONS } from "@/lib/utils/sort-mappings";
-import debounce from "lodash.debounce";
-import { log } from "console";
 import { SearchResult } from "@/types/search.types";
 import { MeiliSearch } from "meilisearch";
 import Link from "next/link";
@@ -60,7 +58,6 @@ export function GameFilters({
   const [showProviders, setShowProviders] = useState(false);
   const [showCategories, setShowCategories] = useState(false);
   const [showSort, setShowSort] = useState(false);
-  const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery || "");
   const [isSearching, setIsSearching] = useState(false);
   const [query, setQuery] = useState("");
 
@@ -122,31 +119,11 @@ export function GameFilters({
     );
   }, [categories, categorySearch]);
 
-  // Debounced search handler
-  const debouncedSearch = useMemo(
-    () =>
-      debounce((query: string) => {
-        setIsSearching(false);
-        if (onSearchChange) {
-          onSearchChange(query);
-        }
-      }, 300),
-    [onSearchChange]
-  );
-
-  // Handle search input changes
-  const handleSearchChange = (value: string) => {
-    console.log("search value", value);
-    setLocalSearchQuery(value);
-    if (onSearchChange) {
-      setIsSearching(true);
-      debouncedSearch(value);
-    }
-  };
 
   // Clear search
   const clearSearch = () => {
-    setLocalSearchQuery("");
+    setQuery("");
+    setResults([]);
     setIsSearching(false);
     if (onSearchChange) {
       onSearchChange("");
@@ -157,8 +134,8 @@ export function GameFilters({
 
   // Effect to sync external search query changes
   useEffect(() => {
-    if (searchQuery !== undefined && searchQuery !== localSearchQuery) {
-      setLocalSearchQuery(searchQuery);
+    if (searchQuery !== undefined && searchQuery !== query) {
+      setQuery(searchQuery);
     }
   }, [searchQuery]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -362,9 +339,7 @@ export function GameFilters({
               <input
                 type="text"
                 ref={gameInputRef}
-                // value={localSearchQuery}
                 value={query}
-                // onChange={(e) => handleSearchChange(e.target.value)}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder={translations.search || "Search games..."}
                 className={cn(
@@ -375,7 +350,7 @@ export function GameFilters({
                 )}
               />
 
-              {localSearchQuery && (
+              {query && (
                 <button
                   onClick={clearSearch}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
