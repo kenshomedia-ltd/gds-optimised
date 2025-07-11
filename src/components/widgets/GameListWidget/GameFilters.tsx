@@ -1,7 +1,7 @@
 // src/components/widgets/GameListWidget/GameFilters.tsx
 "use client";
 
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChevronDown,
@@ -12,6 +12,11 @@ import type { GameFiltersProps } from "@/types/game-list-widget.types";
 import { cn } from "@/lib/utils/cn";
 import { GAME_SORT_OPTIONS } from "@/lib/utils/sort-mappings";
 import debounce from "lodash.debounce";
+import { log } from "console";
+import { SearchResult } from "@/types/search.types";
+import { MeiliSearch } from "meilisearch";
+import Link from "next/link";
+import { Image } from "@/components/common";
 
 /**
  * GameFilters Component
@@ -26,6 +31,18 @@ import debounce from "lodash.debounce";
  * - Accessible keyboard navigation
  * - Fixed z-index layering for mobile touch interactions
  */
+
+// Initialize Meilisearch client
+const client = new MeiliSearch({
+  host: process.env.NEXT_PUBLIC_MEILISEARCH_HOST || "http://127.0.0.1:7700",
+  apiKey: process.env.NEXT_PUBLIC_MEILISEARCH_SEARCH_KEY || "",
+});
+
+// Get the search index
+const searchIndex = client.index(
+  process.env.NEXT_PUBLIC_MEILISEARCH_INDEX_NAME || "games"
+);
+
 export function GameFilters({
   providers,
   categories,
@@ -45,6 +62,7 @@ export function GameFilters({
   const [showSort, setShowSort] = useState(false);
   const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery || "");
   const [isSearching, setIsSearching] = useState(false);
+  const [query, setQuery] = useState("");
 
   // Add search states for dropdowns
   const [providerSearch, setProviderSearch] = useState("");
@@ -54,6 +72,15 @@ export function GameFilters({
   const providerDropdownRef = useRef<HTMLDivElement>(null);
   const categoryDropdownRef = useRef<HTMLDivElement>(null);
   const sortDropdownRef = useRef<HTMLDivElement>(null);
+
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const gameInputRef = useRef<HTMLInputElement>(null);
+  const gameContainerRef = useRef<HTMLDivElement>(null);
+
+  const siteURL = process.env.NEXT_PUBLIC_SITE_URL || "";
+  const gamePagePath = process.env.NEXT_PUBLIC_GAME_PAGE_PATH || "/slot-machines";
+
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const hasActiveFilters =
     selectedProviders.length > 0 ||
@@ -109,6 +136,7 @@ export function GameFilters({
 
   // Handle search input changes
   const handleSearchChange = (value: string) => {
+    console.log("search value", value);
     setLocalSearchQuery(value);
     if (onSearchChange) {
       setIsSearching(true);
@@ -124,6 +152,8 @@ export function GameFilters({
       onSearchChange("");
     }
   };
+
+  
 
   // Effect to sync external search query changes
   useEffect(() => {
@@ -175,6 +205,77 @@ export function GameFilters({
       document.removeEventListener("touchstart", handleClickOutside);
     };
   }, []);
+
+  // Debounced search logic
+  useEffect(() => {
+    if (!query.trim()) {
+      setResults([]);
+      setIsSearching(false);
+      return;
+    }
+
+    const debounceTimeout = setTimeout(async () => {
+      setIsSearching(true);
+      try {
+        const searchResults = await searchIndex.search<SearchResult>(query, {
+          limit: 8,
+          attributesToHighlight: ["title"],
+          highlightPreTag: "__ais-highlight__",
+          highlightPostTag: "__/ais-highlight__",
+        });
+
+        setResults(searchResults.hits);
+      } catch (err) {
+        console.error("MeiliSearch error:", err);
+        setResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(debounceTimeout);
+  }, [query]);
+
+   // Combined keyboard and outside click handler
+   useEffect(() => {
+    const handleInteraction = (e: MouseEvent | KeyboardEvent) => {
+      if (!isExpanded) {
+        setIsExpanded(true);
+        if (
+          (e as KeyboardEvent).key === "k" &&
+          ((e as KeyboardEvent).metaKey || (e as KeyboardEvent).ctrlKey)
+        ) {
+          e.preventDefault();
+          setIsExpanded(true);
+        }
+        return;
+      }
+      if ((e as KeyboardEvent).key === "Escape") {
+        setIsExpanded(false);
+      }
+      if (
+        e.type === "mousedown" &&
+        gameContainerRef.current &&
+        !gameContainerRef.current.contains(e.target as Node)
+      ) {
+        setIsExpanded(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleInteraction);
+    document.addEventListener("mousedown", handleInteraction);
+    return () => {
+      document.removeEventListener("keydown", handleInteraction);
+      document.removeEventListener("mousedown", handleInteraction);
+    };
+  }, [isExpanded]);
+
+  // Focus input when expanded
+  useEffect(() => {
+    if (isExpanded) {
+      gameInputRef.current?.focus();
+    }
+  }, [isExpanded]);
 
   // Handle provider selection with event stop propagation
   const handleProviderToggle = (
@@ -236,6 +337,12 @@ export function GameFilters({
     clearSearch();
   };
 
+  const resetSearch = useCallback(() => {
+    setQuery("");
+    setResults([]);
+    setIsExpanded(false);
+  }, []);
+
   return (
     <div
       className={cn(
@@ -247,15 +354,18 @@ export function GameFilters({
         {/* Search Bar - Full width on mobile */}
         {onSearchChange && (
           <div className="w-full md:w-80">
-            <div className="relative">
+            <div className="relative" ref={gameContainerRef}>
               <FontAwesomeIcon
                 icon={faSearch}
                 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500"
               />
               <input
                 type="text"
-                value={localSearchQuery}
-                onChange={(e) => handleSearchChange(e.target.value)}
+                ref={gameInputRef}
+                // value={localSearchQuery}
+                value={query}
+                // onChange={(e) => handleSearchChange(e.target.value)}
+                onChange={(e) => setQuery(e.target.value)}
                 placeholder={translations.search || "Search games..."}
                 className={cn(
                   "w-full pl-10 pr-10 py-2 rounded-lg border",
@@ -264,6 +374,7 @@ export function GameFilters({
                   "focus:ring-2 focus:ring-primary focus:border-transparent"
                 )}
               />
+
               {localSearchQuery && (
                 <button
                   onClick={clearSearch}
@@ -273,11 +384,67 @@ export function GameFilters({
                   <FontAwesomeIcon icon={faTimes} className="h-4 w-4" />
                 </button>
               )}
-              {isSearching && (
-                <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                  <div className="h-4 w-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+             
+
+              {/* Results Dropdown */}
+            {isExpanded && query && (
+              <div className="absolute top-full right-0 mt-2 w-80 bg-white rounded-lg shadow-2xl overflow-hidden z-50">
+                <div className="max-h-[60vh] overflow-y-auto p-2">
+                  {isSearching && (
+                    <div className="p-4 text-center text-sm text-gray-500">
+                      Searching...
+                    </div>
+                  )}
+                  {!isSearching && results.length > 0 && (
+                    <ul>
+                      {results.map((hit) => {
+                        // Handle highlighting
+                        const highlightedTitle =
+                          hit._highlightResult?.title?.value || hit.title;
+                        const formattedTitle = highlightedTitle
+                          .replace(
+                            /__ais-highlight__/g,
+                            '<mark class="font-semibold text-primary bg-transparent">'
+                          )
+                          .replace(/__\/ais-highlight__/g, "</mark>");
+
+                        return (
+                          <li key={hit.id}>
+                            <Link
+                              href={`${siteURL}${gamePagePath}/${hit.slug}/`}
+                              className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition-colors group"
+                              onClick={resetSearch}
+                            >
+                              <Image
+                                src={hit.logo || "/images/placeholder-game.webp"}
+                                alt={hit.title}
+                                width={48}
+                                height={48}
+                                className="w-12 h-12 object-cover rounded border border-gray-200"
+                              />
+                              <div className="flex-1 min-w-0">
+                                <div
+                                  className="font-medium text-sm text-gray-900 truncate group-hover:text-primary"
+                                  dangerouslySetInnerHTML={{ __html: formattedTitle }}
+                                />
+                                <div className="text-xs text-gray-500">
+                                  {hit.provider}
+                                </div>
+                              </div>
+                            </Link>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+                  {!isSearching && results.length === 0 && query.length > 1 && (
+                    <div className="p-4 text-center text-sm text-gray-500">
+                      No results for &quot;{query}&quot;
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
+            )}
             </div>
           </div>
         )}
