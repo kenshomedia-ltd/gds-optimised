@@ -117,16 +117,18 @@ export async function updateRating({
       };
     }
 
-    // Publish the updated entry using the Content Manager API
+    // Publish the updated entry using Strapi's document service
     const uid = ratingType === "games" ? "api::game.game" : "api::casino.casino";
-    const publishUrl = `${apiUrl}/api/content-manager/collection-types/${uid}/${documentId}/actions/publish`;
+    const statusUrl = `${apiUrl}/api/document-service/collection-types/${uid}/${documentId}/status`;
 
-    const publishRes = await fetch(publishUrl, {
-      method: "POST",
+    const publishRes = await fetch(statusUrl, {
+      method: "PUT",
       headers: {
         Authorization: `Bearer ${apiToken}`,
         Accept: "application/json",
+        "Content-Type": "application/json",
       },
+      body: JSON.stringify({ status: "PUBLISHED" }),
     });
 
     if (!publishRes.ok) {
