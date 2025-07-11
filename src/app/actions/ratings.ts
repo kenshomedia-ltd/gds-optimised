@@ -86,10 +86,12 @@ export async function updateRating({
     const newAvg = (currentAvg * currentCount + ratingValue) / newCount;
 
     // Match Astro's request structure exactly, but with correct values
+    // Also set publishedAt to publish the entry immediately
     const body = {
       data: {
         ratingAvg: newAvg,
         ratingCount: newCount,
+        publishedAt: new Date().toISOString(),
       },
     };
 
@@ -116,6 +118,8 @@ export async function updateRating({
         error: "Failed to update rating",
       };
     }
+
+    // Removing separate publish request as publishing is handled via "publishedAt"
 
     const responseData = await res.json();
     const updatedItem = responseData.data || responseData;

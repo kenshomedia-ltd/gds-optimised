@@ -1,7 +1,7 @@
 // src/components/widgets/GameListWidget/GameFilters.tsx
 "use client";
 
-import { useState, useMemo, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChevronDown,
@@ -11,12 +11,11 @@ import {
 import type { GameFiltersProps } from "@/types/game-list-widget.types";
 import { cn } from "@/lib/utils/cn";
 import { GAME_SORT_OPTIONS } from "@/lib/utils/sort-mappings";
-import debounce from "lodash.debounce";
-import { log } from "console";
 import { SearchResult } from "@/types/search.types";
 import { MeiliSearch } from "meilisearch";
 import Link from "next/link";
 import { Image } from "@/components/common";
+import debounce from "lodash.debounce";
 
 /**
  * GameFilters Component
@@ -122,31 +121,33 @@ export function GameFilters({
     );
   }, [categories, categorySearch]);
 
-  // Debounced search handler
+  // Debounced search handler for updating parent search
   const debouncedSearch = useMemo(
     () =>
-      debounce((query: string) => {
+      debounce((value: string) => {
         setIsSearching(false);
         if (onSearchChange) {
-          onSearchChange(query);
+          onSearchChange(value);
         }
       }, 300),
     [onSearchChange]
   );
 
-  // Handle search input changes
   const handleSearchChange = (value: string) => {
-    console.log("search value", value);
     setLocalSearchQuery(value);
+    setQuery(value);
     if (onSearchChange) {
       setIsSearching(true);
       debouncedSearch(value);
     }
   };
 
+
   // Clear search
-  const clearSearch = () => {
+const clearSearch = () => {
     setLocalSearchQuery("");
+    setQuery("");
+    setResults([]);
     setIsSearching(false);
     if (onSearchChange) {
       onSearchChange("");
@@ -159,6 +160,7 @@ export function GameFilters({
   useEffect(() => {
     if (searchQuery !== undefined && searchQuery !== localSearchQuery) {
       setLocalSearchQuery(searchQuery);
+      setQuery(searchQuery);
     }
   }, [searchQuery]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -362,10 +364,8 @@ export function GameFilters({
               <input
                 type="text"
                 ref={gameInputRef}
-                // value={localSearchQuery}
-                value={query}
-                // onChange={(e) => handleSearchChange(e.target.value)}
-                onChange={(e) => setQuery(e.target.value)}
+                value={localSearchQuery}
+                onChange={(e) => handleSearchChange(e.target.value)}
                 placeholder={translations.search || "Search games..."}
                 className={cn(
                   "w-full pl-10 pr-10 py-2 rounded-lg border",
