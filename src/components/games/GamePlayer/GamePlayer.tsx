@@ -18,6 +18,7 @@ import { StarRatingInteractive } from "@/components/ui/StarRating/StarRatingInte
 import { FullscreenPortal } from "@/components/common/Portal/FullscreenPortal"; // ADD PORTAL IMPORT
 import type { GamePlayerProps } from "@/types/game-page.types";
 import { cn } from "@/lib/utils/cn";
+import { ReportGameModal } from "./ReportGame";
 
 /**
  * Utility function to check if a string contains an iframe tag
@@ -89,6 +90,7 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
   const [showFavoriteTooltip, setShowFavoriteTooltip] = useState(false);
   const [showReportTooltip, setShowReportTooltip] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
 
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -126,11 +128,12 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
     setIsDropdownExpanded(!isDropdownExpanded);
   };
 
-  const handleReportGame = () => {
-    // This would typically open a modal or navigate to a report form
-    console.log("Report game:", game.slug);
-    // You can emit an event or call a parent handler here
-  };
+  // const handleReportGame = () => {
+  //   // This would typically open a modal or navigate to a report form
+  //   console.log("Report game:", game.slug);
+  //   // setShowReportModal(!showReportModal);
+  //   // You can emit an event or call a parent handler here
+  // };
 
   // Get embed code based on device
   const embedCode = isMobile
@@ -413,7 +416,7 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
                 onMouseEnter={() => setShowReloadTooltip(true)}
                 onMouseLeave={() => setShowReloadTooltip(false)}
                 className="w-8 h-8 rounded-[5px] bg-gray-300 border border-gray-400 flex items-center justify-center hover:bg-gray-400 hover:*:text-white transition-colors"
-                aria-label={translations.reload || "Reload"}
+                aria-label={translations.reloadGame || "Reload"}
               >
                 <FontAwesomeIcon
                   icon={faRotateRight}
@@ -423,7 +426,7 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
               </button>
               {showReloadTooltip && (
                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded whitespace-nowrap z-10">
-                  {translations.reload || "Reload"}
+                  {translations.reloadGame || "Reload"}
                 </div>
               )}
             </div>
@@ -452,11 +455,11 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
             {/* Report button */}
             <div className="relative mr-2 lg:mr-0">
               <button
-                onClick={handleReportGame}
+                onClick={() => setShowReportModal(!showReportModal)}
                 onMouseEnter={() => setShowReportTooltip(true)}
                 onMouseLeave={() => setShowReportTooltip(false)}
                 className="w-8 h-8 rounded-[5px] bg-danger border border-gray-300 flex items-center justify-center hover:bg-danger transition-colors"
-                aria-label={translations.report || "Report"}
+                aria-label={translations.reportAProblem || "Report"}
               >
                 <FontAwesomeIcon
                   icon={faExclamationTriangle}
@@ -466,7 +469,7 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
               </button>
               {showReportTooltip && (
                 <div className="absolute bottom-full right-0 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded whitespace-nowrap z-10">
-                  {translations.report || "Report game"}
+                  {translations.reportAProblem || "Report game"}
                 </div>
               )}
             </div>
@@ -582,6 +585,16 @@ export function GamePlayer({ game, translations = {} }: GamePlayerProps) {
           </div>
         </div>
       </FullscreenPortal>
+
+      {/* REPORT GAME MODAL */}
+      {showReportModal && (
+        <ReportGameModal
+          open={showReportModal}
+          onOpenChange={setShowReportModal}
+          gamePageURL={game.slug}
+          translations={translations}
+        />
+      )}
     </>
   );
 }

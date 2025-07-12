@@ -18,7 +18,7 @@ import debounce from "lodash.debounce";
  *
  * Provides filtering UI for games by search, providers, categories, and sort order
  * Features:
- * - Search with Meilisearch integration
+ * - Search input with debounced handler
  * - Multi-select dropdowns for providers and categories with search
  * - Single-select dropdown for sort order
  * - Mobile-responsive design with full-width fields
@@ -26,6 +26,8 @@ import debounce from "lodash.debounce";
  * - Accessible keyboard navigation
  * - Fixed z-index layering for mobile touch interactions
  */
+
+
 export function GameFilters({
   providers,
   categories,
@@ -44,7 +46,6 @@ export function GameFilters({
   const [showCategories, setShowCategories] = useState(false);
   const [showSort, setShowSort] = useState(false);
   const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery || "");
-  const [isSearching, setIsSearching] = useState(false);
 
   // Add search states for dropdowns
   const [providerSearch, setProviderSearch] = useState("");
@@ -54,6 +55,7 @@ export function GameFilters({
   const providerDropdownRef = useRef<HTMLDivElement>(null);
   const categoryDropdownRef = useRef<HTMLDivElement>(null);
   const sortDropdownRef = useRef<HTMLDivElement>(null);
+
 
   const hasActiveFilters =
     selectedProviders.length > 0 ||
@@ -99,7 +101,6 @@ export function GameFilters({
   const debouncedSearch = useMemo(
     () =>
       debounce((query: string) => {
-        setIsSearching(false);
         if (onSearchChange) {
           onSearchChange(query);
         }
@@ -111,7 +112,6 @@ export function GameFilters({
   const handleSearchChange = (value: string) => {
     setLocalSearchQuery(value);
     if (onSearchChange) {
-      setIsSearching(true);
       debouncedSearch(value);
     }
   };
@@ -119,11 +119,12 @@ export function GameFilters({
   // Clear search
   const clearSearch = () => {
     setLocalSearchQuery("");
-    setIsSearching(false);
     if (onSearchChange) {
       onSearchChange("");
     }
   };
+
+  
 
   // Effect to sync external search query changes
   useEffect(() => {
@@ -175,6 +176,7 @@ export function GameFilters({
       document.removeEventListener("touchstart", handleClickOutside);
     };
   }, []);
+
 
   // Handle provider selection with event stop propagation
   const handleProviderToggle = (
@@ -236,6 +238,7 @@ export function GameFilters({
     clearSearch();
   };
 
+
   return (
     <div
       className={cn(
@@ -264,6 +267,7 @@ export function GameFilters({
                   "focus:ring-2 focus:ring-primary focus:border-transparent"
                 )}
               />
+
               {localSearchQuery && (
                 <button
                   onClick={clearSearch}
@@ -272,11 +276,6 @@ export function GameFilters({
                 >
                   <FontAwesomeIcon icon={faTimes} className="h-4 w-4" />
                 </button>
-              )}
-              {isSearching && (
-                <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                  <div className="h-4 w-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                </div>
               )}
             </div>
           </div>

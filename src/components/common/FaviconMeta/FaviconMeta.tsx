@@ -10,7 +10,7 @@ interface FaviconMetaProps {
 /**
  * FaviconMeta Component
  *
- * Updated to work with your favicon format: /favicon/favicon-{siteId}.png
+ * Updated to work with your favicon format: /favicon-{siteId}.png
  * Renders favicon meta tags for a specific site.
  */
 export function FaviconMeta({
@@ -44,7 +44,7 @@ export function FaviconMeta({
       {/* Web App Manifest - you may want to create these files */}
       <link
         rel="manifest"
-        href={`/favicon/site-${currentSiteId}.webmanifest`}
+        href={`/site-${currentSiteId}.webmanifest`}
       />
 
       {/* Browser Configuration */}

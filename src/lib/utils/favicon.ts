@@ -3,26 +3,25 @@ import { existsSync } from "fs";
 import { join } from "path";
 
 /**
- * Updated favicon utility to work with format: /favicon/favicon-{siteId}.png
+ * Updated favicon utility to work with format: /favicon-{siteId}.png
  * This replaces the previous complex multi-size system with a simpler approach
  */
 
 /**
  * Get the favicon file path for a specific site
- * Now works with your format: /favicon/favicon-{siteId}.png
+ * Now works with your format: /favicon-{siteId}.png
  * @param siteId - The site identifier (e.g., 'gds', 'csi')
  * @param size - Optional size for different favicon types (defaults to main favicon)
  * @returns The path to the favicon file
  */
 export function getFaviconPath(siteId: string, size?: string): string {
-  // For your format: /favicon/favicon-{siteId}.png
+  // For your format: /favicon-{siteId}.png
   if (!size || size === "default") {
-    return `/favicon/favicon-${siteId}.png`;
+    return `/favicon-${siteId}.png`;
   }
 
-  // For specific sizes, we'll try your format first, then fall back to standard format
-  const yourFormat = `/favicon/favicon-${siteId}.png`;
-  return yourFormat;
+  // For specific sizes we still return the same single file
+  return `/favicon-${siteId}.png`;
 }
 
 /**
@@ -38,7 +37,7 @@ export function faviconExists(siteId: string): boolean {
 
   try {
     const publicDir = join(process.cwd(), "public");
-    const faviconPath = join(publicDir, "favicon", `favicon-${siteId}.png`);
+    const faviconPath = join(publicDir, `favicon-${siteId}.png`);
     return existsSync(faviconPath);
   } catch {
     return false;
@@ -168,7 +167,7 @@ export function generateWebAppManifest(
 
 /**
  * Get all available site favicons (async version)
- * Scans the favicon directory for files matching your format
+ * Scans the public directory for files matching your format
  * @returns Promise<Array of available site IDs>
  */
 export async function getAvailableSites(): Promise<string[]> {
@@ -180,13 +179,12 @@ export async function getAvailableSites(): Promise<string[]> {
   try {
     const fs = await import("fs");
     const publicDir = join(process.cwd(), "public");
-    const faviconDir = join(publicDir, "favicon");
 
-    if (!existsSync(faviconDir)) {
+    if (!existsSync(publicDir)) {
       return [];
     }
 
-    const files = fs.readdirSync(faviconDir);
+    const files = fs.readdirSync(publicDir);
     const siteIds: string[] = [];
 
     files.forEach((file: string) => {
@@ -200,5 +198,4 @@ export async function getAvailableSites(): Promise<string[]> {
     return siteIds.sort();
   } catch {
     return [];
-  }
-}
+  }}

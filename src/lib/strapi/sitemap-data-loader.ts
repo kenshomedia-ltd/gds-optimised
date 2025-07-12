@@ -63,13 +63,14 @@ const sitemapEndpointMap = {
 const sitemapKeys = Object.keys(sitemapEndpointMap) as Array<keyof typeof sitemapEndpointMap>;
 
 function buildQuery(
-  fields: string[],
+  fields: readonly string[],
   filters: Record<string, unknown>,
   page = 1,
   pageSize = 1000
 ) {
   return {
-    fields,
+    // Convert to a mutable array to satisfy StrapiQuery type
+    fields: [...fields],
     filters,
     sort: ["id:asc"],
     pagination: { page, pageSize },
@@ -82,29 +83,33 @@ async function fetchAllItems(): Promise<SitemapItem[]> {
     const config = sitemapEndpointMap[key];
     try {
       const query = buildQuery(config.fields, config.filters);
-      const response = await strapiClient.fetchWithCache<{ data: unknown[] }>(
-        config.endpoint,
-        query,
-        3600
-      );
+      const response = await strapiClient.fetchWithCache<{
+        data: Record<string, unknown>[];
+      }>(config.endpoint, query, 3600);
       const data = response.data || [];
       for (const item of data) {
         if (config.endpoint === "users") {
+          const firstName = String(item.firstName);
+          const lastName = String(item.lastName);
           items.push({
-            url: `${config.path}/${item.firstName.toLowerCase()}.${item.lastName.toLowerCase()}/`,
-            title: `${item.firstName} ${item.lastName}`,
+            url: `${config.path}/${firstName.toLowerCase()}.${lastName.toLowerCase()}/`,
+            title: `${firstName} ${lastName}`,
             group: key,
           });
         } else if (config.endpoint === "custom-pages") {
+          const urlPath = String(item.urlPath);
+          const title = String(item.title);
           items.push({
-            url: `${config.path}${item.urlPath}/`,
-            title: item.title,
+            url: `${config.path}${urlPath}/`,
+            title,
             group: key,
           });
         } else {
+          const slug = String(item.slug);
+          const title = String(item.title);
           items.push({
-            url: `${config.path}/${item.slug}/`,
-            title: item.title,
+            url: `${config.path}/${slug}/`,
+            title,
             group: key,
           });
         }
