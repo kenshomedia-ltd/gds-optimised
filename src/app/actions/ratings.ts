@@ -90,6 +90,7 @@ export async function updateRating({
       data: {
         ratingAvg: newAvg,
         ratingCount: newCount,
+        publishedAt: new Date().toISOString(),
       },
     };
 
