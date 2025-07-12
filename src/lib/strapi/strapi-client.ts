@@ -385,11 +385,24 @@ class StrapiClient {
       },
     };
 
-    return this.fetchWithCache<GamesListResponse>(
+    const response = await this.fetchWithCache<GamesListResponse>(
       "games",
       query,
       CACHE_TTL.games
     );
+
+    // Normalize rating fields to numbers
+    response.games = response.games.map((g) => ({
+      ...g,
+      ratingAvg:
+        typeof g.ratingAvg === "string" ? parseFloat(g.ratingAvg) : g.ratingAvg,
+      ratingCount:
+        typeof g.ratingCount === "string"
+          ? parseInt(g.ratingCount as unknown as string, 10)
+          : g.ratingCount ?? 0,
+    }));
+
+    return response;
   }
 
   /**
@@ -471,7 +484,18 @@ class StrapiClient {
       data: GameData[];
       meta: { pagination: { total: number } };
     }>("games", query, CACHE_TTL.gameDetail);
-    return response.data?.[0] || null;
+
+    const game = response.data?.[0];
+    if (game) {
+      game.ratingAvg =
+        typeof game.ratingAvg === "string" ? parseFloat(game.ratingAvg) : game.ratingAvg;
+      game.ratingCount =
+        typeof game.ratingCount === "string"
+          ? parseInt(game.ratingCount as unknown as string, 10)
+          : game.ratingCount ?? 0;
+    }
+
+    return game || null;
   }
 
   /**
@@ -515,11 +539,23 @@ class StrapiClient {
       },
     };
 
-    return this.fetchWithCache<GamesListResponse>(
+    const response = await this.fetchWithCache<GamesListResponse>(
       "games",
       query,
       CACHE_TTL.games
     );
+
+    response.games = response.games.map((g) => ({
+      ...g,
+      ratingAvg:
+        typeof g.ratingAvg === "string" ? parseFloat(g.ratingAvg) : g.ratingAvg,
+      ratingCount:
+        typeof g.ratingCount === "string"
+          ? parseInt(g.ratingCount as unknown as string, 10)
+          : g.ratingCount ?? 0,
+    }));
+
+    return response;
   }
 
   /**
